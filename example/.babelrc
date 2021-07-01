@@ -1,0 +1,10 @@
+// This .babelrc file is indeed the one being used by the sibling webpack config
+{
+	"presets": [
+			"@babel/typescript"
+	],
+	"plugins": [
+			"@babel/proposal-class-properties",
+			"@babel/proposal-object-rest-spread"
+	]
+}
