@@ -41,7 +41,8 @@
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\"",
     "lint": "eslint . --ext '.ts,.tsx'",
     "typecheck": "tsc --noEmit true --emitDeclarationOnly false",
-    "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build"
+    "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build",
+    "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",

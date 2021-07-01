@@ -103,6 +103,6 @@ export function initIdentify(
   } as WithJWT;
 }
 
-const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
-const f = initIdentify('123');
-const h = initIdentify('123', false);
+// const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
+// const f = initIdentify('123');
+// const h = initIdentify('123', false);
