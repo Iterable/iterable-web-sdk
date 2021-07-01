@@ -29,17 +29,6 @@ import { getChannels } from 'iterable-web-sdk';
       response.data
     )}</pre`;
   });
-  interface Hi {
-    (hello: string): Promise<any>;
-  }
-
-  const hi: Hi = (hello) => {
-    return Promise.resolve('fdsa');
-  };
-
-  const helo = hi('fdsafds').then((response) => {
-    console.log(response);
-  });
 
   // element.innerHTML = doSomething('marty');
   document.body.appendChild(element);

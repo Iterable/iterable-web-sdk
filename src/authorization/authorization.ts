@@ -104,18 +104,6 @@ export function initIdentify(
   } as WithJWT;
 }
 
-interface Hi {
-  (hello: string): Promise<any>;
-}
-
-export const hi: Hi = (hello) => {
-  return Promise.resolve('fdsa');
-};
-
-export const helo = hi('fdsafds').then((response) => {
-  console.log(response);
-});
-
 // const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
 // const f = initIdentify('123');
 // const h = initIdentify('123', false);
