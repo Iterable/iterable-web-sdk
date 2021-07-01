@@ -2,3 +2,4 @@ node_modules
 dist
 index.js
 index.d.ts
+.env

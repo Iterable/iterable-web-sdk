@@ -1,6 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const env = require('dotenv').config({ path: './.env' });
+const webpack = require('webpack');
 
 module.exports = {
   mode: 'production',
@@ -39,6 +41,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: './index.html'
+    }),
+    new webpack.DefinePlugin({
+      'process.env': JSON.stringify(env.parsed)
     })
   ]
 };

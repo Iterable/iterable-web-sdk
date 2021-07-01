@@ -7,7 +7,7 @@ interface WithJWT {
 }
 
 interface WithoutJWT {
-  setNewToken: (newToken: string) => void;
+  setToken: () => void;
   clearToken: () => void;
 }
 
@@ -30,12 +30,12 @@ export function initIdentify(
   if (!jwtEnabled || !callback) {
     /* we want to set a normal non-JWT enabled API key */
     return {
-      setNewToken: () => {
+      setToken: () => {
         if (interceptor) {
           /* clear previously cached interceptor function */
           baseRequest.interceptors.request.eject(interceptor);
         }
-        interceptor = baseRequest.interceptors.request.use(config => ({
+        interceptor = baseRequest.interceptors.request.use((config) => ({
           ...config,
           headers: {
             ...config.headers,
@@ -44,7 +44,8 @@ export function initIdentify(
         }));
       },
       clearToken: () => {
-        if (interceptor) {
+        /* might be 0 which is a falsy value */
+        if (typeof interceptor === 'number') {
           /* clear previously cached interceptor function */
           baseRequest.interceptors.request.eject(interceptor);
         }
@@ -64,9 +65,9 @@ export function initIdentify(
       baseRequest.interceptors.request.eject(interceptor);
     }
     return callback(...args)
-      .then(token => {
+      .then((token) => {
         /* set interceptor */
-        interceptor = baseRequest.interceptors.request.use(config => ({
+        interceptor = baseRequest.interceptors.request.use((config) => ({
           ...config,
           headers: {
             ...config.headers,
@@ -84,13 +85,13 @@ export function initIdentify(
         }, 10000);
         return token;
       })
-      .catch(error => {
+      .catch((error) => {
         /* clear timer */
         if (timer) {
           clearInterval(timer);
         }
         /* clear interceptor */
-        if (interceptor) {
+        if (typeof interceptor === 'number') {
           baseRequest.interceptors.request.eject(interceptor);
         }
         return Promise.reject(error);
@@ -98,10 +99,22 @@ export function initIdentify(
   };
   return {
     clearRefresh: () => clearInterval(timer as any),
-    setEmail: newEmail => doRequest(newEmail),
-    setUserId: newId => doRequest(newId)
+    setEmail: (newEmail) => doRequest(newEmail),
+    setUserId: (newId) => doRequest(newId)
   } as WithJWT;
 }
+
+interface Hi {
+  (hello: string): Promise<any>;
+}
+
+export const hi: Hi = (hello) => {
+  return Promise.resolve('fdsa');
+};
+
+export const helo = hi('fdsafds').then((response) => {
+  console.log(response);
+});
 
 // const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
 // const f = initIdentify('123');

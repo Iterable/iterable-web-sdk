@@ -48,3 +48,28 @@ Installs dependencies for both the SDK and the sample app. It's important to run
 
 Runs both the SDK and sample app in watch mode. Navigate to `http://localhost:8080` in your browser to see the sample app running. Making changes to the SDK `src` code while running both projects will also trigger the sample app to hot reload, so you can
 develop both projects in parallel.
+
+# FAQ
+
+## How do I make API requests in the example app?
+
+First thing you want to do is generate an API key on [the Iterable app](https://app.iterable.com).
+After you have your key you want to create a `.env` file relative to the `.env.example` file
+in the `example` directory. Once you have your file, copy the contents of `.env.example` to
+your `.env` file and add your API key to the `API_KEY` variable.
+
+Then once you boot up the app, you can set the key with the following code snippet:
+
+```ts
+import { initIdentify } from 'iterable-web-sdk';
+
+((): void => {
+  const { setToken, clearToken } = initIdentify(process.env.API_KEY);
+  setToken();
+
+  /* make your Iterable API requests here */
+
+  /* optionally you can also clear your token if you like */
+  clearToken();
+})();
+```
