@@ -71,5 +71,8 @@ import { initIdentify } from 'iterable-web-sdk';
 
   /* optionally you can also clear your token if you like */
   clearToken();
+
+  /* setToken also takes an optional param if you want to set a new API key */
+  setToken('my-new-api-key')
 })();
 ```

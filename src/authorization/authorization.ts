@@ -7,7 +7,7 @@ interface WithJWT {
 }
 
 interface WithoutJWT {
-  setToken: () => void;
+  setToken: (newToken?: string) => void;
   clearToken: () => void;
 }
 
@@ -30,7 +30,7 @@ export function initIdentify(
   if (!jwtEnabled || !callback) {
     /* we want to set a normal non-JWT enabled API key */
     return {
-      setToken: () => {
+      setToken: (newToken) => {
         if (interceptor) {
           /* clear previously cached interceptor function */
           baseRequest.interceptors.request.eject(interceptor);
@@ -39,7 +39,7 @@ export function initIdentify(
           ...config,
           headers: {
             ...config.headers,
-            Api_Key: authToken
+            Api_Key: newToken || authToken
           }
         }));
       },
