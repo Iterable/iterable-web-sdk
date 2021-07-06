@@ -68,6 +68,7 @@ import { initIdentify } from 'iterable-web-sdk';
   setToken();
 
   /* make your Iterable API requests here */
+  doSomeRequest().then().catch()
 
   /* optionally you can also clear your token if you like */
   clearToken();

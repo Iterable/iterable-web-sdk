@@ -30,8 +30,8 @@ export function initIdentify(
   if (!jwtEnabled || !callback) {
     /* we want to set a normal non-JWT enabled API key */
     return {
-      setToken: (newToken) => {
-        if (interceptor) {
+      setToken: (newToken?: string) => {
+        if (typeof interceptor === 'number') {
           /* clear previously cached interceptor function */
           baseRequest.interceptors.request.eject(interceptor);
         }
@@ -50,7 +50,7 @@ export function initIdentify(
           baseRequest.interceptors.request.eject(interceptor);
         }
       }
-    } as WithoutJWT;
+    };
   }
 
   /* 
@@ -99,9 +99,9 @@ export function initIdentify(
   };
   return {
     clearRefresh: () => clearInterval(timer as any),
-    setEmail: (newEmail) => doRequest(newEmail),
-    setUserId: (newId) => doRequest(newId)
-  } as WithJWT;
+    setEmail: (newEmail: string) => doRequest(newEmail),
+    setUserId: (newId: string) => doRequest(newId)
+  };
 }
 
 // const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
