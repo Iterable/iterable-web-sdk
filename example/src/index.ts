@@ -1,19 +1,20 @@
 import './styles/index.css';
-import { initIdentify, getChannels } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 
 ((): void => {
   const element = document.createElement('div');
 
   /* set token in the SDK */
-  const { setToken, clearToken } = initIdentify(process.env.API_KEY || '');
+  const { setToken, setEmail } = initIdentify(process.env.API_KEY || '');
   setToken();
+  setEmail('martin.mckenna@iterable.com');
 
-  clearToken();
-
-  getChannels()
+  getInAppMessages({
+    count: 20
+  })
     .then((response) => {
       element.innerHTML = `<pre style="white-space:break-spaces">${JSON.stringify(
-        response.data
+        response.data.inAppMessages?.[0]?.createdAt
       )}</pre`;
     })
     .catch((e) => {

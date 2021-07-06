@@ -77,3 +77,43 @@ import { initIdentify } from 'iterable-web-sdk';
   setToken('my-new-api-key')
 })();
 ```
+
+## How do I Identify a user logged in users?
+
+Similar to the previous example, `initIdentify` exposes methods to set an [Axios interceptor](https://github.com/axios/axios#interceptors) on all API requests. You would set an email like so:
+
+```ts
+import { initIdentify, getMessages } from 'iterable-web-sdk';
+
+((): void => {
+  const { setToken, setEmail } = initIdentify(process.env.API_KEY);
+  setToken();
+  setEmail('hello@gmail.com')
+
+
+  /* make your Iterable API requests here */
+  getMessages({ count: 20 }).then().catch()
+
+  /* clear user upon logout */
+  clearUser();
+})();
+```
+
+or with a User ID:
+
+```ts
+import { initIdentify, getMessages } from 'iterable-web-sdk';
+
+((): void => {
+  const { setToken, setUserID, clearUser } = initIdentify(process.env.API_KEY);
+  setToken();
+  setUserID('1a3fed')
+
+
+  /* make your Iterable API requests here */
+  getMessages({ count: 20 }).then().catch()
+
+  /* clear user upon logout */
+  clearUser();
+})();
+```

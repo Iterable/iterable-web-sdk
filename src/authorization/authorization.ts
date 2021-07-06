@@ -9,6 +9,9 @@ interface WithJWT {
 interface WithoutJWT {
   setToken: (newToken?: string) => void;
   clearToken: () => void;
+  setEmail: (email: string) => void;
+  setUserID: (userId: string) => void;
+  clearUser: () => void;
 }
 
 export function initIdentify(
@@ -25,17 +28,18 @@ export function initIdentify(
 ) {
   let timer: NodeJS.Timeout | null = null;
   let expMin: number | null = null;
-  let interceptor: number | null = null;
+  let authInterceptor: number | null = null;
+  let userInterceptor: number | null = null;
 
   if (!jwtEnabled || !callback) {
     /* we want to set a normal non-JWT enabled API key */
     return {
       setToken: (newToken?: string) => {
-        if (typeof interceptor === 'number') {
+        if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
-          baseRequest.interceptors.request.eject(interceptor);
+          baseRequest.interceptors.request.eject(authInterceptor);
         }
-        interceptor = baseRequest.interceptors.request.use((config) => ({
+        authInterceptor = baseRequest.interceptors.request.use((config) => ({
           ...config,
           headers: {
             ...config.headers,
@@ -45,9 +49,40 @@ export function initIdentify(
       },
       clearToken: () => {
         /* might be 0 which is a falsy value */
-        if (typeof interceptor === 'number') {
+        if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
-          baseRequest.interceptors.request.eject(interceptor);
+          baseRequest.interceptors.request.eject(authInterceptor);
+        }
+      },
+      setEmail: (email: string) => {
+        if (typeof userInterceptor === 'number') {
+          baseRequest.interceptors.request.eject(userInterceptor);
+        }
+
+        userInterceptor = baseRequest.interceptors.request.use((config) => ({
+          ...config,
+          params: {
+            ...config.params,
+            email
+          }
+        }));
+      },
+      setUserID: (userId: string) => {
+        if (typeof userInterceptor === 'number') {
+          baseRequest.interceptors.request.eject(userInterceptor);
+        }
+
+        userInterceptor = baseRequest.interceptors.request.use((config) => ({
+          ...config,
+          params: {
+            ...config.params,
+            userId
+          }
+        }));
+      },
+      clearUser: () => {
+        if (typeof userInterceptor === 'number') {
+          baseRequest.interceptors.request.eject(userInterceptor);
         }
       }
     };
@@ -61,13 +96,13 @@ export function initIdentify(
     /* clear timer */
     clearInterval(timer as any);
     /* clear interceptor */
-    if (interceptor) {
-      baseRequest.interceptors.request.eject(interceptor);
+    if (authInterceptor) {
+      baseRequest.interceptors.request.eject(authInterceptor);
     }
     return callback(...args)
       .then((token) => {
         /* set interceptor */
-        interceptor = baseRequest.interceptors.request.use((config) => ({
+        authInterceptor = baseRequest.interceptors.request.use((config) => ({
           ...config,
           headers: {
             ...config.headers,
@@ -91,8 +126,8 @@ export function initIdentify(
           clearInterval(timer);
         }
         /* clear interceptor */
-        if (typeof interceptor === 'number') {
-          baseRequest.interceptors.request.eject(interceptor);
+        if (typeof authInterceptor === 'number') {
+          baseRequest.interceptors.request.eject(authInterceptor);
         }
         return Promise.reject(error);
       });
@@ -103,7 +138,3 @@ export function initIdentify(
     setUserId: (newId: string) => doRequest(newId)
   };
 }
-
-// const t = initIdentify('123', true, () => Promise.resolve('fdsafsf'));
-// const f = initIdentify('123');
-// const h = initIdentify('123', false);

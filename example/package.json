@@ -31,6 +31,7 @@
     "@babel/core": "^7.9.0",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@babel/preset-typescript": "^7.9.0",
     "@types/jest": "^24.0.25",
     "@typescript-eslint/eslint-plugin": "^2.26.0",
@@ -38,6 +39,7 @@
     "babel-loader": "^8.1.0",
     "concurrently": "^5.1.0",
     "css-loader": "^3.2.1",
+    "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-prettier": "^3.3.1",
@@ -54,7 +56,5 @@
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.11.0"
   },
-  "dependencies": {
-    "dotenv": "^10.0.0"
-  }
+  "dependencies": {}
 }
