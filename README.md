@@ -117,7 +117,7 @@ import { initIdentify } from 'iterable-web-sdk';
 })();
 ```
 
-Settings a user by their email or ID will also cover you for endpoints that require an
+Setting a user by their email or ID will also cover you for endpoints that require an
 email or user ID in either the URL path or the query params. For example:
 
 ```ts
@@ -142,7 +142,6 @@ import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
 ((): void => {
   initIdentify(process.env.API_KEY);
 
-  /* no need to pass an email */
   getUserByEmail('hello@gmail.com').then().catch()
 })();
 ```
