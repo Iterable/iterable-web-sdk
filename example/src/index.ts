@@ -1,24 +1,28 @@
 import './styles/index.css';
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import {
+  initIdentify,
+  getInAppMessages
+  // getUserByEmail
+} from 'iterable-web-sdk';
 
 ((): void => {
   const element = document.createElement('div');
 
   /* set token in the SDK */
-  const { setToken, setEmail } = initIdentify(process.env.API_KEY || '');
-  setToken();
+  const { setEmail } = initIdentify(process.env.API_KEY || '');
   setEmail('martin.mckenna@iterable.com');
+
+  // getUserByEmail().then(console.log);
 
   getInAppMessages({
     count: 20
+    // email: 'fdsafds'
   })
     .then((response) => {
-      element.innerHTML = `<pre style="white-space:break-spaces">${JSON.stringify(
-        response.data.inAppMessages?.[0]?.createdAt
-      )}</pre`;
+      element.innerHTML = response.data.inAppMessages?.[0]?.content?.html;
     })
     .catch((e) => {
-      element.innerHTML = `<pre>${e}</pre>`;
+      element.innerText = `<pre>${e}</pre>`;
     });
 
   // element.innerHTML = doSomething('marty');

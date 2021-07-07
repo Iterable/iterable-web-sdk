@@ -64,8 +64,7 @@ Then once you boot up the app, you can set the key with the following code snipp
 import { initIdentify } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setToken, clearToken } = initIdentify(process.env.API_KEY);
-  setToken();
+  const { clearToken, setNewToken } = initIdentify(process.env.API_KEY);
 
   /* make your Iterable API requests here */
   doSomeRequest().then().catch()
@@ -73,21 +72,23 @@ import { initIdentify } from 'iterable-web-sdk';
   /* optionally you can also clear your token if you like */
   clearToken();
 
-  /* setToken also takes an optional param if you want to set a new API key */
-  setToken('my-new-api-key')
+  /* 
+    the initIdentify method also exposes a setNewToken method 
+    if you want to set another key later on.
+  */
+  setNewToken('my-new-api-key')
 })();
 ```
 
-## How do I Identify a user logged in users?
+## How do I Identify a User When They Log In?
 
 Similar to the previous example, `initIdentify` exposes methods to set an [Axios interceptor](https://github.com/axios/axios#interceptors) on all API requests. You would set an email like so:
 
 ```ts
-import { initIdentify, getMessages } from 'iterable-web-sdk';
+import { initIdentify } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setToken, setEmail } = initIdentify(process.env.API_KEY);
-  setToken();
+  const { setEmail } = initIdentify(process.env.API_KEY);
   setEmail('hello@gmail.com')
 
 
@@ -102,18 +103,46 @@ import { initIdentify, getMessages } from 'iterable-web-sdk';
 or with a User ID:
 
 ```ts
-import { initIdentify, getMessages } from 'iterable-web-sdk';
+import { initIdentify } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setToken, setUserID, clearUser } = initIdentify(process.env.API_KEY);
-  setToken();
+  const { setUserID, clearUser } = initIdentify(process.env.API_KEY);
   setUserID('1a3fed')
 
-
   /* make your Iterable API requests here */
-  getMessages({ count: 20 }).then().catch()
+  doRequest().then().catch()
 
   /* clear user upon logout */
   clearUser();
+})();
+```
+
+Settings a user by their email or ID will also cover you for endpoints that require an
+email or user ID in either the URL path or the query params. For example:
+
+```ts
+import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
+
+((): void => {
+  const { setEmail, clearUser } = initIdentify(process.env.API_KEY);
+
+  /* set the email first */
+  setEmail('hello@gmail.com')
+
+  /* no need to pass an email */
+  getUserByEmail().then().catch()
+})();
+```
+
+Of course, this is optional and you can always just pass the email in if you prefer:
+
+```ts
+import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
+
+((): void => {
+  initIdentify(process.env.API_KEY);
+
+  /* no need to pass an email */
+  getUserByEmail('hello@gmail.com').then().catch()
 })();
 ```

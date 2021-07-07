@@ -7,7 +7,7 @@ interface WithJWT {
 }
 
 interface WithoutJWT {
-  setToken: (newToken?: string) => void;
+  setNewToken: (newToken?: string) => void;
   clearToken: () => void;
   setEmail: (email: string) => void;
   setUserID: (userId: string) => void;
@@ -28,13 +28,21 @@ export function initIdentify(
 ) {
   let timer: NodeJS.Timeout | null = null;
   let expMin: number | null = null;
-  let authInterceptor: number | null = null;
+  let authInterceptor: number | null = baseRequest.interceptors.request.use(
+    (config) => ({
+      ...config,
+      headers: {
+        ...config.headers,
+        Api_Key: authToken
+      }
+    })
+  );
   let userInterceptor: number | null = null;
 
   if (!jwtEnabled || !callback) {
     /* we want to set a normal non-JWT enabled API key */
     return {
-      setToken: (newToken?: string) => {
+      setNewToken: (newToken?: string) => {
         if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
           baseRequest.interceptors.request.eject(authInterceptor);
@@ -59,26 +67,64 @@ export function initIdentify(
           baseRequest.interceptors.request.eject(userInterceptor);
         }
 
-        userInterceptor = baseRequest.interceptors.request.use((config) => ({
-          ...config,
-          params: {
-            ...config.params,
-            email
-          }
-        }));
+        userInterceptor = baseRequest.interceptors.request.use((config) => {
+          /* 
+            in other words, if the email is part of the actual API endpoint path 
+            find and replace "{email}" with the actual user email
+
+            Otherwise the email is a query param
+
+            Compare the payloads from these two endpoints to get an idea of what
+            purpose this serves:
+
+            1. email as query param (https://api.iterable.com/api/docs#In-app_getMessages)
+            2. email as url path (https://api.iterable.com/api/docs#users_getUser)
+          */
+          return !!(config?.url || '').match(/{email}/gim)
+            ? {
+                ...config,
+                url: config.url?.replace(
+                  /{email}/gim,
+                  encodeURIComponent(email)
+                )
+              }
+            : !!config.params?.email
+            ? /* 
+              if the user passed an email as a param already (which is possible if the user
+              explicitly passes an email as an argument to whatever API method they're
+              calling), just use that and don't overwrite it here.
+            */
+              config
+            : {
+                ...config,
+                params: {
+                  ...config.params,
+                  email
+                }
+              };
+        });
       },
       setUserID: (userId: string) => {
         if (typeof userInterceptor === 'number') {
           baseRequest.interceptors.request.eject(userInterceptor);
         }
 
-        userInterceptor = baseRequest.interceptors.request.use((config) => ({
-          ...config,
-          params: {
-            ...config.params,
-            userId
-          }
-        }));
+        userInterceptor = baseRequest.interceptors.request.use((config) => {
+          return config.params?.userId
+            ? /* 
+              if the user passed a user ID as a param already (which is possible if the user
+              explicitly passes a user ID as an argument to whatever API method they're
+              calling), just use that and don't overwrite it here.
+            */
+              config
+            : {
+                ...config,
+                params: {
+                  ...config.params,
+                  userId
+                }
+              };
+        });
       },
       clearUser: () => {
         if (typeof userInterceptor === 'number') {
