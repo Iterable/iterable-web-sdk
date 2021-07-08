@@ -11,6 +11,26 @@ This project (along with the sample app) both require a minimum Node version of 
 This project also uses [yarn package manager.](https://yarnpkg.com/getting-started/install) You'll
 need to install that as well to run the commands within this project.
 
+# Installation (not applicable until deployed)
+
+To install this SDK through NPM:
+
+```
+$ npm install @iterable/web-sdk
+```
+
+with yarn:
+
+```
+$ yarn add @iterable/web-sdk
+```
+
+or with a CDN:
+
+```
+<script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
+```
+
 # Commmands (SDK related)
 
 ## `yarn start`
@@ -93,7 +113,7 @@ import { initIdentify } from 'iterable-web-sdk';
 
 
   /* make your Iterable API requests here */
-  getMessages({ count: 20 }).then().catch()
+  doRequest().then().catch()
 
   /* clear user upon logout */
   clearUser();
@@ -124,24 +144,24 @@ email or user ID in either the URL path or the query params. For example:
 import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setEmail, clearUser } = initIdentify(process.env.API_KEY);
+  const { setEmail, clearUser, getMessages } = initIdentify(process.env.API_KEY);
 
   /* set the email first */
   setEmail('hello@gmail.com')
 
   /* no need to pass an email */
-  getUserByEmail().then().catch()
+  getMessages({ count: 20 }).then().catch()
 })();
 ```
 
 Of course, this is optional and you can always just pass the email in if you prefer:
 
 ```ts
-import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
+import { initIdentify, getMessages } from 'iterable-web-sdk';
 
 ((): void => {
   initIdentify(process.env.API_KEY);
 
-  getUserByEmail('hello@gmail.com').then().catch()
+  getMessages({ count: 20, email: 'hello@gmail.com' }).then().catch()
 })();
 ```

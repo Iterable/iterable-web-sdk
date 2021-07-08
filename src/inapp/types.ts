@@ -7,6 +7,8 @@ export interface InAppMessagesRequestParams {
     email and userID params omitted in favor of using the "setEmail" 
     or "setUserID" methods on the _initIdentify_ method
   */
+  //  email?: string;
+  //  userId?: string
 }
 
 export interface InAppDisplaySetting {
