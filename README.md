@@ -108,7 +108,7 @@ Similar to the previous example, `initIdentify` exposes methods to set an [Axios
 import { initIdentify } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setEmail } = initIdentify(process.env.API_KEY);
+  const { setEmail, logout } = initIdentify(process.env.API_KEY);
   setEmail('hello@gmail.com')
 
 
@@ -116,7 +116,7 @@ import { initIdentify } from 'iterable-web-sdk';
   doRequest().then().catch()
 
   /* clear user upon logout */
-  clearUser();
+  logout();
 })();
 ```
 
@@ -126,14 +126,14 @@ or with a User ID:
 import { initIdentify } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setUserID, clearUser } = initIdentify(process.env.API_KEY);
+  const { setUserID, logout } = initIdentify(process.env.API_KEY);
   setUserID('1a3fed')
 
   /* make your Iterable API requests here */
   doRequest().then().catch()
 
   /* clear user upon logout */
-  clearUser();
+  logout();
 })();
 ```
 
@@ -144,24 +144,12 @@ email or user ID in either the URL path or the query params. For example:
 import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
 
 ((): void => {
-  const { setEmail, clearUser, getMessages } = initIdentify(process.env.API_KEY);
+  const { setEmail, getMessages } = initIdentify(process.env.API_KEY);
 
   /* set the email first */
   setEmail('hello@gmail.com')
 
   /* no need to pass an email */
   getMessages({ count: 20 }).then().catch()
-})();
-```
-
-Of course, this is optional and you can always just pass the email in if you prefer:
-
-```ts
-import { initIdentify, getMessages } from 'iterable-web-sdk';
-
-((): void => {
-  initIdentify(process.env.API_KEY);
-
-  getMessages({ count: 20, email: 'hello@gmail.com' }).then().catch()
 })();
 ```

@@ -11,7 +11,7 @@ interface WithoutJWT {
   clearToken: () => void;
   setEmail: (email: string) => void;
   setUserID: (userId: string) => void;
-  clearUser: () => void;
+  logout: () => void;
 }
 
 export function initIdentify(
@@ -67,41 +67,47 @@ export function initIdentify(
           baseRequest.interceptors.request.eject(userInterceptor);
         }
 
+        /* 
+          endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+        */
         userInterceptor = baseRequest.interceptors.request.use((config) => {
-          /* 
-            in other words, if the email is part of the actual API endpoint path 
-            find and replace "{email}" with the actual user email
-
-            Otherwise the email is a query param
-
-            Compare the payloads from these two endpoints to get an idea of what
-            purpose this serves:
-
-            1. email as query param (https://api.iterable.com/api/docs#In-app_getMessages)
-            2. email as url path (https://api.iterable.com/api/docs#users_getUser)
-          */
-          return !!(config?.url || '').match(/{email}/gim)
-            ? {
-                ...config,
-                url: config.url?.replace(
-                  /{email}/gim,
-                  encodeURIComponent(email)
-                )
+          if (!!(config?.url || '').match(/updateEmail/gim)) {
+            return {
+              ...config,
+              data: {
+                ...(config.data || {}),
+                currentEmail: email
               }
-            : !!config.params?.email
-            ? /* 
-              if the user passed an email as a param already (which is possible if the user
-              explicitly passes an email as an argument to whatever API method they're
-              calling), just use that and don't overwrite it here.
-            */
-              config
-            : {
-                ...config,
-                params: {
-                  ...config.params,
-                  email
-                }
-              };
+            };
+          }
+
+          /*
+            endpoints that use _email_ payload prop in POST/PUT requests 
+          */
+          if (!!(config?.url || '').match(/users\/update/gim)) {
+            return {
+              ...config,
+              data: {
+                ...(config.data || {}),
+                email
+              }
+            };
+          }
+
+          /*
+            endpoints that use _email_ query param in GET requests
+          */
+          if (!!(config?.url || '').match(/getMessages/gim)) {
+            return {
+              ...config,
+              params: {
+                ...(config.params || {}),
+                email
+              }
+            };
+          }
+
+          return config;
         });
       },
       setUserID: (userId: string) => {
@@ -110,23 +116,46 @@ export function initIdentify(
         }
 
         userInterceptor = baseRequest.interceptors.request.use((config) => {
-          return config.params?.userId
-            ? /* 
-              if the user passed a user ID as a param already (which is possible if the user
-              explicitly passes a user ID as an argument to whatever API method they're
-              calling), just use that and don't overwrite it here.
-            */
-              config
-            : {
-                ...config,
-                params: {
-                  ...config.params,
-                  userId
-                }
-              };
+          if (!!(config?.url || '').match(/updateEmail/gim)) {
+            return {
+              ...config,
+              data: {
+                ...(config.data || {}),
+                currentUserId: userId
+              }
+            };
+          }
+
+          /*
+            endpoints that use _email_ payload prop in POST/PUT requests 
+          */
+          if (!!(config?.url || '').match(/users\/update/gim)) {
+            return {
+              ...config,
+              data: {
+                ...(config.data || {}),
+                userId
+              }
+            };
+          }
+
+          /*
+            endpoints that use _email_ query param in GET requests
+          */
+          if (!!(config?.url || '').match(/getMessages/gim)) {
+            return {
+              ...config,
+              params: {
+                ...(config.params || {}),
+                userId
+              }
+            };
+          }
+
+          return config;
         });
       },
-      clearUser: () => {
+      logout: () => {
         if (typeof userInterceptor === 'number') {
           baseRequest.interceptors.request.eject(userInterceptor);
         }

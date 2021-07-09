@@ -1,9 +1,5 @@
 import './styles/index.css';
-import {
-  initIdentify,
-  getInAppMessages
-  // getUserByEmail
-} from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 
 ((): void => {
   const element = document.createElement('div');
@@ -12,19 +8,14 @@ import {
   const { setEmail } = initIdentify(process.env.API_KEY || '');
   setEmail('martin.mckenna@iterable.com');
 
-  // getUserByEmail().then(console.log);
-
-  getInAppMessages({
-    count: 20
-    // email: 'fdsafds'
-  })
+  getInAppMessages({ count: 20 })
     .then((response) => {
       element.innerHTML = response.data.inAppMessages?.[0]?.content?.html;
+      document.body.appendChild(element);
     })
     .catch((e) => {
-      element.innerText = `<pre>${e}</pre>`;
+      console.warn(e.response.data);
     });
 
   // element.innerHTML = doSomething('marty');
-  document.body.appendChild(element);
 })();

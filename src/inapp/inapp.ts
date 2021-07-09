@@ -1,13 +1,13 @@
-import { AxiosPromise } from 'axios';
 import { InAppMessagesRequestParams, InAppMessageResponse } from './types';
 import { baseRequest } from '../request';
+import { IterablePromise } from '../types';
 
 export const getInAppMessages = (
   payload: InAppMessagesRequestParams
-): AxiosPromise<InAppMessageResponse> => {
+): IterablePromise<InAppMessageResponse> => {
   return baseRequest({
     method: 'GET',
-    url: '/api/inApp/getMessages',
+    url: '/inApp/getMessages',
     params: payload
   });
 };

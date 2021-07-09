@@ -9,3 +9,11 @@ export interface GetUserResponse {
     correlationId?: string;
   };
 }
+
+export interface UpdateUserParams {
+  dataFields?: Record<string, any>;
+  preferUserId?: boolean;
+  mergeNestedObjects?: boolean;
+  // email: string;
+  // userId: string;
+}

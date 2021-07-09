@@ -1,27 +1,24 @@
-import { AxiosPromise } from 'axios';
+import { IterablePromise, IterableResponse } from '../types';
 import { baseRequest } from '../request';
-import { GetUserResponse } from './types';
+import { UpdateUserParams } from './types';
 
-/* 
-  if the user identified the user with the _setEmail_ method, 
-  {email} will be replaced with the set email.
-*/
-export const getUserByEmail = (
-  email = '{email}'
-): AxiosPromise<GetUserResponse> =>
-  baseRequest({
-    method: 'GET',
-    url: `/api/users/${email}`
+export const updateUserEmail = (
+  newEmail: string
+): IterablePromise<IterableResponse> => {
+  return baseRequest({
+    method: 'POST',
+    url: '/users/updateEmail',
+    data: {
+      newEmail
+    }
   });
+};
 
-/* userId param optional due to the ability to handle this through the _setUserID_ method */
-export const getUserByID = (userId?: string): AxiosPromise<GetUserResponse> =>
+export const updateUser = (
+  payload: UpdateUserParams
+): IterablePromise<IterableResponse> =>
   baseRequest({
-    method: 'GET',
-    url: `/api/users/byUserId`,
-    params: !!userId
-      ? {
-          userId
-        }
-      : {}
+    method: 'POST',
+    url: '/users/update',
+    data: payload
   });
