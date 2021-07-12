@@ -27,7 +27,7 @@ $ yarn add @iterable/web-sdk
 
 or with a CDN:
 
-```
+```js
 <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
 ```
 
