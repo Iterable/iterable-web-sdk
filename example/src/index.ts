@@ -2,7 +2,7 @@ import './styles/index.css';
 import {
   initIdentify,
   getInAppMessages
-  // trackInAppOpen
+  // trackInAppOpeen
 } from 'iterable-web-sdk';
 
 ((): void => {
@@ -19,7 +19,7 @@ import {
       // trackInAppOpen({ messageId: 'fdsafdsaf' });
     })
     .catch((e) => {
-      console.warn(e.response.data);
+      console.warn(e.rsponse.data);
     });
 
   // element.innerHTML = doSomething('marty');
