@@ -84,7 +84,11 @@ export function initIdentify(
           /*
             endpoints that use _email_ payload prop in POST/PUT requests 
           */
-          if (!!(config?.url || '').match(/users\/update/gim)) {
+          if (
+            !!(config?.url || '').match(
+              /(users\/update)|(events\/trackInApp)/gim
+            )
+          ) {
             return {
               ...config,
               data: {
@@ -115,6 +119,9 @@ export function initIdentify(
           baseRequest.interceptors.request.eject(userInterceptor);
         }
 
+        /*
+          endpoints that use _userId_ payload prop in POST/PUT requests 
+        */
         userInterceptor = baseRequest.interceptors.request.use((config) => {
           if (!!(config?.url || '').match(/updateEmail/gim)) {
             return {
@@ -127,9 +134,13 @@ export function initIdentify(
           }
 
           /*
-            endpoints that use _email_ payload prop in POST/PUT requests 
+            endpoints that use _userId_ payload prop in POST/PUT requests 
           */
-          if (!!(config?.url || '').match(/users\/update/gim)) {
+          if (
+            !!(config?.url || '').match(
+              /(users\/update)|(events\/trackInApp)/gim
+            )
+          ) {
             return {
               ...config,
               data: {
@@ -140,7 +151,7 @@ export function initIdentify(
           }
 
           /*
-            endpoints that use _email_ query param in GET requests
+            endpoints that use _userId_ query param in GET requests
           */
           if (!!(config?.url || '').match(/getMessages/gim)) {
             return {

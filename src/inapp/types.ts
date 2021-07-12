@@ -1,6 +1,13 @@
-export interface InAppMessagesRequestParams {
+import { IterablePlatform } from '../types';
+
+interface SDKInAppMessagesParams {
+  interval?: number;
+  showInAppMessagesAutomatically?: boolean;
+}
+
+export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   count: number;
-  platform?: 'iOS' | 'Android';
+  platform?: IterablePlatform;
   SDKVersion?: string;
   packageName?: string;
   /* 

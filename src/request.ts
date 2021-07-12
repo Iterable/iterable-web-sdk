@@ -8,6 +8,9 @@ export const baseRequest = Axios.create({
   UsersApiController.updateUser
   UsersApiController.updateEmail
   InAppApiController.getMessages(email = None, userId = None, count = 0)
+  EventsApiController.trackInAppOpen
+  EventsApiController.trackInAppClick
+  EventsApiController.trackInAppClose
   
   UsersApiController.disableDevice
   UsersApiController.registerDeviceToken
@@ -15,9 +18,6 @@ export const baseRequest = Axios.create({
   CommerceApiController.trackPurchase
   CommerceApiController.updateCart
   EventsApiController.trackPushOpen
-  EventsApiController.trackInAppOpen
-  EventsApiController.trackInAppClick
-  EventsApiController.trackInAppClose
   EventsApiController.trackInAppDelivery
   EventsApiController.trackInboxSession
   EventsApiController.inAppConsume

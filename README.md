@@ -153,3 +153,33 @@ import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
   getMessages({ count: 20 }).then().catch()
 })();
 ```
+
+## I Want to Intercept Outgoing Requests (or responses) Myself Instead. Can I Do This?
+
+Yep! As mentioned before, this library is built upon [Axios](https://github.com/axios/axios), so
+really anything that library exposes will be fair game here.
+
+To get access to the base Axios instance, you can import it like so:
+
+```ts
+import { baseRequest } from 'iterable-web-sdk'
+```
+
+and for example if you want to set an `email` query param on every outgoing request, you would
+just implement the way Axios advises like so:
+
+```ts
+import { baseRequest } from 'iterable-web-sdk';
+
+((): void => {
+  baseRequest.interceptors.request.use((config) => {
+    return {
+      ...config,
+      params: {
+        ...config.params,
+        email: 'hello@gmail.com'
+      }
+    }
+  })
+})();
+```

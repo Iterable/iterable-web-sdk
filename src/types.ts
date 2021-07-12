@@ -22,6 +22,8 @@ export type IterableErrorStatus =
   | 'EmailAlreadyExists'
   | 'Forbidden';
 
+export type IterablePlatform = 'iOS' | 'Android';
+
 /*
   potential response for both 200+ and 400+
 */

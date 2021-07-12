@@ -1,5 +1,9 @@
 import './styles/index.css';
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import {
+  initIdentify,
+  getInAppMessages
+  // trackInAppOpen
+} from 'iterable-web-sdk';
 
 ((): void => {
   const element = document.createElement('div');
@@ -12,6 +16,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
     .then((response) => {
       element.innerHTML = response.data.inAppMessages?.[0]?.content?.html;
       document.body.appendChild(element);
+      // trackInAppOpen({ messageId: 'fdsafdsaf' });
     })
     .catch((e) => {
       console.warn(e.response.data);
