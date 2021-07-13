@@ -1,9 +1,5 @@
 import './styles/index.css';
-import {
-  initIdentify,
-  getInAppMessages
-  // trackInAppOpeen
-} from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 
 ((): void => {
   const element = document.createElement('div');
@@ -12,15 +8,12 @@ import {
   const { setEmail } = initIdentify(process.env.API_KEY || '');
   setEmail('martin.mckenna@iterable.com');
 
-  getInAppMessages({ count: 20 })
+  getInAppMessages({ count: 20, showInAppMessagesAutomatically: true })
     .then((response) => {
       element.innerHTML = response.data.inAppMessages?.[0]?.content?.html;
       document.body.appendChild(element);
-      // trackInAppOpen({ messageId: 'fdsafdsaf' });
     })
     .catch((e) => {
       console.warn(e.rsponse.data);
     });
-
-  // element.innerHTML = doSomething('marty');
 })();
