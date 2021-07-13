@@ -29,6 +29,7 @@
     "README.md"
   ],
   "dependencies": {
+    "@pabra/sortby": "^1.0.1",
     "axios": "^0.21.1",
     "handlebars": "^4.4.3"
   },

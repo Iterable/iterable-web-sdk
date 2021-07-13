@@ -1187,6 +1187,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@pabra/sortby@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@pabra/sortby/-/sortby-1.0.1.tgz#f3ac872e87f75190df301f86a64fd87ade9920ae"
+  integrity sha512-Vt9+cDSVLYmzFDdG08dOFfKn82Qmyns9JHbwf23LYK3dquu7J5lAaBlfQotQB2pMYDMW55FUgGZeS19zVXvmWg==
+
 "@samverschueren/stream-to-observable@^0.3.0":
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/@samverschueren/stream-to-observable/-/stream-to-observable-0.3.1.tgz#a21117b19ee9be70c379ec1877537ef2e1c63301"

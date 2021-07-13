@@ -2,6 +2,42 @@ import { InAppMessage } from '../inapp/types';
 
 export const messages: InAppMessage[] = [
   {
+    messageId: 'Ldvv4QDjpiNarVFxem0uXu8uRqdoVNh7PGj0Hxx984zBg',
+    campaignId: 2584232,
+    createdAt: 1626195967027,
+    expiresAt: 1633971967027,
+    content: {
+      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="itbl://dismiss">close</a></div>\n</body>\n</html>\n',
+      payload: {},
+      inAppDisplaySettings: {
+        top: {
+          displayOption: 'AutoExpand'
+        },
+        right: {
+          percentage: 0
+        },
+        bottom: {
+          displayOption: 'AutoExpand'
+        },
+        left: {
+          percentage: 0
+        }
+      }
+    },
+    customPayload: {},
+    trigger: {
+      type: 'immediate'
+    },
+    saveToInbox: true,
+    inboxMetadata: {
+      title: 'hey there',
+      subtitle: 'mensaje',
+      icon: ''
+    },
+    priorityLevel: 100.5,
+    read: false
+  },
+  {
     messageId: '5JEE574pphDA6WfWa7bizu1uDBv5gNTDXlBBCKKRG8rqa',
     campaignId: 2578290,
     createdAt: 1626104178434,

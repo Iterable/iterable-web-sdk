@@ -96,7 +96,7 @@ describe('Utils', () => {
   });
 
   describe('Sorting', () => {
-    it('should sort messages by priority level, greater ones first', () => {
+    it('should sort messages by priority level, lesser ones first', () => {
       expect(sortInAppMessages()).toEqual([]);
       expect(
         sortInAppMessages([
@@ -132,6 +132,11 @@ describe('Utils', () => {
           },
           {
             ...messages[1],
+            priorityLevel: 3,
+            createdAt: 1
+          },
+          {
+            ...messages[2],
             priorityLevel: 2,
             createdAt: 1
           }
@@ -143,8 +148,13 @@ describe('Utils', () => {
           createdAt: 1
         },
         {
-          ...messages[1],
+          ...messages[2],
           priorityLevel: 2,
+          createdAt: 1
+        },
+        {
+          ...messages[1],
+          priorityLevel: 3,
           createdAt: 1
         }
       ]);
@@ -159,9 +169,19 @@ describe('Utils', () => {
             ...messages[1],
             priorityLevel: 2,
             createdAt: 1
+          },
+          {
+            ...messages[2],
+            priorityLevel: 1,
+            createdAt: 1
           }
         ])
       ).toEqual([
+        {
+          ...messages[2],
+          priorityLevel: 1,
+          createdAt: 1
+        },
         {
           ...messages[1],
           priorityLevel: 2,
@@ -212,6 +232,11 @@ describe('Utils', () => {
             ...messages[1],
             priorityLevel: 1,
             createdAt: 1
+          },
+          {
+            ...messages[2],
+            priorityLevel: 1,
+            createdAt: 10
           }
         ])
       ).toEqual([
@@ -224,6 +249,11 @@ describe('Utils', () => {
           ...messages[0],
           priorityLevel: 1,
           createdAt: 5
+        },
+        {
+          ...messages[2],
+          priorityLevel: 1,
+          createdAt: 10
         }
       ]);
       expect(
@@ -237,6 +267,11 @@ describe('Utils', () => {
             ...messages[1],
             priorityLevel: 1,
             createdAt: 5
+          },
+          {
+            ...messages[2],
+            priorityLevel: 1,
+            createdAt: 10
           }
         ])
       ).toEqual([
@@ -249,6 +284,85 @@ describe('Utils', () => {
           ...messages[1],
           priorityLevel: 1,
           createdAt: 5
+        },
+        {
+          ...messages[2],
+          priorityLevel: 1,
+          createdAt: 10
+        }
+      ]);
+    });
+
+    it('should sort the messages by createdAt first then priority level', () => {
+      expect(
+        sortInAppMessages([
+          {
+            ...messages[0],
+            priorityLevel: 100,
+            createdAt: 5
+          },
+          {
+            ...messages[1],
+            priorityLevel: 300,
+            createdAt: 1
+          },
+          {
+            ...messages[2],
+            priorityLevel: 300,
+            createdAt: 10
+          }
+        ])
+      ).toEqual([
+        {
+          ...messages[0],
+          priorityLevel: 100,
+          createdAt: 5
+        },
+        {
+          ...messages[1],
+          priorityLevel: 300,
+          createdAt: 1
+        },
+        {
+          ...messages[2],
+          priorityLevel: 300,
+          createdAt: 10
+        }
+      ]);
+
+      expect(
+        sortInAppMessages([
+          {
+            ...messages[0],
+            priorityLevel: 700,
+            createdAt: 23
+          },
+          {
+            ...messages[1],
+            priorityLevel: 500,
+            createdAt: 55
+          },
+          {
+            ...messages[2],
+            priorityLevel: 100,
+            createdAt: 100
+          }
+        ])
+      ).toEqual([
+        {
+          ...messages[2],
+          priorityLevel: 100,
+          createdAt: 100
+        },
+        {
+          ...messages[1],
+          priorityLevel: 500,
+          createdAt: 55
+        },
+        {
+          ...messages[0],
+          priorityLevel: 700,
+          createdAt: 23
         }
       ]);
     });

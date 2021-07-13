@@ -1,6 +1,6 @@
 import { InAppMessagesRequestParams, InAppMessageResponse } from './types';
 import { baseIterableRequest } from '../request';
-// import { showInAppMessagesOnInterval } from './utils';
+import { filterHiddenInAppMessages, sortInAppMessages } from './utils';
 
 export const getInAppMessages = (payload: InAppMessagesRequestParams) => {
   return baseIterableRequest<InAppMessageResponse>({
@@ -19,6 +19,15 @@ export const getInAppMessages = (payload: InAppMessagesRequestParams) => {
       3. HTML body is blank
     */
     if (payload?.showInAppMessagesAutomatically) {
+      const parsedMessages = sortInAppMessages(
+        filterHiddenInAppMessages(response.data.inAppMessages)
+      );
+      return {
+        ...response,
+        data: {
+          inAppMessages: parsedMessages
+        }
+      };
       // showInAppMessagesOnInterval(returnedHTML, payload.interval);
     }
 

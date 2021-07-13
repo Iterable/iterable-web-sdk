@@ -14,6 +14,6 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
       document.body.appendChild(element);
     })
     .catch((e) => {
-      console.warn(e.rsponse.data);
+      console.warn(e.response.data);
     });
 })();
