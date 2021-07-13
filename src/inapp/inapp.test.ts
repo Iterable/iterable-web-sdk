@@ -138,13 +138,13 @@ describe('Utils', () => {
         ])
       ).toEqual([
         {
-          ...messages[1],
-          priorityLevel: 2,
+          ...messages[0],
+          priorityLevel: 1,
           createdAt: 1
         },
         {
-          ...messages[0],
-          priorityLevel: 1,
+          ...messages[1],
+          priorityLevel: 2,
           createdAt: 1
         }
       ]);
@@ -163,13 +163,13 @@ describe('Utils', () => {
         ])
       ).toEqual([
         {
-          ...messages[0],
-          priorityLevel: 5,
+          ...messages[1],
+          priorityLevel: 2,
           createdAt: 1
         },
         {
-          ...messages[1],
-          priorityLevel: 2,
+          ...messages[0],
+          priorityLevel: 5,
           createdAt: 1
         }
       ]);
