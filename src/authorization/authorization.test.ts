@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { initIdentify } from './authorization';
-import { baseRequest } from '../request';
+import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { trackInAppClose } from '../events';
 import { updateUserEmail } from '../users';
@@ -9,14 +9,14 @@ let mockRequest: any = null;
 
 describe('API Key Interceptors', () => {
   beforeEach(() => {
-    mockRequest = new MockAdapter(baseRequest);
+    mockRequest = new MockAdapter(baseAxiosRequest);
     /* clear any interceptors already configured */
     [
       ...Array(
         mockRequest.axiosInstance.interceptors.request.handlers.length
       ).keys()
     ].forEach((e, index) => {
-      baseRequest.interceptors.request.eject(index);
+      baseAxiosRequest.interceptors.request.eject(index);
     });
   });
   it('adds Api_Key header to all outgoing requests', async () => {
@@ -57,14 +57,14 @@ describe('API Key Interceptors', () => {
 
 describe('User Identification', () => {
   beforeEach(() => {
-    mockRequest = new MockAdapter(baseRequest);
+    mockRequest = new MockAdapter(baseAxiosRequest);
     /* clear any interceptors already configured */
     [
       ...Array(
         mockRequest.axiosInstance.interceptors.request.handlers.length
       ).keys()
     ].forEach((e, index) => {
-      baseRequest.interceptors.request.eject(index);
+      baseAxiosRequest.interceptors.request.eject(index);
     });
   });
   describe('logout', () => {
@@ -109,7 +109,7 @@ describe('User Identification', () => {
     });
 
     it('clears any previous interceptors if called twice', async () => {
-      const spy = jest.spyOn(baseRequest.interceptors.request, 'eject');
+      const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
       const { setEmail } = initIdentify('123');
       setEmail('hello@gmail.com');
       setEmail('new@gmail.com');
@@ -163,7 +163,7 @@ describe('User Identification', () => {
         data: 'something'
       });
 
-      const response = await baseRequest({
+      const response = await baseAxiosRequest({
         method: 'POST',
         url: '/users/hello',
         data: {
@@ -191,7 +191,7 @@ describe('User Identification', () => {
     });
 
     it('clears any previous interceptors if called twice', async () => {
-      const spy = jest.spyOn(baseRequest.interceptors.request, 'eject');
+      const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
       const { setUserID } = initIdentify('123');
       setUserID('999');
       setUserID('111');
@@ -254,7 +254,7 @@ describe('User Identification', () => {
         data: 'something'
       });
 
-      const response = await baseRequest({
+      const response = await baseAxiosRequest({
         method: 'POST',
         url: '/users/hello',
         data: {

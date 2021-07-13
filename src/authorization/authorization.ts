@@ -1,4 +1,4 @@
-import { baseRequest } from '../request';
+import { baseAxiosRequest } from '../request';
 
 // interface WithJWT {
 //   clearRefresh: () => void;
@@ -28,15 +28,14 @@ export function initIdentify(
 ) {
   // let timer: NodeJS.Timeout | null = null;
   // let expMin: number | null = null;
-  let authInterceptor: number | null = baseRequest.interceptors.request.use(
-    (config) => ({
+  let authInterceptor: number | null =
+    baseAxiosRequest.interceptors.request.use((config) => ({
       ...config,
       headers: {
         ...config.headers,
         Api_Key: authToken
       }
-    })
-  );
+    }));
   let userInterceptor: number | null = null;
 
   if (!jwtEnabled || !callback) {
@@ -45,130 +44,136 @@ export function initIdentify(
       setNewToken: (newToken: string) => {
         if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
-          baseRequest.interceptors.request.eject(authInterceptor);
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
-        authInterceptor = baseRequest.interceptors.request.use((config) => ({
-          ...config,
-          headers: {
-            ...config.headers,
-            Api_Key: newToken
-          }
-        }));
+        authInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => ({
+            ...config,
+            headers: {
+              ...config.headers,
+              Api_Key: newToken
+            }
+          })
+        );
       },
       clearToken: () => {
         /* might be 0 which is a falsy value */
         if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
-          baseRequest.interceptors.request.eject(authInterceptor);
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
       setEmail: (email: string) => {
         if (typeof userInterceptor === 'number') {
-          baseRequest.interceptors.request.eject(userInterceptor);
+          baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
 
         /* 
           endpoints that use _currentEmail_ payload prop in POST/PUT requests 
         */
-        userInterceptor = baseRequest.interceptors.request.use((config) => {
-          if (!!(config?.url || '').match(/updateEmail/gim)) {
-            return {
-              ...config,
-              data: {
-                ...(config.data || {}),
-                currentEmail: email
-              }
-            };
-          }
+        userInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => {
+            if (!!(config?.url || '').match(/updateEmail/gim)) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  currentEmail: email
+                }
+              };
+            }
 
-          /*
+            /*
             endpoints that use _email_ payload prop in POST/PUT requests 
           */
-          if (
-            !!(config?.url || '').match(
-              /(users\/update)|(events\/trackInApp)/gim
-            )
-          ) {
-            return {
-              ...config,
-              data: {
-                ...(config.data || {}),
-                email
-              }
-            };
-          }
+            if (
+              !!(config?.url || '').match(
+                /(users\/update)|(events\/trackInApp)/gim
+              )
+            ) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  email
+                }
+              };
+            }
 
-          /*
+            /*
             endpoints that use _email_ query param in GET requests
           */
-          if (!!(config?.url || '').match(/getMessages/gim)) {
-            return {
-              ...config,
-              params: {
-                ...(config.params || {}),
-                email
-              }
-            };
-          }
+            if (!!(config?.url || '').match(/getMessages/gim)) {
+              return {
+                ...config,
+                params: {
+                  ...(config.params || {}),
+                  email
+                }
+              };
+            }
 
-          return config;
-        });
+            return config;
+          }
+        );
       },
       setUserID: (userId: string) => {
         if (typeof userInterceptor === 'number') {
-          baseRequest.interceptors.request.eject(userInterceptor);
+          baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
 
         /*
           endpoints that use _userId_ payload prop in POST/PUT requests 
         */
-        userInterceptor = baseRequest.interceptors.request.use((config) => {
-          if (!!(config?.url || '').match(/updateEmail/gim)) {
-            return {
-              ...config,
-              data: {
-                ...(config.data || {}),
-                currentUserId: userId
-              }
-            };
-          }
+        userInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => {
+            if (!!(config?.url || '').match(/updateEmail/gim)) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  currentUserId: userId
+                }
+              };
+            }
 
-          /*
+            /*
             endpoints that use _userId_ payload prop in POST/PUT requests 
           */
-          if (
-            !!(config?.url || '').match(
-              /(users\/update)|(events\/trackInApp)/gim
-            )
-          ) {
-            return {
-              ...config,
-              data: {
-                ...(config.data || {}),
-                userId
-              }
-            };
-          }
+            if (
+              !!(config?.url || '').match(
+                /(users\/update)|(events\/trackInApp)/gim
+              )
+            ) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  userId
+                }
+              };
+            }
 
-          /*
+            /*
             endpoints that use _userId_ query param in GET requests
           */
-          if (!!(config?.url || '').match(/getMessages/gim)) {
-            return {
-              ...config,
-              params: {
-                ...(config.params || {}),
-                userId
-              }
-            };
-          }
+            if (!!(config?.url || '').match(/getMessages/gim)) {
+              return {
+                ...config,
+                params: {
+                  ...(config.params || {}),
+                  userId
+                }
+              };
+            }
 
-          return config;
-        });
+            return config;
+          }
+        );
       },
       logout: () => {
         if (typeof userInterceptor === 'number') {
-          baseRequest.interceptors.request.eject(userInterceptor);
+          baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
       }
     };
@@ -183,12 +188,12 @@ export function initIdentify(
   //   clearInterval(timer as any);
   //   /* clear interceptor */
   //   if (authInterceptor) {
-  //     baseRequest.interceptors.request.eject(authInterceptor);
+  //     baseAxiosRequest.interceptors.request.eject(authInterceptor);
   //   }
   //   return callback(...args)
   //     .then((token) => {
   //       /* set interceptor */
-  //       authInterceptor = baseRequest.interceptors.request.use((config) => ({
+  //       authInterceptor = baseAxiosRequest.interceptors.request.use((config) => ({
   //         ...config,
   //         headers: {
   //           ...config.headers,
@@ -213,7 +218,7 @@ export function initIdentify(
   //       }
   //       /* clear interceptor */
   //       if (typeof authInterceptor === 'number') {
-  //         baseRequest.interceptors.request.eject(authInterceptor);
+  //         baseAxiosRequest.interceptors.request.eject(authInterceptor);
   //       }
   //       return Promise.reject(error);
   //     });
