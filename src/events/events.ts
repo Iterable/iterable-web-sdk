@@ -32,3 +32,29 @@ export const trackInAppClick = (
     data: payload
   });
 };
+
+export const trackInAppDelivery = (
+  payload: Omit<
+    InAppEventRequestParams,
+    'clickedUrl' | 'closeAction' | 'inboxSessionId'
+  >
+) => {
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: '/events/trackInAppDelivery',
+    data: payload
+  });
+};
+
+export const trackInAppConsume = (
+  payload: Omit<
+    InAppEventRequestParams,
+    'clickedUrl' | 'closeAction' | 'inboxSessionId'
+  >
+) => {
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: '/events/inAppConsume',
+    data: payload
+  });
+};
