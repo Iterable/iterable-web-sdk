@@ -1,8 +1,11 @@
 import { IterablePlatform } from '../types';
 
 interface SDKInAppMessagesParams {
-  interval?: number;
-  showInAppMessagesAutomatically?: boolean;
+  displayInterval?: number;
+  /* what should the screen reader say once the message opens */
+  onOpenScreenReaderMessage?: string;
+  /* what DOM Node do you want to take keyboard focus when the message opens */
+  onOpenNodeToTakeFocus?: HTMLElementTagNameMap;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
