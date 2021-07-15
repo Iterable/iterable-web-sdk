@@ -52,18 +52,18 @@ export function getInAppMessages(
           ) || [])
         ];
 
-        dismissNodes?.forEach((eachNode) => {
+        for (let i = 0; i < dismissNodes.length; i++) {
           /* 
             give the close anchor tag properties that make it 
             behave more like a button with a logical aria label
           */
-          addButtonAttrsToAnchorTag(eachNode, 'close modal');
+          addButtonAttrsToAnchorTag(dismissNodes[i], 'close modal');
 
           /*
             finally add a click handler that makes the appropriate tracking API
             calls so that it doesn't show up again.
           */
-          eachNode.addEventListener('click', () => {
+          dismissNodes[i].addEventListener('click', () => {
             iframe.remove();
             messageIndex += 1;
             timer = global.setTimeout(() => {
@@ -72,7 +72,7 @@ export function getInAppMessages(
               paintMessageToDOM();
             }, payload.displayInterval || 30000);
           });
-        });
+        }
         iframe.contentWindow?.document?.close();
       }
     };
