@@ -1,6 +1,7 @@
 node_modules
 dist
 index.js
+index-node.js
 index.d.ts
 .env
 coverage
