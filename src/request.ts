@@ -15,22 +15,24 @@ export const baseIterableRequest = <T = any>(
 };
 
 /*
+  implemented:
   UsersApiController.updateUser
   UsersApiController.updateEmail
   InAppApiController.getMessages(email = None, userId = None, count = 0)
   EventsApiController.trackInAppOpen
   EventsApiController.trackInAppClick
   EventsApiController.trackInAppClose
+  EventsApiController.inAppConsume
+  EventsApiController.trackInAppDelivery
   
+  todo:
   UsersApiController.disableDevice
   UsersApiController.registerDeviceToken
   UsersApiController.updateSubscriptions
   CommerceApiController.trackPurchase
   CommerceApiController.updateCart
   EventsApiController.trackPushOpen
-  EventsApiController.trackInAppDelivery
   EventsApiController.trackInboxSession
-  EventsApiController.inAppConsume
   EventsApiController.track
   MobileApiController.getRemoteConfiguration
 */
