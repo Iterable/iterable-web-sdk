@@ -24,7 +24,7 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "index-node.js",
+    "index.node.js",
     "dist/*",
     "package.json",
     "README.md"

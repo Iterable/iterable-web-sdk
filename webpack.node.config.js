@@ -5,7 +5,7 @@ module.exports = {
   entry: './dist/index.js',
   target: 'node',
   output: {
-    filename: './index-node.js',
+    filename: './index.node.js',
     path: path.resolve(__dirname),
     library: 'base-module',
     libraryTarget: 'umd'
