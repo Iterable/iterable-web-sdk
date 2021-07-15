@@ -41,7 +41,7 @@ button {
   transition: all 0.05s ease;
 }
 
-button:active {
+button:active:not(.disabled) {
   background: #ab0457db;
   border: none;
   -webkit-box-shadow: 0 0 0 0 #006be0fa;
