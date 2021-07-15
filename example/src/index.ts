@@ -4,7 +4,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 ((): void => {
   /* set token in the SDK */
   const { setEmail } = initIdentify(process.env.API_KEY || '');
-  setEmail('martin.mckenna@iterable.com');
+  setEmail('iterable.tester@gmail.com');
 
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {

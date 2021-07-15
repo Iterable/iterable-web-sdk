@@ -5,10 +5,7 @@ html, body {
 
 #root {
   width: 90%;
-}
-
-.heading {
-  margin-left: 32px;
+  margin: 0 auto;
 }
 
 .control-wrapper {
@@ -27,7 +24,7 @@ button.disabled {
 
 button {
   width: 60%;
-  margin: 16px;
+  margin: 1em;
   color: #f7f7f7;
   font-size: 1.2em;
   outline: none;
