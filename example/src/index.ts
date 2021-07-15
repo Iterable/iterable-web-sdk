@@ -25,9 +25,19 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
   document
     .getElementById('pause')
     .addEventListener('click', pauseMessageStream);
-  document.getElementById('start').addEventListener('click', () => {
-    document.getElementById('start').setAttribute('disabled', 'true');
-    document.getElementById('start').className = 'disabled';
-    request().catch(console.warn);
+
+  const startBtn = document.getElementById('start');
+  startBtn.addEventListener('click', (event) => {
+    event.preventDefault();
+    if (startBtn.getAttribute('aria-disabled') !== 'true') {
+      /* aria-disabled doesn't actually disable the button lol */
+      request()
+        .then((response) => {
+          startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
+        })
+        .catch(console.warn);
+    }
+    startBtn.setAttribute('aria-disabled', 'true');
+    startBtn.className = 'disabled';
   });
 })();
