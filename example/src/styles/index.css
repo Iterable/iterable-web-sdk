@@ -2,3 +2,55 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
+#root {
+  width: 90%;
+  margin: 0 auto;
+}
+
+.control-wrapper {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+}
+
+button.disabled {
+  background-color: gray;
+  color: #c7c7c7;
+  -webkit-box-shadow: 0 7px 0 0 #4d4d4d;
+  box-shadow: 0 7px 0 0 #4d4d4d;
+  cursor: not-allowed;
+}
+
+button {
+  width: 60%;
+  margin: 1em;
+  color: #f7f7f7;
+  font-size: 1.2em;
+  outline: none;
+  background-color: #63abfb;
+  border: none;
+  border-radius: 5px;
+  margin-top: 1em;
+  padding: 1em;
+  -webkit-box-shadow: 0 7px 0 0 #006be0fa;
+  box-shadow: 0 7px 0 0 #006be0fa;
+  -webkit-transition: all 0.05s ease;
+  -moz-transition: all 0.05s ease;
+  -ms-transition: all 0.05s ease;
+  -o-transition: all 0.05s ease;
+  transition: all 0.05s ease;
+}
+
+button:active {
+  background: #ab0457db;
+  outline: none;
+  border: none;
+  -webkit-box-shadow: 0 0 0 0 #006be0fa;
+  box-shadow: 0 0 0 0 #006be0fa;
+  -moz-transform: translateY(3px);
+  -webkit-transform: translateY(3px);
+  -o-transform: translateY(3px);
+  -ms-transform: translateY(3px);
+  transform: translateY(3px);
+}

@@ -183,3 +183,102 @@ import { baseAxiosRequest } from 'iterable-web-sdk';
   })
 })();
 ```
+
+## I Want to Automatically Show In-App Messages Every X Number of Seconds
+
+This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter
+to have the in-app messages appear automatically on an interval.
+
+Normally to request a list of in-app messages, you'd make a request like this:
+
+```ts
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+
+((): void => {
+  /* set token in the SDK */
+  const { setEmail } = initIdentify(process.env.API_KEY || '');
+  setEmail('hello@gmail.com');
+
+  getInAppMessages({ count: 20 })
+    .then(console.log)
+    .catch(console.warn)
+})();
+```
+
+In order to take advantage of the SDK showing them automatically, you would implement
+the same method in this way:
+
+```ts
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+
+((): void => {
+  /* set token in the SDK */
+  const { setEmail } = initIdentify(process.env.API_KEY || '');
+  setEmail('hello@gmail.com');
+
+  const { request: requestMessages } = getInAppMessages(
+    { count: 20 },
+    true
+  );
+
+  requestMessages().then(console.log).catch(console.warn);
+})();
+```
+
+Optionally, you can pass arguments to fine-tune how you want the messages to appear
+
+```ts
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+
+((): void => {
+  /* set token in the SDK */
+  const { setEmail } = initIdentify(process.env.API_KEY || '');
+  setEmail('hello@gmail.com');
+
+  const { request: requestMessages } = getInAppMessages(
+    { 
+      count: 20,
+      /* time to wait after dismissing a message to show another one (in milliseconds) */
+      displayInterval: 5000,
+      /* optional message you want the screen reader to vocalize for accessibility purposes */
+      onOpenScreenReaderMessage:
+        'hey screen reader here telling you something just popped up on your screen!'
+    },
+    true
+  );
+
+  requestMessages().then(console.log).catch(console.warn);
+})();
+```
+
+You can also pause and resume the messages stream if you like
+
+```ts
+import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+
+((): void => {
+  /* set token in the SDK */
+  const { setEmail } = initIdentify(process.env.API_KEY || '');
+  setEmail('hello@gmail.com');
+
+  const { 
+    request: requestMessages,
+    pauseMessageStream, 
+    resumeMessageStream
+   } = getInAppMessages(
+    { count: 20 },
+    true
+  );
+
+  requestMessages().then(console.log).catch(console.warn);
+
+  /* pause any more in-app messages from appearing for a little while */
+  pauseMessageStream();
+
+  /* 
+    pick up where we left off and show the next message in the queue. 
+    And start the timer again.
+  */
+  resumeMessageStream();
+})();
+```
