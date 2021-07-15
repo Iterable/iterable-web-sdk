@@ -1,6 +1,6 @@
 {
-  "name": "@iterable/web-sdk",
-  "description": "Iterable SDK for JavaScript and Node.",
+  "name": "@iterable/sample-app",
+  "description": "Sample app for Iterable Web SDK",
   "version": "0.0.1",
   "homepage": "https://iterable.com/",
   "repository": {
@@ -12,13 +12,12 @@
   },
   "author": "Iterable",
   "license": "MIT",
-  "private": false,
+  "private": true,
   "keywords": [
     "javscript",
     "iterable sdk",
     "typescript"
   ],
-  "main": "./dist/index.js",
   "scripts": {
     "build": "tsc && webpack",
     "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n 'tsc,webpack' -k",

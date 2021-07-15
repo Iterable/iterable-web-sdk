@@ -1,8 +1,18 @@
-import Axios from 'axios';
+import Axios, { AxiosRequestConfig } from 'axios';
+import { IterablePromise } from './types';
 
-export const baseRequest = Axios.create({
+export const baseAxiosRequest = Axios.create({
   baseURL: 'https://api.iterable.com/api'
 });
+
+/**
+  @todo flesh out later when we have client-side validation
+*/
+export const baseIterableRequest = <T = any>(
+  payload: AxiosRequestConfig
+): IterablePromise<T> => {
+  return baseAxiosRequest(payload);
+};
 
 /*
   UsersApiController.updateUser

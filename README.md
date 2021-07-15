@@ -162,17 +162,17 @@ really anything that library exposes will be fair game here.
 To get access to the base Axios instance, you can import it like so:
 
 ```ts
-import { baseRequest } from 'iterable-web-sdk'
+import { baseAxiosRequest } from 'iterable-web-sdk'
 ```
 
 and for example if you want to set an `email` query param on every outgoing request, you would
 just implement the way Axios advises like so:
 
 ```ts
-import { baseRequest } from 'iterable-web-sdk';
+import { baseAxiosRequest } from 'iterable-web-sdk';
 
 ((): void => {
-  baseRequest.interceptors.request.use((config) => {
+  baseAxiosRequest.interceptors.request.use((config) => {
     return {
       ...config,
       params: {

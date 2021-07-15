@@ -19,26 +19,28 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
 }
 
 export interface InAppDisplaySetting {
-  percentage: number;
+  percentage?: number;
+  displayOption?: string;
 }
 
 export interface InAppMessage {
   messageId: string;
-  campaignId: string;
-  createdAt: string;
-  expiresAt: string;
+  campaignId: number;
+  createdAt: number;
+  expiresAt: number;
   content: {
+    payload?: Record<string, any>;
     html: string;
     inAppDisplaySettings: {
       top: InAppDisplaySetting;
       right: InAppDisplaySetting;
       left: InAppDisplaySetting;
       bottom: InAppDisplaySetting;
-      bgColor: {
+      bgColor?: {
         alpha: number;
         hex: string;
       };
-      shouldAnimate: boolean;
+      shouldAnimate?: boolean;
     };
   };
   customPayload: Record<string, any>;
