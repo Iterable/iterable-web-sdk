@@ -11,7 +11,7 @@ import { trackInAppDelivery } from '../events';
 import { messages } from '../__data__/inAppMessages';
 
 jest.mock('../events', () => ({
-  trackInAppDelivery: jest.fn().mockReturnValue(null)
+  trackInAppDelivery: jest.fn().mockReturnValue(Promise.resolve(''))
 }));
 
 describe('Utils', () => {
