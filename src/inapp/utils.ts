@@ -55,7 +55,11 @@ export const trackMessagesDelivered = (
     if (!!messages[i].messageId) {
       trackInAppDelivery({
         messageId: messages[i].messageId as string
-      });
+        /* 
+          swallow any network failures. 
+          If it fails, there's nothing really we can do here. 
+        */
+      }).catch((e) => e);
     }
   }
 };
