@@ -99,10 +99,10 @@ export function getInAppMessages(
               if (!isIterableKeywordLink) {
                 if (openInNewTab) {
                   /**
-                  Using target="_blank" without rel="noreferrer" and rel="noopener" 
-                  makes the website vulnerable to window.opener API exploitation attacks
-                  
-                  @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                    Using target="_blank" without rel="noreferrer" and rel="noopener" 
+                    makes the website vulnerable to window.opener API exploitation attacks
+                    
+                    @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
                   */
                   global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
                 } else {
@@ -131,17 +131,17 @@ export function getInAppMessages(
           })
           .then((response) => {
             /* 
-            if the user passed the flag to automatically paint the in-app messages
-            to the DOM, start a timer and show each in-app message upon close + timer countdown
-            
-            However there are 3 conditions in which to not show a message:
-            
-            1. _read_ key is truthy
-            2. _trigger.type_ key is "never"
-            3. HTML body is blank
+              if the user passed the flag to automatically paint the in-app messages
+              to the DOM, start a timer and show each in-app message upon close + timer countdown
+              
+              However there are 3 conditions in which to not show a message:
+              
+              1. _read_ key is truthy
+              2. _trigger.type_ key is "never"
+              3. HTML body is blank
 
-            so first filter out unwanted messages and sort them
-          */
+              so first filter out unwanted messages and sort them
+            */
             parsedMessages = sortInAppMessages(
               filterHiddenInAppMessages(response.data.inAppMessages)
             ) as InAppMessage[];
