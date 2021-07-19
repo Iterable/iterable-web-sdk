@@ -47,9 +47,6 @@ export function getInAppMessages(
           iframe.contentWindow?.document?.querySelectorAll('a') || [];
 
         for (let i = 0; i < links.length; i++) {
-          /*
-            hit /events/trackInAppClick for all anchor tags
-          */
           const link = links[i];
           link.addEventListener('click', (event) => {
             /* 
