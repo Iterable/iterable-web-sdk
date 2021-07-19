@@ -25,9 +25,8 @@ button.disabled {
 button {
   width: 60%;
   margin: 1em;
-  color: #f7f7f7;
+  color: #000;
   font-size: 1.2em;
-  outline: none;
   background-color: #63abfb;
   border: none;
   border-radius: 5px;
@@ -42,9 +41,8 @@ button {
   transition: all 0.05s ease;
 }
 
-button:active {
+button:active:not(.disabled) {
   background: #ab0457db;
-  outline: none;
   border: none;
   -webkit-box-shadow: 0 0 0 0 #006be0fa;
   box-shadow: 0 0 0 0 #006be0fa;

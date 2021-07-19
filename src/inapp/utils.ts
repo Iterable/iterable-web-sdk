@@ -1,6 +1,7 @@
 import { by } from '@pabra/sortby';
 import { InAppMessage } from './types';
 import srSpeak from 'src/utils/srSpeak';
+import { trackInAppDelivery } from '../events';
 
 export const filterHiddenInAppMessages = (
   messages: Partial<InAppMessage>[] = []
@@ -45,4 +46,20 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
   node.setAttribute('href', 'javascript:undefined');
+};
+
+export const trackMessagesDelivered = (
+  messages: Partial<InAppMessage>[] = []
+) => {
+  for (let i = 0; i < messages.length; i++) {
+    if (!!messages[i].messageId) {
+      trackInAppDelivery({
+        messageId: messages[i].messageId as string
+        /* 
+          swallow any network failures. 
+          If it fails, there's nothing really we can do here. 
+        */
+      }).catch((e) => e);
+    }
+  }
 };

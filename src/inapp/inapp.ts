@@ -9,7 +9,8 @@ import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
   paintIFrame,
-  sortInAppMessages
+  sortInAppMessages,
+  trackMessagesDelivered
 } from './utils';
 
 export function getInAppMessages(
@@ -51,27 +52,27 @@ export function getInAppMessages(
           ) || [])
         ];
 
-        dismissNodes?.forEach((eachNode) => {
+        for (let i = 0; i < dismissNodes.length; i++) {
           /* 
-          give the close anchor tag properties that make it 
-          behave more like a button with a logical aria label
+            give the close anchor tag properties that make it 
+            behave more like a button with a logical aria label
           */
-          addButtonAttrsToAnchorTag(eachNode, 'close modal');
+          addButtonAttrsToAnchorTag(dismissNodes[i], 'close modal');
 
           /*
-         finally add a click handler that makes the appropriate tracking API
-         calls so that it doesn't show up again.
-         */
-          eachNode.addEventListener('click', () => {
+            finally add a click handler that makes the appropriate tracking API
+            calls so that it doesn't show up again.
+          */
+          dismissNodes[i].addEventListener('click', () => {
             iframe.remove();
             messageIndex += 1;
-            timer = setTimeout(() => {
+            timer = global.setTimeout(() => {
               clearTimeout(timer as NodeJS.Timeout);
 
               paintMessageToDOM();
             }, payload.displayInterval || 30000);
           });
-        });
+        }
         iframe.contentWindow?.document?.close();
       }
     };
@@ -82,8 +83,13 @@ export function getInAppMessages(
           method: 'GET',
           url: '/inApp/getMessages',
           params: payload
-        }).then((response) => {
-          /* 
+        })
+          .then((response) => {
+            trackMessagesDelivered(response.data.inAppMessages || []);
+            return response;
+          })
+          .then((response) => {
+            /* 
             if the user passed the flag to automatically paint the in-app messages
             to the DOM, start a timer and show each in-app message upon close + timer countdown
             
@@ -95,18 +101,18 @@ export function getInAppMessages(
 
             so first filter out unwanted messages and sort them
           */
-          parsedMessages = sortInAppMessages(
-            filterHiddenInAppMessages(response.data.inAppMessages)
-          ) as InAppMessage[];
+            parsedMessages = sortInAppMessages(
+              filterHiddenInAppMessages(response.data.inAppMessages)
+            ) as InAppMessage[];
 
-          paintMessageToDOM();
-          return {
-            ...response,
-            data: {
-              inAppMessages: parsedMessages
-            }
-          };
-        }),
+            paintMessageToDOM();
+            return {
+              ...response,
+              data: {
+                inAppMessages: parsedMessages
+              }
+            };
+          }),
       pauseMessageStream: () => {
         if (timer) {
           clearTimeout(timer);
@@ -118,9 +124,16 @@ export function getInAppMessages(
     };
   }
 
+  /* 
+    user doesn't want us to paint messages automatically.
+    just return the promise like normal
+  */
   return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     url: '/inApp/getMessages',
     params: payload
+  }).then((response) => {
+    trackMessagesDelivered(response.data.inAppMessages || []);
+    return response;
   });
 }

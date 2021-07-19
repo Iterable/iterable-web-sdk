@@ -1,5 +1,18 @@
-import { filterHiddenInAppMessages, sortInAppMessages } from './utils';
+/**
+ * @jest-environment jsdom
+ */
+import {
+  addButtonAttrsToAnchorTag,
+  filterHiddenInAppMessages,
+  sortInAppMessages,
+  trackMessagesDelivered
+} from './utils';
+import { trackInAppDelivery } from '../events';
 import { messages } from '../__data__/inAppMessages';
+
+jest.mock('../events', () => ({
+  trackInAppDelivery: jest.fn().mockReturnValue(null)
+}));
 
 describe('Utils', () => {
   describe('Filtering', () => {
@@ -365,6 +378,24 @@ describe('Utils', () => {
           createdAt: 23
         }
       ]);
+    });
+  });
+
+  describe('track in app delivery', () => {
+    it('should call trackInAppDelivery X times for X messages', async () => {
+      trackMessagesDelivered([{ messageId: '123' }, { messageId: '234' }]);
+      expect((trackInAppDelivery as any).mock.calls.length).toBe(2);
+    });
+  });
+
+  describe('DOM Manipulation', () => {
+    it('should add button attrs to element', () => {
+      const el = document.createElement('div');
+      addButtonAttrsToAnchorTag(el, 'hello');
+
+      expect(el.getAttribute('aria-label')).toBe('hello');
+      expect(el.getAttribute('role')).toBe('button');
+      expect(el.getAttribute('href')).toBe('javascript:undefined');
     });
   });
 });
