@@ -24,6 +24,7 @@
   "files": [
     "index.js",
     "index.d.ts",
+    "index.node.js",
     "dist/*",
     "package.json",
     "README.md"
@@ -38,11 +39,12 @@
     "install:all": "yarn && cd example && yarn",
     "start:all": "concurrently \"yarn start\" \"cd example && yarn start\" -n 'module,website' -k",
     "build": "ttsc && babel src --out-dir ./dist --extensions '.ts,.tsx' && webpack",
+    "build:node": "yarn build --config webpack.node.config.js",
     "test": "jest --config jest.config.js --collectCoverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\" \"example/src/**/*.{ts,tsx}\" \"example/src/**/*.js\"",
     "lint": "eslint . --ext '.ts,.tsx'",
     "typecheck": "ttsc --noEmit true --emitDeclarationOnly false",
-    "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build",
+    "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build && yarn build:node",
     "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +"
   },
   "devDependencies": {

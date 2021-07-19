@@ -28,11 +28,11 @@ export const srSpeak = (text: string, priority: 'polite' | 'assertive') => {
   const elementById: HTMLElement | null = document.getElementById(id);
 
   if (elementById) {
-    window.setTimeout(() => {
+    global.setTimeout(() => {
       elementById.innerText = text;
     }, 100);
 
-    window.setTimeout(() => {
+    global.setTimeout(() => {
       document.body.removeChild(elementById);
     }, 1000);
   }
