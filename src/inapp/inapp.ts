@@ -18,6 +18,7 @@ import {
   trackInAppConsume,
   trackInAppOpen
 } from '../events';
+import { DISPLAY_INTERVAL_DEFAULT } from 'src/constants';
 
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
@@ -119,7 +120,7 @@ export function getInAppMessages(
                   clearTimeout(timer as NodeJS.Timeout);
 
                   paintMessageToDOM();
-                }, payload.displayInterval || 30000);
+                }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
               }
 
               /*
