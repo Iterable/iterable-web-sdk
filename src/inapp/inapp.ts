@@ -12,7 +12,12 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from './utils';
-import { trackInAppClick, trackInAppConsume, trackInAppOpen } from '../events';
+import {
+  trackInAppClick,
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
+} from '../events';
 
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
@@ -101,6 +106,11 @@ export function getInAppMessages(
                   behave more like a button with a logical aria label
                 */
                 addButtonAttrsToAnchorTag(link, 'close modal');
+
+                trackInAppClose({
+                  messageId: activeMessage.messageId,
+                  clickedUrl
+                }).catch((e) => e);
 
                 /* then close the message and start a timer to show the next one */
                 iframe.remove();
