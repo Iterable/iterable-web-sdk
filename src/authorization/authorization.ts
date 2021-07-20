@@ -88,7 +88,7 @@ export function initIdentify(
           */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
               )
             ) {
               return {
@@ -142,7 +142,7 @@ export function initIdentify(
           */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
               )
             ) {
               return {
