@@ -9,7 +9,8 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {
       count: 20,
-      displayInterval: 5000,
+      displayInterval: 1000,
+
       onOpenScreenReaderMessage:
         'hey screen reader here telling you something just popped up on your screen!'
     },

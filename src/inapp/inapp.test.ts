@@ -1,6 +1,8 @@
 /**
  * @jest-environment jsdom
  */
+import MockAdapter from 'axios-mock-adapter';
+import { baseAxiosRequest } from '../request';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
@@ -9,9 +11,12 @@ import {
 } from './utils';
 import { trackInAppDelivery } from '../events';
 import { messages } from '../__data__/inAppMessages';
+import { getInAppMessages } from './inapp';
+
+const mockRequest = new MockAdapter(baseAxiosRequest);
 
 jest.mock('../events', () => ({
-  trackInAppDelivery: jest.fn().mockReturnValue(null)
+  trackInAppDelivery: jest.fn().mockReturnValue(Promise.resolve(''))
 }));
 
 describe('Utils', () => {
@@ -396,6 +401,38 @@ describe('Utils', () => {
       expect(el.getAttribute('aria-label')).toBe('hello');
       expect(el.getAttribute('role')).toBe('button');
       expect(el.getAttribute('href')).toBe('javascript:undefined');
+    });
+  });
+});
+
+describe('getInAppMessages', () => {
+  beforeAll(() => {
+    jest.clearAllMocks();
+  });
+
+  describe('getInAppMessages without auto painting', () => {
+    it('should just return a promise if auto-paint flag is false', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: messages
+      });
+
+      const response = await getInAppMessages({ count: 10 });
+
+      expect(response.data.inAppMessages.length).toBe(3);
+      expect((trackInAppDelivery as any).mock.calls.length).toBe(3);
+    });
+  });
+
+  describe('getInAppMessages with auto painting', () => {
+    it('should return correct values when auto-paint flag is true', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: messages
+      });
+
+      const response = await getInAppMessages({ count: 10 }, true);
+      expect(response.pauseMessageStream).toBeDefined();
+      expect(response.resumeMessageStream).toBeDefined();
+      expect(response.request).toBeDefined();
     });
   });
 });
