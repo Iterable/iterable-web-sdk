@@ -50,8 +50,16 @@ export function getInAppMessages(
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
 
-        const dismissMessage = () => {
+        const dismissMessage = (url?: string) => {
           /* close the message and start a timer to show the next one */
+          trackInAppClose(
+            url
+              ? {
+                  messageId: activeMessage.messageId,
+                  clickedUrl: url
+                }
+              : { messageId: activeMessage.messageId }
+          ).catch((e) => e);
           iframe.remove();
           messageIndex += 1;
           timer = global.setTimeout(() => {
@@ -126,12 +134,7 @@ export function getInAppMessages(
                 */
                 addButtonAttrsToAnchorTag(link, 'close modal');
 
-                trackInAppClose({
-                  messageId: activeMessage.messageId,
-                  clickedUrl
-                }).catch((e) => e);
-
-                dismissMessage();
+                dismissMessage(clickedUrl);
                 overlay.remove();
               }
 
