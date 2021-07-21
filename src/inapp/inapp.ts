@@ -12,7 +12,7 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from './utils';
-import { trackInAppClick } from '../events';
+import { trackInAppClick, trackInAppConsume, trackInAppOpen } from '../events';
 
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
@@ -36,11 +36,35 @@ export function getInAppMessages(
 
     const paintMessageToDOM = () => {
       if (parsedMessages?.[messageIndex]) {
+        const activeMessage = parsedMessages[messageIndex];
         /* add the message's html to an iframe and paint it to the DOM */
         const iframe = paintIFrame(
-          parsedMessages[messageIndex].content.html,
+          activeMessage.content.html,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
+
+        /* 
+          track in-app consumes only when _saveToInbox_ 
+          is falsy or undefined and always track in-app opens
+
+          Also swallow any 400+ response errors. We don't care about them.
+        */
+        Promise.all(
+          !activeMessage?.saveToInbox
+            ? [
+                trackInAppOpen({
+                  messageId: activeMessage.messageId
+                }),
+                trackInAppConsume({
+                  messageId: activeMessage.messageId
+                })
+              ]
+            : [
+                trackInAppOpen({
+                  messageId: activeMessage.messageId
+                })
+              ]
+        ).catch((e) => e);
 
         /* now we'll add click tracking to _all_ anchor tags */
         const links =
@@ -67,7 +91,7 @@ export function getInAppMessages(
               /* track the clicked link */
               trackInAppClick({
                 clickedUrl,
-                messageId: parsedMessages[messageIndex]?.messageId
+                messageId: activeMessage?.messageId
                 /* swallow the network error */
               }).catch((e) => e);
 
