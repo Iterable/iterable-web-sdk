@@ -52,3 +52,10 @@ button:active:not(.disabled) {
   -ms-transform: translateY(3px);
   transform: translateY(3px);
 }
+
+footer {
+  min-height: 1000px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
