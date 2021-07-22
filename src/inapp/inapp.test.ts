@@ -7,17 +7,13 @@ import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
   sortInAppMessages,
-  trackMessagesDelivered
+  trackMessagesDelivered,
+  paintOverlay
 } from './utils';
-import { trackInAppDelivery } from '../events';
 import { messages } from '../__data__/inAppMessages';
 import { getInAppMessages } from './inapp';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
-
-jest.mock('../events', () => ({
-  trackInAppDelivery: jest.fn().mockReturnValue(Promise.resolve(''))
-}));
 
 describe('Utils', () => {
   describe('Filtering', () => {
@@ -388,12 +384,30 @@ describe('Utils', () => {
 
   describe('track in app delivery', () => {
     it('should call trackInAppDelivery X times for X messages', async () => {
-      trackMessagesDelivered([{ messageId: '123' }, { messageId: '234' }]);
-      expect((trackInAppDelivery as any).mock.calls.length).toBe(2);
+      mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
+      await trackMessagesDelivered([
+        { messageId: '123' },
+        { messageId: '234' }
+      ]);
+      expect(mockRequest.history.post.length).toBe(2);
+    });
+
+    it('should not reject if 400 responses happen', async () => {
+      mockRequest.onPost('/events/trackInAppDelivery').reply(400, {});
+
+      const response = await trackMessagesDelivered([
+        { messageId: '123' },
+        { messageId: '234' }
+      ]);
+      expect((response as any).response.status).toBe(400);
     });
   });
 
   describe('DOM Manipulation', () => {
+    beforeAll(() => {
+      jest.clearAllMocks();
+      jest.resetAllMocks();
+    });
     it('should add button attrs to element', () => {
       const el = document.createElement('div');
       addButtonAttrsToAnchorTag(el, 'hello');
@@ -402,12 +416,29 @@ describe('Utils', () => {
       expect(el.getAttribute('role')).toBe('button');
       expect(el.getAttribute('href')).toBe('javascript:undefined');
     });
+
+    it('should paint an overlay', () => {
+      const mockFn = jest.fn();
+      const overlay = paintOverlay('#222', 0.8, mockFn);
+
+      expect(overlay.tagName).toBe('DIV');
+    });
+
+    it('should trigger onclick when overlay is clicked', () => {
+      const mockFn = jest.fn();
+      const overlay = paintOverlay('#222', 0.8, mockFn);
+
+      const clickEvent = new MouseEvent('click');
+      overlay.dispatchEvent(clickEvent);
+      expect(mockFn).toHaveBeenCalled();
+    });
   });
 });
 
 describe('getInAppMessages', () => {
-  beforeAll(() => {
+  beforeEach(() => {
     jest.clearAllMocks();
+    jest.resetAllMocks();
   });
 
   describe('getInAppMessages without auto painting', () => {
@@ -415,11 +446,11 @@ describe('getInAppMessages', () => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: messages
       });
+      mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
 
       const response = await getInAppMessages({ count: 10 });
 
       expect(response.data.inAppMessages.length).toBe(3);
-      expect((trackInAppDelivery as any).mock.calls.length).toBe(3);
     });
   });
 
@@ -428,6 +459,7 @@ describe('getInAppMessages', () => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: messages
       });
+      mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
 
       const response = await getInAppMessages({ count: 10 }, true);
       expect(response.pauseMessageStream).toBeDefined();

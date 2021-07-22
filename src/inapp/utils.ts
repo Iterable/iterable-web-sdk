@@ -27,12 +27,17 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
  */
 export const paintIFrame = (html: string, srMessage?: string) => {
   const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.border = 'none';
-  iframe.style.height = '100vh';
-  iframe.style.width = '100vw';
-  iframe.style.top = '0';
-  iframe.style.left = '0';
+  iframe.style.cssText = `
+    position: fixed;
+    border: none;
+    margin: auto;
+    width: 50%;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 9999;
+  `;
   document.body.appendChild(iframe);
   iframe.contentWindow?.document?.open();
   iframe.contentWindow?.document?.write(html);
@@ -51,15 +56,40 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
 export const trackMessagesDelivered = (
   messages: Partial<InAppMessage>[] = []
 ) => {
-  for (let i = 0; i < messages.length; i++) {
-    if (!!messages[i].messageId) {
-      trackInAppDelivery({
-        messageId: messages[i].messageId as string
+  return Promise.all(
+    messages?.map((eachMessage) => {
+      return trackInAppDelivery({
+        messageId: eachMessage.messageId as string
         /* 
           swallow any network failures. 
           If it fails, there's nothing really we can do here. 
         */
-      }).catch((e) => e);
-    }
-  }
+      });
+    })
+  ).catch((e) => e);
+};
+
+export const paintOverlay = (
+  color = '#fff',
+  opacity = 0,
+  handleDismiss: () => void
+) => {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    background-color: ${color};
+    opacity: ${opacity};
+    top: 0;
+    left: 0;
+    z-index: 9998;
+  `;
+
+  overlay.addEventListener('click', () => {
+    handleDismiss();
+    overlay.remove();
+  });
+  document.body.appendChild(overlay);
+  return overlay;
 };

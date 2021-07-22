@@ -9,14 +9,15 @@ import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
   paintIFrame,
+  paintOverlay,
   sortInAppMessages,
   trackMessagesDelivered
 } from './utils';
 import {
   trackInAppClick,
-  trackInAppClose,
-  trackInAppConsume,
-  trackInAppOpen
+  trackInAppClose
+  // trackInAppConsume,
+  // trackInAppOpen
 } from '../events';
 import { DISPLAY_INTERVAL_DEFAULT } from 'src/constants';
 
@@ -49,28 +50,53 @@ export function getInAppMessages(
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
 
+        const dismissMessage = (url?: string) => {
+          /* close the message and start a timer to show the next one */
+          trackInAppClose(
+            url
+              ? {
+                  messageId: activeMessage.messageId,
+                  clickedUrl: url
+                }
+              : { messageId: activeMessage.messageId }
+          ).catch((e) => e);
+          iframe.remove();
+          messageIndex += 1;
+          timer = global.setTimeout(() => {
+            clearTimeout(timer as NodeJS.Timeout);
+
+            paintMessageToDOM();
+          }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
+        };
+
+        const overlay = paintOverlay(
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.hex,
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha,
+          dismissMessage
+        );
+
         /* 
           track in-app consumes only when _saveToInbox_ 
           is falsy or undefined and always track in-app opens
 
           Also swallow any 400+ response errors. We don't care about them.
         */
-        Promise.all(
-          !activeMessage?.saveToInbox
-            ? [
-                trackInAppOpen({
-                  messageId: activeMessage.messageId
-                }),
-                trackInAppConsume({
-                  messageId: activeMessage.messageId
-                })
-              ]
-            : [
-                trackInAppOpen({
-                  messageId: activeMessage.messageId
-                })
-              ]
-        ).catch((e) => e);
+        // Promise.all(
+        //   !activeMessage?.saveToInbox
+        //     ? [
+        //         trackInAppOpen({
+        //           messageId: activeMessage.messageId
+        //         }),
+        //         trackInAppConsume({
+        //           messageId: activeMessage.messageId
+        //         })
+        //       ]
+        //     : [
+        //         trackInAppOpen({
+        //           messageId: activeMessage.messageId
+        //         })
+        //       ]
+        // ).catch((e) => e);
 
         /* now we'll add click tracking to _all_ anchor tags */
         const links =
@@ -108,19 +134,8 @@ export function getInAppMessages(
                 */
                 addButtonAttrsToAnchorTag(link, 'close modal');
 
-                trackInAppClose({
-                  messageId: activeMessage.messageId,
-                  clickedUrl
-                }).catch((e) => e);
-
-                /* then close the message and start a timer to show the next one */
-                iframe.remove();
-                messageIndex += 1;
-                timer = global.setTimeout(() => {
-                  clearTimeout(timer as NodeJS.Timeout);
-
-                  paintMessageToDOM();
-                }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
+                dismissMessage(clickedUrl);
+                overlay.remove();
               }
 
               /*
