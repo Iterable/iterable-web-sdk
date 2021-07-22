@@ -75,6 +75,16 @@ export function getInAppMessages(
           dismissMessage
         );
 
+        const handleEscKeypress = (event: KeyboardEvent) => {
+          if (event.key === 'Escape') {
+            dismissMessage();
+            overlay.remove();
+            document.removeEventListener('keydown', handleEscKeypress);
+          }
+        };
+
+        document.addEventListener('keydown', handleEscKeypress);
+
         /* 
           track in-app consumes only when _saveToInbox_ 
           is falsy or undefined and always track in-app opens
