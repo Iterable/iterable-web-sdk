@@ -192,7 +192,7 @@ export function getInAppMessages(
   */
   return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
-    url: '/inApp/getMessages',
+    url: '/inApp/getMfessages',
     params: payload
   }).then((response) => {
     trackMessagesDelivered(response.data.inAppMessages || []);
