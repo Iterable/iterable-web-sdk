@@ -12,7 +12,13 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from './utils';
-import { trackInAppClick, trackInAppConsume, trackInAppOpen } from '../events';
+import {
+  trackInAppClick,
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
+} from '../events';
+import { DISPLAY_INTERVAL_DEFAULT } from 'src/constants';
 
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
@@ -102,6 +108,11 @@ export function getInAppMessages(
                 */
                 addButtonAttrsToAnchorTag(link, 'close modal');
 
+                trackInAppClose({
+                  messageId: activeMessage.messageId,
+                  clickedUrl
+                }).catch((e) => e);
+
                 /* then close the message and start a timer to show the next one */
                 iframe.remove();
                 messageIndex += 1;
@@ -109,7 +120,7 @@ export function getInAppMessages(
                   clearTimeout(timer as NodeJS.Timeout);
 
                   paintMessageToDOM();
-                }, payload.displayInterval || 30000);
+                }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
               }
 
               /*
