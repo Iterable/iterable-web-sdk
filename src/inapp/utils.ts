@@ -52,6 +52,7 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
 export const paintIFrame = (
   html: string,
   callback: (frame: HTMLIFrameElement) => void,
+  position: 'full' | 'top-right' | 'bottom-right' | 'center',
   srMessage?: string
 ) => {
   const iframe = document.createElement('iframe');
@@ -67,6 +68,23 @@ export const paintIFrame = (
     z-index: 9999;
   `;
 
+  if (position === 'top-right') {
+    iframe.style.bottom = 'unset';
+    iframe.style.left = 'unset';
+    iframe.style.margin = 'unset';
+  }
+
+  if (position === 'bottom-right') {
+    iframe.style.top = 'unset';
+    iframe.style.left = 'unset';
+    iframe.style.margin = 'unset';
+  }
+
+  if (position === 'full') {
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+  }
+
   /* 
   find all the images in the in-app message, preload them, and 
   only then set the height because we need to know how tall the images
@@ -79,14 +97,15 @@ export const paintIFrame = (
     html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
   preloadImages(images, () => {
     /* 
-      set the scroll height to the content inside, but since images
-      are going to take some time to load, we opt to preload them, THEN
-      set the inner HTML of the iframe
+    set the scroll height to the content inside, but since images
+    are going to take some time to load, we opt to preload them, THEN
+    set the inner HTML of the iframe
     */
     document.body.appendChild(iframe);
     iframe.contentWindow?.document?.open();
     iframe.contentWindow?.document?.write(html);
     iframe.contentWindow?.document?.close();
+
     callback(iframe);
     iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';
   });

@@ -78,7 +78,7 @@ export function getInAppMessages(
           (activeIframe) => {
             /* now we'll add click tracking to _all_ anchor tags */
             const links =
-              iframe.contentWindow?.document?.querySelectorAll('a') || [];
+              activeIframe.contentWindow?.document?.querySelectorAll('a') || [];
 
             for (let i = 0; i < links.length; i++) {
               const link = links[i];
@@ -139,6 +139,7 @@ export function getInAppMessages(
               });
             }
           },
+          'center',
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
 
