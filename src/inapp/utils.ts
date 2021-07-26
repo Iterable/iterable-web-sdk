@@ -97,9 +97,9 @@ export const paintIFrame = (
     html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
   preloadImages(images, () => {
     /* 
-    set the scroll height to the content inside, but since images
-    are going to take some time to load, we opt to preload them, THEN
-    set the inner HTML of the iframe
+      set the scroll height to the content inside, but since images
+      are going to take some time to load, we opt to preload them, THEN
+      set the inner HTML of the iframe
     */
     document.body.appendChild(iframe);
     iframe.contentWindow?.document?.open();
