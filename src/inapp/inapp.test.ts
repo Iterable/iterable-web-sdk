@@ -418,19 +418,9 @@ describe('Utils', () => {
     });
 
     it('should paint an overlay', () => {
-      const mockFn = jest.fn();
-      const overlay = paintOverlay('#222', 0.8, mockFn);
+      const overlay = paintOverlay('#222', 0.8);
 
       expect(overlay.tagName).toBe('DIV');
-    });
-
-    it('should trigger onclick when overlay is clicked', () => {
-      const mockFn = jest.fn();
-      const overlay = paintOverlay('#222', 0.8, mockFn);
-
-      const clickEvent = new MouseEvent('click');
-      overlay.dispatchEvent(clickEvent);
-      expect(mockFn).toHaveBeenCalled();
     });
   });
 });
