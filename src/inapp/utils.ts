@@ -109,17 +109,58 @@ export const paintIFrame = (
         iframe.style.bottom = 'unset';
         iframe.style.left = 'unset';
         iframe.style.margin = 'unset';
+
+        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        if (!mediaQuery.matches) {
+          iframe.style.width = '100%';
+        }
+
+        mediaQuery.onchange = (event) => {
+          if (!event.matches) {
+            iframe.style.width = '100%';
+          } else {
+            iframe.style.width = '50%';
+          }
+        };
       }
 
       if (position === 'bottom-right') {
         iframe.style.top = 'unset';
         iframe.style.left = 'unset';
         iframe.style.margin = 'unset';
+
+        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        if (!mediaQuery.matches) {
+          iframe.style.width = '100%';
+        }
+
+        mediaQuery.onchange = (event) => {
+          if (!event.matches) {
+            iframe.style.width = '100%';
+          } else {
+            iframe.style.width = '50%';
+          }
+        };
       }
 
       if (position === 'full') {
         iframe.style.width = '100%';
         iframe.style.height = '100%';
+      }
+
+      if (position === 'center') {
+        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        if (!mediaQuery.matches) {
+          iframe.style.width = '100%';
+        }
+
+        mediaQuery.onchange = (event) => {
+          if (!event.matches) {
+            iframe.style.width = '100%';
+          } else {
+            iframe.style.width = '50%';
+          }
+        };
       }
 
       iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';
