@@ -139,7 +139,7 @@ export function getInAppMessages(
               });
             }
           },
-          'center',
+          'top-right',
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
 

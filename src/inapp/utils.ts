@@ -1,9 +1,9 @@
 import { by } from '@pabra/sortby';
 import { InAppMessage } from './types';
-import srSpeak from 'src/utils/srSpeak';
+import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
 
-const preloadImages = (imageLinks: string[], callback: () => void) => {
+export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
     callback();
   }
@@ -17,6 +17,15 @@ const preloadImages = (imageLinks: string[], callback: () => void) => {
         track the amount of images we preloaded. If this is the last image
         that's been preloaded, it's time to invoke the callback function we passed.
       */
+      if (loadedImages + 1 !== imageLinks.length) {
+        return (loadedImages += 1);
+      }
+
+      return callback();
+    };
+
+    /* do the same for onerror - if the images fail, we still need to show the message */
+    images[i].onerror = () => {
       if (loadedImages + 1 !== imageLinks.length) {
         return (loadedImages += 1);
       }
@@ -98,19 +107,15 @@ export const paintIFrame = (
         border: none;
         margin: auto;
         width: 50%;
-        left: 0;
-        right: 0;
-        top: 0;
-        bottom: 0;
         z-index: 9999;
     `;
 
       if (position === 'top-right') {
-        iframe.style.bottom = 'unset';
-        iframe.style.left = 'unset';
+        iframe.style.top = '0';
+        iframe.style.right = '0';
         iframe.style.margin = 'unset';
 
-        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
           iframe.style.width = '100%';
         }
@@ -125,11 +130,11 @@ export const paintIFrame = (
       }
 
       if (position === 'bottom-right') {
-        iframe.style.top = 'unset';
-        iframe.style.left = 'unset';
+        iframe.style.bottom = '0';
+        iframe.style.right = '0';
         iframe.style.margin = 'unset';
 
-        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
           iframe.style.width = '100%';
         }
@@ -149,7 +154,11 @@ export const paintIFrame = (
       }
 
       if (position === 'center') {
-        const mediaQuery = window.matchMedia('(min-width: 850px)');
+        iframe.style.top = '0';
+        iframe.style.bottom = '0';
+        iframe.style.left = '0';
+        iframe.style.right = '0';
+        const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
           iframe.style.width = '100%';
         }
