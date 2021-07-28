@@ -4,10 +4,11 @@
 
   @thanks https://a11y-guidelines.orange.com/en/web/components-examples/make-a-screen-reader-talk/
 */
-export const srSpeak = (text: string, priority: 'polite' | 'assertive') => {
+export const srSpeak = (text: string, priority?: 'polite' | 'assertive') => {
   const el = document.createElement('div');
   const id = 'speak-' + Math.random().toString(36).substr(2, 9);
   el.setAttribute('id', id);
+  el.setAttribute('data-test-id', 'sr-speak');
   el.setAttribute('aria-live', priority || 'polite');
   /* 
     _display: none_ would cause the SR to not read the message so this just
