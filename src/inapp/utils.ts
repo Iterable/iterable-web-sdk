@@ -3,6 +3,29 @@ import { InAppMessage } from './types';
 import srSpeak from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
 
+const preloadImages = (imageLinks: string[], callback: () => void) => {
+  if (!imageLinks?.length) {
+    callback();
+  }
+  const images = [];
+  let loadedImages = 0;
+  for (let i = 0; i < imageLinks.length; i++) {
+    images[i] = new Image();
+    images[i].src = imageLinks[i];
+    images[i].onload = () => {
+      /* 
+        track the amount of images we preloaded. If this is the last image
+        that's been preloaded, it's time to invoke the callback function we passed.
+      */
+      if (loadedImages + 1 !== imageLinks.length) {
+        return (loadedImages += 1);
+      }
+
+      return callback();
+    };
+  }
+};
+
 export const filterHiddenInAppMessages = (
   messages: Partial<InAppMessage>[] = []
 ) => {
@@ -22,10 +45,15 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
 /**
  *
  * @param html html you want to paint to the DOM inside the iframe
+ * @param callback method to run after HTML has been written to iframe
  * @param srMessage The message you want the screen reader to read when popping up the message
  * @returns { HTMLIFrameElement }
  */
-export const paintIFrame = (html: string, srMessage?: string) => {
+export const paintIFrame = (
+  html: string,
+  callback: (frame: HTMLIFrameElement) => void,
+  srMessage?: string
+) => {
   const iframe = document.createElement('iframe');
   iframe.style.cssText = `
     position: fixed;
@@ -38,9 +66,30 @@ export const paintIFrame = (html: string, srMessage?: string) => {
     bottom: 0;
     z-index: 9999;
   `;
-  document.body.appendChild(iframe);
-  iframe.contentWindow?.document?.open();
-  iframe.contentWindow?.document?.write(html);
+
+  /* 
+  find all the images in the in-app message, preload them, and 
+  only then set the height because we need to know how tall the images
+  are before we set the height of the iframe.
+  
+  This prevents a race condition where if we set the height before the images
+  are loaded, we might end up with a scrolling iframe
+  */
+  const images =
+    html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
+  preloadImages(images, () => {
+    /* 
+      set the scroll height to the content inside, but since images
+      are going to take some time to load, we opt to preload them, THEN
+      set the inner HTML of the iframe
+    */
+    document.body.appendChild(iframe);
+    iframe.contentWindow?.document?.open();
+    iframe.contentWindow?.document?.write(html);
+    iframe.contentWindow?.document?.close();
+    callback(iframe);
+    iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';
+  });
   if (srMessage) {
     srSpeak(srMessage, 'assertive');
   }
@@ -69,11 +118,7 @@ export const trackMessagesDelivered = (
   ).catch((e) => e);
 };
 
-export const paintOverlay = (
-  color = '#fff',
-  opacity = 0,
-  handleDismiss: () => void
-) => {
+export const paintOverlay = (color = '#fff', opacity = 0) => {
   const overlay = document.createElement('div');
   overlay.style.cssText = `
     height: 100%;
@@ -86,10 +131,6 @@ export const paintOverlay = (
     z-index: 9998;
   `;
 
-  overlay.addEventListener('click', () => {
-    handleDismiss();
-    overlay.remove();
-  });
   document.body.appendChild(overlay);
   return overlay;
 };

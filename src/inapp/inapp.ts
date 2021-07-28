@@ -44,13 +44,11 @@ export function getInAppMessages(
     const paintMessageToDOM = () => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
-        /* add the message's html to an iframe and paint it to the DOM */
-        const iframe = paintIFrame(
-          activeMessage.content.html,
-          payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
-        );
 
-        const dismissMessage = (url?: string) => {
+        const dismissMessage = (
+          activeIframe: HTMLIFrameElement,
+          url?: string
+        ) => {
           /* close the message and start a timer to show the next one */
           trackInAppClose(
             url
@@ -60,7 +58,7 @@ export function getInAppMessages(
                 }
               : { messageId: activeMessage.messageId }
           ).catch((e) => e);
-          iframe.remove();
+          activeIframe.remove();
           messageIndex += 1;
           timer = global.setTimeout(() => {
             clearTimeout(timer as NodeJS.Timeout);
@@ -71,13 +69,87 @@ export function getInAppMessages(
 
         const overlay = paintOverlay(
           activeMessage?.content?.inAppDisplaySettings?.bgColor?.hex,
-          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha,
-          dismissMessage
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha
         );
+
+        /* add the message's html to an iframe and paint it to the DOM */
+        const iframe = paintIFrame(
+          activeMessage.content.html,
+          (activeIframe) => {
+            /* now we'll add click tracking to _all_ anchor tags */
+            const links =
+              iframe.contentWindow?.document?.querySelectorAll('a') || [];
+
+            for (let i = 0; i < links.length; i++) {
+              const link = links[i];
+              link.addEventListener('click', (event) => {
+                /* 
+                  remove default linking behavior because we're in an iframe 
+                  so we need to link the user programatically
+                */
+                event.preventDefault();
+                const clickedUrl = link.getAttribute('href') || '';
+                const openInNewTab = link.getAttribute('target') === '_blank';
+                const isIterableKeywordLink = !!clickedUrl.match(
+                  /itbl:\/\/|iterable:\/\/|action:\/\//gim
+                );
+                const isDismissNode = !!clickedUrl.match(
+                  /(itbl:\/\/|iterable:\/\/)dismiss/gim
+                );
+
+                if (clickedUrl) {
+                  /* track the clicked link */
+                  trackInAppClick({
+                    clickedUrl,
+                    messageId: activeMessage?.messageId
+                    /* swallow the network error */
+                  }).catch((e) => e);
+
+                  if (isDismissNode) {
+                    /* 
+                      give the close anchor tag properties that make it 
+                      behave more like a button with a logical aria label
+                    */
+                    addButtonAttrsToAnchorTag(link, 'close modal');
+
+                    dismissMessage(activeIframe, clickedUrl);
+                    overlay.remove();
+                  }
+
+                  /*
+                    finally (since we're in an iframe), programatically click the link
+                    and send the user to where they need to go, only if it's not one
+                    of the reserved iterable keyword links
+                  */
+                  if (!isIterableKeywordLink) {
+                    if (openInNewTab) {
+                      /**
+                        Using target="_blank" without rel="noreferrer" and rel="noopener" 
+                        makes the website vulnerable to window.opener API exploitation attacks
+                        
+                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                      */
+                      global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
+                    } else {
+                      /* otherwise just link them in the same tab */
+                      global.location.href = clickedUrl;
+                    }
+                  }
+                }
+              });
+            }
+          },
+          payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
+        );
+
+        overlay.addEventListener('click', () => {
+          dismissMessage(iframe);
+          overlay.remove();
+        });
 
         const handleEscKeypress = (event: KeyboardEvent) => {
           if (event.key === 'Escape') {
-            dismissMessage();
+            dismissMessage(iframe);
             overlay.remove();
             document.removeEventListener('keydown', handleEscKeypress);
           }
@@ -107,71 +179,6 @@ export function getInAppMessages(
         //         })
         //       ]
         // ).catch((e) => e);
-
-        /* now we'll add click tracking to _all_ anchor tags */
-        const links =
-          iframe.contentWindow?.document?.querySelectorAll('a') || [];
-
-        for (let i = 0; i < links.length; i++) {
-          const link = links[i];
-          link.addEventListener('click', (event) => {
-            /* 
-              remove default linking behavior because we're in an iframe 
-              so we need to link the user programatically
-            */
-            event.preventDefault();
-            const clickedUrl = link.getAttribute('href') || '';
-            const openInNewTab = link.getAttribute('target') === '_blank';
-            const isIterableKeywordLink = !!clickedUrl.match(
-              /itbl:\/\/|iterable:\/\/|action:\/\//gim
-            );
-            const isDismissNode = !!clickedUrl.match(
-              /(itbl:\/\/|iterable:\/\/)dismiss/gim
-            );
-
-            if (clickedUrl) {
-              /* track the clicked link */
-              trackInAppClick({
-                clickedUrl,
-                messageId: activeMessage?.messageId
-                /* swallow the network error */
-              }).catch((e) => e);
-
-              if (isDismissNode) {
-                /* 
-                  give the close anchor tag properties that make it 
-                  behave more like a button with a logical aria label
-                */
-                addButtonAttrsToAnchorTag(link, 'close modal');
-
-                dismissMessage(clickedUrl);
-                overlay.remove();
-              }
-
-              /*
-                finally (since we're in an iframe), programatically click the link
-                and send the user to where they need to go, only if it's not one
-                of the reserved iterable keyword links
-              */
-              if (!isIterableKeywordLink) {
-                if (openInNewTab) {
-                  /**
-                    Using target="_blank" without rel="noreferrer" and rel="noopener" 
-                    makes the website vulnerable to window.opener API exploitation attacks
-                    
-                    @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-                  */
-                  global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
-                } else {
-                  /* otherwise just link them in the same tab */
-                  global.location.href = clickedUrl;
-                }
-              }
-            }
-          });
-        }
-
-        iframe.contentWindow?.document?.close();
       }
     };
 
