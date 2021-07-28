@@ -52,6 +52,7 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
 export const paintIFrame = (
   html: string,
   callback: (frame: HTMLIFrameElement) => void,
+  position: 'full' | 'top-right' | 'bottom-right' | 'center',
   srMessage?: string
 ) => {
   const iframe = document.createElement('iframe');
@@ -66,6 +67,23 @@ export const paintIFrame = (
     bottom: 0;
     z-index: 9999;
   `;
+
+  if (position === 'top-right') {
+    iframe.style.bottom = 'unset';
+    iframe.style.left = 'unset';
+    iframe.style.margin = 'unset';
+  }
+
+  if (position === 'bottom-right') {
+    iframe.style.top = 'unset';
+    iframe.style.left = 'unset';
+    iframe.style.margin = 'unset';
+  }
+
+  if (position === 'full') {
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+  }
 
   /* 
   find all the images in the in-app message, preload them, and 
@@ -87,6 +105,7 @@ export const paintIFrame = (
     iframe.contentWindow?.document?.open();
     iframe.contentWindow?.document?.write(html);
     iframe.contentWindow?.document?.close();
+
     callback(iframe);
     iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';
   });
