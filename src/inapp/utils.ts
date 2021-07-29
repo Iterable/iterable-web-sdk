@@ -65,6 +65,7 @@ export const paintIFrame = (
   srMessage?: string
 ) => {
   const iframe = document.createElement('iframe');
+  iframe.setAttribute('id', 'iterable-iframe');
 
   /* 
     find all the images in the in-app message, preload them, and 
@@ -172,7 +173,7 @@ export const paintIFrame = (
         };
       }
 
-      iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';
+      iframe.height = iframe.contentWindow?.document?.body?.scrollHeight + 'px';
 
       clearTimeout(timeout);
     }, 100);
@@ -207,6 +208,7 @@ export const trackMessagesDelivered = (
 
 export const paintOverlay = (color = '#fff', opacity = 0) => {
   const overlay = document.createElement('div');
+  overlay.setAttribute('data-test-overlay', 'true');
   overlay.style.cssText = `
     height: 100%;
     width: 100%;
