@@ -28,7 +28,7 @@ describe('getInAppMessages', () => {
     it('should just return a promise if auto-paint flag is false', async () => {
       const response = await getInAppMessages({ count: 10 });
 
-      expect(response.data.inAppMessages.length).toBe(4);
+      expect(response.data.inAppMessages.length).toBe(3);
     });
 
     it('should track in app messages delivered', async () => {
@@ -38,7 +38,7 @@ describe('getInAppMessages', () => {
         mockRequest.history.post.filter((e) =>
           e.url?.match(/trackInAppDelivery/gim)
         ).length
-      ).toBe(4);
+      ).toBe(3);
     });
   });
 
@@ -163,16 +163,15 @@ describe('getInAppMessages', () => {
 
       jest.advanceTimersByTime(32000);
 
-      /* there are 3 images in the second mock in-app message, so load the images 3 times */
-      mockOnLoad();
-      mockOnLoad();
       mockOnLoad();
 
       expect(
-        document
-          .getElementById('iterable-iframe')
-          ?.querySelector('a[href="superdraft://close"]')
-      ).toBeDefined();
+        (
+          document.getElementById('iterable-iframe') as HTMLIFrameElement
+        )?.contentWindow?.document.body?.querySelector(
+          'a[href="action://close-second-iframe"]'
+        )
+      ).not.toBe(null);
     });
 
     it('should not paint next message to the DOM after 30s if queue is paused', async () => {
@@ -220,16 +219,14 @@ describe('getInAppMessages', () => {
       resumeMessageStream();
 
       mockOnLoad();
-      mockOnLoad();
-      mockOnLoad();
 
       expect(
         (
           document.getElementById('iterable-iframe') as HTMLIFrameElement
         )?.contentWindow?.document.body?.querySelector(
-          'a[href="superdraft://"]'
+          'a[href="action://close-second-iframe"]'
         )
-      ).toBeDefined();
+      ).not.toBe(null);
     });
 
     it('should navigate offsite in a new tab if a clicked link has target _blank', async () => {
@@ -312,7 +309,7 @@ describe('getInAppMessages', () => {
         mockRequest.history.post.filter((e) =>
           e.url?.match(/trackInAppDelivery/gim)
         ).length
-      ).toBe(4);
+      ).toBe(3);
     });
   });
 });
