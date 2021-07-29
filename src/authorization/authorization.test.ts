@@ -175,6 +175,20 @@ describe('User Identification', () => {
       expect(JSON.parse(response.config.data).email).toBeUndefined();
       expect(response.config.params.email).toBeUndefined();
     });
+
+    it('should overwrite user ID set by setUserID', async () => {
+      const { setEmail, setUserID } = initIdentify('123');
+      setUserID('999');
+      setEmail('hello@gmail.com');
+
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        data: 'something'
+      });
+
+      const response = await getInAppMessages({ count: 10 });
+      expect(response.config.params.userId).toBeUndefined();
+      expect(response.config.params.email).toBe('hello@gmail.com');
+    });
   });
 
   describe('setUserID', () => {
@@ -265,6 +279,20 @@ describe('User Identification', () => {
       expect(JSON.parse(response.config.data).currentUserId).toBeUndefined();
       expect(JSON.parse(response.config.data).userId).toBeUndefined();
       expect(response.config.params.userId).toBeUndefined();
+    });
+
+    it('should overwrite email set by setEmail', async () => {
+      const { setEmail, setUserID } = initIdentify('123');
+      setEmail('hello@gmail.com');
+      setUserID('999');
+
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        data: 'something'
+      });
+
+      const response = await getInAppMessages({ count: 10 });
+      expect(response.config.params.email).toBeUndefined();
+      expect(response.config.params.userId).toBe('999');
     });
   });
 });
