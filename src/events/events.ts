@@ -1,6 +1,14 @@
 import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams } from './types';
+import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
+
+export const track = (payload: InAppTrackRequestParams) => {
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: '/events/track',
+    data: payload
+  });
+};
 
 export const trackInAppClose = (payload: InAppEventRequestParams) => {
   return baseIterableRequest<IterableResponse>({

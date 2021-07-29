@@ -1,6 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import {
+  track,
   trackInAppClick,
   trackInAppClose,
   trackInAppConsume,
@@ -11,6 +12,16 @@ import {
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
 describe('Events Requests', () => {
+  it('return the correct payload for trackInAppClick', async () => {
+    mockRequest.onPost('/events/track').reply(200, {
+      msg: 'hello'
+    });
+
+    const response = await track({ eventName: 'test' });
+
+    expect(JSON.parse(response.config.data).eventName).toBe('test');
+    expect(response.data.msg).toBe('hello');
+  });
   it('return the correct payload for trackInAppClick', async () => {
     mockRequest.onPost('/events/trackInAppClick').reply(200, {
       msg: 'hello'
