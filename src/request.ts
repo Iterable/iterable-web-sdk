@@ -24,15 +24,15 @@ export const baseIterableRequest = <T = any>(
   EventsApiController.trackInAppClose
   EventsApiController.inAppConsume
   EventsApiController.trackInAppDelivery
+  EventsApiController.track
+  CommerceApiController.trackPurchase
+  CommerceApiController.updateCart
   
   todo:
   UsersApiController.disableDevice
   UsersApiController.registerDeviceToken
   UsersApiController.updateSubscriptions
-  CommerceApiController.trackPurchase
-  CommerceApiController.updateCart
   EventsApiController.trackPushOpen
   EventsApiController.trackInboxSession
-  EventsApiController.track
   MobileApiController.getRemoteConfiguration
 */

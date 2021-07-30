@@ -143,20 +143,26 @@ export function getInAppMessages(
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         );
 
+        const generateHandleEscKeypress = (activeIframe: HTMLIFrameElement) => {
+          return function handleEscKeypress(event: KeyboardEvent) {
+            const iframeExists = document.body.contains(activeIframe);
+            if (event.key === 'Escape' && iframeExists) {
+              dismissMessage(iframe);
+              overlay.remove();
+              document.removeEventListener('keydown', handleEscKeypress);
+            }
+          };
+        };
+
+        const handleEscKeypress = generateHandleEscKeypress(iframe);
+
+        document.addEventListener('keydown', handleEscKeypress);
+
         overlay.addEventListener('click', () => {
           dismissMessage(iframe);
           overlay.remove();
+          document.removeEventListener('keydown', handleEscKeypress);
         });
-
-        const handleEscKeypress = (event: KeyboardEvent) => {
-          if (event.key === 'Escape') {
-            dismissMessage(iframe);
-            overlay.remove();
-            document.removeEventListener('keydown', handleEscKeypress);
-          }
-        };
-
-        document.addEventListener('keydown', handleEscKeypress);
 
         /* 
           track in-app consumes only when _saveToInbox_ 
