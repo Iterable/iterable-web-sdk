@@ -120,6 +120,10 @@ export const paintIFrame = (
       if (position === 'full') {
         iframe.style.width = '100%';
         iframe.style.height = '100%';
+        iframe.style.top = '0';
+        iframe.style.bottom = '0';
+        iframe.style.left = '0';
+        iframe.style.right = '0';
       }
 
       iframe.height = iframe.contentWindow?.document.body.scrollHeight + 'px';

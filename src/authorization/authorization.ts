@@ -84,8 +84,8 @@ export function initIdentify(
             }
 
             /*
-            endpoints that use _email_ payload prop in POST/PUT requests 
-          */
+              endpoints that use _email_ payload prop in POST/PUT requests 
+            */
             if (
               !!(config?.url || '').match(
                 /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
@@ -101,8 +101,28 @@ export function initIdentify(
             }
 
             /*
-            endpoints that use _email_ query param in GET requests
-          */
+              endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+            */
+            if (
+              !!(config?.url || '').match(
+                /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+              )
+            ) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  user: {
+                    ...(config.data.user || {}),
+                    email
+                  }
+                }
+              };
+            }
+
+            /*
+              endpoints that use _email_ query param in GET requests
+            */
             if (!!(config?.url || '').match(/getMessages/gim)) {
               return {
                 ...config,
@@ -138,8 +158,8 @@ export function initIdentify(
             }
 
             /*
-            endpoints that use _userId_ payload prop in POST/PUT requests 
-          */
+              endpoints that use _userId_ payload prop in POST/PUT requests 
+            */
             if (
               !!(config?.url || '').match(
                 /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
@@ -155,8 +175,28 @@ export function initIdentify(
             }
 
             /*
-            endpoints that use _userId_ query param in GET requests
-          */
+              endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+            */
+            if (
+              !!(config?.url || '').match(
+                /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+              )
+            ) {
+              return {
+                ...config,
+                data: {
+                  ...(config.data || {}),
+                  user: {
+                    ...(config.data.user || {}),
+                    userId
+                  }
+                }
+              };
+            }
+
+            /*
+              endpoints that use _userId_ query param in GET requests
+            */
             if (!!(config?.url || '').match(/getMessages/gim)) {
               return {
                 ...config,

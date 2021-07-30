@@ -4,6 +4,7 @@ import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { trackInAppClose } from '../events';
 import { updateUserEmail } from '../users';
+import { trackPurchase, updateCart } from '../commerce';
 
 let mockRequest: any = null;
 
@@ -155,6 +156,27 @@ describe('User Identification', () => {
       );
     });
 
+    it('should add user.email param to endpoints that need it', async () => {
+      const { setEmail } = initIdentify('123');
+      setEmail('hello@gmail.com');
+
+      mockRequest.onPost('/commerce/updateCart').reply(200, {
+        data: 'something'
+      });
+      mockRequest.onPost('/commerce/trackPurchase').reply(200, {
+        data: 'something'
+      });
+
+      const cartResponse = await updateCart({ items: [] });
+      const trackResponse = await trackPurchase({ items: [], total: 100 });
+      expect(JSON.parse(cartResponse.config.data).user.email).toBe(
+        'hello@gmail.com'
+      );
+      expect(JSON.parse(trackResponse.config.data).user.email).toBe(
+        'hello@gmail.com'
+      );
+    });
+
     it('adds no email body or header information to unrelated endpoints', async () => {
       const { setEmail } = initIdentify('123');
       setEmail('hello@gmail.com');
@@ -244,6 +266,23 @@ describe('User Identification', () => {
 
       const response = await updateUserEmail('hello@gmail.com');
       expect(JSON.parse(response.config.data).currentUserId).toBe('999');
+    });
+
+    it('should add user.userId param to endpoints that need it', async () => {
+      const { setUserID } = initIdentify('123');
+      setUserID('999');
+
+      mockRequest.onPost('/commerce/updateCart').reply(200, {
+        data: 'something'
+      });
+      mockRequest.onPost('/commerce/trackPurchase').reply(200, {
+        data: 'something'
+      });
+
+      const cartResponse = await updateCart({ items: [] });
+      const trackResponse = await trackPurchase({ items: [], total: 100 });
+      expect(JSON.parse(cartResponse.config.data).user.userId).toBe('999');
+      expect(JSON.parse(trackResponse.config.data).user.userId).toBe('999');
     });
 
     it('adds no userId body or header information to unrelated endpoints', async () => {

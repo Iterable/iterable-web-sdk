@@ -16,5 +16,8 @@ export const updateUser = (payload: UpdateUserParams) =>
   baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/users/update',
-    data: payload
+    data: {
+      ...payload,
+      preferUserId: true
+    }
   });
