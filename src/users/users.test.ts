@@ -11,9 +11,10 @@ describe('Users Requests', () => {
     });
 
     const response = await updateUser({
-      preferUserId: true
+      dataFields: {}
     });
 
+    expect(JSON.parse(response.config.data).dataFields).toEqual({});
     expect(JSON.parse(response.config.data).preferUserId).toBe(true);
     expect(response.data.msg).toBe('hello');
   });
