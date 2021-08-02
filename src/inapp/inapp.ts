@@ -132,7 +132,7 @@ export function getInAppMessages(
                       global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
                     } else {
                       /* otherwise just link them in the same tab */
-                      global.location.href = clickedUrl;
+                      global.location.assign(clickedUrl);
                     }
                   }
                 }

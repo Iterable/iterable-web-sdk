@@ -57,10 +57,12 @@ describe('Utils', () => {
         filterHiddenInAppMessages([
           {
             ...messages[0],
+            trigger: { type: 'good' },
             read: undefined
           },
           {
             ...messages[1],
+            trigger: { type: 'good' },
             read: undefined
           }
         ]).length
