@@ -1,3 +1,4 @@
+import { throttle } from 'throttle-debounce';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
@@ -8,6 +9,7 @@ import { baseIterableRequest } from '../request';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
+  generatePositions,
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
@@ -41,7 +43,7 @@ export function getInAppMessages(
     let messageIndex = 0;
     let parsedMessages: InAppMessage[] = [];
 
-    const paintMessageToDOM = () => {
+    const paintMessageToDOM = (): Promise<any> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
 
@@ -72,121 +74,142 @@ export function getInAppMessages(
           activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha
         );
 
-        /* add the message's html to an iframe and paint it to the DOM */
-        const iframe = paintIFrame(
-          activeMessage.content.html,
-          (activeIframe) => {
-            /* now we'll add click tracking to _all_ anchor tags */
-            const links =
-              activeIframe.contentWindow?.document?.querySelectorAll('a') || [];
-
-            for (let i = 0; i < links.length; i++) {
-              const link = links[i];
-              link.addEventListener('click', (event) => {
-                /* 
-                  remove default linking behavior because we're in an iframe 
-                  so we need to link the user programatically
-                */
-                event.preventDefault();
-                const clickedUrl = link.getAttribute('href') || '';
-                const openInNewTab = link.getAttribute('target') === '_blank';
-                const isIterableKeywordLink = !!clickedUrl.match(
-                  /itbl:\/\/|iterable:\/\/|action:\/\//gim
-                );
-                const isDismissNode = !!clickedUrl.match(
-                  /(itbl:\/\/|iterable:\/\/)dismiss/gim
-                );
-
-                if (clickedUrl) {
-                  /* track the clicked link */
-                  trackInAppClick({
-                    clickedUrl,
-                    messageId: activeMessage?.messageId
-                    /* swallow the network error */
-                  }).catch((e) => e);
-
-                  if (isDismissNode) {
-                    /* 
-                      give the close anchor tag properties that make it 
-                      behave more like a button with a logical aria label
-                    */
-                    addButtonAttrsToAnchorTag(link, 'close modal');
-
-                    dismissMessage(activeIframe, clickedUrl);
-                    overlay.remove();
-                  }
-
-                  /*
-                    finally (since we're in an iframe), programatically click the link
-                    and send the user to where they need to go, only if it's not one
-                    of the reserved iterable keyword links
-                  */
-                  if (!isIterableKeywordLink) {
-                    if (openInNewTab) {
-                      /**
-                        Using target="_blank" without rel="noreferrer" and rel="noopener" 
-                        makes the website vulnerable to window.opener API exploitation attacks
-                        
-                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-                      */
-                      global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
-                    } else {
-                      /* otherwise just link them in the same tab */
-                      global.location.assign(clickedUrl);
-                    }
-                  }
-                }
-              });
-            }
-          },
-          'top-right',
-          payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
+        const { top, bottom, right, left } = generatePositions(
+          activeMessage.content.inAppDisplaySettings?.top?.percentage,
+          activeMessage.content.inAppDisplaySettings?.bottom?.percentage,
+          activeMessage.content.inAppDisplaySettings?.right?.percentage,
+          activeMessage.content.inAppDisplaySettings?.left?.percentage
         );
 
-        const generateHandleEscKeypress = (activeIframe: HTMLIFrameElement) => {
-          return function handleEscKeypress(event: KeyboardEvent) {
-            const iframeExists = document.body.contains(activeIframe);
-            if (event.key === 'Escape' && iframeExists) {
-              dismissMessage(iframe);
+        /* add the message's html to an iframe and paint it to the DOM */
+        return paintIFrame(
+          activeMessage.content.html,
+          top,
+          bottom,
+          right,
+          left,
+          payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
+        ).then((activeIframe) => {
+          const throttledResize = throttle(750, () => {
+            activeIframe.style.height =
+              (activeIframe.contentWindow?.document?.body?.scrollHeight || 0) +
+              1 +
+              'px';
+          });
+
+          global.addEventListener('resize', throttledResize);
+
+          const handleEscKeypress = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+              dismissMessage(activeIframe);
               overlay.remove();
               document.removeEventListener('keydown', handleEscKeypress);
+              global.removeEventListener('resize', throttledResize);
             }
           };
-        };
 
-        const handleEscKeypress = generateHandleEscKeypress(iframe);
+          document.addEventListener('keydown', handleEscKeypress);
 
-        document.addEventListener('keydown', handleEscKeypress);
+          overlay.addEventListener('click', () => {
+            dismissMessage(activeIframe);
+            overlay.remove();
+            document.removeEventListener('keydown', handleEscKeypress);
+            global.removeEventListener('resize', throttledResize);
+          });
 
-        overlay.addEventListener('click', () => {
-          dismissMessage(iframe);
-          overlay.remove();
-          document.removeEventListener('keydown', handleEscKeypress);
+          /* 
+            track in-app consumes only when _saveToInbox_ 
+            is falsy or undefined and always track in-app opens
+
+            Also swallow any 400+ response errors. We don't care about them.
+          */
+          // Promise.all(
+          //   !activeMessage?.saveToInbox
+          //     ? [
+          //         trackInAppOpen({
+          //           messageId: activeMessage.messageId
+          //         }),
+          //         trackInAppConsume({
+          //           messageId: activeMessage.messageId
+          //         })
+          //       ]
+          //     : [
+          //         trackInAppOpen({
+          //           messageId: activeMessage.messageId
+          //         })
+          //       ]
+          // ).catch((e) => e);
+
+          /* now we'll add click tracking to _all_ anchor tags */
+          const links =
+            activeIframe.contentWindow?.document?.querySelectorAll('a') || [];
+
+          for (let i = 0; i < links.length; i++) {
+            const link = links[i];
+            link.addEventListener('click', (event) => {
+              /* 
+              remove default linking behavior because we're in an iframe 
+              so we need to link the user programatically
+              */
+              event.preventDefault();
+              const clickedUrl = link.getAttribute('href') || '';
+              const openInNewTab = link.getAttribute('target') === '_blank';
+              const isIterableKeywordLink = !!clickedUrl.match(
+                /itbl:\/\/|iterable:\/\/|action:\/\//gim
+              );
+              const isDismissNode = !!clickedUrl.match(
+                /(itbl:\/\/|iterable:\/\/)dismiss/gim
+              );
+
+              if (clickedUrl) {
+                /* track the clicked link */
+                trackInAppClick({
+                  clickedUrl,
+                  messageId: activeMessage?.messageId
+                  /* swallow the network error */
+                }).catch((e) => e);
+
+                if (isDismissNode) {
+                  /* 
+                    give the close anchor tag properties that make it 
+                    behave more like a button with a logical aria label
+                  */
+                  addButtonAttrsToAnchorTag(link, 'close modal');
+
+                  dismissMessage(activeIframe, clickedUrl);
+                  overlay.remove();
+                  document.removeEventListener('keydown', handleEscKeypress);
+                  global.removeEventListener('resize', throttledResize);
+                }
+
+                /*
+                  finally (since we're in an iframe), programatically click the link
+                  and send the user to where they need to go, only if it's not one
+                  of the reserved iterable keyword links
+                */
+                if (!isIterableKeywordLink) {
+                  if (openInNewTab) {
+                    /**
+                      Using target="_blank" without rel="noreferrer" and rel="noopener"
+                      makes the website vulnerable to window.opener API exploitation attacks
+
+                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                    */
+                    global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
+                  } else {
+                    /* otherwise just link them in the same tab */
+                    global.location.assign(clickedUrl);
+                  }
+                }
+              }
+            });
+          }
+
+          return activeIframe;
         });
-
-        /* 
-          track in-app consumes only when _saveToInbox_ 
-          is falsy or undefined and always track in-app opens
-
-          Also swallow any 400+ response errors. We don't care about them.
-        */
-        // Promise.all(
-        //   !activeMessage?.saveToInbox
-        //     ? [
-        //         trackInAppOpen({
-        //           messageId: activeMessage.messageId
-        //         }),
-        //         trackInAppConsume({
-        //           messageId: activeMessage.messageId
-        //         })
-        //       ]
-        //     : [
-        //         trackInAppOpen({
-        //           messageId: activeMessage.messageId
-        //         })
-        //       ]
-        // ).catch((e) => e);
       }
+
+      return Promise.resolve();
     };
 
     return {
@@ -217,13 +240,14 @@ export function getInAppMessages(
               filterHiddenInAppMessages(response.data.inAppMessages)
             ) as InAppMessage[];
 
-            paintMessageToDOM();
-            return {
-              ...response,
-              data: {
-                inAppMessages: parsedMessages
-              }
-            };
+            return paintMessageToDOM().then(() => {
+              return {
+                ...response,
+                data: {
+                  inAppMessages: parsedMessages
+                }
+              };
+            });
           }),
       pauseMessageStream: () => {
         if (timer) {
