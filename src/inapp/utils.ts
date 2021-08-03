@@ -93,17 +93,17 @@ export const paintIFrame = (
 
       const timeout = setTimeout(() => {
         /**
-            even though we preloaded the images before setting the height, we add an extra 100MS 
-            here to handle for the case where the user needs to download custom fonts. As 
-            of 07/27/2021, the preloading fonts API is still in a draft state
-            
-            @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-            
-            but even if we did preload the fonts, it would still take a non-trivial amount
-            of computational time to apply the font to the text, so this setTimeout is acting more
-            as a failsafe just incase the new font causes the line-height to grow and create a
-            scrollbar in the iframe.
-          */
+          even though we preloaded the images before setting the height, we add an extra 100MS 
+          here to handle for the case where the user needs to download custom fonts. As 
+          of 07/27/2021, the preloading fonts API is still in a draft state
+          
+          @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+          
+          but even if we did preload the fonts, it would still take a non-trivial amount
+          of computational time to apply the font to the text, so this setTimeout is acting more
+          as a failsafe just incase the new font causes the line-height to grow and create a
+          scrollbar in the iframe.
+        */
         iframe.style.cssText = `
             position: fixed;
             border: none;
@@ -133,8 +133,6 @@ export const paintIFrame = (
 
         iframe.style.height =
           (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 1 + 'px';
-
-        // iframe.style.maxWidth = '100%';
 
         clearTimeout(timeout);
         resolve(iframe);

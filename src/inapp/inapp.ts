@@ -148,8 +148,8 @@ export function getInAppMessages(
             const link = links[i];
             link.addEventListener('click', (event) => {
               /* 
-              remove default linking behavior because we're in an iframe 
-              so we need to link the user programatically
+                remove default linking behavior because we're in an iframe 
+                so we need to link the user programatically
               */
               event.preventDefault();
               const clickedUrl = link.getAttribute('href') || '';
