@@ -31,7 +31,7 @@ export function getInAppMessages(
   showInAppMessagesAutomatically: true
 ): {
   pauseMessageStream: () => void;
-  resumeMessageStream: () => void;
+  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
   request: () => IterablePromise<InAppMessageResponse>;
 };
 export function getInAppMessages(
@@ -43,7 +43,7 @@ export function getInAppMessages(
     let messageIndex = 0;
     let parsedMessages: InAppMessage[] = [];
 
-    const paintMessageToDOM = (): Promise<any> => {
+    const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
 
@@ -98,6 +98,26 @@ export function getInAppMessages(
           });
 
           global.addEventListener('resize', throttledResize);
+
+          try {
+            const elementToFocus =
+              activeIframe.contentWindow?.document.body?.querySelector(
+                payload.onOpenNodeToTakeFocus || ''
+              );
+
+            /* try to focus on the query selector the customer provided  */
+            (elementToFocus as HTMLElement).focus();
+          } catch (e) {
+            /* otherwise, find the first focusable element and focus on that */
+            const firstFocusableElement =
+              activeIframe.contentWindow?.document.body?.querySelectorAll(
+                'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+              )?.[0];
+
+            if (firstFocusableElement) {
+              (firstFocusableElement as HTMLElement).focus();
+            }
+          }
 
           const handleEscKeypress = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -209,7 +229,7 @@ export function getInAppMessages(
         });
       }
 
-      return Promise.resolve();
+      return Promise.resolve('');
     };
 
     return {
@@ -255,7 +275,7 @@ export function getInAppMessages(
         }
       },
       resumeMessageStream: () => {
-        paintMessageToDOM();
+        return paintMessageToDOM();
       }
     };
   }

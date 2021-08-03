@@ -11,7 +11,8 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
       count: 20,
       displayInterval: 1000,
       onOpenScreenReaderMessage:
-        'hey screen reader here telling you something just popped up on your screen!'
+        'hey screen reader here telling you something just popped up on your screen!',
+      onOpenNodeToTakeFocus: 'input'
     },
     true
   );

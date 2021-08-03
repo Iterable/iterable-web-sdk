@@ -5,7 +5,7 @@ interface SDKInAppMessagesParams {
   /* what should the screen reader say once the message opens */
   onOpenScreenReaderMessage?: string;
   /* what DOM Node do you want to take keyboard focus when the message opens */
-  onOpenNodeToTakeFocus?: HTMLElementTagNameMap;
+  onOpenNodeToTakeFocus?: string;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
