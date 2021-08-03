@@ -110,9 +110,9 @@ export function getInAppMessages(
           } catch (e) {
             /* otherwise, find the first focusable element and focus on that */
             const firstFocusableElement =
-              activeIframe.contentWindow?.document.body?.querySelectorAll(
+              activeIframe.contentWindow?.document.body?.querySelector(
                 'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
-              )?.[0];
+              );
 
             if (firstFocusableElement) {
               (firstFocusableElement as HTMLElement).focus();
