@@ -199,7 +199,7 @@ describe('getInAppMessages', () => {
       jest.advanceTimersByTime(32000);
       jest.useRealTimers();
 
-      resumeMessageStream();
+      await resumeMessageStream();
 
       expect(
         (
@@ -222,11 +222,12 @@ describe('getInAppMessages', () => {
           }
         ]
       });
-      const mockOpen = jest.fn();
-      global.open = mockOpen;
 
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
+
+      const mockOpen = jest.fn();
+      global.open = mockOpen;
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -278,6 +279,61 @@ describe('getInAppMessages', () => {
       await element.dispatchEvent(clickEvent);
 
       expect(mockRouteChange).toHaveBeenCalledWith('google.com');
+    });
+
+    it('should focus on element specified by user', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="google.com" /><input class="some-input" />'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, onOpenNodeToTakeFocus: 'input' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      const focusedElement = iframe?.contentWindow?.document
+        ?.activeElement as Element;
+
+      expect(focusedElement.tagName).toBe('INPUT');
+    });
+
+    it('should focus on first interactive element if no selector specified', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="google.com" /><input class="some-input" />'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages({ count: 10 }, true);
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      const focusedElement = iframe?.contentWindow?.document
+        ?.activeElement as Element;
+
+      expect(focusedElement.tagName).toBe('A');
     });
 
     it('should track in app messages delivered', async () => {
