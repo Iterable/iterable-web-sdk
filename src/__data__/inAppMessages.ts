@@ -7,7 +7,7 @@ export const messages: InAppMessage[] = [
     createdAt: 1627332441416,
     expiresAt: 1635108441416,
     content: {
-      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-first-iframe">profile</a><img src="https://google.com/image.png" /></div>\n</body>\n</html>\n',
+      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-first-iframe">profile</a></div>\n</body>\n</html>\n',
       payload: {},
       inAppDisplaySettings: {
         top: {
@@ -43,7 +43,7 @@ export const messages: InAppMessage[] = [
     createdAt: 1627320168381,
     expiresAt: 1635096168381,
     content: {
-      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-second-iframe">profile</a><img src="https://google.com/image.png" /></div>\n</body>\n</html>\n',
+      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-second-iframe">profile</a></div>\n</body>\n</html>\n',
       payload: {
         eventName: 'DailyRewardScreen',
         event: 'screen'
@@ -85,7 +85,7 @@ export const messages: InAppMessage[] = [
     createdAt: 1627060811283,
     expiresAt: 1634836811283,
     content: {
-      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-third-iframe">profile</a><img src="https://google.com/image.png" /></div>\n</body>\n</html>\n',
+      html: '<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/fonts.css" rel="stylesheet" />\n\t<link href="https://storage.googleapis.com/publicstatic.hellobrigit.com/iterable-templates.css" rel="stylesheet" />\n</head>\n<body>\n<div class="overlay"></div>\n\n<div class="modal-container" style="margin: auto; width: 70%; border: 1px dashed black; padding: 10px;background:#ffffff">\n<h2>Hey ,</h2>\n\n<p>This is a sample In App message, how are you?</p>\n<a href="iterable://dismiss">close</a> <a href="action://close-third-iframe">profile</a></div>\n</body>\n</html>\n',
       payload: {},
       inAppDisplaySettings: {
         top: {

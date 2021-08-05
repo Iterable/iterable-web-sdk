@@ -60,80 +60,58 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
  */
 export const paintIFrame = (
   html: string,
-  callback: (frame: HTMLIFrameElement) => void,
-  position: 'full' | 'top-right' | 'bottom-right' | 'center',
+  top?: number | null,
+  bottom?: number | null,
+  right?: number | null,
+  left?: number | null,
   srMessage?: string
-) => {
-  const iframe = document.createElement('iframe');
-  iframe.setAttribute('id', 'iterable-iframe');
+): Promise<HTMLIFrameElement> =>
+  new Promise((resolve: (value: HTMLIFrameElement) => void) => {
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute('id', 'iterable-iframe');
 
-  /* 
-    find all the images in the in-app message, preload them, and 
-    only then set the height because we need to know how tall the images
-    are before we set the height of the iframe.
-    
-    This prevents a race condition where if we set the height before the images
-    are loaded, we might end up with a scrolling iframe
-  */
-  const images =
-    html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
-  preloadImages(images, () => {
     /* 
-      set the scroll height to the content inside, but since images
-      are going to take some time to load, we opt to preload them, THEN
-      set the inner HTML of the iframe
+      find all the images in the in-app message, preload them, and 
+      only then set the height because we need to know how tall the images
+      are before we set the height of the iframe.
+      
+      This prevents a race condition where if we set the height before the images
+      are loaded, we might end up with a scrolling iframe
     */
-    document.body.appendChild(iframe);
-    iframe.contentWindow?.document?.open();
-    iframe.contentWindow?.document?.write(html);
-    iframe.contentWindow?.document?.close();
-
-    callback(iframe);
-
-    const timeout = setTimeout(() => {
-      /**
-        even though we preloaded the images before setting the height, we add an extra 100MS 
-        here to handle for the case where the user needs to download custom fonts. As 
-        of 07/27/2021, the preloading fonts API is still in a draft state
-
-        @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-
-        but even if we did preload the fonts, it would still take a non-trivial amount
-        of computational time to apply the font to the text, so this setTimeout is acting more
-        as a failsafe just incase the new font causes the line-height to grow and create a
-        scrollbar in the iframe.
+    const images =
+      html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
+    return preloadImages(images, () => {
+      /* 
+        set the scroll height to the content inside, but since images
+        are going to take some time to load, we opt to preload them, THEN
+        set the inner HTML of the iframe
       */
-      iframe.style.cssText = `
-        position: fixed;
-        border: none;
-        margin: auto;
-        width: 50%;
-        z-index: 9999;
-    `;
+      document.body.appendChild(iframe);
+      iframe.contentWindow?.document?.open();
+      iframe.contentWindow?.document?.write(html);
+      iframe.contentWindow?.document?.close();
 
-      if (position === 'top-right') {
-        iframe.style.top = '0';
-        iframe.style.right = '0';
-        iframe.style.margin = 'unset';
-
-        const mediaQuery = global.matchMedia('(min-width: 850px)');
-        if (!mediaQuery.matches) {
-          iframe.style.width = '100%';
-        }
-
-        mediaQuery.onchange = (event) => {
-          if (!event.matches) {
-            iframe.style.width = '100%';
-          } else {
-            iframe.style.width = '50%';
-          }
-        };
-      }
-
-      if (position === 'bottom-right') {
-        iframe.style.bottom = '0';
-        iframe.style.right = '0';
-        iframe.style.margin = 'unset';
+      const timeout = setTimeout(() => {
+        /**
+          even though we preloaded the images before setting the height, we add an extra 100MS 
+          here to handle for the case where the user needs to download custom fonts. As 
+          of 07/27/2021, the preloading fonts API is still in a draft state
+          
+          @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+          
+          but even if we did preload the fonts, it would still take a non-trivial amount
+          of computational time to apply the font to the text, so this setTimeout is acting more
+          as a failsafe just incase the new font causes the line-height to grow and create a
+          scrollbar in the iframe.
+        */
+        iframe.style.cssText = `
+            position: fixed;
+            border: none;
+            margin: auto;
+            width: 50%;
+            max-width: 100%;
+            z-index: 9999;
+         `;
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
@@ -147,47 +125,25 @@ export const paintIFrame = (
             iframe.style.width = '50%';
           }
         };
-      }
 
-      if (position === 'full') {
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-        iframe.style.top = '0';
-        iframe.style.bottom = '0';
-        iframe.style.left = '0';
-        iframe.style.right = '0';
-      }
+        if (typeof top === 'number') iframe.style.top = `${top}%`;
+        if (typeof bottom === 'number') iframe.style.bottom = `${bottom}%`;
+        if (typeof left === 'number') iframe.style.left = `${left}%`;
+        if (typeof right === 'number') iframe.style.right = `${right}%`;
 
-      if (position === 'center') {
-        iframe.style.top = '0';
-        iframe.style.bottom = '0';
-        iframe.style.left = '0';
-        iframe.style.right = '0';
-        const mediaQuery = global.matchMedia('(min-width: 850px)');
-        if (!mediaQuery.matches) {
-          iframe.style.width = '100%';
-        }
+        iframe.style.height =
+          (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 1 + 'px';
 
-        mediaQuery.onchange = (event) => {
-          if (!event.matches) {
-            iframe.style.width = '100%';
-          } else {
-            iframe.style.width = '50%';
-          }
-        };
-      }
-
-      iframe.height = iframe.contentWindow?.document?.body?.scrollHeight + 'px';
-
-      clearTimeout(timeout);
-    }, 100);
+        clearTimeout(timeout);
+        resolve(iframe);
+      }, 100);
+    });
+  }).then((iframe: HTMLIFrameElement) => {
+    if (srMessage) {
+      srSpeak(srMessage, 'assertive');
+    }
+    return iframe;
   });
-  if (srMessage) {
-    srSpeak(srMessage, 'assertive');
-  }
-  return iframe;
-};
-
 export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
@@ -226,4 +182,32 @@ export const paintOverlay = (color = '#fff', opacity = 0) => {
 
   document.body.appendChild(overlay);
   return overlay;
+};
+
+export const generatePositions = (
+  initTop?: number,
+  initBottom?: number,
+  initRight?: number,
+  initLeft?: number
+) => {
+  let top = initTop;
+  let bottom = initBottom;
+  let right = initRight;
+  let left = initLeft;
+  if (typeof initTop !== 'number' && typeof initBottom !== 'number') {
+    bottom = 0;
+    top = 0;
+  }
+
+  if (typeof initRight !== 'number' && typeof initLeft !== 'number') {
+    left = 0;
+    right = 0;
+  }
+
+  return {
+    top,
+    bottom,
+    right,
+    left
+  };
 };

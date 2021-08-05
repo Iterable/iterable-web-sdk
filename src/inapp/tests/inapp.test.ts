@@ -43,8 +43,6 @@ describe('getInAppMessages', () => {
   });
 
   describe('getInAppMessages with auto painting', () => {
-    let mockOnLoad: any;
-
     beforeAll(() => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: messages
@@ -54,23 +52,10 @@ describe('getInAppMessages', () => {
     });
 
     beforeEach(() => {
-      jest.useFakeTimers();
-      jest.clearAllTimers();
       jest.clearAllMocks();
       jest.resetAllMocks();
       mockRequest.resetHistory();
       document.body.innerHTML = '';
-
-      Object.defineProperty(global.Image.prototype, 'onload', {
-        configurable: true,
-        get() {
-          return this._onload;
-        },
-        set(onload: any) {
-          mockOnLoad = onload;
-          this._onload = onload;
-        }
-      });
     });
 
     it('should return correct values when auto-paint flag is true', async () => {
@@ -83,7 +68,6 @@ describe('getInAppMessages', () => {
     it('should paint an iframe to the DOM', async () => {
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const element = document.getElementById('iterable-iframe');
       expect(element?.tagName).toBe('IFRAME');
@@ -92,7 +76,6 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when dismiss link is clicked', async () => {
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -117,7 +100,6 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when esc key is pressed', async () => {
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       expect(document.getElementById('iterable-iframe')?.tagName).toBe(
         'IFRAME'
@@ -130,7 +112,6 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when overlay is clicked', async () => {
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       expect(document.getElementById('iterable-iframe')?.tagName).toBe(
         'IFRAME'
@@ -147,7 +128,6 @@ describe('getInAppMessages', () => {
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -161,9 +141,9 @@ describe('getInAppMessages', () => {
 
       expect(document.getElementById('iterable-iframe')).toBe(null);
 
+      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
-
-      mockOnLoad();
+      jest.useRealTimers();
 
       expect(
         (
@@ -180,7 +160,6 @@ describe('getInAppMessages', () => {
         true
       );
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -193,7 +172,9 @@ describe('getInAppMessages', () => {
       await element.dispatchEvent(clickEvent);
 
       pauseMessageStream();
+      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
+      jest.useRealTimers();
 
       expect(document.body.innerHTML).toBe('');
     });
@@ -202,7 +183,6 @@ describe('getInAppMessages', () => {
       const { request, pauseMessageStream, resumeMessageStream } =
         getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -215,10 +195,11 @@ describe('getInAppMessages', () => {
       await element.dispatchEvent(clickEvent);
 
       pauseMessageStream();
+      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
-      resumeMessageStream();
+      jest.useRealTimers();
 
-      mockOnLoad();
+      resumeMessageStream();
 
       expect(
         (
@@ -246,7 +227,6 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'
@@ -285,7 +265,6 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages({ count: 10 }, true);
       await request();
-      mockOnLoad();
 
       const iframe = document.getElementById(
         'iterable-iframe'

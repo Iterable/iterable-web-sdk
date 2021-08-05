@@ -21,14 +21,7 @@ jest.mock('../../utils/srSpeak', () => ({
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
-const mockMarkupWithImage = `
-  <div>
-    <p>Hello</p>
-    <img src="https://google.com/hello.png" />
-  </div
-`;
-
-const mockMarkupWithoutImage = `
+const mockMarkup = `
   <div>
     <p>Hello</p>
   </div
@@ -431,120 +424,52 @@ describe('Utils', () => {
     });
 
     describe('painting the iframe', () => {
-      jest.useFakeTimers();
-      let mockOnLoad: any;
-      beforeAll(() => {
-        Object.defineProperty(global.Image.prototype, 'onload', {
-          configurable: true,
-          get() {
-            return this._onload;
-          },
-          set(onload: any) {
-            mockOnLoad = onload;
-            this._onload = onload;
-          }
-        });
-      });
-
-      it('should paint the iframe with no images in the markup', () => {
-        const mockCallback = jest.fn();
-
-        const iframe = paintIFrame(
-          mockMarkupWithoutImage,
-          mockCallback,
-          'center'
-        );
+      it('should paint the iframe in the center of the screen', async () => {
+        const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
 
         /* speed up time to past the setTimeout */
-        jest.runAllTimers();
         const styles = getComputedStyle(iframe);
         expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('0px');
-        expect(styles.right).toBe('0px');
-        expect(styles.top).toBe('0px');
-        expect(styles.bottom).toBe('0px');
+        expect(styles.left).toBe('0%');
+        expect(styles.right).toBe('0%');
+        expect(styles.top).toBe('0%');
+        expect(styles.bottom).toBe('0%');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('50%');
       });
 
-      it('should paint the iframe in the center of the screen', () => {
-        const mockCallback = jest.fn();
-
-        const iframe = paintIFrame(mockMarkupWithImage, mockCallback, 'center');
-
-        /* load our images */
-        mockOnLoad();
+      it('should paint the iframe in the top-right of the screen', async () => {
+        const iframe = await paintIFrame(mockMarkup, 0, null, 0, null, 'hi');
 
         /* speed up time to past the setTimeout */
-        jest.runAllTimers();
-        const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('0px');
-        expect(styles.right).toBe('0px');
-        expect(styles.top).toBe('0px');
-        expect(styles.bottom).toBe('0px');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('50%');
-      });
-
-      it('should paint the iframe in the top-right of the screen', () => {
-        const mockCallback = jest.fn();
-
-        const iframe = paintIFrame(
-          mockMarkupWithImage,
-          mockCallback,
-          'top-right'
-        );
-
-        /* load our images */
-        mockOnLoad();
-
-        /* speed up time to past the setTimeout */
-        jest.runAllTimers();
         const styles = getComputedStyle(iframe);
         expect(styles.position).toBe('fixed');
         expect(styles.left).toBe('');
-        expect(styles.right).toBe('0px');
-        expect(styles.top).toBe('0px');
+        expect(styles.right).toBe('0%');
+        expect(styles.top).toBe('0%');
         expect(styles.bottom).toBe('');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('50%');
       });
 
-      it('should paint the iframe in the bottom-right of the screen', () => {
-        const mockCallback = jest.fn();
-
-        const iframe = paintIFrame(
-          mockMarkupWithImage,
-          mockCallback,
-          'bottom-right'
-        );
-
-        /* load our images */
-        mockOnLoad();
+      it('should paint the iframe in the bottom-right of the screen', async () => {
+        const iframe = await paintIFrame(mockMarkup, null, 0, 0, null, 'hi');
 
         /* speed up time to past the setTimeout */
-        jest.runAllTimers();
         const styles = getComputedStyle(iframe);
         expect(styles.position).toBe('fixed');
         expect(styles.left).toBe('');
-        expect(styles.right).toBe('0px');
-        expect(styles.bottom).toBe('0px');
+        expect(styles.right).toBe('0%');
+        expect(styles.bottom).toBe('0%');
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('50%');
       });
 
-      it('should paint the iframe full-screen', () => {
-        const mockCallback = jest.fn();
-
-        const iframe = paintIFrame(mockMarkupWithImage, mockCallback, 'full');
-
-        /* load our images */
-        mockOnLoad();
+      it('should paint the iframe full-screen', async () => {
+        const iframe = await paintIFrame(mockMarkup);
 
         /* speed up time to past the setTimeout */
-        jest.runAllTimers();
         const styles = getComputedStyle(iframe);
         expect(styles.position).toBe('fixed');
         expect(styles.left).toBe('');
@@ -552,28 +477,18 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('');
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.height).toBe('100%');
-        expect(styles.width).toBe('100%');
+        expect(styles.height).toBe('1px');
+        expect(styles.width).toBe('50%');
       });
 
-      it('should call srSpeak if screen reader text passed', () => {
-        const mockCallback = jest.fn();
-
-        paintIFrame(mockMarkupWithImage, mockCallback, 'center', 'hi');
-
-        mockOnLoad();
-        jest.runAllTimers();
+      it('should call srSpeak if screen reader text passed', async () => {
+        await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
 
         expect((srSpeak as any).mock.calls.length).toBe(1);
       });
 
-      it('should not call srSpeak if no screen reader text passed', () => {
-        const mockCallback = jest.fn();
-
-        paintIFrame(mockMarkupWithImage, mockCallback, 'center');
-
-        mockOnLoad();
-        jest.runAllTimers();
+      it('should not call srSpeak if no screen reader text passed', async () => {
+        await paintIFrame(mockMarkup, 0, 0, 0, 0);
 
         expect((srSpeak as any).mock.calls.length).toBe(0);
       });
@@ -594,56 +509,26 @@ describe('Utils', () => {
           });
         });
 
-        it('should have correct width for centered-modal', () => {
-          const mockCallback = jest.fn();
-
-          const iframe = paintIFrame(
-            mockMarkupWithImage,
-            mockCallback,
-            'center'
-          );
-
-          /* load our images */
-          mockOnLoad();
+        it('should have correct width for centered-modal', async () => {
+          const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
 
           /* speed up time to past the setTimeout */
-          jest.runAllTimers();
           const styles = getComputedStyle(iframe);
           expect(styles.width).toBe('100%');
         });
 
-        it('should have correct width for bottom-right modal', () => {
-          const mockCallback = jest.fn();
-
-          const iframe = paintIFrame(
-            mockMarkupWithImage,
-            mockCallback,
-            'bottom-right'
-          );
-
-          /* load our images */
-          mockOnLoad();
+        it('should have correct width for bottom-right modal', async () => {
+          const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
 
           /* speed up time to past the setTimeout */
-          jest.runAllTimers();
           const styles = getComputedStyle(iframe);
           expect(styles.width).toBe('100%');
         });
 
-        it('should have correct width for top-right modal', () => {
-          const mockCallback = jest.fn();
-
-          const iframe = paintIFrame(
-            mockMarkupWithImage,
-            mockCallback,
-            'top-right'
-          );
-
-          /* load our images */
-          mockOnLoad();
+        it('should have correct width for top-right modal', async () => {
+          const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
 
           /* speed up time to past the setTimeout */
-          jest.runAllTimers();
           const styles = getComputedStyle(iframe);
           expect(styles.width).toBe('100%');
         });
