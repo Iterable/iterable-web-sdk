@@ -5,6 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
 import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
+import { initIdentify } from '../../authorization';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -44,6 +45,7 @@ describe('getInAppMessages', () => {
 
   describe('getInAppMessages with auto painting', () => {
     beforeAll(() => {
+      jest.useFakeTimers();
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: messages
       });
@@ -81,10 +83,9 @@ describe('getInAppMessages', () => {
         'iterable-iframe'
       ) as HTMLIFrameElement;
       const element = iframe?.contentWindow?.document.body?.querySelector(
-        'a[href="iterable://dismiss"]'
+        'a[href="javascript:undefined"]'
       ) as Element;
 
-      /* click the dismiss link and the iframe should be gone */
       const clickEvent = new MouseEvent('click');
       await element.dispatchEvent(clickEvent);
       expect(document.getElementById('iterable-iframe')).toBe(null);
@@ -133,7 +134,7 @@ describe('getInAppMessages', () => {
         'iterable-iframe'
       ) as HTMLIFrameElement;
       const element = iframe?.contentWindow?.document.body?.querySelector(
-        'a[href="iterable://dismiss"]'
+        'a[href="javascript:undefined"]'
       ) as Element;
 
       const clickEvent = new MouseEvent('click');
@@ -141,17 +142,15 @@ describe('getInAppMessages', () => {
 
       expect(document.getElementById('iterable-iframe')).toBe(null);
 
-      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
-      jest.useRealTimers();
 
-      expect(
-        (
-          document.getElementById('iterable-iframe') as HTMLIFrameElement
-        )?.contentWindow?.document.body?.querySelector(
-          'a[href="action://close-second-iframe"]'
-        )
-      ).not.toBe(null);
+      const secondCloseLink = (
+        document.getElementById('iterable-iframe') as HTMLIFrameElement
+      )?.contentWindow?.document.body?.querySelector(
+        'a[href="action://close-second-iframe"]'
+      );
+      expect(secondCloseLink).not.toBe(null);
+      expect(secondCloseLink).not.toBeUndefined();
     });
 
     it('should not paint next message to the DOM after 30s if queue is paused', async () => {
@@ -165,16 +164,14 @@ describe('getInAppMessages', () => {
         'iterable-iframe'
       ) as HTMLIFrameElement;
       const element = iframe?.contentWindow?.document.body?.querySelector(
-        'a[href="iterable://dismiss"]'
+        'a[href="javascript:undefined"]'
       ) as Element;
 
       const clickEvent = new MouseEvent('click');
       await element.dispatchEvent(clickEvent);
 
       pauseMessageStream();
-      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
-      jest.useRealTimers();
 
       expect(document.body.innerHTML).toBe('');
     });
@@ -188,26 +185,24 @@ describe('getInAppMessages', () => {
         'iterable-iframe'
       ) as HTMLIFrameElement;
       const element = iframe?.contentWindow?.document.body?.querySelector(
-        'a[href="iterable://dismiss"]'
+        'a[href="javascript:undefined"]'
       ) as Element;
 
       const clickEvent = new MouseEvent('click');
       await element.dispatchEvent(clickEvent);
 
       pauseMessageStream();
-      jest.useFakeTimers();
       jest.advanceTimersByTime(32000);
-      jest.useRealTimers();
 
       await resumeMessageStream();
 
-      expect(
-        (
-          document.getElementById('iterable-iframe') as HTMLIFrameElement
-        )?.contentWindow?.document.body?.querySelector(
-          'a[href="action://close-second-iframe"]'
-        )
-      ).not.toBe(null);
+      const secondCloseLink = (
+        document.getElementById('iterable-iframe') as HTMLIFrameElement
+      )?.contentWindow?.document.body?.querySelector(
+        'a[href="action://close-second-iframe"]'
+      );
+      expect(secondCloseLink).not.toBe(null);
+      expect(secondCloseLink).not.toBeUndefined();
     });
 
     it('should navigate offsite in a new tab if a clicked link has target _blank', async () => {
@@ -345,6 +340,34 @@ describe('getInAppMessages', () => {
           e.url?.match(/trackInAppDelivery/gim)
         ).length
       ).toBe(3);
+    });
+
+    it('should not paint another message after 30 seconds if logged out', async () => {
+      const { request } = getInAppMessages({ count: 10 }, true);
+      const { logout } = initIdentify('fdsafsd');
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="javascript:undefined"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+
+      expect(document.getElementById('iterable-iframe')).toBe(null);
+      logout();
+
+      jest.advanceTimersByTime(32000);
+
+      const secondCloseLink = (
+        document.getElementById('iterable-iframe') as HTMLIFrameElement
+      )?.contentWindow?.document.body?.querySelector(
+        'a[href="action://close-second-iframe"]'
+      );
+      expect(secondCloseLink).toBeUndefined();
     });
   });
 });

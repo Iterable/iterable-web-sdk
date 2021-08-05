@@ -3,8 +3,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 
 ((): void => {
   /* set token in the SDK */
-  const { setEmail } = initIdentify(process.env.API_KEY || '');
-  setEmail('iterable.tester@gmail.com');
+  const { setEmail, logout } = initIdentify(process.env.API_KEY || '');
 
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {
@@ -17,6 +16,8 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
     true
   );
 
+  const startBtn = document.getElementById('start');
+
   document
     .getElementById('pause')
     .addEventListener('click', pauseMessageStream);
@@ -26,10 +27,16 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
   document
     .getElementById('pause')
     .addEventListener('click', pauseMessageStream);
+  document.getElementById('logout').addEventListener('click', () => {
+    logout();
+    startBtn.innerText = 'Start Auto-Painting In-App Messages';
+    startBtn.setAttribute('aria-disabled', 'false');
+    startBtn.className = '';
+  });
 
-  const startBtn = document.getElementById('start');
   startBtn.addEventListener('click', (event) => {
     event.preventDefault();
+    setEmail('iterable.tester@gmail.com');
     if (startBtn.getAttribute('aria-disabled') !== 'true') {
       /* aria-disabled doesn't actually disable the button lol */
       request()

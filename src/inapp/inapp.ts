@@ -23,6 +23,18 @@ import {
 } from '../events';
 import { DISPLAY_INTERVAL_DEFAULT } from 'src/constants';
 
+let parsedMessages: InAppMessage[] = [];
+let timer: NodeJS.Timeout | null = null;
+let messageIndex = 0;
+
+export const clearMessages = () => {
+  parsedMessages = [];
+  messageIndex = 0;
+  if (timer) {
+    clearTimeout(timer);
+  }
+};
+
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
 ): IterablePromise<InAppMessageResponse>;
@@ -38,11 +50,8 @@ export function getInAppMessages(
   payload: InAppMessagesRequestParams,
   showInAppMessagesAutomatically?: boolean
 ) {
+  clearMessages();
   if (showInAppMessagesAutomatically) {
-    let timer: NodeJS.Timeout | null = null;
-    let messageIndex = 0;
-    let parsedMessages: InAppMessage[] = [];
-
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
@@ -166,20 +175,29 @@ export function getInAppMessages(
 
           for (let i = 0; i < links.length; i++) {
             const link = links[i];
+            const clickedUrl = link.getAttribute('href') || '';
+            const openInNewTab = link.getAttribute('target') === '_blank';
+            const isIterableKeywordLink = !!clickedUrl.match(
+              /itbl:\/\/|iterable:\/\/|action:\/\//gim
+            );
+            const isDismissNode = !!clickedUrl.match(
+              /(itbl:\/\/|iterable:\/\/)dismiss/gim
+            );
+
+            if (isDismissNode) {
+              /* 
+                give the close anchor tag properties that make it 
+                behave more like a button with a logical aria label
+              */
+              addButtonAttrsToAnchorTag(link, 'close modal');
+            }
+
             link.addEventListener('click', (event) => {
               /* 
                 remove default linking behavior because we're in an iframe 
                 so we need to link the user programatically
               */
               event.preventDefault();
-              const clickedUrl = link.getAttribute('href') || '';
-              const openInNewTab = link.getAttribute('target') === '_blank';
-              const isIterableKeywordLink = !!clickedUrl.match(
-                /itbl:\/\/|iterable:\/\/|action:\/\//gim
-              );
-              const isDismissNode = !!clickedUrl.match(
-                /(itbl:\/\/|iterable:\/\/)dismiss/gim
-              );
 
               if (clickedUrl) {
                 /* track the clicked link */
@@ -190,12 +208,6 @@ export function getInAppMessages(
                 }).catch((e) => e);
 
                 if (isDismissNode) {
-                  /* 
-                    give the close anchor tag properties that make it 
-                    behave more like a button with a logical aria label
-                  */
-                  addButtonAttrsToAnchorTag(link, 'close modal');
-
                   dismissMessage(activeIframe, clickedUrl);
                   overlay.remove();
                   document.removeEventListener('keydown', handleEscKeypress);

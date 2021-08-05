@@ -1,4 +1,5 @@
 import { baseAxiosRequest } from '../request';
+import { clearMessages } from 'src/inapp';
 
 // interface WithJWT {
 //   clearRefresh: () => void;
@@ -64,6 +65,7 @@ export function initIdentify(
         }
       },
       setEmail: (email: string) => {
+        clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
@@ -138,6 +140,7 @@ export function initIdentify(
         );
       },
       setUserID: (userId: string) => {
+        clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
@@ -212,6 +215,7 @@ export function initIdentify(
         );
       },
       logout: () => {
+        clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
