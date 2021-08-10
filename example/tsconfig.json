@@ -12,7 +12,7 @@
     "esModuleInterop": true,
     "paths": {
       "src/*": ["src/*"],
-      "iterable-web-sdk": ["../dist"]
+      "@iterable/web-sdk": ["../dist"]
     }
   },
   "include": [

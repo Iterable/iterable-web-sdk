@@ -81,7 +81,7 @@ your `.env` file and add your API key to the `API_KEY` variable.
 Then once you boot up the app, you can set the key with the following code snippet:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { clearToken, setNewToken } = initIdentify(process.env.API_KEY);
@@ -105,7 +105,7 @@ import { initIdentify } from 'iterable-web-sdk';
 Similar to the previous example, `initIdentify` exposes methods to set an [Axios interceptor](https://github.com/axios/axios#interceptors) on all API requests. You would set an email like so:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { setEmail, logout } = initIdentify(process.env.API_KEY);
@@ -123,7 +123,7 @@ import { initIdentify } from 'iterable-web-sdk';
 or with a User ID:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { setUserID, logout } = initIdentify(process.env.API_KEY);
@@ -141,7 +141,7 @@ Setting a user by their email or ID will also cover you for endpoints that requi
 email or user ID in either the URL path or the query params. For example:
 
 ```ts
-import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
+import { initIdentify, getUserByEmail } from '@iterable/web-sdk';
 
 ((): void => {
   const { setEmail, getMessages } = initIdentify(process.env.API_KEY);
@@ -162,14 +162,14 @@ really anything that library exposes will be fair game here.
 To get access to the base Axios instance, you can import it like so:
 
 ```ts
-import { baseAxiosRequest } from 'iterable-web-sdk'
+import { baseAxiosRequest } from '@iterable/web-sdk'
 ```
 
 and for example if you want to set an `email` query param on every outgoing request, you would
 just implement the way Axios advises like so:
 
 ```ts
-import { baseAxiosRequest } from 'iterable-web-sdk';
+import { baseAxiosRequest } from '@iterable/web-sdk';
 
 ((): void => {
   baseAxiosRequest.interceptors.request.use((config) => {
@@ -192,7 +192,7 @@ to have the in-app messages appear automatically on an interval.
 Normally to request a list of in-app messages, you'd make a request like this:
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -209,7 +209,7 @@ In order to take advantage of the SDK showing them automatically, you would impl
 the same method in this way:
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -228,7 +228,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 Optionally, you can pass arguments to fine-tune how you want the messages to appear
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -254,7 +254,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 You can also pause and resume the messages stream if you like
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
