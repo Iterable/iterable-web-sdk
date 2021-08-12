@@ -3,7 +3,7 @@ import { initIdentify } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { trackInAppClose } from '../events';
-import { updateUserEmail } from '../users';
+import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
 
 let mockRequest: any = null;
@@ -136,9 +136,25 @@ describe('User Identification', () => {
       mockRequest.onPost('/events/trackInAppClose').reply(200, {
         data: 'something'
       });
+      mockRequest.onPost('/users/updateSubscriptions').reply(200, {
+        data: 'something'
+      });
+      mockRequest.onPost('/users/update').reply(200, {
+        data: 'something'
+      });
 
-      const response = await trackInAppClose({ messageId: '123' });
-      expect(JSON.parse(response.config.data).email).toBe('hello@gmail.com');
+      const closeResponse = await trackInAppClose({ messageId: '123' });
+      const subsResponse = await updateSubscriptions();
+      const userResponse = await updateUser();
+      expect(JSON.parse(closeResponse.config.data).email).toBe(
+        'hello@gmail.com'
+      );
+      expect(JSON.parse(subsResponse.config.data).email).toBe(
+        'hello@gmail.com'
+      );
+      expect(JSON.parse(userResponse.config.data).email).toBe(
+        'hello@gmail.com'
+      );
     });
 
     it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
@@ -265,9 +281,20 @@ describe('User Identification', () => {
       mockRequest.onPost('/events/trackInAppClose').reply(200, {
         data: 'something'
       });
+      mockRequest.onPost('/users/updateSubscriptions').reply(200, {
+        data: 'something'
+      });
+      mockRequest.onPost('/users/update').reply(200, {
+        data: 'something'
+      });
 
-      const response = await trackInAppClose({ messageId: '123' });
-      expect(JSON.parse(response.config.data).userId).toBe('999');
+      const closeResponse = await trackInAppClose({ messageId: '123' });
+      const subsResponse = await updateSubscriptions();
+      const userResponse = await updateUser();
+
+      expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
+      expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
+      expect(JSON.parse(userResponse.config.data).userId).toBe('999');
     });
 
     it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
