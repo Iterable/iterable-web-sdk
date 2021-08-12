@@ -51,7 +51,7 @@ for information on what data to pass and what payload to receive from the HTTP r
 | `track`               	| Track custom events                                                                                                       	|
 | `trackInAppClose`     	| Track when an in-app message is closed                                                                                    	|
 | `trackInAppOpen`      	| Track when a message is opened and marks it as read                                                                       	|
-| `trackInAppCLick`     	| Track when a user clicks on a button or link within a message                                                             	|
+| `trackInAppClick`     	| Track when a user clicks on a button or link within a message                                                             	|
 | `trackInAppDelivery`  	| Track when a message has been delivered to a user's device                                                                	|
 | `trackInAppConsume`   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
 | `getInAppMessages`    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
