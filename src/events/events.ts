@@ -3,6 +3,10 @@ import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
 
 export const track = (payload: InAppTrackRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/track',
@@ -11,6 +15,10 @@ export const track = (payload: InAppTrackRequestParams) => {
 };
 
 export const trackInAppClose = (payload: InAppEventRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClose',
@@ -24,6 +32,10 @@ export const trackInAppOpen = (
     'clickedUrl' | 'inboxSessionId' | 'closeAction'
   >
 ) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppOpen',
@@ -34,6 +46,10 @@ export const trackInAppOpen = (
 export const trackInAppClick = (
   payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>
 ) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClick',
@@ -47,6 +63,10 @@ export const trackInAppDelivery = (
     'clickedUrl' | 'closeAction' | 'inboxSessionId'
   >
 ) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppDelivery',
@@ -60,6 +80,10 @@ export const trackInAppConsume = (
     'clickedUrl' | 'closeAction' | 'inboxSessionId'
   >
 ) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/inAppConsume',
