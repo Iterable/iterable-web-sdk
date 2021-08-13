@@ -68,6 +68,11 @@ describe('User Identification', () => {
       baseAxiosRequest.interceptors.request.eject(index);
     });
   });
+
+  beforeAll(() => {
+    mockRequest.onPost('/users/update').reply(200, {});
+  });
+
   describe('logout', () => {
     it('logout method removes the email field from requests', async () => {
       const { logout, setEmail } = initIdentify('123');
@@ -84,7 +89,7 @@ describe('User Identification', () => {
 
     it('logout method removes the userId field from requests', async () => {
       const { logout, setUserID } = initIdentify('123');
-      setUserID('hello@gmail.com');
+      await setUserID('hello@gmail.com');
       logout();
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
@@ -216,7 +221,7 @@ describe('User Identification', () => {
 
     it('should overwrite user ID set by setUserID', async () => {
       const { setEmail, setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
       setEmail('hello@gmail.com');
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
@@ -230,9 +235,12 @@ describe('User Identification', () => {
   });
 
   describe('setUserID', () => {
+    beforeEach(() => {
+      mockRequest.resetHistory();
+    });
     it('adds userId param to endpoint that need an userId as a param', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         data: 'something'
@@ -245,8 +253,8 @@ describe('User Identification', () => {
     it('clears any previous interceptors if called twice', async () => {
       const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
       const { setUserID } = initIdentify('123');
-      setUserID('999');
-      setUserID('111');
+      await setUserID('999');
+      await setUserID('111');
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         data: 'something'
@@ -264,7 +272,7 @@ describe('User Identification', () => {
 
     it('adds userId param to endpoint that need an userId as a param', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         data: 'something'
@@ -276,7 +284,7 @@ describe('User Identification', () => {
 
     it('adds userId body to endpoint that need an userId as a body', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onPost('/events/trackInAppClose').reply(200, {
         data: 'something'
@@ -299,7 +307,7 @@ describe('User Identification', () => {
 
     it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onPost('/users/updateEmail').reply(200, {
         data: 'something'
@@ -311,7 +319,7 @@ describe('User Identification', () => {
 
     it('should add user.userId param to endpoints that need it', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onPost('/commerce/updateCart').reply(200, {
         data: 'something'
@@ -328,7 +336,7 @@ describe('User Identification', () => {
 
     it('adds no userId body or header information to unrelated endpoints', async () => {
       const { setUserID } = initIdentify('123');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onPost('/users/hello').reply(200, {
         data: 'something'
@@ -350,7 +358,7 @@ describe('User Identification', () => {
     it('should overwrite email set by setEmail', async () => {
       const { setEmail, setUserID } = initIdentify('123');
       setEmail('hello@gmail.com');
-      setUserID('999');
+      await setUserID('999');
 
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         data: 'something'
@@ -359,6 +367,19 @@ describe('User Identification', () => {
       const response = await getInAppMessages({ count: 10 });
       expect(response.config.params.email).toBeUndefined();
       expect(response.config.params.userId).toBe('999');
+    });
+
+    it('should try /users/update 0 times if request to create a user fails', async () => {
+      mockRequest.onPost('/users/update').reply(400, {});
+
+      const { setUserID } = initIdentify('123');
+      await setUserID('999');
+
+      expect(
+        mockRequest.history.post.filter(
+          (e: any) => !!e.url?.match(/users\/update/gim)
+        ).length
+      ).toBe(1);
     });
   });
 });

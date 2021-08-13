@@ -1,5 +1,7 @@
 import { baseAxiosRequest } from '../request';
+import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
+import { RETRY_USER_ATTEMPTS } from 'src/constants';
 
 // interface WithJWT {
 //   clearRefresh: () => void;
@@ -11,7 +13,7 @@ interface WithoutJWT {
   setNewToken: (newToken?: string) => void;
   clearToken: () => void;
   setEmail: (email: string) => void;
-  setUserID: (userId: string) => void;
+  setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -139,8 +141,9 @@ export function initIdentify(
           }
         );
       },
-      setUserID: (userId: string) => {
+      setUserID: async (userId: string) => {
         clearMessages();
+
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
@@ -213,6 +216,32 @@ export function initIdentify(
             return config;
           }
         );
+
+        const tryUser = () => {
+          let createUserAttempts = 0;
+
+          return async function tryUserNTimes(): Promise<any> {
+            try {
+              return await updateUser({});
+            } catch (e) {
+              if (createUserAttempts < RETRY_USER_ATTEMPTS) {
+                createUserAttempts += 1;
+                return tryUserNTimes();
+              }
+
+              return Promise.reject(
+                `could not create user after ${createUserAttempts} tries`
+              );
+            }
+          };
+        };
+
+        try {
+          return await tryUser()();
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
+        }
       },
       logout: () => {
         clearMessages();
