@@ -53,9 +53,9 @@ describe('Users Requests', () => {
       }
     } as any);
 
-    expect(JSON.parse(updateResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(updateResponse.config.data).userId).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).user.email).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).user.userId).toBeUndefined();
+    expect(JSON.parse(trackResponse.config.data).user.email).toBeUndefined();
+    expect(JSON.parse(trackResponse.config.data).user.userId).toBeUndefined();
   });
 });
