@@ -69,6 +69,23 @@ export const paintIFrame = (
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = document.createElement('iframe');
     iframe.setAttribute('id', 'iterable-iframe');
+    /* 
+      _display: none_ would remove the ability to set event handlers on elements
+      so instead we choose to hide it visibly with CSS but not actually remove
+      its interact-ability
+      
+      https://snook.ca/archives/html_and_css/hiding-content-for-accessibility 
+    */
+    iframe.style.cssText = `
+      position: absolute !important;
+      top: 0;
+      left: 0;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      clip: rect(1px 1px 1px 1px);
+      clip: rect(1px, 1px, 1px, 1px);
+    `;
 
     /* 
       find all the images in the in-app message, preload them, and 
@@ -135,8 +152,8 @@ export const paintIFrame = (
           (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 1 + 'px';
 
         clearTimeout(timeout);
-        resolve(iframe);
       }, 100);
+      resolve(iframe);
     });
   }).then((iframe: HTMLIFrameElement) => {
     if (srMessage) {

@@ -418,7 +418,11 @@ describe('Utils', () => {
   });
 
   describe('DOM Manipulation', () => {
+    beforeAll(() => {
+      jest.useFakeTimers();
+    });
     beforeEach(() => {
+      jest.clearAllTimers();
       jest.clearAllMocks();
       jest.resetAllMocks();
     });
@@ -426,6 +430,7 @@ describe('Utils', () => {
     describe('painting the iframe', () => {
       it('should paint the iframe in the center of the screen', async () => {
         const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
+        jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
@@ -440,6 +445,7 @@ describe('Utils', () => {
 
       it('should paint the iframe in the top-right of the screen', async () => {
         const iframe = await paintIFrame(mockMarkup, 0, null, 0, null, 'hi');
+        jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
@@ -454,6 +460,7 @@ describe('Utils', () => {
 
       it('should paint the iframe in the bottom-right of the screen', async () => {
         const iframe = await paintIFrame(mockMarkup, null, 0, 0, null, 'hi');
+        jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
@@ -468,6 +475,7 @@ describe('Utils', () => {
 
       it('should paint the iframe full-screen', async () => {
         const iframe = await paintIFrame(mockMarkup);
+        jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
@@ -511,6 +519,7 @@ describe('Utils', () => {
 
         it('should have correct width for centered-modal', async () => {
           const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
+          jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
@@ -519,6 +528,7 @@ describe('Utils', () => {
 
         it('should have correct width for bottom-right modal', async () => {
           const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
+          jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
@@ -527,6 +537,7 @@ describe('Utils', () => {
 
         it('should have correct width for top-right modal', async () => {
           const iframe = await paintIFrame(mockMarkup, 0, 0, 0, 0, 'hi');
+          jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);

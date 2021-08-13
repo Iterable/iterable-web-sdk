@@ -4,7 +4,7 @@ export const messages: InAppMessage[] = [
   {
     messageId: 'Dbld4KEgeUMXneIbBW5uauvuLQ0Ngmcme6WUxxX0lX6G',
     campaignId: 2642276,
-    createdAt: 1627332441416,
+    createdAt: 1627060811283,
     expiresAt: 1635108441416,
     content: {
       html: `<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, 
@@ -104,7 +104,7 @@ export const messages: InAppMessage[] = [
   {
     messageId: 'xEA5MZmz8T2pAoi1VJ5hRuDuazdZzXS9BD85t00w0r9ax',
     campaignId: 2632531,
-    createdAt: 1627060811283,
+    createdAt: 1627332441416,
     expiresAt: 1634836811283,
     content: {
       html: `<html>\n<head>\n\t<title></title>\n\t<meta name="viewport" content="width=device-width, 
