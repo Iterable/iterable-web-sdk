@@ -1,17 +1,24 @@
-# Description
+![Iterable-Logo](https://user-images.githubusercontent.com/7387001/129065810-44b39e27-e319-408c-b87c-4d6b37e1f3b2.png)
 
-Iterable SDK
+# Iterable's JavaScript SDK
 
-# Requirements
+[Iterable](https://www.iterable.com) is a growth marketing platform that helps
+you to create better experiences for—and deeper relationships with—your
+customers. Use it to send customized email, SMS, push notification, in-app
+message, web push notification campaigns to your customers.
 
-This project (along with the sample app) both require a minimum Node version of 16.3.0 or greater.
-[Download NodeJS here.](https://nodejs.org/en/) Alternatively, you can use a tool such as 
-[nvm](https://github.com/nvm-sh/nvm) to install another version of node and switch to that.
+This SDK helps you integrate your Web apps with Iterable.
 
-This project also uses [yarn package manager.](https://yarnpkg.com/getting-started/install) You'll
-need to install that as well to run the commands within this project.
+# Table of Contents
 
-# Installation (not applicable until deployed)
+* [Installation](#installation)
+* [API](#api)
+* [FAQ](#faq)
+* [TypeScript](#typescript)
+* [Contributing](#contributing)
+* [License](#license)
+
+# Installation
 
 To install this SDK through NPM:
 
@@ -31,43 +38,26 @@ or with a CDN:
 <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
 ```
 
-# Commmands (SDK related)
+# API
 
-## `yarn start`
+Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs)
+for information on what data to pass and what payload to receive from the HTTP requests.
 
-Starts the SDK on a local server. Does 3 things in parallel:
-
-1. Runs `ttsc` (yes you read that right [`ttsc`](https://github.com/cevek/ttypescript) instead of `tsc`) in watch mode, which is responsible for _only_ creating the TypeScript
-definitions (`d.ts`) files and then transforming absolute path imports to relative ones.
-2. Runs `babel` in watch mode, responsible for transpiling the TypeScript files into JavaScript
-3. Runs `webpack` in watch mode, which compiles all the transpiled JavaScript files into one root
-`index.js`.
-
-## `yarn build`
-
-Runs all the same 3 commands from `yarn start` but not in watch mode.
-
-When this command finishes, you'll have transpiled files located in the `dist` directory, along
-with an `index.js` file in the root of the project.
-
-## `yarn test`
-
-Runs the Jest test suite on any files ending in `test.{ts|js|tsx|jsx}` or inside a `__test__` directory
-
-## `yarn clean`
-
-Recursively deletes all `node_modules` directories (important if you also want to delete the `node_modules` within the sample app. Otherwise `rm -rf node_modules` will work just as well).
-
-# Commands to run sample app with the SDK
-
-## `yarn install:all`
-
-Installs dependencies for both the SDK and the sample app. It's important to run this command before either `yarn start`ing or `yan build`ing.
-
-## `yarn start:all`
-
-Runs both the SDK and sample app in watch mode. Navigate to `http://localhost:8080` in your browser to see the sample app running. Making changes to the SDK `src` code while running both projects will also trigger the sample app to hot reload, so you can
-develop both projects in parallel.
+| Method Name           	| Description                                                                                                               	|
+|-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
+| `initIdentify`        	| Method for identifying users and setting a JWT                                                                            	|
+| `updateCart`          	| Update _shoppingCartItems_ field on user profile                                                                          	|
+| `trackPurchase`       	| Track purchase events                                                                                                     	|
+| `track`               	| Track custom events                                                                                                       	|
+| `trackInAppClose`     	| Track when an in-app message is closed                                                                                    	|
+| `trackInAppOpen`      	| Track when a message is opened and marks it as read                                                                       	|
+| `trackInAppClick`     	| Track when a user clicks on a button or link within a message                                                             	|
+| `trackInAppDelivery`  	| Track when a message has been delivered to a user's device                                                                	|
+| `trackInAppConsume`   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
+| `getInAppMessages`    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
+| `updateUserEmail`     	| Change a user's email address                                                                                             	|
+| `updateUser`          	| Change data on a user's profile or create a user if none exists                                                           	|
+| `updateSubscriptions` 	| Updates user's subscriptions                                                                                              	|
 
 # FAQ
 
@@ -81,7 +71,7 @@ your `.env` file and add your API key to the `API_KEY` variable.
 Then once you boot up the app, you can set the key with the following code snippet:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { clearToken, setNewToken } = initIdentify(process.env.API_KEY);
@@ -105,7 +95,7 @@ import { initIdentify } from 'iterable-web-sdk';
 Similar to the previous example, `initIdentify` exposes methods to set an [Axios interceptor](https://github.com/axios/axios#interceptors) on all API requests. You would set an email like so:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { setEmail, logout } = initIdentify(process.env.API_KEY);
@@ -123,14 +113,21 @@ import { initIdentify } from 'iterable-web-sdk';
 or with a User ID:
 
 ```ts
-import { initIdentify } from 'iterable-web-sdk';
+import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
   const { setUserID, logout } = initIdentify(process.env.API_KEY);
-  setUserID('1a3fed')
 
-  /* make your Iterable API requests here */
-  doRequest().then().catch()
+  setUserID('1a3fed')
+    .then(() => {
+      /* 
+        set user returns a promise due to the fact that the method will attempt
+        to create a user in the Iterable backend if one does not exist.
+      */
+
+      /* make your Iterable API requests here */
+      doRequest().then().catch()
+    })
 
   /* clear user upon logout */
   logout();
@@ -141,7 +138,7 @@ Setting a user by their email or ID will also cover you for endpoints that requi
 email or user ID in either the URL path or the query params. For example:
 
 ```ts
-import { initIdentify, getUserByEmail } from 'iterable-web-sdk';
+import { initIdentify, getUserByEmail } from '@iterable/web-sdk';
 
 ((): void => {
   const { setEmail, getMessages } = initIdentify(process.env.API_KEY);
@@ -162,14 +159,14 @@ really anything that library exposes will be fair game here.
 To get access to the base Axios instance, you can import it like so:
 
 ```ts
-import { baseAxiosRequest } from 'iterable-web-sdk'
+import { baseAxiosRequest } from '@iterable/web-sdk'
 ```
 
 and for example if you want to set an `email` query param on every outgoing request, you would
 just implement the way Axios advises like so:
 
 ```ts
-import { baseAxiosRequest } from 'iterable-web-sdk';
+import { baseAxiosRequest } from '@iterable/web-sdk';
 
 ((): void => {
   baseAxiosRequest.interceptors.request.use((config) => {
@@ -192,7 +189,7 @@ to have the in-app messages appear automatically on an interval.
 Normally to request a list of in-app messages, you'd make a request like this:
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -209,7 +206,7 @@ In order to take advantage of the SDK showing them automatically, you would impl
 the same method in this way:
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -228,7 +225,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 Optionally, you can pass arguments to fine-tune how you want the messages to appear
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -242,7 +239,9 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
       displayInterval: 5000,
       /* optional message you want the screen reader to vocalize for accessibility purposes */
       onOpenScreenReaderMessage:
-        'hey screen reader here telling you something just popped up on your screen!'
+        'hey screen reader here telling you something just popped up on your screen!',
+      /* what DOM node you want to take keyboard focus. Here we choose the first <input /> */
+      onOpenNodeToTakeFocus: 'input'
     },
     true
   );
@@ -254,7 +253,7 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
 You can also pause and resume the messages stream if you like
 
 ```ts
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
@@ -282,3 +281,21 @@ import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
   resumeMessageStream();
 })();
 ```
+
+# TypeScript
+
+The Iterable Web SDK includes TypeScript definitions out of the box. All SDK methods
+should be typed for you already but if you need to import specific typings, you can
+parse through each `types.d.ts` file inside of the `./dist` directory to find what you need.
+Request and response payloads should all be available.
+
+If you feel something is missing, feel free to open an issue!
+
+# Contributing
+
+Looking to contribute? Please see the [contributing instructions here](./CONTRIBUTING.md) for more
+details.
+
+# License
+
+This SDK is released under the MIT License. See [LICENSE](./LICENSE.md) for more information.
