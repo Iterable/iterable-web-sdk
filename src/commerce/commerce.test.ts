@@ -41,12 +41,16 @@ describe('Users Requests', () => {
     });
 
     const updateResponse = await updateCart({
-      email: 'hello@gmail.com',
-      userId: '1234'
+      user: {
+        email: 'hello@gmail.com',
+        userId: '1234'
+      }
     } as any);
     const trackResponse = await trackPurchase({
-      email: 'hello@gmail.com',
-      userId: '1234'
+      user: {
+        email: 'hello@gmail.com',
+        userId: '1234'
+      }
     } as any);
 
     expect(JSON.parse(updateResponse.config.data).email).toBeUndefined();
