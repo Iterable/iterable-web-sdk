@@ -1,5 +1,5 @@
 import './styles/index.css';
-import { initIdentify, getInAppMessages } from 'iterable-web-sdk';
+import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */

@@ -6,7 +6,7 @@ module.exports = {
   output: {
     filename: './index.js',
     path: path.resolve(__dirname),
-    library: 'base-module',
+    library: '@iterable/web-sdk',
     libraryTarget: 'umd'
   },
   devServer: {
