@@ -14,6 +14,13 @@ export interface UpdateUserParams {
   dataFields?: Record<string, any>;
   preferUserId?: boolean;
   mergeNestedObjects?: boolean;
-  // email: string;
-  // userId: string;
+}
+
+export interface UpdateSubscriptionParams {
+  emailListIds: number[];
+  unsubscribedChannelIds: number[];
+  unsubscribedMessageTypeIds: number[];
+  subscribedMessageTypeIds: number[];
+  campaignId: number;
+  templateId: number;
 }

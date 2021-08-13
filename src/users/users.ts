@@ -1,6 +1,6 @@
 import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
-import { UpdateUserParams } from './types';
+import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
@@ -12,7 +12,7 @@ export const updateUserEmail = (newEmail: string) => {
   });
 };
 
-export const updateUser = (payload: UpdateUserParams) =>
+export const updateUser = (payload: UpdateUserParams = {}) =>
   baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/users/update',
@@ -20,4 +20,13 @@ export const updateUser = (payload: UpdateUserParams) =>
       ...payload,
       preferUserId: true
     }
+  });
+
+export const updateSubscriptions = (
+  payload: Partial<UpdateSubscriptionParams> = {}
+) =>
+  baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: '/users/updateSubscriptions',
+    data: payload
   });
