@@ -10,8 +10,15 @@ module.exports = {
     libraryTarget: 'umd'
   },
   devServer: {
-    contentBase: './dist',
-    port: 8000
+    static: {
+      directory: './dist'
+    },
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false
+      }
+    }
   },
   devtool: 'eval'
 };
