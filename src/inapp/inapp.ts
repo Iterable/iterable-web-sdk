@@ -21,7 +21,11 @@ import {
   // trackInAppConsume,
   // trackInAppOpen
 } from '../events';
-import { DISPLAY_INTERVAL_DEFAULT, WEB_PLATFORM } from 'src/constants';
+import {
+  ANIMATION_DURATION,
+  DISPLAY_INTERVAL_DEFAULT,
+  WEB_PLATFORM
+} from 'src/constants';
 import schema from './inapp.schema';
 
 let parsedMessages: InAppMessage[] = [];
@@ -71,6 +75,8 @@ export function getInAppMessages(
           activeIframe: HTMLIFrameElement,
           url?: string
         ) => {
+          activeIframe.className = 'fade-out';
+
           /* close the message and start a timer to show the next one */
           trackInAppClose(
             url
@@ -86,13 +92,18 @@ export function getInAppMessages(
                   deviceInfo: { appPackageName: dupedPayload.packageName }
                 }
           ).catch((e) => e);
-          activeIframe.remove();
+
+          const fadeTimer = global.setTimeout(() => {
+            activeIframe.remove();
+            clearTimeout(fadeTimer);
+          }, ANIMATION_DURATION);
+
           messageIndex += 1;
           timer = global.setTimeout(() => {
             clearTimeout(timer as NodeJS.Timeout);
 
             paintMessageToDOM();
-          }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
+          }, (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) + ANIMATION_DURATION);
         };
 
         const overlay = paintOverlay(

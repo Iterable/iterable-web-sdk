@@ -2,6 +2,13 @@ import { by } from '@pabra/sortby';
 import { InAppMessage } from './types';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
+import { ANIMATION_DURATION } from 'src/constants';
+
+const addStyleSheeet = (doc: Document, style: string) => {
+  const stylesheet = doc.createElement('style');
+  stylesheet.textContent = style;
+  doc.head.appendChild(stylesheet);
+};
 
 export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
@@ -88,24 +95,66 @@ export const paintIFrame = (
     `;
 
     /* 
-      find all the images in the in-app message, preload them, and 
-      only then set the height because we need to know how tall the images
-      are before we set the height of the iframe.
-      
-      This prevents a race condition where if we set the height before the images
-      are loaded, we might end up with a scrolling iframe
+    find all the images in the in-app message, preload them, and 
+    only then set the height because we need to know how tall the images
+    are before we set the height of the iframe.
+    
+    This prevents a race condition where if we set the height before the images
+    are loaded, we might end up with a scrolling iframe
     */
     const images =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
     return preloadImages(images, () => {
       /* 
-        set the scroll height to the content inside, but since images
-        are going to take some time to load, we opt to preload them, THEN
-        set the inner HTML of the iframe
-      */
+     set the scroll height to the content inside, but since images
+     are going to take some time to load, we opt to preload them, THEN
+     set the inner HTML of the iframe
+     */
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
+      addStyleSheeet(
+        document,
+        `
+          @keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          @-moz-keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          @-webkit-keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          @-ms-keyframes fadein {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+
+          .fade-in {
+            -webkit-animation: fadein ${ANIMATION_DURATION}ms;
+            -moz-animation: fadein ${ANIMATION_DURATION}ms;
+            -ms-animation: fadein ${ANIMATION_DURATION}ms;
+            -o-animation: fadein ${ANIMATION_DURATION}ms;
+            animation: fadein ${ANIMATION_DURATION}ms;
+          }
+
+          .fade-out {
+            visibility: hidden;
+            opacity: 0;
+            -webkit-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+            -moz-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+            -ms-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+            -o-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+            transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+          }
+        `
+      );
       iframe.contentWindow?.document?.close();
 
       const timeout = setTimeout(() => {
@@ -129,6 +178,8 @@ export const paintIFrame = (
             max-width: 100%;
             z-index: 9999;
          `;
+
+        iframe.className = 'fade-in';
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
