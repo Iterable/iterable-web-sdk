@@ -107,10 +107,10 @@ export const paintIFrame = (
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
     return preloadImages(images, () => {
       /* 
-      set the scroll height to the content inside, but since images
-      are going to take some time to load, we opt to preload them, THEN
-      set the inner HTML of the iframe
-     */
+        set the scroll height to the content inside, but since images
+        are going to take some time to load, we opt to preload them, THEN
+        set the inner HTML of the iframe
+      */
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
@@ -162,10 +162,10 @@ export const paintIFrame = (
 
       const timeout = setTimeout(() => {
         /**
-         even though we preloaded the images before setting the height, we add an extra 100MS 
+          even though we preloaded the images before setting the height, we add an extra 100MS 
           here to handle for the case where the user needs to download custom fonts. As 
           of 07/27/2021, the preloading fonts API is still in a draft state
-          
+            
           @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
           
           but even if we did preload the fonts, it would still take a non-trivial amount
