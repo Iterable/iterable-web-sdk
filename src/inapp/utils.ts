@@ -96,20 +96,20 @@ export const paintIFrame = (
     `;
 
     /* 
-    find all the images in the in-app message, preload them, and 
-    only then set the height because we need to know how tall the images
-    are before we set the height of the iframe.
-    
-    This prevents a race condition where if we set the height before the images
-    are loaded, we might end up with a scrolling iframe
+      find all the images in the in-app message, preload them, and 
+      only then set the height because we need to know how tall the images
+      are before we set the height of the iframe.
+      
+      This prevents a race condition where if we set the height before the images
+      are loaded, we might end up with a scrolling iframe
     */
     const images =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
     return preloadImages(images, () => {
       /* 
-     set the scroll height to the content inside, but since images
-     are going to take some time to load, we opt to preload them, THEN
-     set the inner HTML of the iframe
+      set the scroll height to the content inside, but since images
+      are going to take some time to load, we opt to preload them, THEN
+      set the inner HTML of the iframe
      */
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
@@ -162,17 +162,17 @@ export const paintIFrame = (
 
       const timeout = setTimeout(() => {
         /**
-             even though we preloaded the images before setting the height, we add an extra 100MS 
-             here to handle for the case where the user needs to download custom fonts. As 
-             of 07/27/2021, the preloading fonts API is still in a draft state
-             
-             @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-             
-             but even if we did preload the fonts, it would still take a non-trivial amount
-             of computational time to apply the font to the text, so this setTimeout is acting more
-             as a failsafe just incase the new font causes the line-height to grow and create a
-             scrollbar in the iframe.
-             */
+         even though we preloaded the images before setting the height, we add an extra 100MS 
+          here to handle for the case where the user needs to download custom fonts. As 
+          of 07/27/2021, the preloading fonts API is still in a draft state
+          
+          @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+          
+          but even if we did preload the fonts, it would still take a non-trivial amount
+          of computational time to apply the font to the text, so this setTimeout is acting more
+          as a failsafe just incase the new font causes the line-height to grow and create a
+          scrollbar in the iframe.
+        */
         iframe.style.cssText = `
             position: fixed;
             border: none;
