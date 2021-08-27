@@ -70,12 +70,16 @@ export function getInAppMessages(
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
+        const shouldAnimate =
+          activeMessage?.content?.inAppDisplaySettings?.shouldAnimate;
 
         const dismissMessage = (
           activeIframe: HTMLIFrameElement,
           url?: string
         ) => {
-          activeIframe.className = 'fade-out';
+          if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
+            activeIframe.className = 'fade-out';
+          }
 
           /* close the message and start a timer to show the next one */
           trackInAppClose(
@@ -93,17 +97,26 @@ export function getInAppMessages(
                 }
           ).catch((e) => e);
 
-          const fadeTimer = global.setTimeout(() => {
+          if (shouldAnimate) {
+            const fadeTimer = global.setTimeout(() => {
+              activeIframe.remove();
+              clearTimeout(fadeTimer);
+            }, ANIMATION_DURATION);
+          } else {
             activeIframe.remove();
-            clearTimeout(fadeTimer);
-          }, ANIMATION_DURATION);
+          }
+
+          const timeToNextMessage = shouldAnimate
+            ? (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) +
+              ANIMATION_DURATION
+            : payload.displayInterval || DISPLAY_INTERVAL_DEFAULT;
 
           messageIndex += 1;
           timer = global.setTimeout(() => {
             clearTimeout(timer as NodeJS.Timeout);
 
             paintMessageToDOM();
-          }, (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) + ANIMATION_DURATION);
+          }, timeToNextMessage);
         };
 
         const overlay = paintOverlay(
@@ -121,6 +134,7 @@ export function getInAppMessages(
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
           activeMessage.content.html,
+          shouldAnimate,
           top,
           bottom,
           right,

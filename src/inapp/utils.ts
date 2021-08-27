@@ -67,6 +67,7 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
  */
 export const paintIFrame = (
   html: string,
+  shouldAnimate?: boolean,
   top?: number | null,
   bottom?: number | null,
   right?: number | null,
@@ -113,9 +114,10 @@ export const paintIFrame = (
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
-      addStyleSheeet(
-        document,
-        `
+      if (shouldAnimate) {
+        addStyleSheeet(
+          document,
+          `
           @keyframes fadein {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -135,7 +137,7 @@ export const paintIFrame = (
             from { opacity: 0; }
             to { opacity: 1; }
           }
-
+          
           .fade-in {
             -webkit-animation: fadein ${ANIMATION_DURATION}ms;
             -moz-animation: fadein ${ANIMATION_DURATION}ms;
@@ -143,7 +145,7 @@ export const paintIFrame = (
             -o-animation: fadein ${ANIMATION_DURATION}ms;
             animation: fadein ${ANIMATION_DURATION}ms;
           }
-
+          
           .fade-out {
             visibility: hidden;
             opacity: 0;
@@ -153,23 +155,24 @@ export const paintIFrame = (
             -o-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
             transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
           }
-        `
-      );
+          `
+        );
+      }
       iframe.contentWindow?.document?.close();
 
       const timeout = setTimeout(() => {
         /**
-          even though we preloaded the images before setting the height, we add an extra 100MS 
-          here to handle for the case where the user needs to download custom fonts. As 
-          of 07/27/2021, the preloading fonts API is still in a draft state
-          
-          @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-          
-          but even if we did preload the fonts, it would still take a non-trivial amount
-          of computational time to apply the font to the text, so this setTimeout is acting more
-          as a failsafe just incase the new font causes the line-height to grow and create a
-          scrollbar in the iframe.
-        */
+             even though we preloaded the images before setting the height, we add an extra 100MS 
+             here to handle for the case where the user needs to download custom fonts. As 
+             of 07/27/2021, the preloading fonts API is still in a draft state
+             
+             @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
+             
+             but even if we did preload the fonts, it would still take a non-trivial amount
+             of computational time to apply the font to the text, so this setTimeout is acting more
+             as a failsafe just incase the new font causes the line-height to grow and create a
+             scrollbar in the iframe.
+             */
         iframe.style.cssText = `
             position: fixed;
             border: none;
@@ -179,7 +182,9 @@ export const paintIFrame = (
             z-index: 9999;
          `;
 
-        iframe.className = 'fade-in';
+        if (shouldAnimate) {
+          iframe.className = 'fade-in';
+        }
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');
         if (!mediaQuery.matches) {
