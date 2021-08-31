@@ -2,9 +2,8 @@ import { by } from '@pabra/sortby';
 import { InAppMessage } from './types';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import { ANIMATION_DURATION } from 'src/constants';
 
-const addStyleSheeet = (doc: Document, style: string) => {
+export const addStyleSheeet = (doc: Document, style: string) => {
   const stylesheet = doc.createElement('style');
   stylesheet.textContent = style;
   doc.head.appendChild(stylesheet);
@@ -114,50 +113,6 @@ export const paintIFrame = (
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
-      if (shouldAnimate) {
-        addStyleSheeet(
-          document,
-          `
-          @keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          @-moz-keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          @-webkit-keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          @-ms-keyframes fadein {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          
-          .fade-in {
-            -webkit-animation: fadein ${ANIMATION_DURATION}ms;
-            -moz-animation: fadein ${ANIMATION_DURATION}ms;
-            -ms-animation: fadein ${ANIMATION_DURATION}ms;
-            -o-animation: fadein ${ANIMATION_DURATION}ms;
-            animation: fadein ${ANIMATION_DURATION}ms;
-          }
-          
-          .fade-out {
-            visibility: hidden;
-            opacity: 0;
-            -webkit-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-            -moz-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-            -ms-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-            -o-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-            transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-          }
-          `
-        );
-      }
       iframe.contentWindow?.document?.close();
 
       const timeout = setTimeout(() => {
@@ -173,17 +128,28 @@ export const paintIFrame = (
           as a failsafe just incase the new font causes the line-height to grow and create a
           scrollbar in the iframe.
         */
-        iframe.style.cssText = `
+        iframe.style.cssText = shouldAnimate
+          ? `
             position: fixed;
             border: none;
             margin: auto;
             width: 50%;
             max-width: 100%;
             z-index: 9999;
-         `;
+            transform: translateX(150%);
+            -webkit-transform: translateX(150%);      
+          `
+          : `
+            position: fixed;
+            border: none;
+            margin: auto;
+            width: 50%;
+            max-width: 100%;
+            z-index: 9999;
+          `;
 
         if (shouldAnimate) {
-          iframe.className = 'fade-in';
+          iframe.className = 'slide-in';
         }
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');

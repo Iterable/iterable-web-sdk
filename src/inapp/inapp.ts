@@ -13,7 +13,8 @@ import {
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
-  trackMessagesDelivered
+  trackMessagesDelivered,
+  addStyleSheeet
 } from './utils';
 import {
   trackInAppClick,
@@ -23,6 +24,7 @@ import {
 } from '../events';
 import {
   ANIMATION_DURATION,
+  ANIMATION_STYLESHEET,
   DISPLAY_INTERVAL_DEFAULT,
   WEB_PLATFORM
 } from 'src/constants';
@@ -67,6 +69,7 @@ export function getInAppMessages(
   delete dupedPayload.onOpenNodeToTakeFocus;
 
   if (showInAppMessagesAutomatically) {
+    addStyleSheeet(document, ANIMATION_STYLESHEET);
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
@@ -78,7 +81,7 @@ export function getInAppMessages(
           url?: string
         ) => {
           if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
-            activeIframe.className = 'fade-out';
+            activeIframe.className = 'slide-out';
           }
 
           /* close the message and start a timer to show the next one */
@@ -98,9 +101,9 @@ export function getInAppMessages(
           ).catch((e) => e);
 
           if (shouldAnimate) {
-            const fadeTimer = global.setTimeout(() => {
+            const animationTimer = global.setTimeout(() => {
               activeIframe.remove();
-              clearTimeout(fadeTimer);
+              clearTimeout(animationTimer);
             }, ANIMATION_DURATION);
           } else {
             activeIframe.remove();
