@@ -2,49 +2,63 @@ import { baseAxiosRequest } from '../request';
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
 import { RETRY_USER_ATTEMPTS } from 'src/constants';
+import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
 
-// interface WithJWT {
-//   clearRefresh: () => void;
-//   setEmail: (newEmail: string) => Promise<string>;
-//   setUserId: (newId: string) => Promise<string>;
-// }
+const ONE_MINUTE = 60000;
+
+interface WithJWT {
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+}
 
 interface WithoutJWT {
-  setNewToken: (newToken?: string) => void;
-  clearToken: () => void;
+  setNewAuthToken: (newToken?: string) => void;
+  clearAuthToken: () => void;
   setEmail: (email: string) => void;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }
 
-// export function initIdentify(
-//   authToken: string,
-//   jwtEnabled: true,
-//   callback: (...args: any) => Promise<string>
-// ): WithJWT;
-export function initIdentify(authToken: string, jwtEnabled: false): WithoutJWT;
+export function initIdentify(
+  authToken: string,
+  generateJWT: (...args: any) => Promise<string>
+): WithJWT;
 export function initIdentify(authToken: string): WithoutJWT;
 export function initIdentify(
   authToken: string,
-  jwtEnabled?: boolean,
-  callback?: (...args: any) => Promise<string>
+  generateJWT?: (...args: any) => Promise<string>
 ) {
-  // let timer: NodeJS.Timeout | null = null;
-  // let expMin: number | null = null;
-  let authInterceptor: number | null =
-    baseAxiosRequest.interceptors.request.use((config) => ({
-      ...config,
-      headers: {
-        ...config.headers,
-        Api_Key: authToken
-      }
-    }));
+  const isDevelopmentMode =
+    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+  if (!generateJWT && !isDevelopmentMode) {
+    /* only let people use non-JWT mode if running the app locally */
+    return console.error(
+      'Please provide a Promise method for generating a JWT token.'
+    );
+  }
+
+  let timer: NodeJS.Timeout | null = null;
+  /* 
+    only set token interceptor if we're using a non-JWT key.
+    Otherwise, we'll set it later once we generate the JWT
+  */
+  let authInterceptor: number | null = generateJWT
+    ? null
+    : baseAxiosRequest.interceptors.request.use((config) => ({
+        ...config,
+        headers: {
+          ...config.headers,
+          Api_Key: authToken
+        }
+      }));
   let userInterceptor: number | null = null;
 
-  if (!jwtEnabled || !callback) {
+  if (!generateJWT) {
     /* we want to set a normal non-JWT enabled API key */
     return {
-      setNewToken: (newToken: string) => {
+      setNewAuthToken: (newToken: string) => {
         if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -59,7 +73,7 @@ export function initIdentify(
           })
         );
       },
-      clearToken: () => {
+      clearAuthToken: () => {
         /* might be 0 which is a falsy value */
         if (typeof authInterceptor === 'number') {
           /* clear previously cached interceptor function */
@@ -244,8 +258,16 @@ export function initIdentify(
         }
       },
       logout: () => {
+        /* clear fetched in-app messages */
         clearMessages();
+
+        if (typeof authInterceptor === 'number') {
+          /* stop adding auth token to requests */
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
+        }
+
         if (typeof userInterceptor === 'number') {
+          /* stop adding JWT to requests */
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
       }
@@ -256,49 +278,267 @@ export function initIdentify(
     We're using a JWT enabled API key
     callback is assumed to be some sort of GET /api/generate-jwt 
   */
-  // const doRequest = (...args: any) => {
-  //   /* clear timer */
-  //   clearInterval(timer as any);
-  //   /* clear interceptor */
-  //   if (authInterceptor) {
-  //     baseAxiosRequest.interceptors.request.eject(authInterceptor);
-  //   }
-  //   return callback(...args)
-  //     .then((token) => {
-  //       /* set interceptor */
-  //       authInterceptor = baseAxiosRequest.interceptors.request.use((config) => ({
-  //         ...config,
-  //         headers: {
-  //           ...config.headers,
-  //           Api_Key: authToken,
-  //           Authorization: `Bearer ${token}`
-  //         }
-  //       }));
-  //       expMin = new Date().getMinutes() + 2;
-  //       timer = setInterval(() => {
-  //         /* check to see if token has expired */
-  //         if (expMin && expMin - new Date().getMinutes() <= 1) {
-  //           /* token has expired. get new JWT */
-  //           return doRequest(...args);
-  //         }
-  //       }, 10000);
-  //       return token;
-  //     })
-  //     .catch((error) => {
-  //       /* clear timer */
-  //       if (timer) {
-  //         clearInterval(timer);
-  //       }
-  //       /* clear interceptor */
-  //       if (typeof authInterceptor === 'number') {
-  //         baseAxiosRequest.interceptors.request.eject(authInterceptor);
-  //       }
-  //       return Promise.reject(error);
-  //     });
-  // };
-  // return {
-  //   clearRefresh: () => clearInterval(timer as any),
-  //   setEmail: (newEmail: string) => doRequest(newEmail),
-  //   setUserId: (newId: string) => doRequest(newId)
-  // };
+  const doRequest = (...args: any) => {
+    /* clear timer */
+    if (timer) {
+      clearTimeout(timer);
+    }
+    /* clear any token interceptor if any exists */
+    if (authInterceptor) {
+      baseAxiosRequest.interceptors.request.eject(authInterceptor);
+    }
+    return generateJWT(...args)
+      .then((token) => {
+        /* set JWT token and auth token headers */
+        authInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => ({
+            ...config,
+            headers: {
+              ...config.headers,
+              Api_Key: authToken,
+              Authorization: `Bearer ${token}`
+            }
+          })
+        );
+        const expTime = getEpochExpiryTimeInMS(token);
+        const millisecondsToExpired = getEpochDifferenceInMS(
+          Date.now(),
+          expTime
+        );
+        timer = setTimeout(() => {
+          /* get new token */
+          return doRequest(...args).catch((e) => {
+            console.warn(e);
+            console.warn(
+              'Could not refresh JWT. Try identifying the user again.'
+            );
+          });
+          /* try to refresh one minute until expiry */
+        }, millisecondsToExpired - ONE_MINUTE);
+        return token;
+      })
+      .catch((error) => {
+        /* clear timer */
+        if (timer) {
+          clearTimeout(timer);
+        }
+        /* clear interceptor */
+        if (typeof authInterceptor === 'number') {
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
+        }
+        return Promise.reject(error);
+      });
+  };
+  return {
+    clearRefresh: () => {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    },
+    setEmail: (email: string) => {
+      /* clear previous user */
+      clearMessages();
+      if (typeof userInterceptor === 'number') {
+        baseAxiosRequest.interceptors.request.eject(userInterceptor);
+      }
+
+      /* 
+        endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+      */
+      userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+        if (!!(config?.url || '').match(/updateEmail/gim)) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              currentEmail: email
+            }
+          };
+        }
+
+        /*
+          endpoints that use _email_ payload prop in POST/PUT requests 
+        */
+        if (
+          !!(config?.url || '').match(
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+          )
+        ) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              email
+            }
+          };
+        }
+
+        /*
+          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+        */
+        if (
+          !!(config?.url || '').match(
+            /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+          )
+        ) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              user: {
+                ...(config.data.user || {}),
+                email
+              }
+            }
+          };
+        }
+
+        /*
+          endpoints that use _email_ query param in GET requests
+        */
+        if (!!(config?.url || '').match(/getMessages/gim)) {
+          return {
+            ...config,
+            params: {
+              ...(config.params || {}),
+              email
+            }
+          };
+        }
+
+        return config;
+      });
+
+      return doRequest(email).catch((e) => {
+        console.warn(
+          'Could not generate JWT. Please try calling setEmail again.'
+        );
+        return Promise.reject(e);
+      });
+    },
+    setUserID: async (userId: string) => {
+      clearMessages();
+
+      if (typeof userInterceptor === 'number') {
+        baseAxiosRequest.interceptors.request.eject(userInterceptor);
+      }
+
+      /*
+        endpoints that use _userId_ payload prop in POST/PUT requests 
+      */
+      userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+        if (!!(config?.url || '').match(/updateEmail/gim)) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              currentUserId: userId
+            }
+          };
+        }
+
+        /*
+          endpoints that use _userId_ payload prop in POST/PUT requests 
+        */
+        if (
+          !!(config?.url || '').match(
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+          )
+        ) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              userId
+            }
+          };
+        }
+
+        /*
+          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+        */
+        if (
+          !!(config?.url || '').match(
+            /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+          )
+        ) {
+          return {
+            ...config,
+            data: {
+              ...(config.data || {}),
+              user: {
+                ...(config.data.user || {}),
+                userId
+              }
+            }
+          };
+        }
+
+        /*
+          endpoints that use _userId_ query param in GET requests
+        */
+        if (!!(config?.url || '').match(/getMessages/gim)) {
+          return {
+            ...config,
+            params: {
+              ...(config.params || {}),
+              userId
+            }
+          };
+        }
+
+        return config;
+      });
+
+      const tryUser = () => {
+        let createUserAttempts = 0;
+
+        return async function tryUserNTimes(): Promise<any> {
+          try {
+            return await updateUser({});
+          } catch (e) {
+            if (createUserAttempts < RETRY_USER_ATTEMPTS) {
+              createUserAttempts += 1;
+              return tryUserNTimes();
+            }
+
+            return Promise.reject(
+              `could not create user after ${createUserAttempts} tries`
+            );
+          }
+        };
+      };
+
+      return doRequest(userId)
+        .then(async (token) => {
+          await tryUser()();
+          return token;
+        })
+        .catch((e) => {
+          console.warn(
+            'Could not generate JWT. Please try calling setUserID again.'
+          );
+          return Promise.reject(e);
+        });
+    },
+    logout: () => {
+      /* clear fetched in-app messages */
+      clearMessages();
+
+      if (timer) {
+        /* prevent any refreshing of JWT */
+        clearTimeout(timer);
+      }
+
+      if (typeof authInterceptor === 'number') {
+        /* stop adding auth token to requests */
+        baseAxiosRequest.interceptors.request.eject(authInterceptor);
+      }
+
+      if (typeof userInterceptor === 'number') {
+        /* stop adding JWT to requests */
+        baseAxiosRequest.interceptors.request.eject(userInterceptor);
+      }
+    }
+  };
 }

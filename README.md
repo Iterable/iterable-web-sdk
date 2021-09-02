@@ -74,19 +74,19 @@ Then once you boot up the app, you can set the key with the following code snipp
 import { initIdentify } from '@iterable/web-sdk';
 
 ((): void => {
-  const { clearToken, setNewToken } = initIdentify(process.env.API_KEY);
+  const { clearAuthToken, setNewAuthToken } = initIdentify(process.env.API_KEY);
 
   /* make your Iterable API requests here */
   doSomeRequest().then().catch()
 
   /* optionally you can also clear your token if you like */
-  clearToken();
+  clearAuthToken();
 
   /* 
-    the initIdentify method also exposes a setNewToken method 
+    the initIdentify method also exposes a setNewAuthToken method 
     if you want to set another key later on.
   */
-  setNewToken('my-new-api-key')
+  setNewAuthToken('my-new-api-key')
 })();
 ```
 
