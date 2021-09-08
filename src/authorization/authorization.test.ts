@@ -2,7 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { initIdentify } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
-import { track, trackInAppClose } from '../events';
+import { trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
 
@@ -242,7 +242,7 @@ describe('User Identification', () => {
         const closeResponse = await trackInAppClose({ messageId: '123' });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
-        const trackResponse = await track({ eventName: 'fdsafdf' });
+        // const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).email).toBe(
           'hello@gmail.com'
@@ -253,9 +253,9 @@ describe('User Identification', () => {
         expect(JSON.parse(userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).email).toBe(
-          'hello@gmail.com'
-        );
+        // expect(JSON.parse(trackResponse.config.data).email).toBe(
+        //   'hello@gmail.com'
+        // );
       });
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
@@ -382,12 +382,12 @@ describe('User Identification', () => {
         const closeResponse = await trackInAppClose({ messageId: '123' });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
-        const trackResponse = await track({ eventName: 'fdsafdf' });
+        // const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
         expect(JSON.parse(userResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
+        // expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
@@ -552,7 +552,7 @@ describe('User Identification', () => {
         const closeResponse = await trackInAppClose({ messageId: '123' });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
-        const trackResponse = await track({ eventName: 'fdsafdf' });
+        // const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).email).toBe(
           'hello@gmail.com'
@@ -563,9 +563,9 @@ describe('User Identification', () => {
         expect(JSON.parse(userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).email).toBe(
-          'hello@gmail.com'
-        );
+        // expect(JSON.parse(trackResponse.config.data).email).toBe(
+        //   'hello@gmail.com'
+        // );
       });
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
@@ -708,12 +708,12 @@ describe('User Identification', () => {
         const closeResponse = await trackInAppClose({ messageId: '123' });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
-        const trackResponse = await track({ eventName: 'fdsafdf' });
+        // const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
         expect(JSON.parse(userResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
+        // expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
