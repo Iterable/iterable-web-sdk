@@ -4,22 +4,25 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
-  const { setEmail, logout } = initIdentify(process.env.API_KEY || '', (id) => {
-    return axios
-      .post(
-        'http://localhost:5000/generate',
-        {
-          exp_minutes: 3,
-          user_id: id
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
+  const { setEmail, logout } = initIdentify(
+    process.env.API_KEY || '',
+    (email) => {
+      return axios
+        .post(
+          'http://localhost:5000/generate',
+          {
+            exp_minutes: 2,
+            email
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      )
-      .then((response) => response.data.token);
-  });
+        )
+        .then((response) => response.data.token);
+    }
+  );
 
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {
@@ -54,7 +57,7 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
     event.preventDefault();
     if (startBtn.getAttribute('aria-disabled') !== 'true') {
       startBtn.innerText = `Loading...`;
-      setEmail('width.tester@gmail.com').then(() => {
+      setEmail('iterable.tester@gmail.com').then(() => {
         /* aria-disabled doesn't actually disable the button lol */
         request()
           .then((response) => {
