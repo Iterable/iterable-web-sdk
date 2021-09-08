@@ -106,7 +106,7 @@ export function initIdentify(
             */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
               )
             ) {
               return {
@@ -182,7 +182,7 @@ export function initIdentify(
             */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
               )
             ) {
               return {
@@ -279,10 +279,6 @@ export function initIdentify(
     callback is assumed to be some sort of GET /api/generate-jwt 
   */
   const doRequest = (...args: any) => {
-    /* clear timer */
-    if (timer) {
-      clearTimeout(timer);
-    }
     /* clear any token interceptor if any exists */
     if (authInterceptor) {
       baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -306,6 +302,9 @@ export function initIdentify(
           expTime
         );
         timer = setTimeout(() => {
+          if (timer) {
+            clearTimeout(timer);
+          }
           /* get new token */
           return doRequest(...args).catch((e) => {
             console.warn(e);
@@ -361,7 +360,7 @@ export function initIdentify(
         */
         if (
           !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
           )
         ) {
           return {
@@ -442,7 +441,7 @@ export function initIdentify(
         */
         if (
           !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)/gim
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
           )
         ) {
           return {
