@@ -8,6 +8,7 @@ describe('Utils', () => {
       'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA1MjIyNjUwMDAsImlhdCI6MTYzMDUyMTk2NTAwMCwiZW1haWwiOiJ3aWR0aC50ZXN0ZXJAZ21haWwuY29tIn0.vpVUJiXh9BEb5cELzdncUbiHEjcVdr3pH_VnSrHqLYY';
     expect(getEpochExpiryTimeInMS(token)).toBe(1630432936000);
     expect(getEpochExpiryTimeInMS(token2)).toBe(1630522265000);
+    expect(getEpochExpiryTimeInMS('')).toBe(0);
     expect(getEpochExpiryTimeInMS('.')).toBe(0);
   });
 
