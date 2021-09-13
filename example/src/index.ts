@@ -20,7 +20,11 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
             }
           }
         )
-        .then((response) => response.data.token);
+        .then((response) => {
+          const tokenInStorage = localStorage.getItem('token-jawn');
+          localStorage.setItem('token-jawn', response.data.token);
+          return tokenInStorage || response.data.token;
+        });
     }
   );
 
