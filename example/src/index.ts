@@ -21,9 +21,7 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
           }
         )
         .then((response) => {
-          const tokenInStorage = localStorage.getItem('token-jawn');
-          localStorage.setItem('token-jawn', response.data.token);
-          return tokenInStorage || response.data.token;
+          return 'fdsafdsfdsf';
         });
     }
   );
