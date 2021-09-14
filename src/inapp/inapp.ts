@@ -51,6 +51,16 @@ export function getInAppMessages(
   showInAppMessagesAutomatically?: boolean
 ) {
   clearMessages();
+
+  const dupedPayload = { ...payload };
+
+  /* delete SDK-defined payload props and email and userId */
+  delete (dupedPayload as any).userId;
+  delete (dupedPayload as any).email;
+  delete dupedPayload.displayInterval;
+  delete dupedPayload.onOpenScreenReaderMessage;
+  delete dupedPayload.onOpenNodeToTakeFocus;
+
   if (showInAppMessagesAutomatically) {
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
@@ -249,7 +259,7 @@ export function getInAppMessages(
         baseIterableRequest<InAppMessageResponse>({
           method: 'GET',
           url: '/inApp/getMessages',
-          params: payload
+          params: dupedPayload
         })
           .then((response) => {
             trackMessagesDelivered(response.data.inAppMessages || []);
@@ -299,7 +309,7 @@ export function getInAppMessages(
   return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     url: '/inApp/getMessages',
-    params: payload
+    params: dupedPayload
   }).then((response) => {
     trackMessagesDelivered(response.data.inAppMessages || []);
     return response;

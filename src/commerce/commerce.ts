@@ -3,6 +3,12 @@ import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  if (payload.user) {
+    delete (payload as any).user.userId;
+    delete (payload as any).user.email;
+  }
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/commerce/updateCart',
@@ -17,6 +23,12 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 };
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  if (payload.user) {
+    delete (payload as any).user.userId;
+    delete (payload as any).user.email;
+  }
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/commerce/trackPurchase',

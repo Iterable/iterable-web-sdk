@@ -26,6 +26,16 @@ describe('getInAppMessages', () => {
   });
 
   describe('getInAppMessages without auto painting', () => {
+    it('should not include passed email or userId as query params', async () => {
+      const response = await getInAppMessages({
+        email: 'hello@gmail.com',
+        userId: '1234'
+      } as any);
+
+      expect(response.config.params.email).toBeUndefined();
+      expect(response.config.params.userId).toBeUndefined();
+    });
+
     it('should just return a promise if auto-paint flag is false', async () => {
       const response = await getInAppMessages({ count: 10 });
 
@@ -65,6 +75,19 @@ describe('getInAppMessages', () => {
       expect(response.pauseMessageStream).toBeDefined();
       expect(response.resumeMessageStream).toBeDefined();
       expect(response.request).toBeDefined();
+    });
+
+    it('should not include passed email or userId as query params', async () => {
+      const response = await getInAppMessages(
+        {
+          email: 'hello@gmail.com',
+          userId: '1234'
+        } as any,
+        true
+      ).request();
+
+      expect(response.config.params.email).toBeUndefined();
+      expect(response.config.params.userId).toBeUndefined();
     });
 
     it('should paint an iframe to the DOM', async () => {
