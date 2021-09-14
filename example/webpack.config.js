@@ -32,7 +32,15 @@ module.exports = {
     }
   },
   devServer: {
-    contentBase: './dist'
+    static: {
+      directory: './dist'
+    },
+    client: {
+      overlay: {
+        errors: true,
+        warnings: false
+      }
+    }
   },
   plugins: [
     new ESLintPlugin({
