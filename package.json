@@ -33,6 +33,7 @@
   "dependencies": {
     "@pabra/sortby": "^1.0.1",
     "axios": "^0.21.1",
+    "buffer": "^6.0.3",
     "handlebars": "^4.4.3",
     "throttle-debounce": "^3.0.1"
   },
@@ -67,6 +68,7 @@
     "axios-mock-adapter": "^1.19.0",
     "babel-plugin-module-resolver": "^3.2.0",
     "concurrently": "^6.2.0",
+    "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",

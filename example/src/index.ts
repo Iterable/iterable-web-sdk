@@ -1,9 +1,28 @@
 import './styles/index.css';
+import axios from 'axios';
 import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
-  const { setEmail, logout } = initIdentify(process.env.API_KEY || '');
+  const { setEmail, logout } = initIdentify(
+    process.env.API_KEY || '',
+    (email) => {
+      return axios
+        .post(
+          'http://localhost:5000/generate',
+          {
+            exp_minutes: 2,
+            email
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        .then((response) => response.data.token);
+    }
+  );
 
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {
@@ -36,14 +55,16 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 
   startBtn.addEventListener('click', (event) => {
     event.preventDefault();
-    setEmail('iterable.tester@gmail.com');
     if (startBtn.getAttribute('aria-disabled') !== 'true') {
-      /* aria-disabled doesn't actually disable the button lol */
-      request()
-        .then((response) => {
-          startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
-        })
-        .catch(console.warn);
+      startBtn.innerText = `Loading...`;
+      setEmail('iterable.tester@gmail.com').then(() => {
+        /* aria-disabled doesn't actually disable the button lol */
+        request()
+          .then((response) => {
+            startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
+          })
+          .catch(console.warn);
+      });
     }
     startBtn.setAttribute('aria-disabled', 'true');
     startBtn.className = 'disabled';
