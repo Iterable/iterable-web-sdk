@@ -1,7 +1,8 @@
+import axios from 'axios';
 import { baseAxiosRequest } from '../request';
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
-import { RETRY_USER_ATTEMPTS } from 'src/constants';
+import { INVALID_JWT_CODE, RETRY_USER_ATTEMPTS } from 'src/constants';
 import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
 
 const ONE_MINUTE = 60000;
@@ -295,6 +296,59 @@ export function initIdentify(
               Authorization: `Bearer ${token}`
             }
           })
+        );
+
+        baseAxiosRequest.interceptors.response.use(
+          (config) => config,
+          (error) => {
+            /*
+              adds a status code 400+ callback to try and get a new JWT
+              key if the Iterable API told us the JWT is invalid.
+            */
+            // console.log(error.response.data.code);
+            if (error?.response?.data?.code === INVALID_JWT_CODE) {
+              return generateJWT(...args)
+                .then((newToken) => {
+                  if (authInterceptor) {
+                    baseAxiosRequest.interceptors.request.eject(
+                      authInterceptor
+                    );
+                  }
+                  authInterceptor = baseAxiosRequest.interceptors.request.use(
+                    (config) => ({
+                      ...config,
+                      headers: {
+                        ...config.headers,
+                        Api_Key: authToken,
+                        Authorization: `Bearer ${newToken}`
+                      }
+                    })
+                  );
+
+                  /*
+                    finally, after the new JWT is generated, try the original
+                    request that failed again.
+                  */
+                  return axios({
+                    ...error.config,
+                    headers: {
+                      ...error.config.headers,
+                      Api_Key: authToken,
+                      Authorization: `Bearer ${newToken}`
+                    }
+                  });
+                })
+                .catch((e) => {
+                  /*
+                    if the JWT generation failed, 
+                    just abort with a Promise rejection.
+                  */
+                  return Promise.reject(e);
+                });
+            }
+
+            return Promise.reject(error);
+          }
         );
         const expTime = getEpochExpiryTimeInMS(token);
         const millisecondsToExpired = getEpochDifferenceInMS(

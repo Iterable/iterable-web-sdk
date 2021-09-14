@@ -20,7 +20,9 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
             }
           }
         )
-        .then((response) => response.data.token);
+        .then((response) => {
+          return response.data?.token;
+        });
     }
   );
 

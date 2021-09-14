@@ -1,3 +1,4 @@
+import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { initIdentify } from './authorization';
 import { baseAxiosRequest } from '../request';
@@ -5,6 +6,7 @@ import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
+import { INVALID_JWT_CODE } from '../constants';
 
 let mockRequest: any = null;
 /*
@@ -25,14 +27,14 @@ describe('API Key Interceptors', () => {
     mockRequest.onGet('/inApp/getMessages').reply(200, {
       data: 'something'
     });
-    mockRequest.onPost('/users/update').reply(200, {
-      data: 'something'
-    });
 
     jest.useFakeTimers();
   });
 
   beforeEach(() => {
+    mockRequest.onPost('/users/update').reply(200, {
+      data: 'something'
+    });
     /* clear any interceptors already configured */
     [
       ...Array(
@@ -40,6 +42,13 @@ describe('API Key Interceptors', () => {
       ).keys()
     ].forEach((e, index) => {
       baseAxiosRequest.interceptors.request.eject(index);
+    });
+    [
+      ...Array(
+        mockRequest.axiosInstance.interceptors.response.handlers.length
+      ).keys()
+    ].forEach((e, index) => {
+      baseAxiosRequest.interceptors.response.eject(index);
     });
   });
 
@@ -148,6 +157,28 @@ describe('API Key Interceptors', () => {
           'Could not generate JWT. Please try calling setEmail again.'
         );
         spy.mockRestore();
+      }
+    });
+
+    it('should try to generate JWT again if 401 response comes in', async () => {
+      const mockBaseAdapter = new MockAdapter(axios);
+      mockBaseAdapter.onPost('/users/update').reply(400, {
+        code: 'Something'
+      });
+      mockRequest.onPost('/users/update').reply(400, {
+        code: INVALID_JWT_CODE
+      });
+
+      const mockGenerateJW = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail } = initIdentify('123', mockGenerateJW);
+
+      try {
+        await setEmail('hello@gmail.com');
+        await updateUser();
+      } catch (e) {
+        expect(mockGenerateJW).toHaveBeenCalledTimes(2);
       }
     });
   });
