@@ -2,20 +2,20 @@ import { Buffer } from 'buffer';
 
 export const getEpochExpiryTimeInMS = (jwt: string) => {
   /** @thanks https://stackoverflow.com/a/38552302/7455960  */
-  const base64Url = jwt.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const jsonPayload = decodeURIComponent(
-    Buffer.from(base64, 'base64')
-      .toString()
-      .split('')
-      .map(
-        (character) =>
-          '%' + ('00' + character.charCodeAt(0).toString(16)).slice(-2)
-      )
-      .join('')
-  );
-
   try {
+    const base64Url = jwt.split('.')?.[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      Buffer.from(base64, 'base64')
+        .toString()
+        .split('')
+        .map(
+          (character) =>
+            '%' + ('00' + character.charCodeAt(0).toString(16)).slice(-2)
+        )
+        .join('')
+    );
+
     const expTime = JSON.parse(jsonPayload)?.exp;
     return expTime < 10000000000 ? expTime * 1000 : expTime;
   } catch {
