@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "@pabra/sortby": "^1.0.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.4",
     "buffer": "^6.0.3",
     "handlebars": "^4.4.3",
     "throttle-debounce": "^3.0.1"
