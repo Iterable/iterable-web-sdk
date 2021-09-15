@@ -20,7 +20,8 @@ export type IterableErrorStatus =
   | 'InvalidEmailAddressError'
   | 'DatabaseError'
   | 'EmailAlreadyExists'
-  | 'Forbidden';
+  | 'Forbidden'
+  | 'InvalidJwtPayload';
 
 export type IterablePlatform = 'iOS' | 'Android';
 

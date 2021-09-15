@@ -181,6 +181,62 @@ describe('API Key Interceptors', () => {
         expect(mockGenerateJW).toHaveBeenCalledTimes(2);
       }
     });
+
+    it('should try to generate JWT again if updateEmail is called', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail } = initIdentify('123', mockGenerateJWT);
+
+      await setEmail('hello@gmail.com');
+      await updateUserEmail('helloworld@gmail.com');
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+    });
+
+    it('should generate JWT 1 minute before expiry with new email if updateEmail is called', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail } = initIdentify('123', mockGenerateJWT);
+
+      await setEmail('hello@gmail.com');
+      await updateUserEmail('helloworld@gmail.com');
+
+      jest.advanceTimersByTime(60000 * 4.1);
+      /* 
+        called once originally, a second time after the email was changed, 
+        and a third after the JWT was about to expire
+      */
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
+      expect(mockGenerateJWT).lastCalledWith({
+        email: 'helloworld@gmail.com'
+      });
+    });
+
+    it('should make new API requests with new email after updateEmail is called', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail } = initIdentify('123', mockGenerateJWT);
+
+      await setEmail('hello@gmail.com');
+      await updateUserEmail('helloworld@gmail.com');
+
+      const response = await getInAppMessages({ count: 20 });
+      expect(response.config.params.email).toBe('helloworld@gmail.com');
+    });
   });
 });
 
