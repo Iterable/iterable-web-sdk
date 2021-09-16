@@ -153,6 +153,7 @@ export const paintIFrame = (
         }
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');
+
         if (!mediaQuery.matches) {
           iframe.style.width = '100%';
         }
@@ -236,7 +237,7 @@ export const generatePositions = (
   let top = initTop;
   let bottom = initBottom;
   let right = initRight;
-  let left = initLeft;
+  let left = null;
   if (typeof initTop !== 'number' && typeof initBottom !== 'number') {
     bottom = 0;
     top = 0;
