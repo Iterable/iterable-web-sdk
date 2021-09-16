@@ -22,7 +22,7 @@ export type IterableErrorStatus =
   | 'EmailAlreadyExists'
   | 'Forbidden';
 
-export type IterablePlatform = 'iOS' | 'Android';
+export type IterablePlatform = 'iOS' | 'Android' | 'Web';
 
 /*
   potential response for both 200+ and 400+
