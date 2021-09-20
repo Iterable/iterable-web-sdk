@@ -22,6 +22,7 @@ import {
   // trackInAppOpen
 } from '../events';
 import { DISPLAY_INTERVAL_DEFAULT, WEB_PLATFORM } from 'src/constants';
+import schema from './inapp.schema';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -270,7 +271,10 @@ export function getInAppMessages(
           url: '/inApp/getMessages',
           params: {
             ...dupedPayload,
-            platform: WEB_PLATFORM
+            platform: WEB_PLATFORM,
+            validation: {
+              params: schema
+            }
           }
         })
           .then((response) => {
@@ -326,7 +330,10 @@ export function getInAppMessages(
     url: '/inApp/getMessages',
     params: {
       ...dupedPayload,
-      platform: WEB_PLATFORM
+      platform: WEB_PLATFORM,
+      validation: {
+        params: schema
+      }
     }
   }).then((response) => {
     trackMessagesDelivered(
