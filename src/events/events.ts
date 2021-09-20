@@ -27,7 +27,8 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
       ...payload,
       deviceInfo: {
         ...payload.deviceInfo,
-        platform: WEB_PLATFORM
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
       }
     }
   });
@@ -70,7 +71,8 @@ export const trackInAppClick = (
       ...payload,
       deviceInfo: {
         ...payload.deviceInfo,
-        platform: WEB_PLATFORM
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
       }
     }
   });
@@ -93,7 +95,8 @@ export const trackInAppDelivery = (
       ...payload,
       deviceInfo: {
         ...payload.deviceInfo,
-        platform: WEB_PLATFORM
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
       }
     }
   });
@@ -116,7 +119,8 @@ export const trackInAppConsume = (
       ...payload,
       deviceInfo: {
         ...payload.deviceInfo,
-        platform: WEB_PLATFORM
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
       }
     }
   });
