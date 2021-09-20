@@ -12,3 +12,10 @@ Object.defineProperty(global, 'matchMedia', {
     dispatchEvent: jest.fn()
   })
 });
+
+Object.defineProperty(global, 'navigator', {
+  writable: true,
+  value: () => ({
+    userAgent: 'some-user-agent'
+  })
+});
