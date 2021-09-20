@@ -269,12 +269,12 @@ export function getInAppMessages(
         baseIterableRequest<InAppMessageResponse>({
           method: 'GET',
           url: '/inApp/getMessages',
+          validation: {
+            params: schema
+          },
           params: {
             ...dupedPayload,
-            platform: WEB_PLATFORM,
-            validation: {
-              params: schema
-            }
+            platform: WEB_PLATFORM
           }
         })
           .then((response) => {
@@ -328,12 +328,12 @@ export function getInAppMessages(
   return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     url: '/inApp/getMessages',
+    validation: {
+      params: schema
+    },
     params: {
       ...dupedPayload,
-      platform: WEB_PLATFORM,
-      validation: {
-        params: schema
-      }
+      platform: WEB_PLATFORM
     }
   }).then((response) => {
     trackMessagesDelivered(

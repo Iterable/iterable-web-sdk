@@ -13,4 +13,4 @@ export const BASE_URL = process.env.BASE_URL || 'https://api.iterable.com/api';
   API payload _platform_ param which is send up automatically 
   with tracking and getMessage requests 
 */
-export const WEB_PLATFORM = 'Web';
+export const WEB_PLATFORM = 'iOS';
