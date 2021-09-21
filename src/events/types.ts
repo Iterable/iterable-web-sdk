@@ -17,7 +17,7 @@ export interface InAppEventRequestParams {
   };
   closeAction?: string;
   deviceInfo: {
-    deviceId?: string;
+    // deviceId?: string; forced to userAgent
     // platform?: IterablePlatform; forced to "Web."
     appPackageName: string; // customer-defined name
   };
