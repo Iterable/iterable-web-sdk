@@ -1,6 +1,7 @@
 import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
+import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -18,6 +19,9 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
         ...payload.user,
         preferUserId: true
       }
+    },
+    validation: {
+      data: updateCartSchema
     }
   });
 };
@@ -38,6 +42,9 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
         ...payload.user,
         preferUserId: true
       }
+    },
+    validation: {
+      data: trackPurchaseSchema
     }
   });
 };

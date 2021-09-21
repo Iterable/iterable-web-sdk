@@ -7,6 +7,7 @@ import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
 import { initIdentify } from '../../authorization';
 import { WEB_PLATFORM } from '../../constants';
+import { createClientError } from '../../utils/testUtils';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -40,37 +41,20 @@ describe('getInAppMessages', () => {
 
     it('should reject if fails client-side validation', async () => {
       try {
-        await getInAppMessages({
-          count: 10
-        } as any);
+        await getInAppMessages({} as any);
       } catch (e) {
-        expect(e.response.data).toEqual({
-          code: 'GenericError',
-          msg: 'Client-side error',
-          clientErrors: [
+        expect(e).toEqual(
+          createClientError([
+            {
+              error: 'count is a required field',
+              field: 'count'
+            },
             {
               error: 'packageName is a required field',
               field: 'packageName'
             }
-          ]
-        });
-      }
-
-      try {
-        await getInAppMessages({
-          packageName: 'my-lil-website'
-        } as any);
-      } catch (e) {
-        expect(e.response.data).toEqual({
-          code: 'GenericError',
-          msg: 'Client-side error',
-          clientErrors: [
-            {
-              error: 'count is a required field',
-              field: 'count'
-            }
-          ]
-        });
+          ])
+        );
       }
     });
 
@@ -136,43 +120,20 @@ describe('getInAppMessages', () => {
 
     it('should reject if fails client-side validation', async () => {
       try {
-        await getInAppMessages(
-          {
-            count: 10
-          } as any,
-          true
-        ).request();
+        await getInAppMessages({} as any, true).request();
       } catch (e) {
-        expect(e.response.data).toEqual({
-          code: 'GenericError',
-          msg: 'Client-side error',
-          clientErrors: [
+        expect(e).toEqual(
+          createClientError([
+            {
+              error: 'count is a required field',
+              field: 'count'
+            },
             {
               error: 'packageName is a required field',
               field: 'packageName'
             }
-          ]
-        });
-      }
-
-      try {
-        await getInAppMessages(
-          {
-            packageName: 'my-lil-website'
-          } as any,
-          true
-        ).request();
-      } catch (e) {
-        expect(e.response.data).toEqual({
-          code: 'GenericError',
-          msg: 'Client-side error',
-          clientErrors: [
-            {
-              error: 'count is a required field',
-              field: 'count'
-            }
-          ]
-        });
+          ])
+        );
       }
     });
 
