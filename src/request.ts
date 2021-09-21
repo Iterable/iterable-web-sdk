@@ -45,7 +45,15 @@ export const baseIterableRequest = <T = any>(
       }))
     };
     /* match Axios' Error object schema and reject */
-    return Promise.reject({ response: { data: newError } });
+    return Promise.reject({
+      response: {
+        data: newError,
+        status: 400,
+        statusText: '',
+        headers: {},
+        config: {}
+      }
+    });
   }
 };
 
