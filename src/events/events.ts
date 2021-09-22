@@ -2,6 +2,7 @@ import { baseIterableRequest } from '../request';
 import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
+import { eventRequestSchema, trackSchema } from './events.schema';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -11,7 +12,10 @@ export const track = (payload: InAppTrackRequestParams) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/track',
-    data: payload
+    data: payload,
+    validation: {
+      data: trackSchema
+    }
   });
 };
 
@@ -30,6 +34,9 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || ''
       }
+    },
+    validation: {
+      data: eventRequestSchema
     }
   });
 };
@@ -54,6 +61,13 @@ export const trackInAppOpen = (
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || ''
       }
+    },
+    validation: {
+      data: eventRequestSchema.omit([
+        'clickedUrl',
+        'inboxSessionId',
+        'closeAction'
+      ])
     }
   });
 };
@@ -75,6 +89,9 @@ export const trackInAppClick = (
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || ''
       }
+    },
+    validation: {
+      data: eventRequestSchema.omit(['inboxSessionId', 'closeAction'])
     }
   });
 };
@@ -99,6 +116,13 @@ export const trackInAppDelivery = (
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || ''
       }
+    },
+    validation: {
+      data: eventRequestSchema.omit([
+        'clickedUrl',
+        'inboxSessionId',
+        'closeAction'
+      ])
     }
   });
 };
@@ -123,6 +147,13 @@ export const trackInAppConsume = (
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || ''
       }
+    },
+    validation: {
+      data: eventRequestSchema.omit([
+        'clickedUrl',
+        'inboxSessionId',
+        'closeAction'
+      ])
     }
   });
 };

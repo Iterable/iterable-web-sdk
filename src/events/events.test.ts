@@ -9,6 +9,7 @@ import {
   trackInAppOpen
 } from './events';
 import { WEB_PLATFORM } from '../constants';
+import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -34,11 +35,26 @@ describe('Events Requests', () => {
     });
   });
 
-  it('return the correct payload for trackInAppClick', async () => {
+  it('return the correct payload for track', async () => {
     const response = await track({ eventName: 'test' });
 
     expect(JSON.parse(response.config.data).eventName).toBe('test');
     expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject track on bad params', async () => {
+    try {
+      await track({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'eventName is a required field',
+            field: 'eventName'
+          }
+        ])
+      );
+    }
   });
 
   it('return the correct payload for trackInAppClick', async () => {
@@ -57,6 +73,25 @@ describe('Events Requests', () => {
     expect(response.data.msg).toBe('hello');
   });
 
+  it('should reject trackInAppClick on bad params', async () => {
+    try {
+      await trackInAppClick({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
+  });
+
   it('return the correct payload for trackInAppClose', async () => {
     const response = await trackInAppClose({
       messageId: '123',
@@ -71,6 +106,25 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject trackInAppClose on bad params', async () => {
+    try {
+      await trackInAppClose({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
   });
 
   it('return the correct payload for trackInAppConsume', async () => {
@@ -89,6 +143,25 @@ describe('Events Requests', () => {
     expect(response.data.msg).toBe('hello');
   });
 
+  it('should reject trackInAppConsume on bad params', async () => {
+    try {
+      await trackInAppConsume({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
+  });
+
   it('return the correct payload for trackInAppDelivery', async () => {
     const response = await trackInAppDelivery({
       messageId: '123',
@@ -103,6 +176,25 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject trackInAppDelivery on bad params', async () => {
+    try {
+      await trackInAppDelivery({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
   });
 
   it('return the correct payload for trackInAppOpen', async () => {
@@ -121,35 +213,60 @@ describe('Events Requests', () => {
     expect(response.data.msg).toBe('hello');
   });
 
+  it('should reject trackInAppOpen on bad params', async () => {
+    try {
+      await trackInAppOpen({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
+  });
+
   it('should not send up passed email or userId params', async () => {
     const trackResponse = await track({
       email: 'hello@gmail.com',
       userId: '1234',
+      eventName: 'my-event',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackClickResponse = await trackInAppClick({
       email: 'hello@gmail.com',
       userId: '1234',
+      messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackCloseResponse = await trackInAppClose({
       email: 'hello@gmail.com',
       userId: '1234',
+      messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackConsumeResponse = await trackInAppConsume({
       email: 'hello@gmail.com',
       userId: '1234',
+      messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackDeliveryResponse = await trackInAppDelivery({
       email: 'hello@gmail.com',
       userId: '1234',
+      messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackOpenResponse = await trackInAppOpen({
       email: 'hello@gmail.com',
       userId: '1234',
+      messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
 
