@@ -51,7 +51,8 @@ export const trackInAppOpen = (
       ...payload,
       deviceInfo: {
         ...payload.deviceInfo,
-        platform: WEB_PLATFORM
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
       }
     }
   });
