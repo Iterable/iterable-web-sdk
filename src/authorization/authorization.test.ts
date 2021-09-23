@@ -53,17 +53,17 @@ describe('API Key Interceptors', () => {
   });
 
   describe('non-JWT auth', () => {
-    it('should add Api_Key header to all outgoing requests', async () => {
+    it('should add Api-Key header to all outgoing requests', async () => {
       initIdentify('123');
 
       const response = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
       });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      expect(response.config.headers['Api-Key']).toBe('123');
     });
 
-    it('should add Api_Key header to all outgoing requests with new token', async () => {
+    it('should add Api-Key header to all outgoing requests with new token', async () => {
       const { setNewAuthToken } = initIdentify('123');
       setNewAuthToken('333');
 
@@ -71,10 +71,10 @@ describe('API Key Interceptors', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      expect(response.config.headers['Api_Key']).toBe('333');
+      expect(response.config.headers['Api-Key']).toBe('333');
     });
 
-    it('should not add Api_Key header to all outgoing requests after cleared', async () => {
+    it('should not add Api-Key header to all outgoing requests after cleared', async () => {
       const { clearAuthToken } = initIdentify('123');
       clearAuthToken();
 
@@ -82,12 +82,12 @@ describe('API Key Interceptors', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      expect(response.config.headers['Api_Key']).toBeUndefined();
+      expect(response.config.headers['Api-Key']).toBeUndefined();
     });
   });
 
   describe('JWT auth', () => {
-    it('should add Api_Key and Authorization headers to outgoing requests when setEmail is invoked', async () => {
+    it('should add Api-Key and Authorization headers to outgoing requests when setEmail is invoked', async () => {
       const { setEmail } = initIdentify('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
@@ -98,13 +98,13 @@ describe('API Key Interceptors', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      expect(response.config.headers['Api-Key']).toBe('123');
       expect(response.config.headers['Authorization']).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
 
-    it('should add Api_Key and Authorization headers to outgoing requests when setUserId is invoked', async () => {
+    it('should add Api-Key and Authorization headers to outgoing requests when setUserId is invoked', async () => {
       const { setUserID } = initIdentify('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
@@ -115,7 +115,7 @@ describe('API Key Interceptors', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      expect(response.config.headers['Api-Key']).toBe('123');
       expect(response.config.headers['Authorization']).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );

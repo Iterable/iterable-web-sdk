@@ -51,7 +51,7 @@ export function initIdentify(
         ...config,
         headers: {
           ...config.headers,
-          Api_Key: authToken
+          'Api-Key': authToken
         }
       }));
   let userInterceptor: number | null = null;
@@ -69,7 +69,7 @@ export function initIdentify(
             ...config,
             headers: {
               ...config.headers,
-              Api_Key: newToken
+              'Api-Key': newToken
             }
           })
         );
