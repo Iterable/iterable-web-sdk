@@ -15,7 +15,7 @@ Object.defineProperty(global, 'matchMedia', {
 
 Object.defineProperty(global, 'navigator', {
   writable: true,
-  value: () => ({
+  value: {
     userAgent: 'some-user-agent'
-  })
+  }
 });
