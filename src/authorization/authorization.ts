@@ -292,7 +292,7 @@ export function initIdentify(
             ...config,
             headers: {
               ...config.headers,
-              Api_Key: authToken,
+              'Api-Key': authToken,
               Authorization: `Bearer ${token}`
             }
           })
@@ -305,7 +305,6 @@ export function initIdentify(
               adds a status code 400+ callback to try and get a new JWT
               key if the Iterable API told us the JWT is invalid.
             */
-            // console.log(error.response.data.code);
             if (error?.response?.data?.code === INVALID_JWT_CODE) {
               return generateJWT(...args)
                 .then((newToken) => {
@@ -319,7 +318,7 @@ export function initIdentify(
                       ...config,
                       headers: {
                         ...config.headers,
-                        Api_Key: authToken,
+                        'Api-Key': authToken,
                         Authorization: `Bearer ${newToken}`
                       }
                     })
@@ -333,7 +332,7 @@ export function initIdentify(
                     ...error.config,
                     headers: {
                       ...error.config.headers,
-                      Api_Key: authToken,
+                      'Api-Key': authToken,
                       Authorization: `Bearer ${newToken}`
                     }
                   });
