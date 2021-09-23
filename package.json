@@ -38,7 +38,7 @@
     "throttle-debounce": "^3.0.1"
   },
   "scripts": {
-    "start": "concurrently \"ttsc -w\" \"babel src --watch --out-dir ./dist --extensions '.ts,.tsx'\" \"webpack --watch --config webpack.dev.config.js\" -n 'tsc,babel,webpack' -k",
+    "start": "concurrently \"ttsc -w\" \"babel src --watch --out-dir ./dist --extensions '.ts,.tsx'\" \"webpack-dev-server --config webpack.dev.config.js\" -n 'tsc,babel,webpack' -k",
     "install:all": "yarn && cd example && yarn",
     "start:all": "concurrently \"yarn start\" \"cd example && yarn start\" -n 'module,website' -k",
     "build": "ttsc && babel src --out-dir ./dist --extensions '.ts,.tsx' && webpack",
