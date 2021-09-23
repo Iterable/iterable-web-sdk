@@ -5,3 +5,5 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 export const RETRY_USER_ATTEMPTS = 0;
 
 export const INVALID_JWT_CODE = 'InvalidJwtPayload';
+
+export const BASE_URL = process.env.BASE_URL || 'https://api.iterable.com/api';

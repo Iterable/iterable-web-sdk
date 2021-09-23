@@ -1,8 +1,9 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 import { IterablePromise } from './types';
+import { BASE_URL } from './constants';
 
 export const baseAxiosRequest = Axios.create({
-  baseURL: 'https://api.iterable.com/api'
+  baseURL: BASE_URL
 });
 
 /**

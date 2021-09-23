@@ -9,23 +9,26 @@ module.exports = {
     filename: './index.js',
     path: path.resolve(__dirname),
     library: '@iterable/web-sdk',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    hotUpdateChunkFilename: 'hot/hot-update.js',
+    hotUpdateMainFilename: 'hot/hot-update.json'
   },
   devServer: {
-    static: {
-      directory: './dist'
-    },
+    port: 8000,
     client: {
       overlay: {
         errors: true,
         warnings: false
       }
+    },
+    devMiddleware: {
+      writeToDisk: true
     }
   },
   devtool: 'eval',
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': JSON.stringify(env.parsed)
+      'process.env': JSON.stringify(!env.error ? env.parsed : {})
     })
   ]
 };
