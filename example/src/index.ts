@@ -36,7 +36,8 @@ import {
       displayInterval: 1000,
       onOpenScreenReaderMessage:
         'hey screen reader here telling you something just popped up on your screen!',
-      onOpenNodeToTakeFocus: 'input'
+      onOpenNodeToTakeFocus: 'input',
+      packageName: 'my-lil-website'
     },
     true
   );

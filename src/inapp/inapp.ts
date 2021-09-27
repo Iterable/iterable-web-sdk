@@ -21,7 +21,7 @@ import {
   // trackInAppConsume,
   // trackInAppOpen
 } from '../events';
-import { DISPLAY_INTERVAL_DEFAULT } from 'src/constants';
+import { DISPLAY_INTERVAL_DEFAULT, WEB_PLATFORM } from 'src/constants';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -75,9 +75,15 @@ export function getInAppMessages(
             url
               ? {
                   messageId: activeMessage.messageId,
-                  clickedUrl: url
+                  clickedUrl: url,
+                  deviceInfo: {
+                    appPackageName: dupedPayload.packageName
+                  }
                 }
-              : { messageId: activeMessage.messageId }
+              : {
+                  messageId: activeMessage.messageId,
+                  deviceInfo: { appPackageName: dupedPayload.packageName }
+                }
           ).catch((e) => e);
           activeIframe.remove();
           messageIndex += 1;
@@ -213,7 +219,10 @@ export function getInAppMessages(
                 /* track the clicked link */
                 trackInAppClick({
                   clickedUrl,
-                  messageId: activeMessage?.messageId
+                  messageId: activeMessage?.messageId,
+                  deviceInfo: {
+                    appPackageName: dupedPayload.packageName
+                  }
                   /* swallow the network error */
                 }).catch((e) => e);
 
@@ -259,10 +268,16 @@ export function getInAppMessages(
         baseIterableRequest<InAppMessageResponse>({
           method: 'GET',
           url: '/inApp/getMessages',
-          params: dupedPayload
+          params: {
+            ...dupedPayload,
+            platform: WEB_PLATFORM
+          }
         })
           .then((response) => {
-            trackMessagesDelivered(response.data.inAppMessages || []);
+            trackMessagesDelivered(
+              response.data.inAppMessages || [],
+              dupedPayload.packageName
+            );
             return response;
           })
           .then((response) => {
@@ -309,9 +324,15 @@ export function getInAppMessages(
   return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     url: '/inApp/getMessages',
-    params: dupedPayload
+    params: {
+      ...dupedPayload,
+      platform: WEB_PLATFORM
+    }
   }).then((response) => {
-    trackMessagesDelivered(response.data.inAppMessages || []);
+    trackMessagesDelivered(
+      response.data.inAppMessages || [],
+      dupedPayload.packageName
+    );
     return response;
   });
 }

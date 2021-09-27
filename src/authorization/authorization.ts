@@ -56,7 +56,7 @@ export function initIdentify(
         ...config,
         headers: {
           ...config.headers,
-          Api_Key: authToken
+          'Api-Key': authToken
         }
       }));
   let userInterceptor: number | null = null;
@@ -170,7 +170,7 @@ export function initIdentify(
             ...config,
             headers: {
               ...config.headers,
-              Api_Key: newToken
+              'Api-Key': newToken
             }
           })
         );
@@ -334,7 +334,7 @@ export function initIdentify(
             ...config,
             headers: {
               ...config.headers,
-              Api_Key: authToken,
+              'Api-Key': authToken,
               Authorization: `Bearer ${token}`
             }
           })
@@ -436,7 +436,7 @@ export function initIdentify(
                       ...config,
                       headers: {
                         ...config.headers,
-                        Api_Key: authToken,
+                        'Api-Key': authToken,
                         Authorization: `Bearer ${newToken}`
                       }
                     })
@@ -450,7 +450,7 @@ export function initIdentify(
                     ...error.config,
                     headers: {
                       ...error.config.headers,
-                      Api_Key: authToken,
+                      'Api-Key': authToken,
                       Authorization: `Bearer ${newToken}`
                     }
                   });

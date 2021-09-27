@@ -1,6 +1,7 @@
 import { baseIterableRequest } from '../request';
 import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
+import { WEB_PLATFORM } from '../constants';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -22,7 +23,14 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClose',
-    data: payload
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    }
   });
 };
 
@@ -39,7 +47,14 @@ export const trackInAppOpen = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppOpen',
-    data: payload
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    }
   });
 };
 
@@ -53,7 +68,14 @@ export const trackInAppClick = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClick',
-    data: payload
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    }
   });
 };
 
@@ -70,7 +92,14 @@ export const trackInAppDelivery = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppDelivery',
-    data: payload
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    }
   });
 };
 
@@ -87,6 +116,13 @@ export const trackInAppConsume = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/inAppConsume',
-    data: payload
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    }
   });
 };

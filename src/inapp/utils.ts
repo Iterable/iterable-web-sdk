@@ -168,12 +168,16 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
 };
 
 export const trackMessagesDelivered = (
-  messages: Partial<InAppMessage>[] = []
+  messages: Partial<InAppMessage>[] = [],
+  packageName: string
 ) => {
   return Promise.all(
     messages?.map((eachMessage) => {
       return trackInAppDelivery({
-        messageId: eachMessage.messageId as string
+        messageId: eachMessage.messageId as string,
+        deviceInfo: {
+          appPackageName: packageName
+        }
         /* 
           swallow any network failures. 
           If it fails, there's nothing really we can do here. 

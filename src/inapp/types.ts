@@ -1,5 +1,3 @@
-import { IterablePlatform } from '../types';
-
 interface SDKInAppMessagesParams {
   displayInterval?: number;
   /* what should the screen reader say once the message opens */
@@ -10,9 +8,9 @@ interface SDKInAppMessagesParams {
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   count: number;
-  platform?: IterablePlatform;
+  // platform?: IterablePlatform; forced to "Web"
   SDKVersion?: string;
-  packageName?: string;
+  packageName: string;
   /* 
     email and userID params omitted in favor of using the "setEmail" 
     or "setUserID" methods on the _initIdentify_ method
