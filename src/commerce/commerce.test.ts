@@ -1,6 +1,7 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { trackPurchase, updateCart } from './commerce';
+import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -11,12 +12,55 @@ describe('Users Requests', () => {
     });
 
     const response = await updateCart({
-      items: []
+      items: [
+        {
+          id: 'fdsafds',
+          name: 'banana',
+          quantity: 2,
+          price: 12
+        }
+      ]
     });
 
-    expect(JSON.parse(response.config.data).items).toEqual([]);
+    expect(JSON.parse(response.config.data).items).toEqual([
+      {
+        id: 'fdsafds',
+        name: 'banana',
+        quantity: 2,
+        price: 12
+      }
+    ]);
     expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
     expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject updateCart on bad params', async () => {
+    try {
+      await updateCart({
+        items: [{} as any]
+      });
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'items[0].id is a required field',
+            field: 'items[0].id'
+          },
+          {
+            error: 'items[0].name is a required field',
+            field: 'items[0].name'
+          },
+          {
+            error: 'items[0].price is a required field',
+            field: 'items[0].price'
+          },
+          {
+            error: 'items[0].quantity is a required field',
+            field: 'items[0].quantity'
+          }
+        ])
+      );
+    }
   });
 
   it('should set params and return the correct payload for trackPurchase', async () => {
@@ -24,7 +68,10 @@ describe('Users Requests', () => {
       msg: 'hello'
     });
 
-    const response = await trackPurchase({ items: [], total: 100 });
+    const response = await trackPurchase({
+      items: [],
+      total: 100
+    });
 
     expect(JSON.parse(response.config.data).total).toBe(100);
     expect(JSON.parse(response.config.data).items).toEqual([]);
@@ -44,18 +91,54 @@ describe('Users Requests', () => {
       user: {
         email: 'hello@gmail.com',
         userId: '1234'
-      }
+      },
+      items: []
     } as any);
     const trackResponse = await trackPurchase({
       user: {
         email: 'hello@gmail.com',
         userId: '1234'
-      }
+      },
+      items: [],
+      total: 100
     } as any);
 
     expect(JSON.parse(updateResponse.config.data).user.email).toBeUndefined();
     expect(JSON.parse(updateResponse.config.data).user.userId).toBeUndefined();
     expect(JSON.parse(trackResponse.config.data).user.email).toBeUndefined();
     expect(JSON.parse(trackResponse.config.data).user.userId).toBeUndefined();
+  });
+
+  it('should reject updateCart on bad params', async () => {
+    try {
+      await trackPurchase({
+        items: [{} as any]
+      } as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'items[0].id is a required field',
+            field: 'items[0].id'
+          },
+          {
+            error: 'items[0].name is a required field',
+            field: 'items[0].name'
+          },
+          {
+            error: 'items[0].price is a required field',
+            field: 'items[0].price'
+          },
+          {
+            error: 'items[0].quantity is a required field',
+            field: 'items[0].quantity'
+          },
+          {
+            error: 'total is a required field',
+            field: 'total'
+          }
+        ])
+      );
+    }
   });
 });

@@ -7,6 +7,7 @@ import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
 import { initIdentify } from '../../authorization';
 import { WEB_PLATFORM } from '../../constants';
+import { createClientError } from '../../utils/testUtils';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -36,6 +37,25 @@ describe('getInAppMessages', () => {
       expect(response.config.params.packageName).toBe('my-lil-website');
       expect(response.config.params.platform).toBe(WEB_PLATFORM);
       expect(response.config.params.count).toBe(10);
+    });
+
+    it('should reject if fails client-side validation', async () => {
+      try {
+        await getInAppMessages({} as any);
+      } catch (e) {
+        expect(e).toEqual(
+          createClientError([
+            {
+              error: 'count is a required field',
+              field: 'count'
+            },
+            {
+              error: 'packageName is a required field',
+              field: 'packageName'
+            }
+          ])
+        );
+      }
     });
 
     it('should not include passed email or userId as query params', async () => {
@@ -96,6 +116,25 @@ describe('getInAppMessages', () => {
       expect(response.config.params.packageName).toBe('my-lil-website');
       expect(response.config.params.platform).toBe(WEB_PLATFORM);
       expect(response.config.params.count).toBe(10);
+    });
+
+    it('should reject if fails client-side validation', async () => {
+      try {
+        await getInAppMessages({} as any, true).request();
+      } catch (e) {
+        expect(e).toEqual(
+          createClientError([
+            {
+              error: 'count is a required field',
+              field: 'count'
+            },
+            {
+              error: 'packageName is a required field',
+              field: 'packageName'
+            }
+          ])
+        );
+      }
     });
 
     it('should return correct values when auto-paint flag is true', async () => {
