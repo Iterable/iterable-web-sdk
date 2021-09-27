@@ -249,7 +249,10 @@ describe('API Key Interceptors', () => {
       await setEmail('hello@gmail.com');
       await updateUserEmail('helloworld@gmail.com');
 
-      const response = await getInAppMessages({ count: 20 });
+      const response = await getInAppMessages({
+        count: 20,
+        packageName: 'my-lil-website'
+      });
       expect(response.config.params.email).toBe('helloworld@gmail.com');
     });
   });
