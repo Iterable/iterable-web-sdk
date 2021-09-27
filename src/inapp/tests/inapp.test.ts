@@ -41,7 +41,9 @@ describe('getInAppMessages', () => {
     it('should not include passed email or userId as query params', async () => {
       const response = await getInAppMessages({
         email: 'hello@gmail.com',
-        userId: '1234'
+        userId: '1234',
+        count: 10,
+        packageName: 'my-lil-website'
       } as any);
 
       expect(response.config.params.email).toBeUndefined();
@@ -110,7 +112,9 @@ describe('getInAppMessages', () => {
       const response = await getInAppMessages(
         {
           email: 'hello@gmail.com',
-          userId: '1234'
+          userId: '1234',
+          count: 10,
+          packageName: 'my-lil-website'
         } as any,
         true
       ).request();
