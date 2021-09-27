@@ -12,10 +12,23 @@
   <div id="root">
     <h1 class="heading">In-App Messaging Controls</h1>
     <div class="control-wrapper">
-      <button id="start">Start Auto-Painting In-App Messages</button>
+      <button id="login">Login</button>
+      <button id="start" class="disabled" aria-disabled>Login to See In-App Messages</button>
       <button id="pause">Pause Message Stream</button>
       <button id="resume">Resume Message Stream</button>
       <button id="logout">Logout</button>
+      <form id="change-email-form">
+        <div class="input-wrapper">
+          <label for="change-email">Update Email</label>
+          <input 
+            placeholder="Enter new email" 
+            type="text" 
+            name="change-email" 
+            id="change-email-input" 
+          />
+        </div>
+        <button type="submit" id="change-email-btn" class="disabled" aria-disabled>Change email</button>
+      </form>
     </div>
   </div>
   <footer>hi im the footer</footer>
