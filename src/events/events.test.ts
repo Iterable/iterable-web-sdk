@@ -8,6 +8,7 @@ import {
   trackInAppDelivery,
   trackInAppOpen
 } from './events';
+import { WEB_PLATFORM } from '../constants';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -41,84 +42,168 @@ describe('Events Requests', () => {
   });
 
   it('return the correct payload for trackInAppClick', async () => {
-    const response = await trackInAppClick({ messageId: '123' });
+    const response = await trackInAppClick({
+      messageId: '123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('123');
+    expect(JSON.parse(response.config.data).deviceInfo.appPackageName).toBe(
+      'my-lil-site'
+    );
+    expect(JSON.parse(response.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
     expect(response.data.msg).toBe('hello');
   });
 
   it('return the correct payload for trackInAppClose', async () => {
-    const response = await trackInAppClose({ messageId: '123' });
+    const response = await trackInAppClose({
+      messageId: '123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('123');
+    expect(JSON.parse(response.config.data).deviceInfo.appPackageName).toBe(
+      'my-lil-site'
+    );
+    expect(JSON.parse(response.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
     expect(response.data.msg).toBe('hello');
   });
 
   it('return the correct payload for trackInAppConsume', async () => {
-    const response = await trackInAppConsume({ messageId: '123' });
+    const response = await trackInAppConsume({
+      messageId: '123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('123');
+    expect(JSON.parse(response.config.data).deviceInfo.appPackageName).toBe(
+      'my-lil-site'
+    );
+    expect(JSON.parse(response.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
     expect(response.data.msg).toBe('hello');
   });
 
   it('return the correct payload for trackInAppDelivery', async () => {
-    const response = await trackInAppDelivery({ messageId: '123' });
+    const response = await trackInAppDelivery({
+      messageId: '123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('123');
+    expect(JSON.parse(response.config.data).deviceInfo.appPackageName).toBe(
+      'my-lil-site'
+    );
+    expect(JSON.parse(response.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
     expect(response.data.msg).toBe('hello');
   });
 
   it('return the correct payload for trackInAppOpen', async () => {
-    const response = await trackInAppOpen({ messageId: '123' });
+    const response = await trackInAppOpen({
+      messageId: '123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('123');
+    expect(JSON.parse(response.config.data).deviceInfo.appPackageName).toBe(
+      'my-lil-site'
+    );
+    expect(JSON.parse(response.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
     expect(response.data.msg).toBe('hello');
   });
 
   it('should not send up passed email or userId params', async () => {
     const trackResponse = await track({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackClickResponse = await trackInAppClick({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackCloseResponse = await trackInAppClose({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackConsumeResponse = await trackInAppConsume({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackDeliveryResponse = await trackInAppDelivery({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
     const trackOpenResponse = await trackInAppOpen({
       email: 'hello@gmail.com',
-      userId: '1234'
+      userId: '1234',
+      deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
 
     expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
 
     expect(JSON.parse(trackClickResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackClickResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackClickResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackClickResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
 
     expect(JSON.parse(trackCloseResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackCloseResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackCloseResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackCloseResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
 
     expect(JSON.parse(trackConsumeResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackConsumeResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackConsumeResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(
+      JSON.parse(trackConsumeResponse.config.data).deviceInfo.platform
+    ).toBe(WEB_PLATFORM);
 
     expect(JSON.parse(trackDeliveryResponse.config.data).email).toBeUndefined();
     expect(
       JSON.parse(trackDeliveryResponse.config.data).userId
     ).toBeUndefined();
+    expect(
+      JSON.parse(trackDeliveryResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(
+      JSON.parse(trackDeliveryResponse.config.data).deviceInfo.platform
+    ).toBe(WEB_PLATFORM);
 
     expect(JSON.parse(trackOpenResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackOpenResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackOpenResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackOpenResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
   });
 });

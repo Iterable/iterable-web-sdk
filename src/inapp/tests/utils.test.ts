@@ -399,20 +399,20 @@ describe('Utils', () => {
   describe('track in app delivery', () => {
     it('should call trackInAppDelivery X times for X messages', async () => {
       mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
-      await trackMessagesDelivered([
-        { messageId: '123' },
-        { messageId: '234' }
-      ]);
+      await trackMessagesDelivered(
+        [{ messageId: '123' }, { messageId: '234' }],
+        'my-lil-website'
+      );
       expect(mockRequest.history.post.length).toBe(2);
     });
 
     it('should not reject if 400 responses happen', async () => {
       mockRequest.onPost('/events/trackInAppDelivery').reply(400, {});
 
-      const response = await trackMessagesDelivered([
-        { messageId: '123' },
-        { messageId: '234' }
-      ]);
+      const response = await trackMessagesDelivered(
+        [{ messageId: '123' }, { messageId: '234' }],
+        'my-lil-website'
+      );
       expect((response as any).response.status).toBe(400);
     });
   });

@@ -1,5 +1,3 @@
-import { IterablePlatform } from '../types';
-
 export interface InAppTrackRequestParams {
   eventName: string;
   id?: string;
@@ -18,10 +16,10 @@ export interface InAppEventRequestParams {
     location?: string;
   };
   closeAction?: string;
-  deviceInfo?: {
-    deviceId?: string;
-    platform?: IterablePlatform;
-    appPackageName?: string;
+  deviceInfo: {
+    // deviceId?: string; forced to userAgent
+    // platform?: IterablePlatform; forced to "Web."
+    appPackageName: string; // customer-defined name
   };
   inboxSessionId?: string;
   createdAt?: number;

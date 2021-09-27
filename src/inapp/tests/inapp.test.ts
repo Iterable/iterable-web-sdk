@@ -6,6 +6,7 @@ import { baseAxiosRequest } from '../../request';
 import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
 import { initIdentify } from '../../authorization';
+import { WEB_PLATFORM } from '../../constants';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -26,6 +27,17 @@ describe('getInAppMessages', () => {
   });
 
   describe('getInAppMessages without auto painting', () => {
+    it('should send up correct payload', async () => {
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+
+      expect(response.config.params.packageName).toBe('my-lil-website');
+      expect(response.config.params.platform).toBe(WEB_PLATFORM);
+      expect(response.config.params.count).toBe(10);
+    });
+
     it('should not include passed email or userId as query params', async () => {
       const response = await getInAppMessages({
         email: 'hello@gmail.com',
@@ -37,13 +49,16 @@ describe('getInAppMessages', () => {
     });
 
     it('should just return a promise if auto-paint flag is false', async () => {
-      const response = await getInAppMessages({ count: 10 });
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
 
       expect(response.data.inAppMessages.length).toBe(3);
     });
 
     it('should track in app messages delivered', async () => {
-      await getInAppMessages({ count: 10 });
+      await getInAppMessages({ count: 10, packageName: 'my-lil-website' });
 
       expect(
         mockRequest.history.post.filter((e) =>
@@ -70,8 +85,22 @@ describe('getInAppMessages', () => {
       document.body.innerHTML = '';
     });
 
+    it('should send up correct payload', async () => {
+      const response = await getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      ).request();
+
+      expect(response.config.params.packageName).toBe('my-lil-website');
+      expect(response.config.params.platform).toBe(WEB_PLATFORM);
+      expect(response.config.params.count).toBe(10);
+    });
+
     it('should return correct values when auto-paint flag is true', async () => {
-      const response = await getInAppMessages({ count: 10 }, true);
+      const response = await getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       expect(response.pauseMessageStream).toBeDefined();
       expect(response.resumeMessageStream).toBeDefined();
       expect(response.request).toBeDefined();
@@ -91,7 +120,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should paint an iframe to the DOM', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const element = document.getElementById('iterable-iframe');
@@ -99,7 +131,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should remove the iframe when dismiss link is clicked', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const iframe = document.getElementById(
@@ -122,7 +157,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should remove the iframe when esc key is pressed', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       expect(document.getElementById('iterable-iframe')?.tagName).toBe(
@@ -134,7 +172,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should remove the iframe when overlay is clicked', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       expect(document.getElementById('iterable-iframe')?.tagName).toBe(
@@ -150,7 +191,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const iframe = document.getElementById(
@@ -178,7 +222,7 @@ describe('getInAppMessages', () => {
 
     it('should not paint next message to the DOM after 30s if queue is paused', async () => {
       const { request, pauseMessageStream } = getInAppMessages(
-        { count: 10 },
+        { count: 10, packageName: 'my-lil-website' },
         true
       );
       await request();
@@ -201,7 +245,7 @@ describe('getInAppMessages', () => {
 
     it('should paint next messsage to DOM if resumed', async () => {
       const { request, pauseMessageStream, resumeMessageStream } =
-        getInAppMessages({ count: 10 }, true);
+        getInAppMessages({ count: 10, packageName: 'my-lil-website' }, true);
       await request();
 
       const iframe = document.getElementById(
@@ -241,7 +285,10 @@ describe('getInAppMessages', () => {
         ]
       });
 
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const mockOpen = jest.fn();
@@ -282,7 +329,10 @@ describe('getInAppMessages', () => {
       global.location = {} as any;
       global.location.assign = mockRouteChange;
 
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const iframe = document.getElementById(
@@ -313,7 +363,11 @@ describe('getInAppMessages', () => {
       });
 
       const { request } = getInAppMessages(
-        { count: 10, onOpenNodeToTakeFocus: 'input' },
+        {
+          count: 10,
+          onOpenNodeToTakeFocus: 'input',
+          packageName: 'my-lil-website'
+        },
         true
       );
       await request();
@@ -341,7 +395,10 @@ describe('getInAppMessages', () => {
         ]
       });
 
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       const iframe = document.getElementById(
@@ -355,7 +412,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should track in app messages delivered', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       await request();
 
       expect(
@@ -366,7 +426,10 @@ describe('getInAppMessages', () => {
     });
 
     it('should not paint another message after 30 seconds if logged out', async () => {
-      const { request } = getInAppMessages({ count: 10 }, true);
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
       const { logout } = initIdentify('fdsafsd');
       await request();
 

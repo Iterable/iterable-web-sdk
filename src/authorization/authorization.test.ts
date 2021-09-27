@@ -53,54 +53,69 @@ describe('API Key Interceptors', () => {
   });
 
   describe('non-JWT auth', () => {
-    it('should add Api_Key header to all outgoing requests', async () => {
+    it('should add Api-Key header to all outgoing requests', async () => {
       initIdentify('123');
 
-      const response = await getInAppMessages({ count: 10 });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers['Api-Key']).toBe('123');
     });
 
-    it('should add Api_Key header to all outgoing requests with new token', async () => {
+    it('should add Api-Key header to all outgoing requests with new token', async () => {
       const { setNewAuthToken } = initIdentify('123');
       setNewAuthToken('333');
 
-      const response = await getInAppMessages({ count: 10 });
-      expect(response.config.headers['Api_Key']).toBe('333');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers['Api-Key']).toBe('333');
     });
 
-    it('should not add Api_Key header to all outgoing requests after cleared', async () => {
+    it('should not add Api-Key header to all outgoing requests after cleared', async () => {
       const { clearAuthToken } = initIdentify('123');
       clearAuthToken();
 
-      const response = await getInAppMessages({ count: 10 });
-      expect(response.config.headers['Api_Key']).toBeUndefined();
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers['Api-Key']).toBeUndefined();
     });
   });
 
   describe('JWT auth', () => {
-    it('should add Api_Key and Authorization headers to outgoing requests when setEmail is invoked', async () => {
+    it('should add Api-Key and Authorization headers to outgoing requests when setEmail is invoked', async () => {
       const { setEmail } = initIdentify('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
 
       await setEmail('hello@gmail.com');
 
-      const response = await getInAppMessages({ count: 10 });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers['Api-Key']).toBe('123');
       expect(response.config.headers['Authorization']).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
 
-    it('should add Api_Key and Authorization headers to outgoing requests when setUserId is invoked', async () => {
+    it('should add Api-Key and Authorization headers to outgoing requests when setUserId is invoked', async () => {
       const { setUserID } = initIdentify('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
 
       await setUserID('123ffdas');
 
-      const response = await getInAppMessages({ count: 10 });
-      expect(response.config.headers['Api_Key']).toBe('123');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers['Api-Key']).toBe('123');
       expect(response.config.headers['Authorization']).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
@@ -229,7 +244,10 @@ describe('API Key Interceptors', () => {
       await setEmail('hello@gmail.com');
       await updateUserEmail('helloworld@gmail.com');
 
-      const response = await getInAppMessages({ count: 20 });
+      const response = await getInAppMessages({
+        count: 20,
+        packageName: 'my-lil-website'
+      });
       expect(response.config.params.email).toBe('helloworld@gmail.com');
     });
   });
@@ -264,7 +282,10 @@ describe('User Identification', () => {
         setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBeUndefined();
       });
 
@@ -273,7 +294,10 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBeUndefined();
       });
     });
@@ -283,7 +307,10 @@ describe('User Identification', () => {
         const { setEmail } = initIdentify('123');
         setEmail('hello@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
 
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
@@ -294,7 +321,10 @@ describe('User Identification', () => {
         setEmail('hello@gmail.com');
         setEmail('new@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBe('new@gmail.com');
         expect(
           mockRequest.axiosInstance.interceptors.request.handlers.filter(
@@ -321,7 +351,10 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const closeResponse = await trackInAppClose({ messageId: '123' });
+        const closeResponse = await trackInAppClose({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
         const trackResponse = await track({ eventName: 'fdsafdf' });
@@ -402,7 +435,10 @@ describe('User Identification', () => {
         await setUserID('999');
         setEmail('hello@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBeUndefined();
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
@@ -416,7 +452,10 @@ describe('User Identification', () => {
         const { setUserID } = initIdentify('123');
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('999');
       });
 
@@ -426,7 +465,10 @@ describe('User Identification', () => {
         await setUserID('999');
         await setUserID('111');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('111');
         expect(
           mockRequest.axiosInstance.interceptors.request.handlers.filter(
@@ -440,7 +482,10 @@ describe('User Identification', () => {
         const { setUserID } = initIdentify('123');
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('999');
       });
 
@@ -461,7 +506,10 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const closeResponse = await trackInAppClose({ messageId: '123' });
+        const closeResponse = await trackInAppClose({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
         const trackResponse = await track({ eventName: 'fdsafdf' });
@@ -527,7 +575,10 @@ describe('User Identification', () => {
         setEmail('hello@gmail.com');
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
       });
@@ -566,7 +617,10 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBeUndefined();
       });
 
@@ -577,7 +631,10 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBeUndefined();
       });
     });
@@ -589,7 +646,10 @@ describe('User Identification', () => {
         );
         await setEmail('hello@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
 
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
@@ -602,7 +662,10 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         await setEmail('new@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBe('new@gmail.com');
         expect(
           mockRequest.axiosInstance.interceptors.request.handlers.filter(
@@ -631,7 +694,10 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const closeResponse = await trackInAppClose({ messageId: '123' });
+        const closeResponse = await trackInAppClose({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
         const trackResponse = await track({ eventName: 'fdsafdf' });
@@ -720,7 +786,10 @@ describe('User Identification', () => {
         await setUserID('999');
         await setEmail('hello@gmail.com');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBeUndefined();
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
@@ -736,7 +805,10 @@ describe('User Identification', () => {
         );
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('999');
       });
 
@@ -748,7 +820,10 @@ describe('User Identification', () => {
         await setUserID('999');
         await setUserID('111');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('111');
         expect(
           mockRequest.axiosInstance.interceptors.request.handlers.filter(
@@ -764,7 +839,10 @@ describe('User Identification', () => {
         );
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.userId).toBe('999');
       });
 
@@ -787,7 +865,10 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const closeResponse = await trackInAppClose({ messageId: '123' });
+        const closeResponse = await trackInAppClose({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
         const subsResponse = await updateSubscriptions();
         const userResponse = await updateUser();
         const trackResponse = await track({ eventName: 'fdsafdf' });
@@ -861,7 +942,10 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         await setUserID('999');
 
-        const response = await getInAppMessages({ count: 10 });
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
       });
