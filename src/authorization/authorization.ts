@@ -4,6 +4,7 @@ import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
 import { INVALID_JWT_CODE, RETRY_USER_ATTEMPTS } from 'src/constants';
 import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
+import { config } from '../utils/config';
 
 const ONE_MINUTE = 60000;
 
@@ -36,13 +37,16 @@ export function initIdentify(
   authToken: string,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
-  const isDevelopmentMode =
-    process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
-  if (!generateJWT && !isDevelopmentMode) {
+  const logLevel = config.getConfig('logLevel');
+  const isProductionMode = process.env.NODE_ENV === 'production';
+  if (!generateJWT && isProductionMode) {
     /* only let people use non-JWT mode if running the app locally */
-    return console.error(
-      'Please provide a Promise method for generating a JWT token.'
-    );
+    if (logLevel === 'verbose') {
+      return console.error(
+        'Please provide a Promise method for generating a JWT token.'
+      );
+    }
+    return;
   }
 
   let timer: NodeJS.Timeout | null = null;
@@ -470,10 +474,12 @@ export function initIdentify(
         handleTokenExpiration(token, () => {
           /* re-run the JWT generation */
           return doRequest(payload).catch((e) => {
-            console.warn(e);
-            console.warn(
-              'Could not refresh JWT. Try identifying the user again.'
-            );
+            if (logLevel === 'verbose') {
+              console.warn(e);
+              console.warn(
+                'Could not refresh JWT. Try identifying the user again.'
+              );
+            }
           });
         });
         return token;
@@ -502,9 +508,11 @@ export function initIdentify(
       addEmailToRequest(email);
 
       return doRequest({ email }).catch((e) => {
-        console.warn(
-          'Could not generate JWT. Please try calling setEmail again.'
-        );
+        if (logLevel === 'verbose') {
+          console.warn(
+            'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
+          );
+        }
         return Promise.reject(e);
       });
     },
@@ -607,9 +615,11 @@ export function initIdentify(
           return token;
         })
         .catch((e) => {
-          console.warn(
-            'Could not generate JWT. Please try calling setUserID again.'
-          );
+          if (logLevel === 'verbose') {
+            console.warn(
+              'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+            );
+          }
           return Promise.reject(e);
         });
     },

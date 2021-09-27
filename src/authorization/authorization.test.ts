@@ -140,7 +140,6 @@ describe('API Key Interceptors', () => {
     it('should not request a new JWT if the first request failed', async () => {
       /* 5 minutes before the JWT expires */
       Date.now = jest.fn(() => 1630617433001);
-      const spy = jest.spyOn(console, 'warn').mockImplementation();
       /* this JWT expires in 5 minutes */
       const mockGenerateJWT = jest
         .fn()
@@ -153,10 +152,6 @@ describe('API Key Interceptors', () => {
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(60000 * 4.1);
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
-        expect(spy).toHaveBeenCalledWith(
-          'Could not generate JWT. Please try calling setEmail again.'
-        );
-        spy.mockRestore();
       }
     });
 
@@ -873,7 +868,6 @@ describe('User Identification', () => {
 
       it('should try /users/update 0 times if request to create a user fails', async () => {
         mockRequest.onPost('/users/update').reply(400, {});
-        const spy = jest.spyOn(console, 'warn').mockImplementation();
 
         const { setUserID } = initIdentify('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
@@ -886,7 +880,6 @@ describe('User Identification', () => {
               (e: any) => !!e.url?.match(/users\/update/gim)
             ).length
           ).toBe(1);
-          spy.mockRestore();
         }
       });
     });
