@@ -163,6 +163,51 @@ export function getInAppMessages(
             global.removeEventListener('resize', throttledResize);
           });
 
+          /*
+            create an absolutely positioned button that lies underneath the
+            in-app message and takes up full width and height
+
+            The reason for this is if the customer made their in-app take less width
+            than the iframe surrounding it, they should still be able to click outside
+            their in-app, but within the bounds of the iframe to dismiss it.
+
+            The overlay doesn't handle this because the overlay only surrounds the iframe,
+            not the in-app message. So imagine an in-app looking like this:
+          */
+          if (activeIframe.contentWindow?.document) {
+            const absoluteDismissButton =
+              activeIframe.contentWindow.document.createElement('button');
+            absoluteDismissButton.style.cssText = `
+                background: none;
+                color: inherit;
+                border: none;
+                padding: 0;
+                font: inherit;
+                cursor: unset;
+                outline: inherit;
+                height: 100vh;
+                width: 100vw;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: -1;
+              `;
+            /* 
+              don't let the user tab to this button. 
+              It's not necessarily for blind folks to tab over 
+            */
+            absoluteDismissButton.tabIndex = -1;
+            absoluteDismissButton.addEventListener('click', () => {
+              dismissMessage(activeIframe);
+              overlay.remove();
+              document.removeEventListener('keydown', handleEscKeypress);
+              global.removeEventListener('resize', throttledResize);
+            });
+            activeIframe.contentWindow.document.body.appendChild(
+              absoluteDismissButton
+            );
+          }
+
           /* 
             track in-app consumes only when _saveToInbox_ 
             is falsy or undefined and always track in-app opens
