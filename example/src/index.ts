@@ -9,7 +9,7 @@ import {
 ((): void => {
   /* set token in the SDK */
   const { setEmail, logout } = initIdentify(
-    process.env.API_KEY || '',
+    '9454ff152ce244149eb411bde189bf04',
     ({ email }) => {
       return axios
         .post(
