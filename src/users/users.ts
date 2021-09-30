@@ -1,6 +1,8 @@
+import { object, string } from 'yup';
 import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
+import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
@@ -8,6 +10,11 @@ export const updateUserEmail = (newEmail: string) => {
     url: '/users/updateEmail',
     data: {
       newEmail
+    },
+    validation: {
+      data: object().shape({
+        newEmail: string().required()
+      })
     }
   });
 };
@@ -23,6 +30,9 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
     data: {
       ...payload,
       preferUserId: true
+    },
+    validation: {
+      data: updateUserSchema
     }
   });
 };
@@ -37,6 +47,9 @@ export const updateSubscriptions = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/users/updateSubscriptions',
-    data: payload
+    data: payload,
+    validation: {
+      data: updateSubscriptionsSchema
+    }
   });
 };
