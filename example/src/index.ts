@@ -38,7 +38,7 @@ import {
         'hey screen reader here telling you something just popped up on your screen!',
       onOpenNodeToTakeFocus: 'input',
       packageName: 'my-lil-website'
-    } as any,
+    },
     true
   );
 
