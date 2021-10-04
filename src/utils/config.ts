@@ -1,10 +1,14 @@
+import { BASE_URL } from '../constants';
+
 interface Options {
   logLevel: 'none' | 'verbose';
+  baseURL: string;
 }
 
 const _config = () => {
   let options: Options = {
-    logLevel: 'none'
+    logLevel: 'none',
+    baseURL: BASE_URL
   };
 
   return {
