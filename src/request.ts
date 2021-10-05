@@ -2,6 +2,7 @@ import Axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { AnySchema, ValidationError } from 'yup';
+import { config } from './utils/config';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
@@ -33,7 +34,10 @@ export const baseIterableRequest = <T = any>(
         abortEarly: false
       });
     }
-    return baseAxiosRequest(payload);
+    return baseAxiosRequest({
+      ...payload,
+      baseURL: config.getConfig('baseURL') || BASE_URL
+    });
   } catch (error) {
     /* match Iterable's API error schema and add client errors as a new key */
     const newError: ClientError = {
