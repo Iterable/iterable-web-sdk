@@ -3,12 +3,10 @@ import axios from 'axios';
 import {
   initIdentify,
   getInAppMessages,
-  updateUserEmail,
-  config
+  updateUserEmail
 } from '@iterable/web-sdk';
 
 ((): void => {
-  config.setConfig({ baseURL: 'https://google.com' });
   /* set token in the SDK */
   const { setEmail, logout } = initIdentify(
     process.env.API_KEY || '',
