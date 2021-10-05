@@ -6,7 +6,6 @@ import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
-import { INVALID_JWT_CODE } from '../constants';
 
 let mockRequest: any = null;
 /*
@@ -175,8 +174,8 @@ describe('API Key Interceptors', () => {
       mockBaseAdapter.onPost('/users/update').reply(400, {
         code: 'Something'
       });
-      mockRequest.onPost('/users/update').reply(400, {
-        code: INVALID_JWT_CODE
+      mockRequest.onPost('/users/update').reply(401, {
+        code: 'BadAPIKey'
       });
 
       const mockGenerateJW = jest

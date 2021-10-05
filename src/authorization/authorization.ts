@@ -2,7 +2,7 @@ import axios from 'axios';
 import { baseAxiosRequest } from '../request';
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
-import { INVALID_JWT_CODE, RETRY_USER_ATTEMPTS } from 'src/constants';
+import { RETRY_USER_ATTEMPTS } from 'src/constants';
 import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
 import { config } from '../utils/config';
 
@@ -424,10 +424,10 @@ export function initIdentify(
           },
           (error) => {
             /*
-              adds a status code 400+ callback to try and get a new JWT
+              adds a status code 401 callback to try and get a new JWT
               key if the Iterable API told us the JWT is invalid.
             */
-            if (error?.response?.data?.code === INVALID_JWT_CODE) {
+            if (error?.response?.status === 401) {
               return generateJWT(payload)
                 .then((newToken) => {
                   if (authInterceptor) {
