@@ -10,6 +10,7 @@ This SDK helps you integrate your Web apps with Iterable.
 
 * [Installation](#installation)
 * [API](#api)
+* [Usage](#usage)
 * [FAQ](#faq)
 * [TypeScript](#typescript)
 * [Contributing](#contributing)
@@ -41,7 +42,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 | Method Name           	| Description                                                                                                               	|
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| `initIdentify`        	| Method for identifying users and setting a JWT                                                                            	|
+| [`initIdentify`](#initIdentify)        	| Method for identifying users and setting a JWT                                                                            	|
 | `updateCart`          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | `trackPurchase`       	| Track purchase events                                                                                                     	|
 | `track`               	| Track custom events                                                                                                       	|
@@ -54,6 +55,30 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | `updateUserEmail`     	| Change a user's email address                                                                                             	|
 | `updateUser`          	| Change data on a user's profile or create a user if none exists                                                           	|
 | `updateSubscriptions` 	| Updates user's subscriptions                                                                                              	|
+
+# Usage
+
+## initIdentify
+
+API:
+
+```ts
+initIdentify: (authToken: string, generateJWT: (...args: any) => Promise<string>) => { 
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+}
+```
+
+Example:
+
+```ts
+const { clearRefresh, setEmail, setUserID, logout } = initIdentify(
+  'my-API-key',
+  () => Promise.resolve('my-JWT')
+)
+```
 
 # FAQ
 
