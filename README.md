@@ -46,7 +46,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
 | [`track`](#track)               	| Track custom events                                                                                                       	|
-| [`trackInAppClose`](trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
+| [`trackInAppClose`](#trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
 | [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
 | [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
 | [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
