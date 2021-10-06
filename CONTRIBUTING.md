@@ -36,7 +36,7 @@ Recursively deletes all `node_modules` directories (important if you also want t
 
 # Developing the SDK with the Sample App
 
-:rotating-light: Prerequisite: Run through the [configuring instructions](./EXAMPLE_APP.md) first
+:rotating_light: Prerequisite: Run through the [configuring instructions](./EXAMPLE_APP.md) first
 
 While developing the SDK, you'll most likely want to run the sample app alongside it so you can test your code in a browser environment. You can get the sample app running with the SDK by using these commands:
 

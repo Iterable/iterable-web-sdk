@@ -122,7 +122,7 @@ trackPurchase({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
 
 ```ts
-track = (payload: InAppTrackRequestParams) => Promise<TrackData>
+track: (payload: InAppTrackRequestParams) => Promise<TrackData>
 ```
 
 Example:
@@ -138,7 +138,7 @@ track({ eventName: 'my-event' });
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
 
 ```ts
-trackInAppClose = (payload: InAppEventRequestParams) => Promise<TrackCloseData>
+trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
 ```
 
 Example:
@@ -157,7 +157,7 @@ trackInAppClose({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
 
 ```ts
-trackInAppOpen = (payload: InAppEventRequestParams) => Promise<TrackOpenData>
+trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
 ```
 
 Example:
@@ -176,7 +176,7 @@ trackInAppOpen({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
 
 ```ts
-trackInAppClick = (payload: InAppEventRequestParams) => Promise<TrackClickData>
+trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
 ```
 
 Example:
@@ -195,7 +195,7 @@ trackInAppClick({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
 
 ```ts
-trackInAppDelivery = (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
+trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
 ```
 
 Example:
@@ -211,10 +211,10 @@ trackInAppDelivery({
 
 ## trackInAppConsume
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppConsume):
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
 
 ```ts
-trackInAppConsume = (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
+trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
 ```
 
 Example:
@@ -233,7 +233,7 @@ trackInAppConsume({
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
 
 ```ts
-getInAppMessages = (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean) => Promise<TrackConsumeData> | PaintInAppMessageData
+getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
 Example:
@@ -273,7 +273,7 @@ request()
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
 
 ```ts
-updateUserEmail = (newEmail: string) => Promise<UpdateEmailData>
+updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
 ```
 
 Example:
@@ -289,7 +289,7 @@ updateUserEmail('hello@gmail.com')
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
 
 ```ts
-updateUser = (payload?: UpdateUserParams) => Promise<UpdateUserData>
+updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
 ```
 
 Example:
@@ -305,7 +305,7 @@ updateUser({ dataFields: {} })
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
 
 ```ts
-updateSubscriptions = (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
+updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
 ```
 
 Example:
@@ -337,7 +337,7 @@ initIdentify(
 })();
 ```
 
-Now that we've set our authorization logic within our app, it's time to set the user. You can identify a user by either the email or user ID. User ID is preferred because the SDK will automatically create a user in your Iterable instance. If you identify by email, the user will remain "anonymous" with no user ID attached to it. See [Iterable's updateUser endpoint for more information about how users are created](https://api.iterable.com/api/docs#users_updateUser).
+Now that we've set our authorization logic within our app, it's time to set the user. You can identify a user by either the email or user ID. User ID is preferred because the SDK will automatically create a user in your Iterable instance. If you identify by email, the user will remain "anonymous" with no user ID attached to it. See [Iterable's updateUser endpoint](https://api.iterable.com/api/docs#users_updateUser) for more information about how users are created.
 
 The syntax for identifying a user by user ID looks like this:
 
@@ -450,7 +450,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk';
 })();
 ```
 
-:rotating-light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
+:rotating_light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
 
 ## I Want to Automatically Show In-App Messages Every X Number of Seconds
 
