@@ -44,17 +44,17 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
 | [`initIdentify`](#initIdentify)        	| Method for identifying users and setting a JWT                                                                            	|
 | [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
-| `trackPurchase`       	| Track purchase events                                                                                                     	|
-| `track`               	| Track custom events                                                                                                       	|
-| `trackInAppClose`     	| Track when an in-app message is closed                                                                                    	|
-| `trackInAppOpen`      	| Track when a message is opened and marks it as read                                                                       	|
-| `trackInAppClick`     	| Track when a user clicks on a button or link within a message                                                             	|
-| `trackInAppDelivery`  	| Track when a message has been delivered to a user's device                                                                	|
-| `trackInAppConsume`   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
-| `getInAppMessages`    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
-| `updateUserEmail`     	| Change a user's email address                                                                                             	|
-| `updateUser`          	| Change data on a user's profile or create a user if none exists                                                           	|
-| `updateSubscriptions` 	| Updates user's subscriptions                                                                                              	|
+| [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
+| [`track`](#track)               	| Track custom events                                                                                                       	|
+| [`trackInAppClose`](trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
+| [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
+| [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
+| [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
+| [`trackInAppConsume`](#trackInAppConsume)   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
+| [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
+| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email address                                                                                             	|
+| [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
+| [`updateSubscriptions`](updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
 
 # Usage
 
@@ -94,7 +94,225 @@ Example:
 updateCart({
   items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
 })
+  .then()
+  .catch()
+```
+
+## trackPurchase
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
+
+```ts
+trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
+```
+
+Example:
+
+```ts
+trackPurchase({
+  items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
+  total: 200
+});
+  .then()
+  .catch()
+```
+
+## track
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
+
+```ts
+track = (payload: InAppTrackRequestParams) => Promise<TrackData>
+```
+
+Example:
+
+```ts
+track({ eventName: 'my-event' });
   ,then()
+  .catch()
+```
+
+## trackInAppClose
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
+
+```ts
+trackInAppClose = (payload: InAppEventRequestParams) => Promise<TrackCloseData>
+```
+
+Example:
+
+```ts
+trackInAppClose({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppOpen
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
+
+```ts
+trackInAppOpen = (payload: InAppEventRequestParams) => Promise<TrackOpenData>
+```
+
+Example:
+
+```ts
+trackInAppOpen({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppClick
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
+
+```ts
+trackInAppClick = (payload: InAppEventRequestParams) => Promise<TrackClickData>
+```
+
+Example:
+
+```ts
+trackInAppClick({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppDelivery
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
+
+```ts
+trackInAppDelivery = (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
+```
+
+Example:
+
+```ts
+trackInAppDelivery({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppConsume
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppConsume):
+
+```ts
+trackInAppConsume = (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
+```
+
+Example:
+
+```ts
+trackInAppConsume({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## getInAppMessages
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
+
+```ts
+getInAppMessages = (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean) => Promise<TrackConsumeData> | PaintInAppMessageData
+```
+
+Example:
+
+```ts
+getInAppMessages({ count: 20 })
+  .then()
+  .catch()
+```
+
+or
+
+```ts
+const { 
+  request,
+  pauseMessageStream, 
+  resumeMessageStream
+} = getInAppMessages(
+  { 
+    count: 20,
+    packageName: 'my-website',
+    displayInterval: 5000,
+    onOpenScreenReaderMessage:
+      'hey screen reader here telling you something just popped up on your screen!',
+    onOpenNodeToTakeFocus: 'input'
+  },
+  true
+);
+
+request()
+  .then()
+  .catch();
+```
+
+## updateUserEmail
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
+
+```ts
+updateUserEmail = (newEmail: string) => Promise<UpdateEmailData>
+```
+
+Example:
+
+```ts
+updateUserEmail('hello@gmail.com')
+  .then()
+  .catch()
+```
+
+## updateUser
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
+
+```ts
+updateUser = (payload?: UpdateUserParams) => Promise<UpdateUserData>
+```
+
+Example:
+
+```ts
+updateUser({ dataFields: {} })
+  .then()
+  .catch()
+```
+
+## updateSubscriptions
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
+
+```ts
+updateSubscriptions = (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
+```
+
+Example:
+
+```ts
+updateSubscriptions({ emailListIds: [1, 2, 3] })
+  .then()
   .catch()
 ```
 
@@ -253,11 +471,9 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
     .then(response => {
       setUserID(response.user_id)
         .then(() => {
-          document.getElementById('my-button').addEventListener('click', () => {
-            getInAppMessages({ count: 20 })
-              .then()
-              .catch()
-          })
+          getInAppMessages({ count: 20 })
+            .then()
+            .catch()
         })
     })
 })();

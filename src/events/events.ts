@@ -71,7 +71,6 @@ export const trackInAppOpen = (
     }
   });
 };
-
 export const trackInAppClick = (
   payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>
 ) => {
@@ -95,6 +94,11 @@ export const trackInAppClick = (
     }
   });
 };
+
+trackInAppClick({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+});
 
 export const trackInAppDelivery = (
   payload: Omit<
