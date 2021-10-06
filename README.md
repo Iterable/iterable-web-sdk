@@ -54,7 +54,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
 | [`updateUserEmail`](#updateUserEmail)     	| Change a user's email address                                                                                             	|
 | [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
-| [`updateSubscriptions`](updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
+| [`updateSubscriptions`](#updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
 
 # Usage
 
