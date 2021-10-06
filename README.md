@@ -43,7 +43,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | Method Name           	| Description                                                                                                               	|
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
 | [`initIdentify`](#initIdentify)        	| Method for identifying users and setting a JWT                                                                            	|
-| `updateCart`          	| Update _shoppingCartItems_ field on user profile                                                                          	|
+| [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | `trackPurchase`       	| Track purchase events                                                                                                     	|
 | `track`               	| Track custom events                                                                                                       	|
 | `trackInAppClose`     	| Track when an in-app message is closed                                                                                    	|
@@ -78,6 +78,24 @@ const { clearRefresh, setEmail, setUserID, logout } = initIdentify(
   'my-API-key',
   () => Promise.resolve('my-JWT')
 )
+```
+
+## updateCart
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
+
+```ts
+updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
+```
+
+Example:
+
+```ts
+updateCart({
+  items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
+})
+  ,then()
+  .catch()
 ```
 
 # FAQ
