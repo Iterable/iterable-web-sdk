@@ -63,7 +63,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 API:
 
 ```ts
-initIdentify: (authToken: string, generateJWT: (...args: any) => Promise<string>) => { 
+initIdentify: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -76,7 +76,11 @@ Example:
 ```ts
 const { clearRefresh, setEmail, setUserID, logout } = initIdentify(
   'my-API-key',
-  () => Promise.resolve('my-JWT')
+  /* 
+    _email_ will be defined if you call _setEmail_ 
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) => Promise.resolve('my-JWT')
 )
 ```
 
