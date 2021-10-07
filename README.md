@@ -239,7 +239,10 @@ getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomaticall
 Example:
 
 ```ts
-getInAppMessages({ count: 20 })
+getInAppMessages({ 
+  count: 20,
+  packageName: 'my-website'
+})
   .then()
   .catch()
 ```
@@ -471,7 +474,10 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
     .then(response => {
       setUserID(response.user_id)
         .then(() => {
-          getInAppMessages({ count: 20 })
+          getInAppMessages({ 
+            count: 20,
+            packageName: 'my-website'
+          })
             .then()
             .catch()
         })
