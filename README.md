@@ -337,10 +337,11 @@ Once you have a JWT or a service that can generate a JWT automatically, you're r
 ```ts
 import { initIdentify } from '@iterable/web-sdk'
 
-initIdentify(
-  'YOUR_API_KEY_HERE',
-  () => Promise.resolve('YOUR_JWT_HERE')
-);
+(() => {
+  initIdentify(
+    'YOUR_API_KEY_HERE',
+    () => Promise.resolve('YOUR_JWT_HERE')
+  );
 })();
 ```
 
