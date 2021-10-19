@@ -9,10 +9,10 @@ First thing you need to do is generate an API key on [the Iterable app](https://
 Then once you boot up the app with `yarn install:all && yarn start:all`, you can set the key with the following code snippet. Similar code already exists in [`./example/src/index.ts`](./example/src/index.ts), but feel free to edit and play with it:
 
 ```ts
-import { initIdentify } from '@iterable/web-sdk';
+import { initialize } from '@iterable/web-sdk';
 
 (() => {
-  const { clearAuthToken, setNewAuthToken } = initIdentify(process.env.API_KEY);
+  const { clearAuthToken, setNewAuthToken } = initialize(process.env.API_KEY);
 
   /* make your Iterable API requests here */
   doSomeRequest().then().catch()
@@ -21,7 +21,7 @@ import { initIdentify } from '@iterable/web-sdk';
   clearAuthToken();
 
   /* 
-    the initIdentify method also exposes a setNewAuthToken method 
+    the initialize method also exposes a setNewAuthToken method 
     if you want to set another key later on.
   */
   setNewAuthToken('my-new-api-key')
