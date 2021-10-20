@@ -33,6 +33,9 @@ export const messages: InAppMessage[] = [
         left: {
           percentage: 0
         }
+      },
+      webInAppDisplaySettings: {
+        position: 'Center'
       }
     },
     customPayload: {},
@@ -83,6 +86,9 @@ export const messages: InAppMessage[] = [
         left: {
           percentage: 0
         }
+      },
+      webInAppDisplaySettings: {
+        position: 'Center'
       }
     },
     customPayload: {
@@ -138,6 +144,9 @@ export const messages: InAppMessage[] = [
           hex: '#a2e3ff'
         },
         shouldAnimate: true
+      },
+      webInAppDisplaySettings: {
+        position: 'Center'
       }
     },
     customPayload: {},

@@ -24,6 +24,10 @@ export interface InAppDisplaySetting {
   displayOption?: string;
 }
 
+export interface WebInAppDisplaySettings {
+  position: 'Center' | 'TopRight' | 'BottomRight' | 'Full';
+}
+
 export interface InAppMessage {
   messageId: string;
   campaignId: number;
@@ -43,6 +47,7 @@ export interface InAppMessage {
       };
       shouldAnimate?: boolean;
     };
+    webInAppDisplaySettings: WebInAppDisplaySettings;
   };
   customPayload: Record<string, any>;
   trigger: {
