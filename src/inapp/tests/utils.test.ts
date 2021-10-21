@@ -455,7 +455,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('0%');
         expect(styles.bottom).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('50%');
+        expect(styles.width).toBe('33%');
       });
 
       it('should paint the iframe in the bottom-right of the screen', async () => {
@@ -475,7 +475,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('0%');
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('50%');
+        expect(styles.width).toBe('33%');
       });
 
       it('should paint the iframe full-screen', async () => {
