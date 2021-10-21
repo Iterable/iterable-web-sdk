@@ -144,9 +144,7 @@ export function getInAppMessages(
               ? throttle(750, () => {
                   activeIframe.style.height =
                     (activeIframe.contentWindow?.document?.body?.scrollHeight ||
-                      0) +
-                    1 +
-                    'px';
+                      0) + 'px';
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
