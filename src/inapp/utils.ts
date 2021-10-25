@@ -170,6 +170,8 @@ export const paintIFrame = (
           as a failsafe just incase the new font causes the line-height to grow and create a
           scrollbar in the iframe.
         */
+        const startingWidth =
+          position === 'Full' ? 100 : position === 'Center' ? 50 : 33;
         iframe.style.cssText = generateLayoutCSS(
           shouldAnimate &&
             (position === 'TopRight' || position === 'BottomRight')
@@ -177,7 +179,7 @@ export const paintIFrame = (
             position: fixed;
             border: none;
             margin: auto;
-            width: 50%;
+            width: ${startingWidth}%;
             max-width: 100%;
             z-index: 9999;
             transform: translateX(150%);
@@ -187,7 +189,7 @@ export const paintIFrame = (
             position: fixed;
             border: none;
             margin: auto;
-            width: 50%;
+            width: ${startingWidth}%;
             max-width: 100%;
             z-index: 9999;
           `,
@@ -201,25 +203,54 @@ export const paintIFrame = (
               : 'slide-in';
         }
 
-        const mediaQuery = global.matchMedia('(min-width: 850px)');
+        const mediaQueryMd = global.matchMedia('(min-width: 850px)');
+        const mediaQueryLg = global.matchMedia('(max-width: 1200px)');
 
-        if (!mediaQuery.matches) {
+        /* 
+          breakpoint widths are as follows:
+          
+          1. TopRight, BottomRight (100% at < 850px, 33% < 1200px, 25% > 1200px)
+          2. Center (50% > 850px, 100% < 850px)
+          3. Full (100% all the time)
+        */
+        if (!mediaQueryMd.matches) {
           iframe.style.width = '100%';
         }
 
-        mediaQuery.onchange = (event) => {
-          if (!event.matches) {
+        if (
+          !mediaQueryLg.matches &&
+          (position === 'TopRight' || position === 'BottomRight')
+        ) {
+          iframe.style.width = '25%';
+        }
+
+        mediaQueryMd.onchange = (event) => {
+          if (!event.matches || position === 'Full') {
             iframe.style.width = '100%';
           } else {
-            iframe.style.width = '50%';
+            iframe.style.width = `${startingWidth}%`;
+          }
+        };
+
+        mediaQueryLg.onchange = (event) => {
+          if (
+            !event.matches &&
+            (position === 'TopRight' || position === 'BottomRight')
+          ) {
+            iframe.style.width = '25%';
+          }
+
+          if (
+            event.matches &&
+            (position === 'TopRight' || position === 'BottomRight')
+          ) {
+            iframe.style.width = '33%';
           }
         };
 
         if (position !== 'Full') {
           iframe.style.height =
-            (iframe.contentWindow?.document?.body?.scrollHeight || 0) +
-            1 +
-            'px';
+            (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 'px';
         }
 
         clearTimeout(timeout);
