@@ -2,6 +2,14 @@ import { by } from '@pabra/sortby';
 import { InAppMessage } from './types';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
+import { WebInAppDisplaySettings } from 'src/inapp';
+import { ANIMATION_DURATION } from 'src/constants';
+
+export const addStyleSheeet = (doc: Document, style: string) => {
+  const stylesheet = doc.createElement('style');
+  stylesheet.textContent = style;
+  doc.head.appendChild(stylesheet);
+};
 
 export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
@@ -51,6 +59,49 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
   return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 };
 
+export const generateLayoutCSS = (
+  baseCSSText: string,
+  position: WebInAppDisplaySettings['position']
+) => {
+  let styles = '';
+  if (position === 'Center') {
+    styles = `
+      left: 0%;
+      right: 0%;
+      top: 0%;
+      bottom: 0%;
+    `;
+  }
+
+  if (position === 'TopRight') {
+    styles = `
+      right: 0%;
+      top: 0%;
+    `;
+  }
+
+  if (position === 'BottomRight') {
+    styles = `
+      right: 0%;
+      bottom: 0%;
+    `;
+  }
+
+  if (position === 'Full') {
+    styles = `
+      height: 100%;
+      width: 100%;
+      left: 0%;
+      top: 0%;
+    `;
+  }
+
+  return `
+    ${baseCSSText}
+    ${styles}
+  `;
+};
+
 /**
  *
  * @param html html you want to paint to the DOM inside the iframe
@@ -60,10 +111,8 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
  */
 export const paintIFrame = (
   html: string,
-  top?: number | null,
-  bottom?: number | null,
-  right?: number | null,
-  left?: number | null,
+  position: WebInAppDisplaySettings['position'],
+  shouldAnimate?: boolean,
   srMessage?: string
 ): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
@@ -113,7 +162,7 @@ export const paintIFrame = (
           even though we preloaded the images before setting the height, we add an extra 100MS 
           here to handle for the case where the user needs to download custom fonts. As 
           of 07/27/2021, the preloading fonts API is still in a draft state
-          
+            
           @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
           
           but even if we did preload the fonts, it would still take a non-trivial amount
@@ -121,16 +170,39 @@ export const paintIFrame = (
           as a failsafe just incase the new font causes the line-height to grow and create a
           scrollbar in the iframe.
         */
-        iframe.style.cssText = `
+        iframe.style.cssText = generateLayoutCSS(
+          shouldAnimate &&
+            (position === 'TopRight' || position === 'BottomRight')
+            ? `
             position: fixed;
             border: none;
             margin: auto;
             width: 50%;
             max-width: 100%;
             z-index: 9999;
-         `;
+            transform: translateX(150%);
+            -webkit-transform: translateX(150%);      
+          `
+            : `
+            position: fixed;
+            border: none;
+            margin: auto;
+            width: 50%;
+            max-width: 100%;
+            z-index: 9999;
+          `,
+          position
+        );
+
+        if (shouldAnimate) {
+          iframe.className =
+            position === 'Center' || position === 'Full'
+              ? 'fade-in'
+              : 'slide-in';
+        }
 
         const mediaQuery = global.matchMedia('(min-width: 850px)');
+
         if (!mediaQuery.matches) {
           iframe.style.width = '100%';
         }
@@ -143,13 +215,12 @@ export const paintIFrame = (
           }
         };
 
-        if (typeof top === 'number') iframe.style.top = `${top}%`;
-        if (typeof bottom === 'number') iframe.style.bottom = `${bottom}%`;
-        if (typeof left === 'number') iframe.style.left = `${left}%`;
-        if (typeof right === 'number') iframe.style.right = `${right}%`;
-
-        iframe.style.height =
-          (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 1 + 'px';
+        if (position !== 'Full') {
+          iframe.style.height =
+            (iframe.contentWindow?.document?.body?.scrollHeight || 0) +
+            1 +
+            'px';
+        }
 
         clearTimeout(timeout);
       }, 100);
@@ -187,10 +258,57 @@ export const trackMessagesDelivered = (
   ).catch((e) => e);
 };
 
-export const paintOverlay = (color = '#fff', opacity = 0) => {
+export const paintOverlay = (
+  color = '#fff',
+  opacity = 0,
+  shouldAnimate = false
+) => {
   const overlay = document.createElement('div');
   overlay.setAttribute('data-test-overlay', 'true');
-  overlay.style.cssText = `
+  if (shouldAnimate) {
+    addStyleSheeet(
+      document,
+      `
+        @keyframes fadeinfast {
+          from { opacity: 0; }
+          to { opacity: ${opacity}; }
+        }
+      
+        @-moz-keyframes fadeinfast {
+          from { opacity: 0; }
+          to { opacity: ${opacity}; }
+        }
+      
+        @-webkit-keyframes fadeinfast {
+          from { opacity: 0; }
+          to { opacity: ${opacity}; }
+        }
+      
+        @-ms-keyframes fadeinfast {
+          from { opacity: 0; }
+          to { opacity: ${opacity}; }
+        }    
+    `
+    );
+  }
+
+  overlay.style.cssText = shouldAnimate
+    ? `
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    background-color: ${color};
+    opacity: ${opacity};
+    top: 0;
+    left: 0;
+    z-index: 9998;
+    -webkit-animation: fadeinfast ${ANIMATION_DURATION / 2}ms;
+    -moz-animation: fadeinfast ${ANIMATION_DURATION / 2}ms;
+    -ms-animation: fadeinfast ${ANIMATION_DURATION / 2}ms;
+    -o-animation: fadeinfast ${ANIMATION_DURATION / 2}ms;
+    animation: fadeinfast ${ANIMATION_DURATION / 2}ms;
+  `
+    : `
     height: 100%;
     width: 100%;
     position: fixed;
@@ -203,32 +321,4 @@ export const paintOverlay = (color = '#fff', opacity = 0) => {
 
   document.body.appendChild(overlay);
   return overlay;
-};
-
-export const generatePositions = (
-  initTop?: number,
-  initBottom?: number,
-  initRight?: number,
-  initLeft?: number
-) => {
-  let top = initTop;
-  let bottom = initBottom;
-  let right = initRight;
-  let left = initLeft;
-  if (typeof initTop !== 'number' && typeof initBottom !== 'number') {
-    bottom = 0;
-    top = 0;
-  }
-
-  if (typeof initRight !== 'number' && typeof initLeft !== 'number') {
-    left = 0;
-    right = 0;
-  }
-
-  return {
-    top,
-    bottom,
-    right,
-    left
-  };
 };

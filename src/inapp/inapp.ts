@@ -9,11 +9,11 @@ import { baseIterableRequest } from '../request';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
-  generatePositions,
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
-  trackMessagesDelivered
+  trackMessagesDelivered,
+  addStyleSheeet
 } from './utils';
 import {
   trackInAppClick,
@@ -21,7 +21,12 @@ import {
   // trackInAppConsume,
   // trackInAppOpen
 } from '../events';
-import { DISPLAY_INTERVAL_DEFAULT, WEB_PLATFORM } from 'src/constants';
+import {
+  ANIMATION_DURATION,
+  ANIMATION_STYLESHEET,
+  DISPLAY_INTERVAL_DEFAULT,
+  WEB_PLATFORM
+} from 'src/constants';
 import schema from './inapp.schema';
 
 let parsedMessages: InAppMessage[] = [];
@@ -63,14 +68,26 @@ export function getInAppMessages(
   delete dupedPayload.onOpenNodeToTakeFocus;
 
   if (showInAppMessagesAutomatically) {
+    addStyleSheeet(document, ANIMATION_STYLESHEET);
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
+        const shouldAnimate =
+          activeMessage?.content?.inAppDisplaySettings?.shouldAnimate;
+        const position =
+          activeMessage?.content?.webInAppDisplaySettings?.position || 'Center';
 
         const dismissMessage = (
           activeIframe: HTMLIFrameElement,
           url?: string
         ) => {
+          if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
+            activeIframe.className =
+              position === 'Center' || position === 'Full'
+                ? 'fade-out'
+                : 'slide-out';
+          }
+
           /* close the message and start a timer to show the next one */
           trackInAppClose(
             url
@@ -86,43 +103,52 @@ export function getInAppMessages(
                   deviceInfo: { appPackageName: dupedPayload.packageName }
                 }
           ).catch((e) => e);
-          activeIframe.remove();
+
+          if (shouldAnimate) {
+            const animationTimer = global.setTimeout(() => {
+              activeIframe.remove();
+              clearTimeout(animationTimer);
+            }, ANIMATION_DURATION);
+          } else {
+            activeIframe.remove();
+          }
+
+          const timeToNextMessage = shouldAnimate
+            ? (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) +
+              ANIMATION_DURATION
+            : payload.displayInterval || DISPLAY_INTERVAL_DEFAULT;
+
           messageIndex += 1;
           timer = global.setTimeout(() => {
             clearTimeout(timer as NodeJS.Timeout);
 
             paintMessageToDOM();
-          }, payload.displayInterval || DISPLAY_INTERVAL_DEFAULT);
+          }, timeToNextMessage);
         };
 
         const overlay = paintOverlay(
           activeMessage?.content?.inAppDisplaySettings?.bgColor?.hex,
-          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha
-        );
-
-        const { top, bottom, right, left } = generatePositions(
-          activeMessage.content.inAppDisplaySettings?.top?.percentage,
-          activeMessage.content.inAppDisplaySettings?.bottom?.percentage,
-          activeMessage.content.inAppDisplaySettings?.right?.percentage,
-          activeMessage.content.inAppDisplaySettings?.left?.percentage
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha,
+          shouldAnimate
         );
 
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
           activeMessage.content.html,
-          top,
-          bottom,
-          right,
-          left,
+          position,
+          shouldAnimate,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
         ).then((activeIframe) => {
-          const throttledResize = throttle(750, () => {
-            activeIframe.style.height =
-              (activeIframe.contentWindow?.document?.body?.scrollHeight || 0) +
-              1 +
-              'px';
-          });
-
+          const throttledResize =
+            position === 'Full'
+              ? throttle(750, () => {
+                  activeIframe.style.height =
+                    (activeIframe.contentWindow?.document?.body?.scrollHeight ||
+                      0) +
+                    1 +
+                    'px';
+                })
+              : () => null;
           global.addEventListener('resize', throttledResize);
 
           try {
