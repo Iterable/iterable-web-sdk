@@ -1,14 +1,14 @@
 import './styles/index.css';
 import axios from 'axios';
 import {
-  initIdentify,
+  initialize,
   getInAppMessages,
   updateUserEmail
 } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
-  const { setEmail, logout } = initIdentify(
+  const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
     ({ email }) => {
       return axios

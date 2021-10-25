@@ -13,7 +13,7 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   packageName: string;
   /* 
     email and userID params omitted in favor of using the "setEmail" 
-    or "setUserID" methods on the _initIdentify_ method
+    or "setUserID" methods on the _initialize_ method
   */
   //  email?: string;
   //  userId?: string

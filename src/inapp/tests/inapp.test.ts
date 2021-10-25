@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
 import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
-import { initIdentify } from '../../authorization';
+import { initialize } from '../../authorization';
 import { WEB_PLATFORM } from '../../constants';
 import { createClientError } from '../../utils/testUtils';
 
@@ -473,7 +473,7 @@ describe('getInAppMessages', () => {
         { count: 10, packageName: 'my-lil-website' },
         true
       );
-      const { logout } = initIdentify('fdsafsd');
+      const { logout } = initialize('fdsafsd');
       await request();
 
       const iframe = document.getElementById(

@@ -42,7 +42,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 | Method Name           	| Description                                                                                                               	|
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| [`initIdentify`](#initIdentify)        	| Method for identifying users and setting a JWT                                                                            	|
+| [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
 | [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
 | [`track`](#track)               	| Track custom events                                                                                                       	|
@@ -58,12 +58,12 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 # Usage
 
-## initIdentify
+## initialize
 
 API:
 
 ```ts
-initIdentify: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -74,7 +74,7 @@ initIdentify: (authToken: string, generateJWT: ({ email?: string, userID?: strin
 Example:
 
 ```ts
-const { clearRefresh, setEmail, setUserID, logout } = initIdentify(
+const { clearRefresh, setEmail, setUserID, logout } = initialize(
   'my-API-key',
   /* 
     _email_ will be defined if you call _setEmail_ 
@@ -335,10 +335,10 @@ First, we'll deal with the JWT Secret. Typically, you need some backend service 
 Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
 
 ```ts
-import { initIdentify } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk'
 
 (() => {
-  initIdentify(
+  initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -350,10 +350,10 @@ Now that we've set our authorization logic within our app, it's time to set the 
 The syntax for identifying a user by user ID looks like this:
 
 ```ts
-import { initIdentify } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk'
 
 (() => {
-  const { setUserID, logout } = initIdentify(
+  const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -375,10 +375,10 @@ import { initIdentify } from '@iterable/web-sdk'
 Doing this with an email is similar:
 
 ```ts
-import { initIdentify } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk'
 
 (() => {
-  const { setEmail, logout } = initIdentify(
+  const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -403,10 +403,10 @@ import { initIdentify } from '@iterable/web-sdk'
 Now let's put it altogether with an Iterable API method:
 
 ```ts
-import { initIdentify, track } from '@iterable/web-sdk'
+import { initialize, track } from '@iterable/web-sdk'
 
 (() => {
-  const { setUserID, logout } = initIdentify(
+  const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -467,10 +467,10 @@ This SDK allows that. Simply call the `getMessages` method but pass `true` as th
 Normally to request a list of in-app messages, you'd make a request like this:
 
 ```ts
-import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initIdentify(
+  const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -493,10 +493,10 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 In order to take advantage of the SDK showing them automatically, you would implement the same method in this way:
 
 ```ts
-import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initIdentify(
+  const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -524,10 +524,10 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 Optionally, you can pass arguments to fine-tune how you want the messages to appear
 
 ```ts
-import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initIdentify(
+  const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );
@@ -562,10 +562,10 @@ import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
 You can also pause and resume the messages stream if you like
 
 ```ts
-import { initIdentify, getInAppMessages } from '@iterable/web-sdk';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initIdentify(
+  const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
     () => Promise.resolve('YOUR_JWT_HERE')
   );

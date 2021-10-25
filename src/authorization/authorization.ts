@@ -28,12 +28,12 @@ interface WithoutJWT {
   logout: () => void;
 }
 
-export function initIdentify(
+export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
 ): WithJWT;
-export function initIdentify(authToken: string): WithoutJWT;
-export function initIdentify(
+export function initialize(authToken: string): WithoutJWT;
+export function initialize(
   authToken: string,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
