@@ -546,7 +546,20 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
               onOpenScreenReaderMessage:
                 'hey screen reader here telling you something just popped up on your screen!',
               /* what DOM node you want to take keyboard focus. Here we choose the first <input /> */
-              onOpenNodeToTakeFocus: 'input'
+              onOpenNodeToTakeFocus: 'input',
+              /* 
+                additional offsets for top-right and bottom-right in-app messages.
+                Good if you want the message to be out of the way of your navbar
+                or something similar
+
+                _topOffset_ only applies to "top-right" messages
+                _bottomOffset_ only applies to "bottom-right" messages
+              */
+              topOffset: '20px',
+              bottomOffset: '20px',
+              rightOffset: '20px',
+              /* how long the in-app messages take to animate in/out (in milliseconds) */
+              animationDuration: 400;
             },
             true
           );

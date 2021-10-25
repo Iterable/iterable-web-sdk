@@ -5,7 +5,7 @@ import { trackInAppDelivery } from '../events';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { ANIMATION_DURATION } from 'src/constants';
 
-export const addStyleSheeet = (doc: Document, style: string) => {
+export const addStyleSheet = (doc: Document, style: string) => {
   const stylesheet = doc.createElement('style');
   stylesheet.textContent = style;
   doc.head.appendChild(stylesheet);
@@ -61,7 +61,10 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
 
 export const generateLayoutCSS = (
   baseCSSText: string,
-  position: WebInAppDisplaySettings['position']
+  position: WebInAppDisplaySettings['position'],
+  topOffset?: string,
+  bottomOffset?: string,
+  rightOffset?: string
 ) => {
   let styles = '';
   if (position === 'Center') {
@@ -75,15 +78,15 @@ export const generateLayoutCSS = (
 
   if (position === 'TopRight') {
     styles = `
-      right: 0%;
-      top: 0%;
+      right: ${rightOffset ?? '0%'};
+      top: ${topOffset ?? '0%'};
     `;
   }
 
   if (position === 'BottomRight') {
     styles = `
-      right: 0%;
-      bottom: 0%;
+      right: ${rightOffset ?? '0%'};
+      bottom: ${bottomOffset ?? '0%'};
     `;
   }
 
@@ -113,7 +116,10 @@ export const paintIFrame = (
   html: string,
   position: WebInAppDisplaySettings['position'],
   shouldAnimate?: boolean,
-  srMessage?: string
+  srMessage?: string,
+  topOffset?: string,
+  bottomOffset?: string,
+  rightOffset?: string
 ): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = document.createElement('iframe');
@@ -193,7 +199,10 @@ export const paintIFrame = (
             max-width: 100%;
             z-index: 9999;
           `,
-          position
+          position,
+          topOffset,
+          bottomOffset,
+          rightOffset
         );
 
         if (shouldAnimate) {
@@ -297,7 +306,7 @@ export const paintOverlay = (
   const overlay = document.createElement('div');
   overlay.setAttribute('data-test-overlay', 'true');
   if (shouldAnimate) {
-    addStyleSheeet(
+    addStyleSheet(
       document,
       `
         @keyframes fadeinfast {
