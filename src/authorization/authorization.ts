@@ -8,6 +8,11 @@ import { config } from '../utils/config';
 
 const ONE_MINUTE = 60000;
 
+interface GenerateJWTPayload {
+  email?: string;
+  userID?: string;
+}
+
 interface WithJWT {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
@@ -23,14 +28,9 @@ interface WithoutJWT {
   logout: () => void;
 }
 
-interface GenerateJWTPayload {
-  email?: string;
-  userID?: string;
-}
-
 export function initIdentify(
   authToken: string,
-  generateJWT: (...args: any) => Promise<string>
+  generateJWT: (payload: GenerateJWTPayload) => Promise<string>
 ): WithJWT;
 export function initIdentify(authToken: string): WithoutJWT;
 export function initIdentify(
