@@ -376,7 +376,9 @@ export function getInAppMessages(
               ...eachMessage,
               content: {
                 ...eachMessage.content,
-                html: sanitizeHTML(eachMessage?.content?.html ?? '')
+                html: `<!DOCTYPE html>\n${sanitizeHTML(
+                  eachMessage?.content?.html ?? ''
+                )}`
               }
             })) as InAppMessage[];
 
