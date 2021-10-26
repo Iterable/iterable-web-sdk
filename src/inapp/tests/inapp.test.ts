@@ -8,9 +8,14 @@ import { getInAppMessages } from '../inapp';
 import { initialize } from '../../authorization';
 import { WEB_PLATFORM } from '../../constants';
 import { createClientError } from '../../utils/testUtils';
+import { sanitizeHTML } from '../../utils/sanitizeHTML';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
+}));
+
+jest.mock('../../utils/sanitizeHTML', () => ({
+  sanitizeHTML: jest.fn()
 }));
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
@@ -103,6 +108,7 @@ describe('getInAppMessages', () => {
     beforeEach(() => {
       jest.clearAllMocks();
       jest.resetAllMocks();
+      (sanitizeHTML as any).mockImplementation((e: string) => e);
       mockRequest.resetHistory();
       document.body.innerHTML = '';
     });
@@ -160,6 +166,20 @@ describe('getInAppMessages', () => {
 
       expect(response.config.params.email).toBeUndefined();
       expect(response.config.params.userId).toBeUndefined();
+    });
+
+    it('should sanitize returned HTML', async () => {
+      await getInAppMessages(
+        {
+          email: 'hello@gmail.com',
+          userId: '1234',
+          count: 10,
+          packageName: 'my-lil-website'
+        } as any,
+        true
+      ).request();
+
+      expect((sanitizeHTML as any).mock.calls.length).toBe(3);
     });
 
     it('should paint an iframe to the DOM', async () => {

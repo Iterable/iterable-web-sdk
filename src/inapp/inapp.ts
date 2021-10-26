@@ -15,6 +15,7 @@ import {
   trackMessagesDelivered,
   addStyleSheeet
 } from './utils';
+import { sanitizeHTML } from '../utils/sanitizeHTML';
 import {
   trackInAppClick,
   trackInAppClose
@@ -365,10 +366,19 @@ export function getInAppMessages(
               3. HTML body is blank
 
               so first filter out unwanted messages and sort them
+
+              Then finally, sanitize the HTML. Escape script tags, event handlers from
+              tags, and remove bad url schemas in href attributes
             */
             parsedMessages = sortInAppMessages(
               filterHiddenInAppMessages(response.data.inAppMessages)
-            ) as InAppMessage[];
+            ).map((eachMessage) => ({
+              ...eachMessage,
+              content: {
+                ...eachMessage.content,
+                html: sanitizeHTML(eachMessage?.content?.html ?? '')
+              }
+            })) as InAppMessage[];
 
             return paintMessageToDOM().then(() => {
               return {
