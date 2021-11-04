@@ -147,7 +147,7 @@ export function getInAppMessages(
           payload.rightOffset
         ).then((activeIframe) => {
           const throttledResize =
-            position === 'Full'
+            position !== 'Full'
               ? throttle(750, () => {
                   activeIframe.style.height =
                     (activeIframe.contentWindow?.document?.body?.scrollHeight ||

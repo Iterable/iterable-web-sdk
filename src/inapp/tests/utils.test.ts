@@ -574,25 +574,30 @@ describe('Utils', () => {
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('50%');
         });
 
         it('should have correct width for bottom-right modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+          const iframe = await paintIFrame(
+            mockMarkup,
+            'BottomRight',
+            false,
+            'hi'
+          );
           jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('33%');
         });
 
         it('should have correct width for top-right modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+          const iframe = await paintIFrame(mockMarkup, 'TopRight', false, 'hi');
           jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('33%');
         });
       });
     });

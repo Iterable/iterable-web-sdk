@@ -62,6 +62,7 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
 export const generateLayoutCSS = (
   baseCSSText: string,
   position: WebInAppDisplaySettings['position'],
+  isMobileBreakpoint: boolean,
   topOffset?: string,
   bottomOffset?: string,
   rightOffset?: string
@@ -78,15 +79,15 @@ export const generateLayoutCSS = (
 
   if (position === 'TopRight') {
     styles = `
-      right: ${rightOffset ?? '0%'};
-      top: ${topOffset ?? '0%'};
+      right: ${isMobileBreakpoint ? '0%' : rightOffset || '0%'};
+      top: ${isMobileBreakpoint ? '0%' : topOffset || '0%'};
     `;
   }
 
   if (position === 'BottomRight') {
     styles = `
-      right: ${rightOffset ?? '0%'};
-      bottom: ${bottomOffset ?? '0%'};
+      right: ${isMobileBreakpoint ? '0%' : rightOffset || '0%'};
+      bottom: ${isMobileBreakpoint ? '0%' : bottomOffset || '0%'};
     `;
   }
 
@@ -104,6 +105,9 @@ export const generateLayoutCSS = (
     ${styles}
   `;
 };
+
+const mediaQueryMd = global.matchMedia('(min-width: 850px)');
+const mediaQueryLg = global.matchMedia('(max-width: 1200px)');
 
 /**
  *
@@ -149,15 +153,15 @@ export const paintIFrame = (
       
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
-    */
+      */
     const images =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
     return preloadImages(images, () => {
       /* 
-        set the scroll height to the content inside, but since images
-        are going to take some time to load, we opt to preload them, THEN
-        set the inner HTML of the iframe
-      */
+       set the scroll height to the content inside, but since images
+       are going to take some time to load, we opt to preload them, THEN
+       set the inner HTML of the iframe
+       */
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
@@ -176,34 +180,42 @@ export const paintIFrame = (
           as a failsafe just incase the new font causes the line-height to grow and create a
           scrollbar in the iframe.
         */
+        const setCSS = (width: string) => {
+          console.log(`set css ${width}`);
+          iframe.style.cssText = generateLayoutCSS(
+            shouldAnimate &&
+              (position === 'TopRight' || position === 'BottomRight')
+              ? `
+              position: fixed;
+              border: none;
+              margin: auto;
+              max-width: 100%;
+              z-index: 9999;
+              transform: translateX(150%);
+              -webkit-transform: translateX(150%);
+              width: ${width};
+              height: ${iframe.style.height};
+            `
+              : `
+              position: fixed;
+              border: none;
+              margin: auto;
+              max-width: 100%;
+              z-index: 9999;
+              width: ${width};
+              height: ${iframe.style.height};
+            `,
+            position,
+            !mediaQueryMd.matches,
+            topOffset,
+            bottomOffset,
+            rightOffset
+          );
+        };
+
         const startingWidth =
           position === 'Full' ? 100 : position === 'Center' ? 50 : 33;
-        iframe.style.cssText = generateLayoutCSS(
-          shouldAnimate &&
-            (position === 'TopRight' || position === 'BottomRight')
-            ? `
-            position: fixed;
-            border: none;
-            margin: auto;
-            width: ${startingWidth}%;
-            max-width: 100%;
-            z-index: 9999;
-            transform: translateX(150%);
-            -webkit-transform: translateX(150%);      
-          `
-            : `
-            position: fixed;
-            border: none;
-            margin: auto;
-            width: ${startingWidth}%;
-            max-width: 100%;
-            z-index: 9999;
-          `,
-          position,
-          topOffset,
-          bottomOffset,
-          rightOffset
-        );
+        setCSS(`${startingWidth}%`);
 
         if (shouldAnimate) {
           iframe.className =
@@ -211,9 +223,6 @@ export const paintIFrame = (
               ? 'fade-in'
               : 'slide-in';
         }
-
-        const mediaQueryMd = global.matchMedia('(min-width: 850px)');
-        const mediaQueryLg = global.matchMedia('(max-width: 1200px)');
 
         /* 
           breakpoint widths are as follows:
@@ -223,7 +232,15 @@ export const paintIFrame = (
           3. Full (100% all the time)
         */
         if (!mediaQueryMd.matches) {
-          iframe.style.width = '100%';
+          if (position === 'TopRight' || position === 'BottomRight') {
+            /* 
+              in-app messages is being initially painted, but we're on mobile
+              breakpoints so remove any offsets the user provided in the config object.
+            */
+            setCSS('100%');
+          } else {
+            iframe.style.width = '100%';
+          }
         }
 
         if (
@@ -235,9 +252,27 @@ export const paintIFrame = (
 
         mediaQueryMd.onchange = (event) => {
           if (!event.matches || position === 'Full') {
-            iframe.style.width = '100%';
+            if (position === 'TopRight' || position === 'BottomRight') {
+              /* 
+                here we hit a mobile breakpoint for TopRight or BottomRight.
+                We re-generate the entire CSS because we want to remove any custom
+                offsets the user gave us for these since mobile should not allow for margins
+                in the iframe since screen real-estate is precious.
+              */
+              setCSS(`100%`);
+            } else {
+              iframe.style.width = '100%';
+            }
           } else {
-            iframe.style.width = `${startingWidth}%`;
+            if (position === 'TopRight' || position === 'BottomRight') {
+              /* 
+                same comment as above but we want to apply the offsets again 
+                since we're back to desktop-sized breakpoints
+              */
+              setCSS(`${startingWidth}%`);
+            } else {
+              iframe.style.width = `${startingWidth}%`;
+            }
           }
         };
 
