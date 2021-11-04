@@ -1,5 +1,5 @@
 node_modules
-dist
+**/*/dist
 # index.js
 # index.node.js
 .env
