@@ -1,8 +1,8 @@
 node_modules
 dist
-index.js
-index.node.js
-index.d.ts
+# index.js
+# index.node.js
 .env
 coverage
 hot
+**LICENSE.txt
