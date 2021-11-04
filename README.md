@@ -80,7 +80,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) => Promise.resolve('my-JWT')
+  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
 )
 ```
 
@@ -340,7 +340,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 })();
 ```
@@ -355,7 +355,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -380,7 +380,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -408,7 +408,7 @@ import { initialize, track } from '@iterable/web-sdk'
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -472,7 +472,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -498,7 +498,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -529,7 +529,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -580,7 +580,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
