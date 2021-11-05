@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 function getParsedEnv() {
   if (!env.error) {
-    return JSON.stringify(env.parsed);
+    return env.parsed;
   }
 
   return {};
