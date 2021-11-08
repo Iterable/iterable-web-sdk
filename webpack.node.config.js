@@ -8,7 +8,7 @@ function getParsedEnv() {
   }
 
   return {};
-};
+}
 
 module.exports = {
   mode: 'production',
