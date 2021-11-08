@@ -1,6 +1,6 @@
 const path = require('path');
 const env = require('dotenv').config({ path: './.env' });
-const { DefinePlugin, ProvidePlugin } = require('webpack');
+const webpack = require('webpack');
 
 function getParsedEnv() {
   if (!env.error) {
@@ -8,7 +8,7 @@ function getParsedEnv() {
   }
 
   return {};
-}
+};
 
 module.exports = {
   mode: 'production',
@@ -21,9 +21,8 @@ module.exports = {
     libraryTarget: 'umd'
   },
   plugins: [
-    new ProvidePlugin({ process: 'process' }),
-    new DefinePlugin({
-      'process.env': JSON.stringify(getParsedEnv())
+    new webpack.DefinePlugin({
+      'process.env': `(${JSON.stringify(getParsedEnv())})`
     })
   ]
 };

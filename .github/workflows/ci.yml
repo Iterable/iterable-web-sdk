@@ -24,7 +24,7 @@ jobs:
         node-version: '16.3.0'
         cache: 'yarn'
     - run: yarn install --frozen-lockfile
-    - run: yarn build
     - run: yarn build:node
+    - run: yarn build
     - run: yarn test
     - run: yarn check-deps
