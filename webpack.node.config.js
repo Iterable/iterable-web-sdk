@@ -4,7 +4,7 @@ const webpack = require('webpack');
 
 function getParsedEnv() {
   if (!env.error) {
-    return JSON.stringify(env.parsed);
+    return env.parsed;
   }
 
   return {};
@@ -22,7 +22,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': JSON.stringify(getParsedEnv())
+      'process.env': `(${JSON.stringify(getParsedEnv())})`
     })
   ]
 };
