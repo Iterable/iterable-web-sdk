@@ -83,8 +83,8 @@
     "ttypescript": "^1.5.12",
     "typescript": "^3.7.4",
     "typescript-transform-paths": "^3.0.1",
-    "webpack": "^5.61.0",
-    "webpack-cli": "^4.7.2",
+    "webpack": "^5.63.0",
+    "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.4.0"
   },
   "resolutions": {
