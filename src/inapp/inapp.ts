@@ -13,7 +13,7 @@ import {
   paintOverlay,
   sortInAppMessages,
   trackMessagesDelivered,
-  addStyleSheeet
+  addStyleSheet
 } from './utils';
 import {
   trackInAppClick,
@@ -66,9 +66,13 @@ export function getInAppMessages(
   delete dupedPayload.displayInterval;
   delete dupedPayload.onOpenScreenReaderMessage;
   delete dupedPayload.onOpenNodeToTakeFocus;
+  delete dupedPayload.topOffset;
+  delete dupedPayload.bottomOffset;
+  delete dupedPayload.rightOffset;
+  delete dupedPayload.animationDuration;
 
   if (showInAppMessagesAutomatically) {
-    addStyleSheeet(document, ANIMATION_STYLESHEET);
+    addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
@@ -137,10 +141,13 @@ export function getInAppMessages(
           activeMessage.content.html,
           position,
           shouldAnimate,
-          payload.onOpenScreenReaderMessage || 'in-app iframe message opened'
+          payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
+          payload.topOffset,
+          payload.bottomOffset,
+          payload.rightOffset
         ).then((activeIframe) => {
           const throttledResize =
-            position === 'Full'
+            position !== 'Full'
               ? throttle(750, () => {
                   activeIframe.style.height =
                     (activeIframe.contentWindow?.document?.body?.scrollHeight ||

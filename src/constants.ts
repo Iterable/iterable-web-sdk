@@ -15,7 +15,9 @@ export const WEB_PLATFORM = 'Web';
 /* how long animations fade/side in for. */
 export const ANIMATION_DURATION = 400;
 
-export const ANIMATION_STYLESHEET = `
+export const ANIMATION_STYLESHEET = (
+  animationDuration: number = ANIMATION_DURATION
+) => `
   @keyframes fadein {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -73,36 +75,36 @@ export const ANIMATION_STYLESHEET = `
   }
 
   .slide-in {
-    -webkit-animation: slidein ${ANIMATION_DURATION}ms forwards;
-    -moz-animation: slidein ${ANIMATION_DURATION}ms forwards;
-    -ms-animation: slidein ${ANIMATION_DURATION}ms forwards;
-    -o-animation: slidein ${ANIMATION_DURATION}ms forwards;
-    animation: slidein ${ANIMATION_DURATION}ms forwards;
+    -webkit-animation: slidein ${animationDuration}ms forwards;
+    -moz-animation: slidein ${animationDuration}ms forwards;
+    -ms-animation: slidein ${animationDuration}ms forwards;
+    -o-animation: slidein ${animationDuration}ms forwards;
+    animation: slidein ${animationDuration}ms forwards;
   }
 
   .slide-out {
-    -webkit-animation: slideout ${ANIMATION_DURATION}ms forwards;
-    -moz-animation: slideout ${ANIMATION_DURATION}ms forwards;
-    -ms-animation: slideout ${ANIMATION_DURATION}ms forwards;
-    -o-animation: slideout ${ANIMATION_DURATION}ms forwards;
-    animation: slideout ${ANIMATION_DURATION}ms forwards;
+    -webkit-animation: slideout ${animationDuration}ms forwards;
+    -moz-animation: slideout ${animationDuration}ms forwards;
+    -ms-animation: slideout ${animationDuration}ms forwards;
+    -o-animation: slideout ${animationDuration}ms forwards;
+    animation: slideout ${animationDuration}ms forwards;
   }
 
   .fade-in {
-    -webkit-animation: fadein ${ANIMATION_DURATION}ms;
-    -moz-animation: fadein ${ANIMATION_DURATION}ms;
-    -ms-animation: fadein ${ANIMATION_DURATION}ms;
-    -o-animation: fadein ${ANIMATION_DURATION}ms;
-    animation: fadein ${ANIMATION_DURATION}ms;
+    -webkit-animation: fadein ${animationDuration}ms;
+    -moz-animation: fadein ${animationDuration}ms;
+    -ms-animation: fadein ${animationDuration}ms;
+    -o-animation: fadein ${animationDuration}ms;
+    animation: fadein ${animationDuration}ms;
   }
 
   .fade-out {
     visibility: hidden;
     opacity: 0;
-    -webkit-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-    -moz-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-    -ms-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-    -o-transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
-    transition: visibility 0s ${ANIMATION_DURATION}ms, opacity ${ANIMATION_DURATION}ms linear;
+    -webkit-transition: visibility 0s ${animationDuration}ms, opacity ${animationDuration}ms linear;
+    -moz-transition: visibility 0s ${animationDuration}ms, opacity ${animationDuration}ms linear;
+    -ms-transition: visibility 0s ${animationDuration}ms, opacity ${animationDuration}ms linear;
+    -o-transition: visibility 0s ${animationDuration}ms, opacity ${animationDuration}ms linear;
+    transition: visibility 0s ${animationDuration}ms, opacity ${animationDuration}ms linear;
   }
 `;

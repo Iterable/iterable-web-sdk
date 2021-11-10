@@ -37,7 +37,10 @@ import {
       onOpenScreenReaderMessage:
         'hey screen reader here telling you something just popped up on your screen!',
       onOpenNodeToTakeFocus: 'input',
-      packageName: 'my-lil-website'
+      packageName: 'my-lil-website',
+      rightOffset: '20px',
+      topOffset: '20px',
+      bottomOffset: '20px'
     },
     true
   );

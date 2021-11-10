@@ -494,6 +494,52 @@ describe('Utils', () => {
         expect(styles.width).toBe('100%');
       });
 
+      it('should paint TopRight iframes with custom offsets', async () => {
+        const iframe = await paintIFrame(
+          mockMarkup,
+          'TopRight',
+          false,
+          '',
+          '10px',
+          '10px',
+          '10px'
+        );
+        jest.advanceTimersByTime(2000);
+
+        /* speed up time to past the setTimeout */
+        const styles = getComputedStyle(iframe);
+        expect(styles.position).toBe('fixed');
+        expect(styles.left).toBe('');
+        expect(styles.right).toBe('10px');
+        expect(styles.bottom).toBe('');
+        expect(styles.top).toBe('10px');
+        expect(styles.zIndex).toBe('9999');
+        expect(styles.width).toBe('33%');
+      });
+
+      it('should paint BottomRight iframes with custom offsets', async () => {
+        const iframe = await paintIFrame(
+          mockMarkup,
+          'BottomRight',
+          false,
+          '',
+          '10px',
+          '10px',
+          '10px'
+        );
+        jest.advanceTimersByTime(2000);
+
+        /* speed up time to past the setTimeout */
+        const styles = getComputedStyle(iframe);
+        expect(styles.position).toBe('fixed');
+        expect(styles.left).toBe('');
+        expect(styles.right).toBe('10px');
+        expect(styles.bottom).toBe('10px');
+        expect(styles.top).toBe('');
+        expect(styles.zIndex).toBe('9999');
+        expect(styles.width).toBe('33%');
+      });
+
       it('should call srSpeak if screen reader text passed', async () => {
         await paintIFrame(mockMarkup, 'Center', false, 'hi');
 
@@ -528,25 +574,30 @@ describe('Utils', () => {
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('50%');
         });
 
         it('should have correct width for bottom-right modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+          const iframe = await paintIFrame(
+            mockMarkup,
+            'BottomRight',
+            false,
+            'hi'
+          );
           jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('33%');
         });
 
         it('should have correct width for top-right modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+          const iframe = await paintIFrame(mockMarkup, 'TopRight', false, 'hi');
           jest.advanceTimersByTime(2000);
 
           /* speed up time to past the setTimeout */
           const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('100%');
+          expect(styles.width).toBe('33%');
         });
       });
     });

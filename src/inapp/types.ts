@@ -4,6 +4,11 @@ interface SDKInAppMessagesParams {
   onOpenScreenReaderMessage?: string;
   /* what DOM Node do you want to take keyboard focus when the message opens */
   onOpenNodeToTakeFocus?: string;
+  topOffset?: string;
+  bottomOffset?: string;
+  rightOffset?: string;
+  /* how long the in-app messages take to animate in/out */
+  animationDuration?: number;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {

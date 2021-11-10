@@ -80,7 +80,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) => Promise.resolve('my-JWT')
+  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
 )
 ```
 
@@ -340,7 +340,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 })();
 ```
@@ -355,7 +355,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -380,7 +380,7 @@ import { initialize } from '@iterable/web-sdk'
 (() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -408,7 +408,7 @@ import { initialize, track } from '@iterable/web-sdk'
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -472,7 +472,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -498,7 +498,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -529,7 +529,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -546,7 +546,20 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
               onOpenScreenReaderMessage:
                 'hey screen reader here telling you something just popped up on your screen!',
               /* what DOM node you want to take keyboard focus. Here we choose the first <input /> */
-              onOpenNodeToTakeFocus: 'input'
+              onOpenNodeToTakeFocus: 'input',
+              /* 
+                additional offsets for top-right and bottom-right in-app messages.
+                Good if you want the message to be out of the way of your navbar
+                or something similar
+
+                _topOffset_ only applies to "top-right" messages
+                _bottomOffset_ only applies to "bottom-right" messages
+              */
+              topOffset: '20px',
+              bottomOffset: '20px',
+              rightOffset: '20px',
+              /* how long the in-app messages take to animate in/out (in milliseconds) */
+              animationDuration: 400;
             },
             true
           );
@@ -567,7 +580,7 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    () => Promise.resolve('YOUR_JWT_HERE')
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
