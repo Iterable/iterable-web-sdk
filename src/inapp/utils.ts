@@ -181,7 +181,6 @@ export const paintIFrame = (
           scrollbar in the iframe.
         */
         const setCSS = (width: string) => {
-          console.log(`set css ${width}`);
           iframe.style.cssText = generateLayoutCSS(
             shouldAnimate &&
               (position === 'TopRight' || position === 'BottomRight')
