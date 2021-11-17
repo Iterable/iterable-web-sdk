@@ -323,7 +323,7 @@ export function getInAppMessages(
 
                       @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
                     */
-                    global.open(clickedUrl, '_blank', 'noopenner,noreferrer');
+                    global.open(clickedUrl, '_blank', 'noopener,noreferrer');
                   } else {
                     /* otherwise just link them in the same tab */
                     global.location.assign(clickedUrl);

@@ -351,7 +351,7 @@ describe('getInAppMessages', () => {
       expect(mockOpen).toHaveBeenCalledWith(
         'google.com',
         '_blank',
-        'noopenner,noreferrer'
+        'noopener,noreferrer'
       );
     });
 
