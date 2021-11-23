@@ -17,14 +17,16 @@ import {
 } from './utils';
 import {
   trackInAppClick,
-  trackInAppClose
-  // trackInAppConsume,
-  // trackInAppOpen
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
 } from '../events';
 import {
   ANIMATION_DURATION,
   ANIMATION_STYLESHEET,
   DISPLAY_INTERVAL_DEFAULT,
+  ENABLE_INAPP_CONSUME,
+  IS_PRODUCTION,
   WEB_PLATFORM
 } from 'src/constants';
 import schema from './inapp.schema';
@@ -245,22 +247,33 @@ export function getInAppMessages(
 
             Also swallow any 400+ response errors. We don't care about them.
           */
-          // Promise.all(
-          //   !activeMessage?.saveToInbox
-          //     ? [
-          //         trackInAppOpen({
-          //           messageId: activeMessage.messageId
-          //         }),
-          //         trackInAppConsume({
-          //           messageId: activeMessage.messageId
-          //         })
-          //       ]
-          //     : [
-          //         trackInAppOpen({
-          //           messageId: activeMessage.messageId
-          //         })
-          //       ]
-          // ).catch((e) => e);
+          if (ENABLE_INAPP_CONSUME || IS_PRODUCTION) {
+            Promise.all(
+              !activeMessage?.saveToInbox
+                ? [
+                    trackInAppOpen({
+                      messageId: activeMessage.messageId,
+                      deviceInfo: {
+                        appPackageName: payload.packageName
+                      }
+                    }),
+                    trackInAppConsume({
+                      messageId: activeMessage.messageId,
+                      deviceInfo: {
+                        appPackageName: payload.packageName
+                      }
+                    })
+                  ]
+                : [
+                    trackInAppOpen({
+                      messageId: activeMessage.messageId,
+                      deviceInfo: {
+                        appPackageName: payload.packageName
+                      }
+                    })
+                  ]
+            ).catch((e) => e);
+          }
 
           /* now we'll add click tracking to _all_ anchor tags */
           const links =

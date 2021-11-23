@@ -6,6 +6,18 @@ export const RETRY_USER_ATTEMPTS = 0;
 
 export const BASE_URL = process.env.BASE_URL || 'https://api.iterable.com/api';
 
+const GET_ENABLE_INAPP_CONSUME = () => {
+  try {
+    return JSON.parse(process.env.ENABLE_INAPP_CONSUME);
+  } catch {
+    return true;
+  }
+};
+
+export const ENABLE_INAPP_CONSUME = GET_ENABLE_INAPP_CONSUME();
+
+export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
 /* 
   API payload _platform_ param which is send up automatically 
   with tracking and getMessage requests 

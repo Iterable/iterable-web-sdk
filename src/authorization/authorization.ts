@@ -2,7 +2,7 @@ import axios from 'axios';
 import { baseAxiosRequest } from '../request';
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
-import { RETRY_USER_ATTEMPTS } from 'src/constants';
+import { IS_PRODUCTION, RETRY_USER_ATTEMPTS } from 'src/constants';
 import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
 import { config } from '../utils/config';
 
@@ -38,8 +38,7 @@ export function initialize(
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
   const logLevel = config.getConfig('logLevel');
-  const isProductionMode = process.env.NODE_ENV === 'production';
-  if (!generateJWT && isProductionMode) {
+  if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
     if (logLevel === 'verbose') {
       return console.error(
