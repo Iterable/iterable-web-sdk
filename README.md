@@ -12,7 +12,7 @@ This SDK helps you integrate your Web apps with Iterable.
 * [API](#api)
 * [Usage](#usage)
 * [FAQ](#faq)
-* [A Note About Imports](#anoteaboutimports)
+* [A Note About Imports](#a-note-about-imports)
 * [TypeScript](#typescript)
 * [Contributing](#contributing)
 * [License](#license)
@@ -622,11 +622,13 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 This library exposes UMD modules and a single-file build for you to import from. In other words, this means that you'll be able to import methods in these ways:
 
 ```ts
-import { getInAppMessages } from '@iterable/web-sdk'
+import { getInAppMessages, initialize, updateUser } from '@iterable/web-sdk';
 ```
 
 ```ts
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp'
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { updateUser } from '@iterable/web-sdk/dist/users';
 ```
 
 For those using Webpack/Rollup/Some Other Build Tool, we recommend importing methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
