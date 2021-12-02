@@ -336,7 +336,7 @@ First, we'll deal with the JWT Secret. Typically, you need some backend service 
 Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk/dist/authorization';
 
 (() => {
   initialize(
@@ -351,7 +351,7 @@ Now that we've set our authorization logic within our app, it's time to set the 
 The syntax for identifying a user by user ID looks like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk/dist/authorization';
 
 (() => {
   const { setUserID, logout } = initialize(
@@ -376,7 +376,7 @@ import { initialize } from '@iterable/web-sdk'
 Doing this with an email is similar:
 
 ```ts
-import { initialize } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk/dist/authorization';
 
 (() => {
   const { setEmail, logout } = initialize(
@@ -404,7 +404,8 @@ import { initialize } from '@iterable/web-sdk'
 Now let's put it altogether with an Iterable API method:
 
 ```ts
-import { initialize, track } from '@iterable/web-sdk'
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { track } from '@iterable/web-sdk/dist/events';
 
 (() => {
   const { setUserID, logout } = initialize(
@@ -438,13 +439,13 @@ This SDK relies on a library called [Axios](https://github.com/axios/axios). For
 You can do that! This SDK exposes the base Axios instance so you can do whatever you like with it and build upon that. You can import the Axios instance like so and anything in the Axios documentation is fair game to use:
 
 ```ts
-import { baseAxiosInstance } from '@iterable/web-sdk'
+import { baseAxiosInstance } from '@iterable/web-sdk/dist/request';
 ```
 
 For example, if you want to set an `email` query param on every outgoing request, you would just implement the way Axios advises like so:
 
 ```ts
-import { baseAxiosRequest } from '@iterable/web-sdk';
+import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 (() => {
   baseAxiosRequest.interceptors.request.use((config) => {
@@ -468,7 +469,8 @@ This SDK allows that. Simply call the `getMessages` method but pass `true` as th
 Normally to request a list of in-app messages, you'd make a request like this:
 
 ```ts
-import { initialize, getInAppMessages } from '@iterable/web-sdk';
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
   const { setUserID } = initialize(
@@ -494,7 +496,8 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 In order to take advantage of the SDK showing them automatically, you would implement the same method in this way:
 
 ```ts
-import { initialize, getInAppMessages } from '@iterable/web-sdk';
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
   const { setUserID } = initialize(
@@ -525,7 +528,8 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 Optionally, you can pass arguments to fine-tune how you want the messages to appear
 
 ```ts
-import { initialize, getInAppMessages } from '@iterable/web-sdk';
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
   const { setUserID } = initialize(
@@ -576,7 +580,8 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 You can also pause and resume the messages stream if you like
 
 ```ts
-import { initialize, getInAppMessages } from '@iterable/web-sdk';
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
   const { setUserID } = initialize(
