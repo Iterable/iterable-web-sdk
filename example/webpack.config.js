@@ -49,7 +49,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: 'index.html',
-      template: './index.html'
+      template: './index.html',
+      inject: 'body'
     }),
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(!env.error ? env.parsed : {})
