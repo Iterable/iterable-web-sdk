@@ -6,6 +6,7 @@ import { baseAxiosRequest } from '../../request';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
+  generateWidth,
   paintIFrame,
   paintOverlay,
   preloadImages,
@@ -396,6 +397,196 @@ describe('Utils', () => {
     });
   });
 
+  describe('Breakpoint Logic', () => {
+    it('should generate small breakpoint widths', () => {
+      expect(
+        generateWidth(
+          {
+            smMatches: true,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'Full'
+        )
+      ).toBe('100%');
+      expect(
+        generateWidth(
+          {
+            smMatches: true,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'TopRight'
+        )
+      ).toBe('100%');
+      expect(
+        generateWidth(
+          {
+            smMatches: true,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'BottomRight'
+        )
+      ).toBe('100%');
+      expect(
+        generateWidth(
+          {
+            smMatches: true,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'Center'
+        )
+      ).toBe('100%');
+    });
+
+    it('should generate medium breakpoint widths', () => {
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: true,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'Full'
+        )
+      ).toBe('50%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: true,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'TopRight'
+        )
+      ).toBe('45%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: true,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'BottomRight'
+        )
+      ).toBe('45%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: true,
+            lgMatches: false,
+            xlMatches: false
+          },
+          'Center'
+        )
+      ).toBe('50%');
+    });
+
+    it('should generate large breakpoint widths', () => {
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: true,
+            xlMatches: false
+          },
+          'Full'
+        )
+      ).toBe('50%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: true,
+            xlMatches: false
+          },
+          'TopRight'
+        )
+      ).toBe('33%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: true,
+            xlMatches: false
+          },
+          'BottomRight'
+        )
+      ).toBe('33%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: true,
+            xlMatches: false
+          },
+          'Center'
+        )
+      ).toBe('50%');
+    });
+
+    it('should generate XL breakpoint widths', () => {
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: true
+          },
+          'Full'
+        )
+      ).toBe('50%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: true
+          },
+          'TopRight'
+        )
+      ).toBe('25%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: true
+          },
+          'BottomRight'
+        )
+      ).toBe('25%');
+      expect(
+        generateWidth(
+          {
+            smMatches: false,
+            mdMatches: false,
+            lgMatches: false,
+            xlMatches: true
+          },
+          'Center'
+        )
+      ).toBe('50%');
+    });
+  });
+
   describe('track in app delivery', () => {
     it('should call trackInAppDelivery X times for X messages', async () => {
       mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
@@ -440,7 +631,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('0%');
         expect(styles.bottom).toBe('0%');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('50%');
+        expect(styles.width).toBe('100%');
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
@@ -455,7 +646,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('0%');
         expect(styles.bottom).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('33%');
+        expect(styles.width).toBe('100%');
       });
 
       it('should paint the iframe in the bottom-right of the screen', async () => {
@@ -475,7 +666,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('0%');
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('33%');
+        expect(styles.width).toBe('100%');
       });
 
       it('should paint the iframe full-screen', async () => {
@@ -514,7 +705,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('');
         expect(styles.top).toBe('10px');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('33%');
+        expect(styles.width).toBe('100%');
       });
 
       it('should paint BottomRight iframes with custom offsets', async () => {
@@ -537,7 +728,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('10px');
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('33%');
+        expect(styles.width).toBe('100%');
       });
 
       it('should call srSpeak if screen reader text passed', async () => {
@@ -550,55 +741,6 @@ describe('Utils', () => {
         await paintIFrame(mockMarkup, 'Center', false);
 
         expect((srSpeak as any).mock.calls.length).toBe(0);
-      });
-
-      describe('iframe on mobile sizes', () => {
-        beforeAll(() => {
-          Object.defineProperty(global, 'matchMedia', {
-            value: (query: string) => ({
-              matches: false,
-              media: query,
-              onchange: null,
-              addListener: jest.fn(), // Deprecated
-              removeListener: jest.fn(), // Deprecated
-              addEventListener: jest.fn(),
-              removeEventListener: jest.fn(),
-              dispatchEvent: jest.fn()
-            })
-          });
-        });
-
-        it('should have correct width for centered-modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
-          jest.advanceTimersByTime(2000);
-
-          /* speed up time to past the setTimeout */
-          const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('50%');
-        });
-
-        it('should have correct width for bottom-right modal', async () => {
-          const iframe = await paintIFrame(
-            mockMarkup,
-            'BottomRight',
-            false,
-            'hi'
-          );
-          jest.advanceTimersByTime(2000);
-
-          /* speed up time to past the setTimeout */
-          const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('33%');
-        });
-
-        it('should have correct width for top-right modal', async () => {
-          const iframe = await paintIFrame(mockMarkup, 'TopRight', false, 'hi');
-          jest.advanceTimersByTime(2000);
-
-          /* speed up time to past the setTimeout */
-          const styles = getComputedStyle(iframe);
-          expect(styles.width).toBe('33%');
-        });
       });
     });
 

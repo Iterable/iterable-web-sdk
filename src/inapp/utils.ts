@@ -5,6 +5,61 @@ import { trackInAppDelivery } from '../events';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { ANIMATION_DURATION } from 'src/constants';
 
+interface Breakpoints {
+  smMatches: boolean;
+  mdMatches: boolean;
+  lgMatches: boolean;
+  xlMatches: boolean;
+}
+
+export const generateWidth = (
+  { smMatches, mdMatches, lgMatches, xlMatches }: Breakpoints,
+  position: WebInAppDisplaySettings['position']
+): string => {
+  /* 
+    breakpoint widths are as follows:
+    
+    1. TopRight, BottomRight (100% at SM; 45% at MD; 33% at LG; 25% at XL)
+    2. Center (100% at SM, MD; 50% at LG, XL)
+    3. Full (100% all the time)
+  */
+  if (smMatches) {
+    return '100%';
+  }
+
+  if (mdMatches) {
+    if (position === 'TopRight' || position === 'BottomRight') {
+      /* 
+        in-app messages is being initially painted, but we're on mobile
+        breakpoints so remove any offsets the user provided in the config object.
+      */
+      return '45%';
+    }
+
+    return '50%';
+  }
+  if (lgMatches) {
+    if (position === 'TopRight' || position === 'BottomRight') {
+      return '33%';
+    }
+
+    return '50%';
+  }
+
+  if (xlMatches) {
+    if (position === 'TopRight' || position === 'BottomRight') {
+      return '25%';
+    }
+    return '50%';
+  }
+
+  /* 
+    this line will never run. One of those breakpoints has to return true 
+    but this is just to appease typescript.
+  */
+  return '100%';
+};
+
 export const addStyleSheet = (doc: Document, style: string) => {
   const stylesheet = doc.createElement('style');
   stylesheet.textContent = style;
@@ -106,8 +161,14 @@ export const generateLayoutCSS = (
   `;
 };
 
-const mediaQueryMd = global.matchMedia('(min-width: 850px)');
-const mediaQueryLg = global.matchMedia('(max-width: 1200px)');
+const mediaQuerySm = global.matchMedia('(max-width: 850px)');
+const mediaQueryMd = global.matchMedia(
+  '(min-width: 851px) and (max-width: 975px)'
+);
+const mediaQueryLg = global.matchMedia(
+  '(min-width: 976px) and (max-width: 1300px)'
+);
+const mediaQueryXl = global.matchMedia('(min-width: 1301px)');
 
 /**
  *
@@ -205,16 +266,12 @@ export const paintIFrame = (
               height: ${iframe.style.height};
             `,
             position,
-            !mediaQueryMd.matches,
+            mediaQuerySm.matches,
             topOffset,
             bottomOffset,
             rightOffset
           );
         };
-
-        const startingWidth =
-          position === 'Full' ? 100 : position === 'Center' ? 50 : 33;
-        setCSS(`${startingWidth}%`);
 
         if (shouldAnimate) {
           iframe.className =
@@ -223,71 +280,51 @@ export const paintIFrame = (
               : 'slide-in';
         }
 
-        /* 
-          breakpoint widths are as follows:
-          
-          1. TopRight, BottomRight (100% at < 850px, 33% < 1200px, 25% > 1200px)
-          2. Center (50% > 850px, 100% < 850px)
-          3. Full (100% all the time)
-        */
-        if (!mediaQueryMd.matches) {
-          if (position === 'TopRight' || position === 'BottomRight') {
-            /* 
-              in-app messages is being initially painted, but we're on mobile
-              breakpoints so remove any offsets the user provided in the config object.
-            */
-            setCSS('100%');
-          } else {
-            iframe.style.width = '100%';
-          }
-        }
+        const initialWidth = generateWidth(
+          {
+            smMatches: mediaQuerySm.matches,
+            mdMatches: mediaQueryMd.matches,
+            lgMatches: mediaQueryLg.matches,
+            xlMatches: mediaQueryXl.matches
+          },
+          position
+        );
 
-        if (
-          !mediaQueryLg.matches &&
-          (position === 'TopRight' || position === 'BottomRight')
-        ) {
-          iframe.style.width = '25%';
-        }
+        /* set the initial width based at the breakpoint we loaded the message at. */
+        setCSS(position === 'Full' ? '100%' : initialWidth);
 
-        mediaQueryMd.onchange = (event) => {
-          if (!event.matches || position === 'Full') {
-            if (position === 'TopRight' || position === 'BottomRight') {
-              /* 
-                here we hit a mobile breakpoint for TopRight or BottomRight.
-                We re-generate the entire CSS because we want to remove any custom
-                offsets the user gave us for these since mobile should not allow for margins
-                in the iframe since screen real-estate is precious.
-              */
-              setCSS(`100%`);
-            } else {
-              iframe.style.width = '100%';
-            }
-          } else {
-            if (position === 'TopRight' || position === 'BottomRight') {
-              /* 
-                same comment as above but we want to apply the offsets again 
-                since we're back to desktop-sized breakpoints
-              */
-              setCSS(`${startingWidth}%`);
-            } else {
-              iframe.style.width = `${startingWidth}%`;
-            }
-          }
+        const setNewWidth = (event: MediaQueryListEvent) => {
+          setCSS(
+            generateWidth(
+              {
+                smMatches: mediaQuerySm.matches,
+                mdMatches: mediaQueryMd.matches,
+                lgMatches: mediaQueryLg.matches,
+                xlMatches: mediaQueryXl.matches
+              },
+              position
+            )
+          );
         };
 
-        mediaQueryLg.onchange = (event) => {
-          if (
-            !event.matches &&
-            (position === 'TopRight' || position === 'BottomRight')
-          ) {
-            iframe.style.width = '25%';
+        mediaQuerySm.onchange = (event) => {
+          if (position !== 'Full') {
+            setNewWidth(event);
           }
-
-          if (
-            event.matches &&
-            (position === 'TopRight' || position === 'BottomRight')
-          ) {
-            iframe.style.width = '33%';
+        };
+        mediaQueryMd.onchange = (event) => {
+          if (position !== 'Full') {
+            setNewWidth(event);
+          }
+        };
+        mediaQueryLg.onchange = (event) => {
+          if (position !== 'Full') {
+            setNewWidth(event);
+          }
+        };
+        mediaQueryXl.onchange = (event) => {
+          if (position !== 'Full') {
+            setNewWidth(event);
           }
         };
 
