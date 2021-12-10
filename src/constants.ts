@@ -18,11 +18,18 @@ export const ENABLE_INAPP_CONSUME = GET_ENABLE_INAPP_CONSUME();
 
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
+export const SDK_VERSION = process.env.VERSION;
+
 /* 
   API payload _platform_ param which is send up automatically 
   with tracking and getMessage requests 
 */
 export const WEB_PLATFORM = 'Web';
+
+export const STATIC_HEADERS = {
+  'SDK-Version': SDK_VERSION,
+  'SDK-Platform': WEB_PLATFORM
+};
 
 /* how long animations fade/side in for. */
 export const ANIMATION_DURATION = 400;

@@ -6,7 +6,7 @@ import { baseAxiosRequest } from '../../request';
 import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
 import { initialize } from '../../authorization';
-import { WEB_PLATFORM } from '../../constants';
+import { SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { createClientError } from '../../utils/testUtils';
 
 jest.mock('../../utils/srSpeak', () => ({
@@ -36,7 +36,10 @@ describe('getInAppMessages', () => {
 
       expect(response.config.params.packageName).toBe('my-lil-website');
       expect(response.config.params.platform).toBe(WEB_PLATFORM);
+      expect(response.config.params.SDKVersion).toBe(SDK_VERSION);
       expect(response.config.params.count).toBe(10);
+      expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
+      expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
     });
 
     it('should reject if fails client-side validation', async () => {

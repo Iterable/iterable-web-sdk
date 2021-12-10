@@ -1,5 +1,5 @@
 import Axios, { AxiosRequestConfig } from 'axios';
-import { BASE_URL } from './constants';
+import { BASE_URL, STATIC_HEADERS } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { AnySchema, ValidationError } from 'yup';
 import { config } from './utils/config';
@@ -36,7 +36,11 @@ export const baseIterableRequest = <T = any>(
     }
     return baseAxiosRequest({
       ...payload,
-      baseURL: config.getConfig('baseURL') || BASE_URL
+      baseURL: config.getConfig('baseURL') || BASE_URL,
+      headers: {
+        ...payload.headers,
+        ...STATIC_HEADERS
+      }
     });
   } catch (error) {
     /* match Iterable's API error schema and add client errors as a new key */
