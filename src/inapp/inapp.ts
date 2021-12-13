@@ -27,6 +27,7 @@ import {
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION,
+  SDK_VERSION,
   WEB_PLATFORM
 } from 'src/constants';
 import schema from './inapp.schema';
@@ -363,7 +364,8 @@ export function getInAppMessages(
           },
           params: {
             ...dupedPayload,
-            platform: WEB_PLATFORM
+            platform: WEB_PLATFORM,
+            SDKVersion: SDK_VERSION
           }
         })
           .then((response) => {
@@ -422,7 +424,8 @@ export function getInAppMessages(
     },
     params: {
       ...dupedPayload,
-      platform: WEB_PLATFORM
+      platform: WEB_PLATFORM,
+      SDKVersion: SDK_VERSION
     }
   }).then((response) => {
     trackMessagesDelivered(

@@ -1,13 +1,17 @@
 const path = require('path');
 const env = require('dotenv').config({ path: './.env' });
 const webpack = require('webpack');
+const { version } = require('./package.json');
 
 function getParsedEnv() {
   if (!env.error) {
-    return env.parsed;
+    return {
+      ...env.parsed,
+      version
+    };
   }
 
-  return {};
+  return { version };
 }
 
 module.exports = {

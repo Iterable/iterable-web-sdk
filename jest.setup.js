@@ -19,3 +19,5 @@ Object.defineProperty(global, 'navigator', {
     userAgent: 'some-user-agent'
   }
 });
+
+process.env.VERSION = 'mock-version';

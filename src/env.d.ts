@@ -3,5 +3,6 @@ declare namespace NodeJS {
     NODE_ENV: 'development' | 'production' | 'test';
     BASE_URL: string;
     ENABLE_INAPP_CONSUME: string;
+    VERSION: string;
   }
 }

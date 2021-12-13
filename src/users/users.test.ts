@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { updateSubscriptions, updateUser, updateUserEmail } from './users';
 import { createClientError } from '../utils/testUtils';
+import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -17,6 +18,8 @@ describe('Users Requests', () => {
 
     expect(JSON.parse(response.config.data).dataFields).toEqual({});
     expect(JSON.parse(response.config.data).preferUserId).toBe(true);
+    expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
+    expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
     expect(response.data.msg).toBe('hello');
   });
 
@@ -55,6 +58,8 @@ describe('Users Requests', () => {
 
     expect(JSON.parse(response.config.data).newEmail).toBe('hello@gmail.com');
     expect(response.data.msg).toBe('hello');
+    expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
+    expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject updateUserEmail on bad params', async () => {
@@ -101,6 +106,8 @@ describe('Users Requests', () => {
     expect(JSON.parse(response.config.data).campaignId).toBe(5);
     expect(JSON.parse(response.config.data).templateId).toBe(556);
     expect(response.data.msg).toBe('hello');
+    expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
+    expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject updateSubscriptions on bad params', async () => {

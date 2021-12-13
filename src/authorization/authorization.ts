@@ -2,7 +2,11 @@ import axios from 'axios';
 import { baseAxiosRequest } from '../request';
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
-import { IS_PRODUCTION, RETRY_USER_ATTEMPTS } from 'src/constants';
+import {
+  IS_PRODUCTION,
+  RETRY_USER_ATTEMPTS,
+  STATIC_HEADERS
+} from 'src/constants';
 import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
 import { config } from '../utils/config';
 
@@ -453,6 +457,7 @@ export function initialize(
                     ...error.config,
                     headers: {
                       ...error.config.headers,
+                      ...STATIC_HEADERS,
                       'Api-Key': authToken,
                       Authorization: `Bearer ${newToken}`
                     }

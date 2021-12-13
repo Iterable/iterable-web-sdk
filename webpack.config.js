@@ -1,6 +1,18 @@
 const path = require('path');
 const env = require('dotenv').config({ path: './.env' });
 const webpack = require('webpack');
+const { version } = require('./package.json');
+
+function getParsedEnv() {
+  if (!env.error) {
+    return {
+      ...env.parsed,
+      version
+    };
+  }
+
+  return { version };
+}
 
 module.exports = {
   mode: 'production',
@@ -13,7 +25,7 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      'process.env': JSON.stringify(!env.error ? env.parsed : {})
+      'process.env': JSON.stringify(getParsedEnv())
     })
   ]
 };
