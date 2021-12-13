@@ -64,26 +64,3 @@ export const baseIterableRequest = <T = any>(
     });
   }
 };
-
-/*
-  implemented:
-  UsersApiController.updateUser
-  UsersApiController.updateEmail
-  InAppApiController.getMessages(email = None, userId = None, count = 0)
-  EventsApiController.trackInAppOpen
-  EventsApiController.trackInAppClick
-  EventsApiController.trackInAppClose
-  EventsApiController.inAppConsume
-  EventsApiController.trackInAppDelivery
-  EventsApiController.track
-  CommerceApiController.trackPurchase
-  CommerceApiController.updateCart
-  UsersApiController.updateSubscriptions
-  
-  todo:
-  UsersApiController.disableDevice
-  UsersApiController.registerDeviceToken
-  EventsApiController.trackPushOpen
-  EventsApiController.trackInboxSession
-  MobileApiController.getRemoteConfiguration
-*/
