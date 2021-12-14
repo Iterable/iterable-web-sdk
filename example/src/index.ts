@@ -40,8 +40,7 @@ import {
       packageName: 'my-lil-website',
       rightOffset: '20px',
       topOffset: '20px',
-      bottomOffset: '20px',
-      handleLinks: 'open-all-external'
+      bottomOffset: '20px'
     },
     true
   );
