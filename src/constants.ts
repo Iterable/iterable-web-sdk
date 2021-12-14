@@ -26,9 +26,10 @@ export const SDK_VERSION = process.env.VERSION;
 */
 export const WEB_PLATFORM = 'Web';
 
+/** @todo uncomment when these headers don't give CORS errors */
 export const STATIC_HEADERS = {
-  'SDK-Version': SDK_VERSION,
-  'SDK-Platform': WEB_PLATFORM
+  // 'SDK-Version': SDK_VERSION,
+  // 'SDK-Platform': WEB_PLATFORM
 };
 
 /* how long animations fade/side in for. */

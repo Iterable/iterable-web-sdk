@@ -7,11 +7,11 @@ function getParsedEnv() {
   if (!env.error) {
     return {
       ...env.parsed,
-      version
+      VERSION: version
     };
   }
 
-  return { version };
+  return { VERSION: version };
 }
 
 module.exports = {
