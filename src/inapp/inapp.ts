@@ -338,8 +338,8 @@ export function getInAppMessages(
                       if the _handleLinks_ option is set, we need to open links 
                       according to that enum. So the way this works is:
 
-                      1. If _open-all-internal_, then open every link in the same tab
-                      2. If _open-all-external_, open all in new tab
+                      1. If _open-all-same-tab, then open every link in the same tab
+                      2. If _open-all-new-tab, open all in new tab
                       3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
 
                       This was a fix to account for the fact that Bee editor templates force
@@ -350,7 +350,7 @@ export function getInAppMessages(
                       clickedHostname === global.location.host;
 
                     if (
-                      handleLinks === 'open-all-internal' ||
+                      handleLinks === 'open-all-same-tab' ||
                       (isInternalLink && handleLinks === 'external-new-tab')
                     ) {
                       global.location.assign(clickedUrl);

@@ -9,7 +9,7 @@ interface SDKInAppMessagesParams {
   rightOffset?: string;
   /* how long the in-app messages take to animate in/out */
   animationDuration?: number;
-  handleLinks?: 'open-all-external' | 'open-all-internal' | 'external-new-tab';
+  handleLinks?: 'open-all-new-tab' | 'open-all-same-tab' | 'external-new-tab';
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {

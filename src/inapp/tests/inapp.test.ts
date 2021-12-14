@@ -395,7 +395,7 @@ describe('getInAppMessages', () => {
       expect(mockRouteChange).toHaveBeenCalledWith('google.com');
     });
 
-    it('should navigate to site in new tab if _handleLinks_ is "open-all-external"', async () => {
+    it('should navigate to site in new tab if _handleLinks_ is "open-all-new-tab"', async () => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: [
           {
@@ -412,7 +412,7 @@ describe('getInAppMessages', () => {
         {
           count: 10,
           packageName: 'my-lil-website',
-          handleLinks: 'open-all-external'
+          handleLinks: 'open-all-new-tab'
         },
         true
       );
@@ -439,7 +439,7 @@ describe('getInAppMessages', () => {
       );
     });
 
-    it('should navigate to site in same tab if _handleLinks_ is "open-all-internal"', async () => {
+    it('should navigate to site in same tab if _handleLinks_ is "open-all-same-tab"', async () => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: [
           {
@@ -461,7 +461,7 @@ describe('getInAppMessages', () => {
         {
           count: 10,
           packageName: 'my-lil-website',
-          handleLinks: 'open-all-internal'
+          handleLinks: 'open-all-same-tab'
         },
         true
       );
