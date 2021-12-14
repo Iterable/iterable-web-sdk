@@ -7,6 +7,7 @@ import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
   generateWidth,
+  getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
   preloadImages,
@@ -856,6 +857,29 @@ describe('Utils', () => {
 
         expect(mockCallback.mock.calls.length).toBe(1);
       });
+    });
+  });
+
+  describe('URL parsing', () => {
+    it('should return the correct hostname', () => {
+      expect(getHostnameFromUrl('https://hello.com/fdsafdsaf')).toBe(
+        'hello.com'
+      );
+      expect(getHostnameFromUrl('https://hello.com#fdsafdsaf')).toBe(
+        'hello.com'
+      );
+      expect(getHostnameFromUrl('https://hello.com?name=fdsafdsaf')).toBe(
+        'hello.com'
+      );
+      expect(getHostnameFromUrl('https://hello.com/?name=fdsafdsaf')).toBe(
+        'hello.com'
+      );
+      expect(getHostnameFromUrl('http://www.hello.com/?name=fdsafdsaf')).toBe(
+        'www.hello.com'
+      );
+      expect(getHostnameFromUrl('http://localhost:8080/?name=fdsafdsaf')).toBe(
+        'localhost:8080'
+      );
     });
   });
 });
