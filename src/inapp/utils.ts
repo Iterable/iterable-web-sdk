@@ -433,3 +433,8 @@ export const paintOverlay = (
   document.body.appendChild(overlay);
   return overlay;
 };
+
+export const getHostnameFromUrl = (url: string): string | undefined => {
+  const linkHost = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
+  return linkHost?.[1];
+};

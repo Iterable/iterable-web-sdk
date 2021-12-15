@@ -241,6 +241,21 @@ API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_g
 getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
+SDK Specific Options:
+
+Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
+
+| Name                      | Description                                                                                                                                                                                                                     | Values                                                           | Default   |
+|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------|
+| displayInterval           | How much time (in MS) to wait before showing next in-app message                                                                                                                                                                | number                                                           | 30000     |
+| onOpenScreenReaderMessage | What text do you want the screen reader to announce when opening in-app message                                                                                                                                                 | string                                                           | undefined |
+| onOpenNodeToTakeFocus     | What DOM element do you want to take focus when the in-app message opens. (Will open the first interact-able element if not specified)                                                                                          | string                                                           | undefined |
+| topOffset                 | How much space (px or %) to create between the top of the screen and messages. Not applicable for center or full-screen messages                                                                                                | string                                                           | undefined |
+| bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center or full-screen messages                                                                                             | string                                                           | undefined |
+| rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                              | string                                                           | undefined |
+| animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                        | number                                                           | 400       |
+| handleLinks               | How to open links. If undefined, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only external links in new tab otherwise same tab. | 'open-all-internal' \| 'open-all-external' \| 'external-new-tab' | undefined |
+
 Example:
 
 ```ts
@@ -564,7 +579,8 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
               bottomOffset: '20px',
               rightOffset: '20px',
               /* how long the in-app messages take to animate in/out (in milliseconds) */
-              animationDuration: 400;
+              animationDuration: 400,
+              handleLinks: 'external-new-tab'
             },
             true
           );

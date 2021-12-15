@@ -395,6 +395,145 @@ describe('getInAppMessages', () => {
       expect(mockRouteChange).toHaveBeenCalledWith('google.com');
     });
 
+    it('should navigate to site in new tab if _handleLinks_ is "open-all-new-tab"', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="/relative-link" target="_blank" />'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        {
+          count: 10,
+          packageName: 'my-lil-website',
+          handleLinks: 'open-all-new-tab'
+        },
+        true
+      );
+      await request();
+
+      const mockOpen = jest.fn();
+      global.open = mockOpen;
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+
+      expect(mockOpen).toHaveBeenCalledWith(
+        '/relative-link',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+
+    it('should navigate to site in same tab if _handleLinks_ is "open-all-same-tab"', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="http://google.com" target="_blank" />'
+            }
+          }
+        ]
+      });
+
+      const mockRouteChange = jest.fn();
+      delete global.location;
+      global.location = {} as any;
+      global.location.assign = mockRouteChange;
+
+      const { request } = getInAppMessages(
+        {
+          count: 10,
+          packageName: 'my-lil-website',
+          handleLinks: 'open-all-same-tab'
+        },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+
+      expect(mockRouteChange).toHaveBeenCalledWith('http://google.com');
+    });
+
+    it('should navigate to site in new tab if _handleLinks_ is "external-new-tab" and is external link', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="http://google.com" target="_blank" /><a href="http://othersite.com" target="_blank" />'
+            }
+          }
+        ]
+      });
+
+      const mockOpen = jest.fn();
+      global.open = mockOpen;
+      const mockRouteChange = jest.fn();
+      delete global.location;
+      global.location = {} as any;
+      global.location.assign = mockRouteChange;
+      global.location.host = 'google.com';
+
+      const { request } = getInAppMessages(
+        {
+          count: 10,
+          packageName: 'my-lil-website',
+          handleLinks: 'external-new-tab'
+        },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      const elements =
+        iframe?.contentWindow?.document.body?.querySelectorAll('a');
+
+      const clickEvent = new MouseEvent('click');
+      await elements?.[0].dispatchEvent(clickEvent);
+
+      expect(mockRouteChange).toHaveBeenCalledWith('http://google.com');
+
+      const clickEvent2 = new MouseEvent('click');
+      await elements?.[1].dispatchEvent(clickEvent2);
+
+      expect(mockOpen).toHaveBeenCalledWith(
+        'http://othersite.com',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    });
+
     it('should focus on element specified by user', async () => {
       mockRequest.onGet('/inApp/getMessages').reply(200, {
         inAppMessages: [

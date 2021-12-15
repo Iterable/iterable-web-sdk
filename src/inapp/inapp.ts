@@ -8,12 +8,13 @@ import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
 import {
   addButtonAttrsToAnchorTag,
+  addStyleSheet,
   filterHiddenInAppMessages,
+  getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
-  trackMessagesDelivered,
-  addStyleSheet
+  trackMessagesDelivered
 } from './utils';
 import {
   trackInAppClick,
@@ -73,6 +74,7 @@ export function getInAppMessages(
   delete dupedPayload.bottomOffset;
   delete dupedPayload.rightOffset;
   delete dupedPayload.animationDuration;
+  delete dupedPayload.handleLinks;
 
   if (showInAppMessagesAutomatically) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
@@ -330,7 +332,32 @@ export function getInAppMessages(
                   of the reserved iterable keyword links
                 */
                 if (!isIterableKeywordLink) {
-                  if (openInNewTab) {
+                  const { handleLinks } = payload;
+                  if (typeof handleLinks === 'string') {
+                    /* 
+                      if the _handleLinks_ option is set, we need to open links 
+                      according to that enum. So the way this works is:
+
+                      1. If _open-all-same-tab, then open every link in the same tab
+                      2. If _open-all-new-tab, open all in new tab
+                      3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+
+                      This was a fix to account for the fact that Bee editor templates force
+                      target="_blank" on all links, so we gave this option as an escape hatch for that.
+                    */
+                    const clickedHostname = getHostnameFromUrl(clickedUrl);
+                    const isInternalLink =
+                      clickedHostname === global.location.host;
+
+                    if (
+                      handleLinks === 'open-all-same-tab' ||
+                      (isInternalLink && handleLinks === 'external-new-tab')
+                    ) {
+                      global.location.assign(clickedUrl);
+                    } else {
+                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    }
+                  } else if (openInNewTab) {
                     /**
                       Using target="_blank" without rel="noreferrer" and rel="noopener"
                       makes the website vulnerable to window.opener API exploitation attacks
