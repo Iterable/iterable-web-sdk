@@ -254,7 +254,7 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center or full-screen messages                                                                                             | string                                                           | undefined |
 | rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                              | string                                                           | undefined |
 | animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                        | number                                                           | 400       |
-| handleLinks               | How to open links. If undefined, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only external links in new tab otherwise same tab. | 'open-all-internal' \| 'open-all-external' \| 'external-new-tab' | undefined |
+| handleLinks               | How to open links. If undefined, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only external links in new tab otherwise same tab. | 'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab' | undefined |
 
 Example:
 
