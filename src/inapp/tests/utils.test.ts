@@ -880,6 +880,7 @@ describe('Utils', () => {
       expect(getHostnameFromUrl('http://localhost:8080/?name=fdsafdsaf')).toBe(
         'localhost:8080'
       );
+      expect(getHostnameFromUrl('/about')).toBe(undefined);
     });
   });
 });

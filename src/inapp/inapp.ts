@@ -346,8 +346,10 @@ export function getInAppMessages(
                       target="_blank" on all links, so we gave this option as an escape hatch for that.
                     */
                     const clickedHostname = getHostnameFromUrl(clickedUrl);
+                    /* !clickedHostname means the link was relative with no hostname */
                     const isInternalLink =
-                      clickedHostname === global.location.host;
+                      clickedHostname === global.location.host ||
+                      !clickedHostname;
 
                     if (
                       handleLinks === 'open-all-same-tab' ||
