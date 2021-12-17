@@ -181,21 +181,38 @@ export function getInAppMessages(
             }
           }
 
-          const handleEscKeypress = (event: KeyboardEvent) => {
+          const handleEscKeypress = (event: KeyboardEvent, doc: Document) => {
             if (event.key === 'Escape') {
               dismissMessage(activeIframe);
               overlay.remove();
-              document.removeEventListener('keydown', handleEscKeypress);
+              doc.removeEventListener('keydown', (event) =>
+                handleEscKeypress(event, doc)
+              );
               global.removeEventListener('resize', throttledResize);
             }
           };
 
-          document.addEventListener('keydown', handleEscKeypress);
+          document.addEventListener('keydown', (event) =>
+            handleEscKeypress(event, document)
+          );
+
+          if (activeIframe?.contentWindow?.document) {
+            activeIframe.contentWindow?.document.addEventListener(
+              'keydown',
+              (event) =>
+                handleEscKeypress(
+                  event,
+                  (activeIframe.contentWindow as Window).document
+                )
+            );
+          }
 
           overlay.addEventListener('click', () => {
             dismissMessage(activeIframe);
             overlay.remove();
-            document.removeEventListener('keydown', handleEscKeypress);
+            document.removeEventListener('keydown', (event) =>
+              handleEscKeypress(event, document)
+            );
             global.removeEventListener('resize', throttledResize);
           });
 
@@ -236,7 +253,9 @@ export function getInAppMessages(
             absoluteDismissButton.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
-              document.removeEventListener('keydown', handleEscKeypress);
+              document.removeEventListener('keydown', (event) =>
+                handleEscKeypress(event, document)
+              );
               global.removeEventListener('resize', throttledResize);
             });
             activeIframe.contentWindow.document.body.appendChild(
@@ -322,7 +341,9 @@ export function getInAppMessages(
                 if (isDismissNode) {
                   dismissMessage(activeIframe, clickedUrl);
                   overlay.remove();
-                  document.removeEventListener('keydown', handleEscKeypress);
+                  document.removeEventListener('keydown', (event) =>
+                    handleEscKeypress(event, document)
+                  );
                   global.removeEventListener('resize', throttledResize);
                 }
 
