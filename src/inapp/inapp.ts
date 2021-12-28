@@ -181,38 +181,76 @@ export function getInAppMessages(
             }
           }
 
-          const handleEscKeypress = (event: KeyboardEvent, doc: Document) => {
+          const handleEscKeypress = (
+            event: KeyboardEvent,
+            documentEventHandler: (event: KeyboardEvent) => void,
+            iframeEventHandler?: (event: KeyboardEvent) => void
+          ) => {
             if (event.key === 'Escape') {
               dismissMessage(activeIframe);
               overlay.remove();
-              doc.removeEventListener('keydown', (event) =>
-                handleEscKeypress(event, doc)
-              );
+              document.removeEventListener('keydown', documentEventHandler);
+              if (
+                activeIframe?.contentWindow?.document &&
+                !!iframeEventHandler
+              ) {
+                activeIframe.contentWindow?.document.removeEventListener(
+                  'keydown',
+                  iframeEventHandler
+                );
+              }
               global.removeEventListener('resize', throttledResize);
             }
           };
 
-          document.addEventListener('keydown', (event) =>
-            handleEscKeypress(event, document)
-          );
+          /*
+            handleDocumentEscPress and handleIFrameEscPress both are separate
+            keydown handlers to dismiss the message when the _esc_ key is pressed.
+
+            The reason these are abstracted into their own methods is because the method
+            for adding the event handler also removes itself in its own callback. BUT since
+            we have 2 event listeners (one for the document, and one for the iframe), the method
+            to add the listener needs to know about both of these _addEventListener_ abstracted
+            callbacks so the code can properly remove the same listener that was added.
+
+            In other words, it solves for the issue where you're adding an event listener as a lambda
+            like so and and you get a unique event listener each time:
+
+            document.addEventListener('keydown', () => // do stuff)
+
+            this example code adds a new event listener each time and never gets cleaned up 
+            because there's no reference that to "() => // do stuff" that can be re-used in the
+            _removeEventListener_ call.
+          */
+          const handleDocumentEscPress = (event: KeyboardEvent) =>
+            handleEscKeypress(event, handleDocumentEscPress);
+
+          const handleIFrameEscPress = (event: KeyboardEvent) =>
+            handleEscKeypress(
+              event,
+              handleDocumentEscPress,
+              handleIFrameEscPress
+            );
+
+          document.addEventListener('keydown', handleDocumentEscPress);
 
           if (activeIframe?.contentWindow?.document) {
             activeIframe.contentWindow?.document.addEventListener(
               'keydown',
-              (event) =>
-                handleEscKeypress(
-                  event,
-                  (activeIframe.contentWindow as Window).document
-                )
+              handleIFrameEscPress
             );
           }
 
           overlay.addEventListener('click', () => {
             dismissMessage(activeIframe);
             overlay.remove();
-            document.removeEventListener('keydown', (event) =>
-              handleEscKeypress(event, document)
-            );
+            document.removeEventListener('keydown', handleDocumentEscPress);
+            if (activeIframe?.contentWindow?.document) {
+              activeIframe.contentWindow?.document.removeEventListener(
+                'keydown',
+                handleIFrameEscPress
+              );
+            }
             global.removeEventListener('resize', throttledResize);
           });
 
@@ -253,9 +291,13 @@ export function getInAppMessages(
             absoluteDismissButton.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
-              document.removeEventListener('keydown', (event) =>
-                handleEscKeypress(event, document)
-              );
+              document.removeEventListener('keydown', handleDocumentEscPress);
+              if (activeIframe?.contentWindow?.document) {
+                activeIframe.contentWindow?.document.removeEventListener(
+                  'keydown',
+                  handleIFrameEscPress
+                );
+              }
               global.removeEventListener('resize', throttledResize);
             });
             activeIframe.contentWindow.document.body.appendChild(
@@ -341,9 +383,16 @@ export function getInAppMessages(
                 if (isDismissNode) {
                   dismissMessage(activeIframe, clickedUrl);
                   overlay.remove();
-                  document.removeEventListener('keydown', (event) =>
-                    handleEscKeypress(event, document)
+                  document.removeEventListener(
+                    'keydown',
+                    handleDocumentEscPress
                   );
+                  if (activeIframe?.contentWindow?.document) {
+                    activeIframe.contentWindow?.document.removeEventListener(
+                      'keydown',
+                      handleIFrameEscPress
+                    );
+                  }
                   global.removeEventListener('resize', throttledResize);
                 }
 
