@@ -202,7 +202,23 @@ describe('getInAppMessages', () => {
       ).toBe('iterable://dismiss');
     });
 
-    it('should remove the iframe when esc key is pressed', async () => {
+    it('should remove the iframe when esc key is pressed within the iframe', async () => {
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      expect(iframe?.tagName).toBe('IFRAME');
+      const escEvent = new KeyboardEvent('keydown', { key: 'Escape' });
+      await iframe.contentWindow?.document.dispatchEvent(escEvent);
+      expect(document.getElementById('iterable-iframe')).toBe(null);
+    });
+
+    it('should remove the iframe when esc key is pressed within the document body', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
         true
