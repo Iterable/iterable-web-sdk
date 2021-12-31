@@ -28,3 +28,4 @@ jobs:
     - run: yarn build
     - run: yarn test
     - run: yarn check-deps
+    
