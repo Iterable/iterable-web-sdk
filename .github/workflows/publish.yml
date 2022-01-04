@@ -3,7 +3,6 @@ on:
   release:
     types:
       - created
-  pull_request:
 
 jobs:
   publish:
