@@ -644,7 +644,7 @@ Looking at this table, you can see the browser sizes on the left, and the displa
 
 Another example: If your in-app is positioned in the center and your browser if at 700px, your in-app message will grow to take up 100% of the screen.
 
-This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, *so we recommend that you stick to percentage-based CSS widths when possible when creating your message*
+This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so we recommend that you stick to percentage-based CSS widths when possible when creating your message**
 
 # A Note About Imports
 
