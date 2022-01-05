@@ -59,180 +59,6 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 # Usage
 
-## initialize
-
-API:
-
-```ts
-initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
-  clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
-  logout: () => void;
-}
-```
-
-Example:
-
-```ts
-const { clearRefresh, setEmail, setUserID, logout } = initialize(
-  'my-API-key',
-  /* 
-    _email_ will be defined if you call _setEmail_ 
-    _userID_ will be defined if you call _setUserID_
-  */
-  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
-)
-```
-
-## updateCart
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
-
-```ts
-updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
-```
-
-Example:
-
-```ts
-updateCart({
-  items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
-})
-  .then()
-  .catch()
-```
-
-## trackPurchase
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
-
-```ts
-trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
-```
-
-Example:
-
-```ts
-trackPurchase({
-  items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
-  total: 200
-})
-  .then()
-  .catch()
-```
-
-## track
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
-
-```ts
-track: (payload: InAppTrackRequestParams) => Promise<TrackData>
-```
-
-Example:
-
-```ts
-track({ eventName: 'my-event' })
-  .then()
-  .catch()
-```
-
-## trackInAppClose
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
-
-```ts
-trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
-```
-
-Example:
-
-```ts
-trackInAppClose({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppOpen
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
-
-```ts
-trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
-```
-
-Example:
-
-```ts
-trackInAppOpen({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppClick
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
-
-```ts
-trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
-```
-
-Example:
-
-```ts
-trackInAppClick({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppDelivery
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
-
-```ts
-trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
-```
-
-Example:
-
-```ts
-trackInAppDelivery({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppConsume
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
-
-```ts
-trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
-```
-
-Example:
-
-```ts
-trackInAppConsume({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
 ## getInAppMessages
 
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
@@ -291,18 +117,192 @@ request()
   .catch();
 ```
 
-## updateUserEmail
+## initialize
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
+API:
 
 ```ts
-updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+}
 ```
 
 Example:
 
 ```ts
-updateUserEmail('hello@gmail.com')
+const { clearRefresh, setEmail, setUserID, logout } = initialize(
+  'my-API-key',
+  /* 
+    _email_ will be defined if you call _setEmail_ 
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+)
+```
+
+## track
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
+
+```ts
+track: (payload: InAppTrackRequestParams) => Promise<TrackData>
+```
+
+Example:
+
+```ts
+track({ eventName: 'my-event' })
+  .then()
+  .catch()
+```
+
+## trackInAppClick
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
+
+```ts
+trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
+```
+
+Example:
+
+```ts
+trackInAppClick({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppClose
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
+
+```ts
+trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
+```
+
+Example:
+
+```ts
+trackInAppClose({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppConsume
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
+
+```ts
+trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
+```
+
+Example:
+
+```ts
+trackInAppConsume({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppDelivery
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
+
+```ts
+trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
+```
+
+Example:
+
+```ts
+trackInAppDelivery({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppOpen
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
+
+```ts
+trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
+```
+
+Example:
+
+```ts
+trackInAppOpen({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackPurchase
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
+
+```ts
+trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
+```
+
+Example:
+
+```ts
+trackPurchase({
+  items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
+  total: 200
+})
+  .then()
+  .catch()
+```
+
+## updateCart
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
+
+```ts
+updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
+```
+
+Example:
+
+```ts
+updateCart({
+  items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
+})
+  .then()
+  .catch()
+```
+
+## updateSubscriptions
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
+
+```ts
+updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
+```
+
+Example:
+
+```ts
+updateSubscriptions({ emailListIds: [1, 2, 3] })
   .then()
   .catch()
 ```
@@ -323,18 +323,18 @@ updateUser({ dataFields: {} })
   .catch()
 ```
 
-## updateSubscriptions
+## updateUserEmail
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
 
 ```ts
-updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
+updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
 ```
 
 Example:
 
 ```ts
-updateSubscriptions({ emailListIds: [1, 2, 3] })
+updateUserEmail('hello@gmail.com')
   .then()
   .catch()
 ```
