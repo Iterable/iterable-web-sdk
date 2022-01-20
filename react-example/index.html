@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Iterable Starter App</title>
+</head>
+
+<body>
+  <div id="root">
+    <h1 class="heading">In-App Messaging Controls</h1>
+    <div class="control-wrapper">
+      <button id="login">Login</button>
+      <button id="start" class="disabled" aria-disabled>Login to See In-App Messages</button>
+      <button id="pause">Pause Message Stream</button>
+      <button id="resume">Resume Message Stream</button>
+      <button id="logout">Logout</button>
+      <form id="change-email-form">
+        <div class="input-wrapper">
+          <label for="change-email">Update Email</label>
+          <input 
+            placeholder="Enter new email" 
+            type="text" 
+            name="change-email" 
+            id="change-email-input" 
+          />
+        </div>
+        <button type="submit" id="change-email-btn" class="disabled" aria-disabled>Change email</button>
+      </form>
+    </div>
+  </div>
+  <footer>hi im the footer</footer>
+</body>
+
+</html>

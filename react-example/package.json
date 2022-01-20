@@ -1,0 +1,58 @@
+{
+  "name": "@iterable/sample-app",
+  "description": "Sample app for Iterable Web SDK",
+  "version": "0.0.1",
+  "homepage": "https://iterable.com/",
+  "repository": {
+    "type": "git",
+    "directory": "https://github.com/Iterable/iterable-web-sdk/example"
+  },
+  "engines": {
+    "node": ">= 16.3.0"
+  },
+  "author": "Iterable",
+  "license": "MIT",
+  "private": true,
+  "keywords": [
+    "javscript",
+    "iterable sdk",
+    "typescript"
+  ],
+  "scripts": {
+    "build": "tsc && webpack",
+    "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n 'tsc,webpack' -k",
+    "test": "jest --config jest.config.js",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\"",
+    "typecheck": "tsc --noEmit true --emitDeclarationOnly false",
+    "lint": "eslint . --ext '.ts,.tsx'"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-proposal-optional-chaining": "^7.14.5",
+    "@babel/preset-typescript": "^7.9.0",
+    "@types/jest": "^27.0.2",
+    "@typescript-eslint/eslint-plugin": "^2.26.0",
+    "@typescript-eslint/parser": "^2.26.0",
+    "@webpack-cli/serve": "^1.6.0",
+    "babel-loader": "^8.1.0",
+    "concurrently": "^6.3.0",
+    "css-loader": "^6.5.1",
+    "dotenv": "^10.0.0",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-webpack-plugin": "^3.1.0",
+    "html-webpack-plugin": "^5.5.0",
+    "jest": "^27.3.1",
+    "prettier": "^2.2.1",
+    "style-loader": "^1.0.1",
+    "ts-jest": "^27.0.7",
+    "typescript": "^3.7.2",
+    "webpack": "^5.63.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.3"
+  },
+  "dependencies": {}
+}
