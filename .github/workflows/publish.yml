@@ -1,0 +1,25 @@
+name: publish
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  publish:
+    environment: npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 16.3.0
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.3.0'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
+          dry-run: true
+          check-version: true
+          
