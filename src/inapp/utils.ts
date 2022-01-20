@@ -161,14 +161,14 @@ export const generateLayoutCSS = (
   `;
 };
 
-const mediaQuerySm = global.matchMedia('(max-width: 850px)');
-const mediaQueryMd = global.matchMedia(
+const mediaQuerySm = global?.matchMedia?.('(max-width: 850px)');
+const mediaQueryMd = global?.matchMedia?.(
   '(min-width: 851px) and (max-width: 975px)'
 );
-const mediaQueryLg = global.matchMedia(
+const mediaQueryLg = global?.matchMedia?.(
   '(min-width: 976px) and (max-width: 1300px)'
 );
-const mediaQueryXl = global.matchMedia('(min-width: 1301px)');
+const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 
 /**
  *
