@@ -197,7 +197,7 @@ export const paintIFrame = (
       https://snook.ca/archives/html_and_css/hiding-content-for-accessibility 
     */
     iframe.style.cssText = `
-      position: absolute !important;
+      position: fixed !important;
       top: 0;
       left: 0;
       height: 1px;

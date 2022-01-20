@@ -41,7 +41,7 @@ import {
       rightOffset: '20px',
       topOffset: '20px',
       bottomOffset: '20px',
-      handleLinks: 'open-all-new-tab'
+      handleLinks: 'external-new-tab'
     },
     true
   );
