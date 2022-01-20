@@ -43,195 +43,21 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 | Method Name           	| Description                                                                                                               	|
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
-| [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
-| [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
-| [`track`](#track)               	| Track custom events                                                                                                       	|
-| [`trackInAppClose`](#trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
-| [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
-| [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
-| [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
-| [`trackInAppConsume`](#trackInAppConsume)   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
 | [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
-| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email address                                                                                             	|
-| [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
+| [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
+| [`track`](#track)               	| Track custom events                                                                                                       	|
+| [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
+| [`trackInAppClose`](#trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
+| [`trackInAppConsume`](#trackInAppConsume)   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
+| [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
+| [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
+| [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
+| [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | [`updateSubscriptions`](#updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
+| [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
+| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email address                                                                                             	|
 
 # Usage
-
-## initialize
-
-API:
-
-```ts
-initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
-  clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
-  logout: () => void;
-}
-```
-
-Example:
-
-```ts
-const { clearRefresh, setEmail, setUserID, logout } = initialize(
-  'my-API-key',
-  /* 
-    _email_ will be defined if you call _setEmail_ 
-    _userID_ will be defined if you call _setUserID_
-  */
-  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
-)
-```
-
-## updateCart
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
-
-```ts
-updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
-```
-
-Example:
-
-```ts
-updateCart({
-  items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
-})
-  .then()
-  .catch()
-```
-
-## trackPurchase
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
-
-```ts
-trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
-```
-
-Example:
-
-```ts
-trackPurchase({
-  items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
-  total: 200
-});
-  .then()
-  .catch()
-```
-
-## track
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
-
-```ts
-track: (payload: InAppTrackRequestParams) => Promise<TrackData>
-```
-
-Example:
-
-```ts
-track({ eventName: 'my-event' });
-  ,then()
-  .catch()
-```
-
-## trackInAppClose
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
-
-```ts
-trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
-```
-
-Example:
-
-```ts
-trackInAppClose({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppOpen
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
-
-```ts
-trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
-```
-
-Example:
-
-```ts
-trackInAppOpen({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppClick
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
-
-```ts
-trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
-```
-
-Example:
-
-```ts
-trackInAppClick({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppDelivery
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
-
-```ts
-trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
-```
-
-Example:
-
-```ts
-trackInAppDelivery({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
-
-## trackInAppConsume
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
-
-```ts
-trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
-```
-
-Example:
-
-```ts
-trackInAppConsume({
-  messageId: '123',
-  deviceInfo: { appPackageName: 'my-website' }
-})
-  .then()
-  .catch()
-```
 
 ## getInAppMessages
 
@@ -247,14 +73,14 @@ Along with the API parameters, you can pass these options to the SDK method to h
 
 | Name                      | Description                                                                                                                                                                                                                     | Values                                                           | Default   |
 |---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------|
-| displayInterval           | How much time (in MS) to wait before showing next in-app message                                                                                                                                                                | number                                                           | 30000     |
-| onOpenScreenReaderMessage | What text do you want the screen reader to announce when opening in-app message                                                                                                                                                 | string                                                           | undefined |
-| onOpenNodeToTakeFocus     | What DOM element do you want to take focus when the in-app message opens. (Will open the first interact-able element if not specified)                                                                                          | string                                                           | undefined |
-| topOffset                 | How much space (px or %) to create between the top of the screen and messages. Not applicable for center or full-screen messages                                                                                                | string                                                           | undefined |
-| bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center or full-screen messages                                                                                             | string                                                           | undefined |
-| rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                              | string                                                           | undefined |
-| animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                        | number                                                           | 400       |
-| handleLinks               | How to open links. If undefined, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only external links in new tab otherwise same tab. | 'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab' | undefined |
+| animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                        | `number`                                                           | `400`       |
+| bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                             | `string`                                                           | `undefined` |
+| displayInterval           | How much time (in MS) to wait before showing next in-app message after closing the currently opened one                                                                                                                                                                | `number`                                                           | `30000`     |
+| handleLinks               | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| onOpenScreenReaderMessage | What text do you want the screen reader to announce when opening in-app messages                                                                                                                                                 | `string`                                                           | `undefined` |
+| onOpenNodeToTakeFocus     | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                                                          | `string`                                                           | `undefined` |
+| rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                              | `string`                                                           | `undefined` |
+| topOffset                 | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                                | `string`                                                           | `undefined` |
 
 Example:
 
@@ -291,34 +117,176 @@ request()
   .catch();
 ```
 
-## updateUserEmail
+## initialize
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
+API:
 
 ```ts
-updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+}
 ```
 
 Example:
 
 ```ts
-updateUserEmail('hello@gmail.com')
+const { clearRefresh, setEmail, setUserID, logout } = initialize(
+  'my-API-key',
+  /* 
+    _email_ will be defined if you call _setEmail_ 
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+)
+```
+
+## track
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
+
+```ts
+track: (payload: InAppTrackRequestParams) => Promise<TrackData>
+```
+
+Example:
+
+```ts
+track({ eventName: 'my-event' })
   .then()
   .catch()
 ```
 
-## updateUser
+## trackInAppClick
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
 
 ```ts
-updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
+trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
 ```
 
 Example:
 
 ```ts
-updateUser({ dataFields: {} })
+trackInAppClick({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppClose
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
+
+```ts
+trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
+```
+
+Example:
+
+```ts
+trackInAppClose({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppConsume
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
+
+```ts
+trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
+```
+
+Example:
+
+```ts
+trackInAppConsume({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppDelivery
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
+
+```ts
+trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
+```
+
+Example:
+
+```ts
+trackInAppDelivery({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackInAppOpen
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
+
+```ts
+trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
+```
+
+Example:
+
+```ts
+trackInAppOpen({
+  messageId: '123',
+  deviceInfo: { appPackageName: 'my-website' }
+})
+  .then()
+  .catch()
+```
+
+## trackPurchase
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
+
+```ts
+trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
+```
+
+Example:
+
+```ts
+trackPurchase({
+  items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
+  total: 200
+})
+  .then()
+  .catch()
+```
+
+## updateCart
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
+
+```ts
+updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
+```
+
+Example:
+
+```ts
+updateCart({
+  items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
+})
   .then()
   .catch()
 ```
@@ -339,11 +307,43 @@ updateSubscriptions({ emailListIds: [1, 2, 3] })
   .catch()
 ```
 
+## updateUser
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
+
+```ts
+updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
+```
+
+Example:
+
+```ts
+updateUser({ dataFields: {} })
+  .then()
+  .catch()
+```
+
+## updateUserEmail
+
+API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
+
+```ts
+updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
+```
+
+Example:
+
+```ts
+updateUserEmail('hello@gmail.com')
+  .then()
+  .catch()
+```
+
 # FAQ
 
 ## How do I make API requests with the SDK?
 
-First thing you need to do is generate an API key on [the Iterable app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the _Mobile_ key type. This will ensure the SDK has
+First thing you need to do is generate an API key on [the Iterable app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the _Web_ key type. This will ensure the SDK has
 access to all the necessary endpoints when communicating with the Iterable API. After you generate your key, save both the API Key and JWT Secret somewhere handy. You'll need both of them.
 
 First, we'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, we can demo this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
@@ -477,9 +477,9 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 :rotating_light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
 
-## I Want to Automatically Show In-App Messages Every X Number of Seconds
+## I Want to Automatically Show My In-App Messages with a Delay Between Each
 
-This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter to have the in-app messages appear automatically on an interval.
+This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
@@ -532,6 +532,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
             true
           );
 
+          /* trigger the start of message presentation */
           request()
             .then()
             .catch();
@@ -540,7 +541,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 })();
 ```
 
-Optionally, you can pass arguments to fine-tune how you want the messages to appear
+Optionally, you can pass arguments to fine-tune how you want the messages to appear. See the [usage section](#getInAppMessages) to see all available options and what they do.
 
 ```ts
 import { initialize } from '@iterable/web-sdk/dist/authorization';
@@ -560,31 +561,20 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
             { 
               count: 20,
               packageName: 'my-website',
-              /* time to wait after dismissing a message to show another one (in milliseconds) */
               displayInterval: 5000,
-              /* optional message you want the screen reader to vocalize for accessibility purposes */
               onOpenScreenReaderMessage:
                 'hey screen reader here telling you something just popped up on your screen!',
-              /* what DOM node you want to take keyboard focus. Here we choose the first <input /> */
               onOpenNodeToTakeFocus: 'input',
-              /* 
-                additional offsets for top-right and bottom-right in-app messages.
-                Good if you want the message to be out of the way of your navbar
-                or something similar
-
-                _topOffset_ only applies to "top-right" messages
-                _bottomOffset_ only applies to "bottom-right" messages
-              */
               topOffset: '20px',
               bottomOffset: '20px',
               rightOffset: '20px',
-              /* how long the in-app messages take to animate in/out (in milliseconds) */
               animationDuration: 400,
               handleLinks: 'external-new-tab'
             },
             true
           );
 
+          /* trigger the start of message presentation */
           request()
             .then()
             .catch();
@@ -621,6 +611,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
             true
           );
 
+          /* trigger the start of message presentation */
           request()
             .then()
             .catch();
@@ -637,6 +628,23 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
     })
 })();
 ```
+
+## I Want My Messages to Look Good on Every Device and Be Responsive
+
+This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
+
+| Message Position &#8594; <br><br> Browser Size &#8595; | Center | Full | Top-Right | Bottom-Right |
+|--------------------------------------------------------|--------|------|-----------|--------------|
+| 0px - 850px                                            | 100%   | 100% | 100%      | 100%         |
+| 851px - 975px                                          | 50%    | 100% | 45%       | 45%          |
+| 976px - 1300px                                         | 50%    | 100% | 33%       | 33%          |
+| 1300px+                                                | 50%    | 100% | 25%       | 25%          |
+
+Looking at this table, you can see the browser sizes on the left, and the display positions on top. For example, if your in-app message is positioned in the top-right of the screen and your browser window is at 1000px, then your in-app message will take up 33% of the screen.
+
+Another example: If your in-app is positioned in the center and your browser if at 700px, your in-app message will grow to take up 100% of the screen.
+
+This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so we recommend that you stick to percentage-based CSS widths when possible when creating your message**
 
 # A Note About Imports
 
