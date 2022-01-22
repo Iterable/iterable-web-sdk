@@ -1,3 +1,10 @@
 {
-  "extends": "../.eslintrc"
+  "extends": [
+    "../.eslintrc",
+    "plugin:react/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/no-empty-interface": "off",
+    "react/react-in-jsx-scope": "off"
+  }
 }
