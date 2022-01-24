@@ -16,7 +16,8 @@ import {
           'http://localhost:5000/generate',
           {
             exp_minutes: 2,
-            email
+            email,
+            jwt_secret: process.env.JWT_SECRET
           },
           {
             headers: {
@@ -145,9 +146,6 @@ import {
   document
     .getElementById('resume')
     .addEventListener('click', resumeMessageStream);
-  document
-    .getElementById('pause')
-    .addEventListener('click', pauseMessageStream);
   document.getElementById('logout').addEventListener('click', () => {
     logout();
     startBtn.innerText = 'Login to See In-App Messages';

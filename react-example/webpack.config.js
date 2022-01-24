@@ -7,7 +7,7 @@ const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.ts',
+  entry: './src/index.tsx',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist')
@@ -43,6 +43,7 @@ module.exports = {
       }
     }
   },
+  devtool: 'eval-source-map',
   plugins: [
     new ESLintPlugin({
       extensions: ['js', 'ts', 'tsx', 'jsx']

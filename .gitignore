@@ -6,3 +6,7 @@ index.node.js
 coverage
 hot
 **LICENSE.txt
+log
+*.log
+results
+browserstack.json
