@@ -54,7 +54,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
 
 interface Props {}
 
-export const App: FC<Props> = (props) => {
+export const App: FC<Props> = () => {
   const [isLoggingIn, setLoggingIn] = useState<boolean>(false);
   const [isRequestingMessages, setRequestingMessages] =
     useState<boolean>(false);
@@ -199,7 +199,6 @@ export const App: FC<Props> = (props) => {
           </button>
         </form>
       </div>
-      <footer>hi im the footer</footer>
     </>
   );
 };

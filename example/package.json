@@ -24,8 +24,7 @@
     "test": "jest --config jest.config.js",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\"",
     "typecheck": "tsc --noEmit true --emitDeclarationOnly false",
-    "lint": "eslint . --ext '.ts,.tsx'",
-    "cypress": "cypress open"
+    "lint": "eslint . --ext '.ts,.tsx'"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",
@@ -40,7 +39,6 @@
     "babel-loader": "^8.1.0",
     "concurrently": "^6.3.0",
     "css-loader": "^6.5.1",
-    "cypress": "^9.1.1",
     "dotenv": "^10.0.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",

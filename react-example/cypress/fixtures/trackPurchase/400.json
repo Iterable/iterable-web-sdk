@@ -1,0 +1,10 @@
+{
+  "code": "GenericError",
+  "msg": "Client-side error",
+  "clientErrors": [
+    {
+      "error": "items[0].name is a required field",
+      "field": "items[0].name"
+    }
+  ]
+}
