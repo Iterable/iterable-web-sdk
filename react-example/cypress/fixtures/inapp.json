@@ -1,0 +1,132 @@
+{
+  "inAppMessages": [
+    {
+      "messageId": "Dbld4KEgeUMXneIbBW5uauvuLQ0Ngmcme6WUxxX0lX6G",
+      "campaignId": 2642276,
+      "createdAt": 1627060811283,
+      "expiresAt": 1635108441416,
+      "content": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\" style=\"height: 100%; \">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Document</title>\n  </head>\n  <body style=\"margin: 0\">\n    <div class=\"wrapper\" style=\"background-color: green; margin: 0 auto; padding: 30px;\">\n      <div>\n        <h1 tabindex=\"-1\">hello everybody!!\n        </h1>\n        <p>This modal has widths as percentages and then a media query to change the width\n        </p>\n      </div>\n      <a href=\"itbl://dismiss\">close me </a>\n      <div style=\"margin-top:20px;\"><a href=\"\">link with custom schema</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a target=\"_blank\" href=\"https://www.reddit.com/r/funny/comments/qvzogk/were_getting_a_new_kitchen_countertop_soon_making/\">reddit link testing deeplinks</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a href=\"\">bad link</a>\n      </div>\n    </div>\n  </body>\n</html>\n",
+        "payload": {},
+        "inAppDisplaySettings": {
+          "top": {
+            "displayOption": "AutoExpand"
+          },
+          "right": {
+            "percentage": 0
+          },
+          "bottom": {
+            "displayOption": "AutoExpand"
+          },
+          "left": {
+            "percentage": 0
+          }
+        },
+        "webInAppDisplaySettings": {
+          "position": "Center"
+        }
+      },
+      "customPayload": {},
+      "trigger": {
+        "type": "immediate"
+      },
+      "saveToInbox": true,
+      "inboxMetadata": {
+        "title": "hey there",
+        "subtitle": "mensaje",
+        "icon": ""
+      },
+      "priorityLevel": 300.5,
+      "read": false
+    },
+    {
+      "messageId": "GL1EXnB9Jt1R79fJqNwHBudu9ELdx0HA2L7cEEkVnmnE",
+      "campaignId": 2641072,
+      "createdAt": 1627320168381,
+      "expiresAt": 1635096168381,
+      "content": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\" style=\"height: 100%; \">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Document</title>\n  </head>\n  <body style=\"margin: 0\">\n    <div class=\"wrapper\" style=\"background-color: green; margin: 0 auto; padding: 30px;\">\n      <div>\n        <h1 tabindex=\"-1\">hello everybody!!\n        </h1>\n        <p>This modal has widths as percentages and then a media query to change the width\n        </p>\n      </div>\n      <a href=\"itbl://dismiss\">close me </a>\n      <div style=\"margin-top:20px;\"><a href=\"\">link with custom schema</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a target=\"_blank\" href=\"https://www.reddit.com/r/funny/comments/qvzogk/were_getting_a_new_kitchen_countertop_soon_making/\">reddit link testing deeplinks</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a href=\"\">bad link</a>\n      </div>\n    </div>\n  </body>\n</html>\n",
+        "payload": {
+          "eventName": "DailyRewardScreen",
+          "event": "screen"
+        },
+        "inAppDisplaySettings": {
+          "top": {
+            "displayOption": "AutoExpand"
+          },
+          "right": {
+            "percentage": 0
+          },
+          "bottom": {
+            "displayOption": "AutoExpand"
+          },
+          "left": {
+            "percentage": 0
+          }
+        },
+        "webInAppDisplaySettings": {
+          "position": "Center"
+        }
+      },
+      "customPayload": {
+        "eventName": "DailyRewardScreen",
+        "event": "screen"
+      },
+      "trigger": {
+        "type": "immediate"
+      },
+      "inboxMetadata": {
+        "title": "hey there",
+        "subtitle": "mensaje",
+        "icon": ""
+      },
+      "saveToInbox": false,
+      "priorityLevel": 300.5,
+      "read": false
+    },
+    {
+      "messageId": "xEA5MZmz8T2pAoi1VJ5hRuDuazdZzXS9BD85t00w0r9ax",
+      "campaignId": 2632531,
+      "createdAt": 1627332441416,
+      "expiresAt": 1634836811283,
+      "content": {
+        "html": "<!DOCTYPE html>\n<html lang=\"en\" style=\"height: 100%; \">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>Document</title>\n  </head>\n  <body style=\"margin: 0\">\n    <div class=\"wrapper\" style=\"background-color: green; margin: 0 auto; padding: 30px;\">\n      <div>\n        <h1 tabindex=\"-1\">hello everybody!!\n        </h1>\n        <p>This modal has widths as percentages and then a media query to change the width\n        </p>\n      </div>\n      <a href=\"itbl://dismiss\">close me </a>\n      <div style=\"margin-top:20px;\"><a href=\"\">link with custom schema</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a target=\"_blank\" href=\"https://www.reddit.com/r/funny/comments/qvzogk/were_getting_a_new_kitchen_countertop_soon_making/\">reddit link testing deeplinks</a>\n      </div>\n      <div style=\"margin-top:20px;\"><a href=\"\">bad link</a>\n      </div>\n    </div>\n  </body>\n</html>\n",
+        "payload": {},
+        "inAppDisplaySettings": {
+          "top": {
+            "percentage": 0
+          },
+          "right": {
+            "percentage": 0
+          },
+          "bottom": {
+            "percentage": 0
+          },
+          "left": {
+            "percentage": 0
+          },
+          "bgColor": {
+            "alpha": 0.6,
+            "hex": "#a2e3ff"
+          },
+          "shouldAnimate": true
+        },
+        "webInAppDisplaySettings": {
+          "position": "Center"
+        }
+      },
+      "customPayload": {},
+      "trigger": {
+        "type": "immediate"
+      },
+      "saveToInbox": true,
+      "inboxMetadata": {
+        "title": "wev",
+        "subtitle": "brtbrtb",
+        "icon": ""
+      },
+      "priorityLevel": 300.5,
+      "read": false
+      }
+  ]
+}

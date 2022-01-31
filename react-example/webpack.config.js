@@ -33,6 +33,7 @@ module.exports = {
     }
   },
   devServer: {
+    historyApiFallback: true,
     static: {
       directory: './dist'
     },
