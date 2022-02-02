@@ -26,5 +26,5 @@ beforeEach(() => {
       url: '/api/events/track*'
     },
     { fixture: 'events/200.json' }
-  );
+  ).as('track');
 });

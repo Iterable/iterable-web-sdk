@@ -18,6 +18,9 @@ export const Home: FC<Props> = () => {
         <Link to="/commerce" renderAsButton>
           Commerce
         </Link>
+        <Link to="/events" renderAsButton>
+          Events
+        </Link>
       </Wrapper>
     </>
   );
