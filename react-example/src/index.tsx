@@ -42,9 +42,6 @@ const HomeLink = styled(Link)`
         }
       )
       .then((response) => {
-        const div = document.createElement('div');
-        div.innerHTML = response.data.token;
-        document.body.appendChild(div);
         return response.data?.token;
       });
   });
