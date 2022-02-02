@@ -1,5 +1,5 @@
 {
-  "msg": "",
+  "msg": "success mocked from cypress",
   "code": "Success",
   "params": {
     "id": "mock-cypress-id"

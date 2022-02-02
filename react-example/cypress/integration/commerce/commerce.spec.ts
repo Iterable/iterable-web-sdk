@@ -5,20 +5,8 @@ describe('Track Purchase', () => {
         method: 'POST',
         url: '/api/commerce/trackPurchase*'
       },
-      { fixture: 'trackPurchase/200.json' }
+      { fixture: 'commerce/200.json' }
     ).as('trackPurchase');
-
-    cy.intercept(
-      {
-        url: '/generate*',
-        middleware: true
-      },
-      (req) => {
-        req.on('response', (res) => {
-          res.setThrottle(10000);
-        });
-      }
-    ).as('generateToken');
 
     cy.visit('/commerce');
 
@@ -29,7 +17,7 @@ describe('Track Purchase', () => {
 
     cy.get('[data-qa-purchase-response]').contains(
       JSON.stringify({
-        msg: '',
+        msg: 'success mocked from cypress',
         code: 'Success',
         params: {
           id: 'mock-cypress-id'
@@ -44,20 +32,8 @@ describe('Track Purchase', () => {
         method: 'POST',
         url: '/api/commerce/trackPurchase*'
       },
-      { fixture: 'trackPurchase/400.json' }
+      { fixture: 'commerce/400.json' }
     ).as('trackPurchase');
-
-    cy.intercept(
-      {
-        url: '/generate*',
-        middleware: true
-      },
-      (req) => {
-        req.on('response', (res) => {
-          res.setThrottle(10000);
-        });
-      }
-    ).as('generateToken');
 
     cy.visit('/commerce');
 
@@ -69,7 +45,7 @@ describe('Track Purchase', () => {
     cy.get('[data-qa-purchase-response]').contains(
       JSON.stringify({
         code: 'GenericError',
-        msg: 'Client-side error',
+        msg: 'Client-side error mocked from cypress',
         clientErrors: [
           { error: 'items[0].name is a required field', field: 'items[0].name' }
         ]
@@ -85,20 +61,8 @@ describe('Update Cart', () => {
         method: 'POST',
         url: '/api/commerce/updateCart*'
       },
-      { fixture: 'trackPurchase/200.json' }
+      { fixture: 'commerce/200.json' }
     ).as('updateCart');
-
-    cy.intercept(
-      {
-        url: '/generate*',
-        middleware: true
-      },
-      (req) => {
-        req.on('response', (res) => {
-          res.setThrottle(10000);
-        });
-      }
-    ).as('generateToken');
 
     cy.visit('/commerce');
 
@@ -109,7 +73,7 @@ describe('Update Cart', () => {
 
     cy.get('[data-qa-cart-response]').contains(
       JSON.stringify({
-        msg: '',
+        msg: 'success mocked from cypress',
         code: 'Success',
         params: {
           id: 'mock-cypress-id'
@@ -124,20 +88,8 @@ describe('Update Cart', () => {
         method: 'POST',
         url: '/api/commerce/updateCart*'
       },
-      { fixture: 'trackPurchase/400.json' }
+      { fixture: 'commerce/400.json' }
     ).as('updateCart');
-
-    cy.intercept(
-      {
-        url: '/generate*',
-        middleware: true
-      },
-      (req) => {
-        req.on('response', (res) => {
-          res.setThrottle(10000);
-        });
-      }
-    ).as('generateToken');
 
     cy.visit('/commerce');
 
@@ -149,7 +101,7 @@ describe('Update Cart', () => {
     cy.get('[data-qa-cart-response]').contains(
       JSON.stringify({
         code: 'GenericError',
-        msg: 'Client-side error',
+        msg: 'Client-side error mocked from cypress',
         clientErrors: [
           { error: 'items[0].name is a required field', field: 'items[0].name' }
         ]
