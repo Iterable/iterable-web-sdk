@@ -114,6 +114,64 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
   return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 };
 
+export const generateCloseButton = (
+  doc: Document,
+  position?: 'top-right' | 'top-left',
+  color?: string,
+  size?: string | number,
+  iconPath?: string,
+  topOffset?: string,
+  sideOffset?: string
+) => {
+  const parsedSize = typeof size === 'number' ? `${size}px` : size || '16px';
+  const sharedStyles = `
+    border: none;
+    margin: 0;
+    padding: 0;
+    cursor: pointer;
+    overflow: visible;
+    background: transparent;
+    font: inherit;
+    line-height: normal;
+    -webkit-font-smoothing: inherit;
+    -moz-osx-font-smoothing: inherit;
+    -webkit-appearance: none;
+    position: absolute;
+    top: ${topOffset || '4%'};
+    width: ${parsedSize};
+    height: ${parsedSize};
+    font-size: ${parsedSize};
+    color: ${color};
+  `;
+  const button = doc.createElement('button');
+  button.style.cssText =
+    position === 'top-left'
+      ? `
+    ${sharedStyles}
+    left: ${sideOffset || '4%'};
+  `
+      : `
+    ${sharedStyles}
+    right: ${sideOffset || '4%'};
+  `;
+
+  if (iconPath) {
+    button.style.backgroundImage = `url(${iconPath})`;
+    button.style.backgroundSize = 'cover';
+  } else {
+    /* HTMl encoded "X" icon */
+    button.innerHTML = '&#x2715';
+  }
+
+  /* 
+    no idea why typescript is saying "ariaLabel" doesn't exist on type HTMLButtonElement.
+    Most likely going to need to upgrade typescript to fix this, but in the meantime, we ignore it.
+  */
+  /* @ts-ignore-next-line */
+  button.ariaLabel = 'Close modal button';
+  return button;
+};
+
 export const generateLayoutCSS = (
   baseCSSText: string,
   position: WebInAppDisplaySettings['position'],
@@ -293,7 +351,7 @@ export const paintIFrame = (
         /* set the initial width based at the breakpoint we loaded the message at. */
         setCSS(position === 'Full' ? '100%' : initialWidth);
 
-        const setNewWidth = (event: MediaQueryListEvent) => {
+        const setNewWidth = () => {
           setCSS(
             generateWidth(
               {
@@ -307,24 +365,24 @@ export const paintIFrame = (
           );
         };
 
-        mediaQuerySm.onchange = (event) => {
+        mediaQuerySm.onchange = () => {
           if (position !== 'Full') {
-            setNewWidth(event);
+            setNewWidth();
           }
         };
-        mediaQueryMd.onchange = (event) => {
+        mediaQueryMd.onchange = () => {
           if (position !== 'Full') {
-            setNewWidth(event);
+            setNewWidth();
           }
         };
-        mediaQueryLg.onchange = (event) => {
+        mediaQueryLg.onchange = () => {
           if (position !== 'Full') {
-            setNewWidth(event);
+            setNewWidth();
           }
         };
-        mediaQueryXl.onchange = (event) => {
+        mediaQueryXl.onchange = () => {
           if (position !== 'Full') {
-            setNewWidth(event);
+            setNewWidth();
           }
         };
 
