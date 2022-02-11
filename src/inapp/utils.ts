@@ -123,7 +123,7 @@ export const generateCloseButton = (
   topOffset?: string,
   sideOffset?: string
 ) => {
-  const parsedSize = typeof size === 'number' ? `${size}px` : size || '16px';
+  const parsedSize = typeof size === 'number' ? `${size}px` : size || '24px';
   const sharedStyles = `
     border: none;
     margin: 0;
@@ -169,6 +169,7 @@ export const generateCloseButton = (
   */
   /* @ts-ignore-next-line */
   button.ariaLabel = 'Close modal button';
+  button.setAttribute('data-qa-custom-close-button', 'true');
   return button;
 };
 

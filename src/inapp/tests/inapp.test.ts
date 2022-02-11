@@ -252,6 +252,33 @@ describe('getInAppMessages', () => {
       expect(document.getElementById('iterable-iframe')).toBe(null);
     });
 
+    it('should remove the iframe when the custom close button is clicked', async () => {
+      const { request } = getInAppMessages(
+        {
+          count: 10,
+          packageName: 'my-lil-website',
+          closeButton: {}
+        },
+        true
+      );
+      await request();
+
+      const frame = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+
+      expect(frame?.tagName).toBe('IFRAME');
+
+      const element = frame?.contentWindow?.document.body.querySelector(
+        '[data-qa-custom-close-button]'
+      );
+
+      const clickEvent = new MouseEvent('click');
+      element?.dispatchEvent(clickEvent);
+
+      expect(document.getElementById('iterable-iframe')).toBe(null);
+    });
+
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },

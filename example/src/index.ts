@@ -44,11 +44,11 @@ import {
       bottomOffset: '20px',
       handleLinks: 'external-new-tab',
       closeButton: {
-        color: 'white',
+        color: 'white'
         // size: 30,
-        // iconPath: './assets/somesvg.svg',
-        sideOffset: '6%',
-        topOffset: '6%'
+        // iconPath: './assets/somesvg.svg'
+        // sideOffset: '6%',
+        // topOffset: '6%'
       }
     },
     true
