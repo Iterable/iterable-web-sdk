@@ -45,8 +45,9 @@ import {
       handleLinks: 'external-new-tab',
       closeButton: {
         color: 'white'
+        // position: 'top-right',
         // size: 30,
-        // iconPath: './assets/somesvg.svg'
+        // iconPath: './assets/somesvg.svg',
         // sideOffset: '6%',
         // topOffset: '6%'
       }

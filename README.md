@@ -71,7 +71,7 @@ SDK Specific Options:
 
 Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
 
-| Name                      | Description                                                                                                                                                                                                                     | Values                                                           | Default   |
+| Property Name                      | Description                                                                                                                                                                                                                     | Value                                                           | Default   |
 |---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|-----------|
 | animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                        | `number`                                                           | `400`       |
 | bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                             | `string`                                                           | `undefined` |
@@ -81,6 +81,18 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | onOpenNodeToTakeFocus     | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                                                          | `string`                                                           | `undefined` |
 | rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                              | `string`                                                           | `undefined` |
 | topOffset                 | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                                | `string`                                                           | `undefined` |
+| closeButton               | Properties to show a custom close button on each in-app message                                                                                                | `CloseButtonOptions` (see below)                                                           | `undefined` |
+
+Close Button Options:
+
+| Property Name | Description                                                                    | Value                      | Default       |
+|---------------|--------------------------------------------------------------------------------|----------------------------|---------------|
+| color         | What color the button is (does not affect custom icons)                        | `string`                   | `undefined`   |
+| iconPath      | Custom pathname to an image or SVG you want to show instead of the default "X" | `string`                   | `undefined`   |
+| position      | Where to appear relative to the in-app message                                 | `'top-right \| 'top-left'` | `'top-right'` |
+| sideOffset    | How much space to leave between the button and side of the container           | `string`                   | `'4%'`        |
+| size          | How large to set the width, height, and font-size                              | `string \| number`         | `24`          |
+| topOffset     | How much space to leave between the button and the top of the container        | `string`                   | `'4%'`        |
 
 Example:
 
@@ -107,7 +119,12 @@ const {
     displayInterval: 5000,
     onOpenScreenReaderMessage:
       'hey screen reader here telling you something just popped up on your screen!',
-    onOpenNodeToTakeFocus: 'input'
+    onOpenNodeToTakeFocus: 'input',
+    closeButton: {
+      color: 'red',
+      size: '16px',
+      topOffset: '20px'
+    }
   },
   true
 );

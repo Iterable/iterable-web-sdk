@@ -11,12 +11,12 @@ interface SDKInAppMessagesParams {
   animationDuration?: number;
   handleLinks?: 'open-all-new-tab' | 'open-all-same-tab' | 'external-new-tab';
   closeButton?: {
-    position?: 'top-left' | 'top-right';
     color?: string;
-    size?: string | number;
     iconPath?: string;
-    topOffset?: string;
+    position?: 'top-left' | 'top-right';
     sideOffset?: string;
+    size?: string | number;
+    topOffset?: string;
   };
 }
 
