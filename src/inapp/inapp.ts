@@ -10,6 +10,7 @@ import {
   addButtonAttrsToAnchorTag,
   addStyleSheet,
   filterHiddenInAppMessages,
+  generateCloseButton,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -75,6 +76,7 @@ export function getInAppMessages(
   delete dupedPayload.rightOffset;
   delete dupedPayload.animationDuration;
   delete dupedPayload.handleLinks;
+  delete dupedPayload.closeButton;
 
   if (showInAppMessagesAutomatically) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
@@ -288,7 +290,7 @@ export function getInAppMessages(
               It's not necessarily for blind folks to tab over 
             */
             absoluteDismissButton.tabIndex = -1;
-            absoluteDismissButton.addEventListener('click', () => {
+            const triggerClose = () => {
               dismissMessage(activeIframe);
               overlay.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
@@ -299,10 +301,30 @@ export function getInAppMessages(
                 );
               }
               global.removeEventListener('resize', throttledResize);
-            });
+            };
+            absoluteDismissButton.addEventListener('click', triggerClose);
             activeIframe.contentWindow.document.body.appendChild(
               absoluteDismissButton
             );
+
+            /*
+              here we paint an optional close button if the user provided configuration
+              values. This button is just a quality-of-life feature so that the customer will
+              have an easy way to close the modal outside of the other methods.
+            */
+            if (payload.closeButton) {
+              const newButton = generateCloseButton(
+                document,
+                payload.closeButton?.position,
+                payload.closeButton?.color,
+                payload.closeButton?.size,
+                payload.closeButton?.iconPath,
+                payload.closeButton.topOffset,
+                payload.closeButton.sideOffset
+              );
+              newButton.addEventListener('click', triggerClose);
+              activeIframe.contentWindow.document.body.appendChild(newButton);
+            }
           }
 
           /* 

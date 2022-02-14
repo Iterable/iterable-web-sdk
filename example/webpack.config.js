@@ -34,7 +34,8 @@ module.exports = {
   },
   devServer: {
     static: {
-      directory: './dist'
+      directory: path.resolve(__dirname, './assets'),
+      publicPath: '/assets'
     },
     client: {
       overlay: {

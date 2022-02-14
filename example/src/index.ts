@@ -42,7 +42,15 @@ import {
       rightOffset: '20px',
       topOffset: '20px',
       bottomOffset: '20px',
-      handleLinks: 'external-new-tab'
+      handleLinks: 'external-new-tab',
+      closeButton: {
+        color: 'white'
+        // position: 'top-right',
+        // size: 30,
+        // iconPath: './assets/somesvg.svg',
+        // sideOffset: '6%',
+        // topOffset: '6%'
+      }
     },
     true
   );

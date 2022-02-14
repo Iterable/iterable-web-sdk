@@ -6,6 +6,7 @@ import { baseAxiosRequest } from '../../request';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
+  generateCloseButton,
   generateWidth,
   getHostnameFromUrl,
   paintIFrame,
@@ -881,6 +882,50 @@ describe('Utils', () => {
         'localhost:8080'
       );
       expect(getHostnameFromUrl('/about')).toBe(undefined);
+    });
+  });
+
+  describe('Close Button', () => {
+    it('should paint the close button with the correct properties', () => {
+      const button = generateCloseButton(
+        document,
+        'top-left',
+        'blue',
+        20,
+        undefined,
+        '20px',
+        '20px'
+      );
+
+      expect(button.style.width).toBe('20px');
+      expect(button.style.height).toBe('20px');
+      expect(button.style.fontSize).toBe('20px');
+      expect(button.style.color).toBe('blue');
+      expect(button.style.position).toBe('absolute');
+      expect(button.style.top).toBe('20px');
+      expect(button.style.left).toBe('20px');
+      expect(button.style.right).toBe('');
+      expect(button.innerHTML).toBe('✕');
+
+      const rightButton = generateCloseButton(
+        document,
+        'top-right',
+        'blue',
+        20,
+        './assets/something.svg',
+        '20px',
+        '20px'
+      );
+
+      expect(rightButton.style.width).toBe('20px');
+      expect(rightButton.style.height).toBe('20px');
+      expect(rightButton.style.fontSize).toBe('20px');
+      expect(rightButton.style.color).toBe('blue');
+      expect(rightButton.style.position).toBe('absolute');
+      expect(rightButton.style.top).toBe('20px');
+      expect(rightButton.style.right).toBe('20px');
+      expect(rightButton.style.left).toBe('');
+      expect(rightButton.innerHTML).toBe('');
     });
   });
 });

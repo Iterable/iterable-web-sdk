@@ -10,6 +10,14 @@ interface SDKInAppMessagesParams {
   /* how long the in-app messages take to animate in/out */
   animationDuration?: number;
   handleLinks?: 'open-all-new-tab' | 'open-all-same-tab' | 'external-new-tab';
+  closeButton?: {
+    color?: string;
+    iconPath?: string;
+    position?: 'top-left' | 'top-right';
+    sideOffset?: string;
+    size?: string | number;
+    topOffset?: string;
+  };
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
