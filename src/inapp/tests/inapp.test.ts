@@ -706,7 +706,7 @@ describe('getInAppMessages', () => {
       expect(mockHandler).toHaveBeenCalledWith(
         {
           data: 'close-first-iframe',
-          type: 'action-link'
+          type: 'iterable-action-link'
         },
         '*'
       );

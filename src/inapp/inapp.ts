@@ -427,7 +427,7 @@ export function getInAppMessages(
                     action:// links and early return
                   */
                   return global.postMessage(
-                    { type: 'action-link', data: filteredMatch },
+                    { type: 'iterable-action-link', data: filteredMatch },
                     '*'
                   );
                 }
