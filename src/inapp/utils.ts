@@ -273,15 +273,15 @@ export const paintIFrame = (
       
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
-      */
+    */
     const images =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
     return preloadImages(images, () => {
       /* 
-       set the scroll height to the content inside, but since images
-       are going to take some time to load, we opt to preload them, THEN
-       set the inner HTML of the iframe
-       */
+        set the scroll height to the content inside, but since images
+        are going to take some time to load, we opt to preload them, THEN
+        set the inner HTML of the iframe
+      */
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
@@ -405,6 +405,7 @@ export const paintIFrame = (
 export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
+  node.setAttribute('data-qa-original-link', node.getAttribute('href') || '');
   node.setAttribute('href', 'javascript:undefined');
 };
 

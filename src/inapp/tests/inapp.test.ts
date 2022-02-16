@@ -355,7 +355,7 @@ describe('getInAppMessages', () => {
       const secondCloseLink = (
         document.getElementById('iterable-iframe') as HTMLIFrameElement
       )?.contentWindow?.document.body?.querySelector(
-        'a[href="action://close-second-iframe"]'
+        'a[data-qa-original-link="action://close-second-iframe"]'
       );
       expect(secondCloseLink).not.toBe(null);
       expect(secondCloseLink).not.toBeUndefined();
@@ -682,6 +682,138 @@ describe('getInAppMessages', () => {
         'a[href="action://close-second-iframe"]'
       );
       expect(secondCloseLink).toBeUndefined();
+    });
+
+    it('should call global.postMessage when action:// link is clicked', async () => {
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const mockHandler = jest.fn();
+      global.postMessage = mockHandler;
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[data-qa-original-link="action://close-first-iframe"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(mockHandler).toHaveBeenCalledWith(
+        {
+          data: 'close-first-iframe',
+          type: 'iterable-action-link'
+        },
+        '*'
+      );
+      expect(document.getElementById('iterable-iframe')).toBe(null);
+      expect(
+        JSON.parse(
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )[0].data
+        ).clickedUrl
+      ).toBe('action://close-first-iframe');
+    });
+
+    it('should do nothing upon clicking itbl:// links', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="itbl://whatever">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="itbl://whatever"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(document.getElementById('iterable-iframe')).not.toBe(null);
+      expect(document.getElementById('iterable-iframe')).not.toBeUndefined();
+    });
+
+    it('should do nothing upon clicking itbl://dismiss links', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="itbl://dismiss">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="itbl://dismiss"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(document.getElementById('iterable-iframe')).not.toBe(null);
+      expect(document.getElementById('iterable-iframe')).not.toBeUndefined();
+    });
+
+    it('should do nothing upon clicking iterable:// non-dismiss links', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="iterable://whatever">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="iterable://whatever"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(document.getElementById('iterable-iframe')).not.toBe(null);
+      expect(document.getElementById('iterable-iframe')).not.toBeUndefined();
     });
   });
 });

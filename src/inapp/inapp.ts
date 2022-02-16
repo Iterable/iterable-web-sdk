@@ -370,13 +370,12 @@ export function getInAppMessages(
             const clickedUrl = link.getAttribute('href') || '';
             const openInNewTab = link.getAttribute('target') === '_blank';
             const isIterableKeywordLink = !!clickedUrl.match(
-              /itbl:\/\/|iterable:\/\/|action:\/\//gim
+              /iterable:\/\/|action:\/\//gim
             );
-            const isDismissNode = !!clickedUrl.match(
-              /(itbl:\/\/|iterable:\/\/)dismiss/gim
-            );
+            const isDismissNode = !!clickedUrl.match(/iterable:\/\/dismiss/gim);
+            const isActionLink = !!clickedUrl.match(/action:\/\//gim);
 
-            if (isDismissNode) {
+            if (isDismissNode || isActionLink) {
               /* 
                 give the close anchor tag properties that make it 
                 behave more like a button with a logical aria label
@@ -402,7 +401,7 @@ export function getInAppMessages(
                   /* swallow the network error */
                 }).catch((e) => e);
 
-                if (isDismissNode) {
+                if (isDismissNode || isActionLink) {
                   dismissMessage(activeIframe, clickedUrl);
                   overlay.remove();
                   document.removeEventListener(
@@ -416,6 +415,21 @@ export function getInAppMessages(
                     );
                   }
                   global.removeEventListener('resize', throttledResize);
+                }
+
+                if (isActionLink) {
+                  const filteredMatch = (new RegExp(
+                    /^.*action:\/\/(.*)$/,
+                    'gmi'
+                  )?.exec(clickedUrl) || [])?.[1];
+                  /* 
+                    just post the message to the window when clicking 
+                    action:// links and early return
+                  */
+                  return global.postMessage(
+                    { type: 'iterable-action-link', data: filteredMatch },
+                    '*'
+                  );
                 }
 
                 /*
