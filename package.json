@@ -47,7 +47,7 @@
     "build:node": "yarn build --config webpack.node.config.js",
     "test": "jest --config jest.config.js --collectCoverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.{js}\" \"example/src/**/*.{ts,tsx}\" \"example/src/**/*.{js}\" --no-error-on-unmatched-pattern",
-    "lint": "eslint . --ext '.ts,.tsx'",
+    "lint": "eslint src --ignore-pattern '*.test.*' --ignore-pattern '*.spec.*' --ext '.ts,.tsx'",
     "typecheck": "ttsc --noEmit true --emitDeclarationOnly false",
     "check-deps": "madge --extensions js,ts --circular dist",
     "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build && yarn build:node",
