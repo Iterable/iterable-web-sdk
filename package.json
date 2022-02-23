@@ -5,7 +5,7 @@
   "homepage": "https://iterable.com/",
   "repository": {
     "type": "git",
-    "directory": "https://github.com/Iterable/iterable-web-sdk"
+    "directory": "https://github.com/Iterable/iterable-web-sdk.git"
   },
   "engines": {
     "node": ">= 16.3.0"
