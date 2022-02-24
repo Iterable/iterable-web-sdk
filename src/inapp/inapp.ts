@@ -392,14 +392,30 @@ export function getInAppMessages(
 
               if (clickedUrl) {
                 /* track the clicked link */
-                trackInAppClick({
-                  clickedUrl,
-                  messageId: activeMessage?.messageId,
-                  deviceInfo: {
-                    appPackageName: dupedPayload.packageName
-                  }
+                const clickedHostname = getHostnameFromUrl(clickedUrl);
+                /* !clickedHostname means the link was relative with no hostname */
+                const isInternalLink =
+                  clickedHostname === global.location.host || !clickedHostname;
+                const isOpeningLinkInSameTab =
+                  (!payload.handleLinks && !openInNewTab) ||
+                  payload.handleLinks === 'open-all-same-tab' ||
+                  (isInternalLink &&
+                    payload.handleLinks === 'external-new-tab');
+                trackInAppClick(
+                  {
+                    clickedUrl,
+                    messageId: activeMessage?.messageId,
+                    deviceInfo: {
+                      appPackageName: dupedPayload.packageName
+                    }
+                  },
+                  /* 
+                    only call with the fetch API if we're linking in the 
+                    same tab and it's not a reserved keyword link.
+                  */
+                  isOpeningLinkInSameTab && !isIterableKeywordLink
                   /* swallow the network error */
-                }).catch((e) => e);
+                ).catch((e) => e);
 
                 if (isDismissNode || isActionLink) {
                   dismissMessage(activeIframe, clickedUrl);
@@ -451,12 +467,6 @@ export function getInAppMessages(
                       This was a fix to account for the fact that Bee editor templates force
                       target="_blank" on all links, so we gave this option as an escape hatch for that.
                     */
-                    const clickedHostname = getHostnameFromUrl(clickedUrl);
-                    /* !clickedHostname means the link was relative with no hostname */
-                    const isInternalLink =
-                      clickedHostname === global.location.host ||
-                      !clickedHostname;
-
                     if (
                       handleLinks === 'open-all-same-tab' ||
                       (isInternalLink && handleLinks === 'external-new-tab')

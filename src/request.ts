@@ -35,16 +35,6 @@ export const baseIterableRequest = <T = any>(
         abortEarly: false
       });
     }
-    if (payload.sendBeacon) {
-      const blob = new Blob([JSON.stringify(payload.data)], {
-        type: 'application/json; charset=UTF-8'
-      });
-      global.navigator.sendBeacon(
-        (config.getConfig('baseURL') || BASE_URL) + payload.url,
-        blob
-      );
-    }
-    delete payload.sendBeacon;
     return baseAxiosRequest({
       ...payload,
       baseURL: config.getConfig('baseURL') || BASE_URL,

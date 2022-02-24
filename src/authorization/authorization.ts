@@ -7,7 +7,11 @@ import {
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS
 } from 'src/constants';
-import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
+import {
+  cancelAxiosRequestAndMakeFetch,
+  getEpochDifferenceInMS,
+  getEpochExpiryTimeInMS
+} from './utils';
 import { config } from '../utils/config';
 
 const ONE_MINUTE = 60000;
@@ -337,14 +341,38 @@ export function initialize(
       .then((token) => {
         /* set JWT token and auth token headers */
         authInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => ({
-            ...config,
-            headers: {
-              ...config.headers,
-              'Api-Key': authToken,
-              Authorization: `Bearer ${token}`
+          (config) => {
+            if ((config as any)?.sendBeacon) {
+              /* 
+                send fetch request instead solely so we can use the "keepalive" flag.
+                This is used purely for one use-case only - when the user clicks a link
+                that is going to navigate the browser tab to a new page/site and we need
+                to still call POST /trackInAppClick.
+
+                Normally, since the page is going somewhere new, the browser would just navigate away
+                and cancel any in-flight requests and not fulfill them, but with the fetch API's
+                "keepalive" flag, it will continue the request without blocking the main thread.
+
+                We can't do this with Axios because it's built upon XHR and that doesn't support
+                "keepalive" so we fall back to the fetch API
+              */
+              return cancelAxiosRequestAndMakeFetch(
+                config,
+                { email: payload.email, userID: payload.userID },
+                token,
+                authToken
+              );
             }
-          })
+
+            return {
+              ...config,
+              headers: {
+                ...config.headers,
+                'Api-Key': authToken,
+                Authorization: `Bearer ${token}`
+              }
+            };
+          }
         );
 
         responseInterceptor = baseAxiosRequest.interceptors.response.use(
@@ -380,14 +408,39 @@ export function initialize(
 
                   /* add the new JWT to all outgoing requests */
                   authInterceptor = baseAxiosRequest.interceptors.request.use(
-                    (config) => ({
-                      ...config,
-                      headers: {
-                        ...config.headers,
-                        Api_Key: authToken,
-                        Authorization: `Bearer ${newToken}`
+                    (config) => {
+                      if ((config as any)?.sendBeacon) {
+                        /* 
+                          send fetch request instead solely so we can use the "keepalive" flag.
+                          This is used purely for one use-case only - when the user clicks a link
+                          that is going to navigate the browser tab to a new page/site and we need
+                          to still call POST /trackInAppClick.
+          
+                          Normally, since the page is going somewhere new, the browser would just 
+                          navigate away and cancel any in-flight requests and not fulfill them, 
+                          but with the fetch API's "keepalive" flag, it will continue the request 
+                          without blocking the main thread.
+          
+                          We can't do this with Axios because it's built upon XHR and that 
+                          doesn't support "keepalive" so we fall back to the fetch API
+                        */
+                        return cancelAxiosRequestAndMakeFetch(
+                          config,
+                          { email: newEmail },
+                          newToken,
+                          authToken
+                        );
                       }
-                    })
+
+                      return {
+                        ...config,
+                        headers: {
+                          ...config.headers,
+                          Api_Key: authToken,
+                          Authorization: `Bearer ${newToken}`
+                        }
+                      };
+                    }
                   );
 
                   /* add the new email to all outgoing requests  */
@@ -439,14 +492,39 @@ export function initialize(
                     );
                   }
                   authInterceptor = baseAxiosRequest.interceptors.request.use(
-                    (config) => ({
-                      ...config,
-                      headers: {
-                        ...config.headers,
-                        'Api-Key': authToken,
-                        Authorization: `Bearer ${newToken}`
+                    (config) => {
+                      if ((config as any)?.sendBeacon) {
+                        /* 
+                          send fetch request instead solely so we can use the "keepalive" flag.
+                          This is used purely for one use-case only - when the user clicks a link
+                          that is going to navigate the browser tab to a new page/site and we need
+                          to still call POST /trackInAppClick.
+          
+                          Normally, since the page is going somewhere new, the browser would just 
+                          navigate away and cancel any in-flight requests and not fulfill 
+                          them, but with the fetch API's "keepalive" flag, it will continue 
+                          the request without blocking the main thread.
+          
+                          We can't do this with Axios because it's built upon XHR and that 
+                          doesn't support "keepalive" so we fall back to the fetch API
+                        */
+                        return cancelAxiosRequestAndMakeFetch(
+                          config,
+                          { email: payload.email, userID: payload.userID },
+                          newToken,
+                          authToken
+                        );
                       }
-                    })
+
+                      return {
+                        ...config,
+                        headers: {
+                          ...config.headers,
+                          'Api-Key': authToken,
+                          Authorization: `Bearer ${newToken}`
+                        }
+                      };
+                    }
                   );
 
                   /*
