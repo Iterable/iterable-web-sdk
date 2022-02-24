@@ -82,6 +82,7 @@ export const trackInAppClick = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClick',
+    sendBeacon: true,
     data: {
       ...payload,
       deviceInfo: {
