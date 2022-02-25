@@ -1,6 +1,6 @@
 {
   "code": "GenericError",
-  "msg": "Client-side error",
+  "msg": "Client-side error mocked from cypress",
   "clientErrors": [
     {
       "error": "items[0].name is a required field",

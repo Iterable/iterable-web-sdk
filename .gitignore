@@ -1,7 +1,7 @@
 node_modules
 dist
-index.js
-index.node.js
+/index.js
+/index.node.js
 .env
 coverage
 hot

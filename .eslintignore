@@ -1,6 +1,6 @@
 node_modules
 dist
-index.js
-index.node.js
+/index.js
+/index.node.js
 index.d.ts
 jest.config.js
