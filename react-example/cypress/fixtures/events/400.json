@@ -1,0 +1,10 @@
+{
+  "code": "GenericError",
+  "msg": "Client-side error mocked from cypress",
+  "clientErrors": [
+    {
+      "error": "eventName is a required field",
+      "field": "eventName"
+    }
+  ]
+}

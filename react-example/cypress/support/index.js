@@ -6,12 +6,12 @@
 beforeEach(() => {
   cy.intercept(
     {
-      url: '/generate*',
+      url: '/generate*'
     },
     (req) => {
       req.reply({
         token: 'cypress-mock-token'
-      })
+      });
     }
   ).as('generateToken');
 
@@ -26,5 +26,5 @@ beforeEach(() => {
       url: '/api/events/track*'
     },
     { fixture: 'events/200.json' }
-  );
+  ).as('track');
 });

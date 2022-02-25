@@ -2,6 +2,7 @@ import './styles/index.css';
 import axios from 'axios';
 import Home from 'src/views/Home';
 import Commerce from 'src/views/Commerce';
+import Events from 'src/views/Events';
 import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
@@ -57,6 +58,7 @@ const HomeLink = styled(Link)`
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/commerce" element={<Commerce />} />
+            <Route path="/events" element={<Events />} />
           </Routes>
         </RouteWrapper>
       </Wrapper>

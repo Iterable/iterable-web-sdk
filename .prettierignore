@@ -1,4 +1,4 @@
 dist
-index.js
-index.d.ts
-index.node.js
+/index.js
+/index.d.ts
+/index.node.js
