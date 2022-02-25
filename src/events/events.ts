@@ -73,7 +73,8 @@ export const trackInAppOpen = (
 };
 
 export const trackInAppClick = (
-  payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>
+  payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>,
+  sendBeacon = false
 ) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   delete (payload as any).userId;
@@ -82,6 +83,7 @@ export const trackInAppClick = (
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/trackInAppClick',
+    sendBeacon,
     data: {
       ...payload,
       deviceInfo: {

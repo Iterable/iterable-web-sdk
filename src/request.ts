@@ -9,6 +9,7 @@ interface ExtendedRequestConfig extends AxiosRequestConfig {
     data?: AnySchema;
     params?: AnySchema;
   };
+  sendBeacon?: boolean;
 }
 
 interface ClientError extends IterableResponse {

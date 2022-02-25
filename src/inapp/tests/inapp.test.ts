@@ -815,5 +815,214 @@ describe('getInAppMessages', () => {
       expect(document.getElementById('iterable-iframe')).not.toBe(null);
       expect(document.getElementById('iterable-iframe')).not.toBeUndefined();
     });
+
+    it('should call /trackInAppClick with sendBeacon if linking in same tab', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a href="/about">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="/about"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(
+        mockRequest.history.post.filter((e) => !!e.url?.match(/InAppClick/gim))
+          .length
+      ).toBe(1);
+      expect(
+        (
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )?.[0] as any
+        )?.sendBeacon
+      ).toBeTruthy();
+    });
+
+    it('should call /trackInAppClick without sendBeacon if linking in new tab', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a target="_blank" href="/about">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="/about"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(
+        mockRequest.history.post.filter((e) => !!e.url?.match(/InAppClick/gim))
+          .length
+      ).toBe(1);
+      expect(
+        (
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )?.[0] as any
+        )?.sendBeacon
+      ).toBeFalsy();
+    });
+
+    it('should call /trackInAppClick with sendBeacon if linking in same tab due to handleLinks', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a target="_blank" href="/about">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        {
+          count: 10,
+          packageName: 'my-lil-website',
+          handleLinks: 'open-all-same-tab'
+        },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="/about"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(
+        mockRequest.history.post.filter((e) => !!e.url?.match(/InAppClick/gim))
+          .length
+      ).toBe(1);
+      expect(
+        (
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )?.[0] as any
+        )?.sendBeacon
+      ).toBeTruthy();
+    });
+
+    it('should call /trackInAppClick without sendBeacon if clicking iterable://hi link', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a target="_blank" href="iterable://hi">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="iterable://hi"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(
+        mockRequest.history.post.filter((e) => !!e.url?.match(/InAppClick/gim))
+          .length
+      ).toBe(1);
+      expect(
+        (
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )?.[0] as any
+        )?.sendBeacon
+      ).toBeFalsy();
+    });
+
+    it('should call /trackInAppClick without sendBeacon if clicking action:// link', async () => {
+      mockRequest.onGet('/inApp/getMessages').reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<a target="_blank" href="action://hi">profile</a>'
+            }
+          }
+        ]
+      });
+
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        true
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
+        'a[href="javascript:undefined"]'
+      ) as Element;
+
+      const clickEvent = new MouseEvent('click');
+      await element.dispatchEvent(clickEvent);
+      expect(
+        mockRequest.history.post.filter((e) => !!e.url?.match(/InAppClick/gim))
+          .length
+      ).toBe(1);
+      expect(
+        (
+          mockRequest.history.post.filter(
+            (e) => !!e.url?.match(/InAppClick/gim)
+          )?.[0] as any
+        )?.sendBeacon
+      ).toBeFalsy();
+    });
   });
 });
