@@ -101,6 +101,8 @@ Close Button Options:
 Example:
 
 ```ts
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+
 getInAppMessages({ 
   count: 20,
   packageName: 'my-website'
@@ -112,6 +114,8 @@ getInAppMessages({
 or
 
 ```ts
+import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+
 const { 
   request,
   pauseMessageStream, 
@@ -154,6 +158,8 @@ initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string 
 Example:
 
 ```ts
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+
 const { clearRefresh, setEmail, setUserID, logout } = initialize(
   'my-API-key',
   /* 
@@ -175,6 +181,8 @@ track: (payload: InAppTrackRequestParams) => Promise<TrackData>
 Example:
 
 ```ts
+import { track } from '@iterable/web-sdk/dist/events';
+
 track({ eventName: 'my-event' })
   .then()
   .catch()
@@ -191,6 +199,8 @@ trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
 Example:
 
 ```ts
+import { trackInAppClick } from '@iterable/web-sdk/dist/events';
+
 trackInAppClick({
   messageId: '123',
   deviceInfo: { appPackageName: 'my-website' }
@@ -210,6 +220,8 @@ trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
 Example:
 
 ```ts
+import { trackInAppClose } from '@iterable/web-sdk/dist/events';
+
 trackInAppClose({
   messageId: '123',
   deviceInfo: { appPackageName: 'my-website' }
@@ -229,6 +241,8 @@ trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeDat
 Example:
 
 ```ts
+import { trackInAppConsume } from '@iterable/web-sdk/dist/events';
+
 trackInAppConsume({
   messageId: '123',
   deviceInfo: { appPackageName: 'my-website' }
@@ -248,6 +262,8 @@ trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryD
 Example:
 
 ```ts
+import { trackInAppDelivery } from '@iterable/web-sdk/dist/events';
+
 trackInAppDelivery({
   messageId: '123',
   deviceInfo: { appPackageName: 'my-website' }
@@ -267,6 +283,8 @@ trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
 Example:
 
 ```ts
+import { trackInAppOpen } from '@iterable/web-sdk/dist/events';
+
 trackInAppOpen({
   messageId: '123',
   deviceInfo: { appPackageName: 'my-website' }
@@ -286,6 +304,8 @@ trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseDat
 Example:
 
 ```ts
+import { trackPurchase } from '@iterable/web-sdk/dist/commerce';
+
 trackPurchase({
   items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
   total: 200
@@ -305,6 +325,8 @@ updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
 Example:
 
 ```ts
+import { updateCart } from '@iterable/web-sdk/dist/commerce';
+
 updateCart({
   items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
 })
@@ -323,6 +345,8 @@ updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsD
 Example:
 
 ```ts
+import { updateSubscriptions } from '@iterable/web-sdk/dist/users';
+
 updateSubscriptions({ emailListIds: [1, 2, 3] })
   .then()
   .catch()
@@ -339,6 +363,8 @@ updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
 Example:
 
 ```ts
+import { updateUser } from '@iterable/web-sdk/dist/users';
+
 updateUser({ dataFields: {} })
   .then()
   .catch()
@@ -355,6 +381,8 @@ updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
 Example:
 
 ```ts
+import { updateUserEmail } from '@iterable/web-sdk/dist/users';
+
 updateUserEmail('hello@gmail.com')
   .then()
   .catch()
