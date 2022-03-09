@@ -495,11 +495,11 @@ import { track } from '@iterable/web-sdk/dist/events';
 })();
 ```
 
-## How Does the SDK Pass up My Email / User ID?
+## How does the SDK pass up my email / user ID?
 
 This SDK relies on a library called [Axios](https://github.com/axios/axios). For all outgoing XHR requests, the SDK utilities [Axios interceptors](https://github.com/axios/axios#interceptors) to add your user information to the requests.
 
-## Ok Cool. What if I Want to Handle This Intercepting Logic Myself Instead?
+## Ok cool. What if I want to handle this intercepting logic myself instead?
 
 You can do that! This SDK exposes the base Axios instance so you can do whatever you like with it and build upon that. You can import the Axios instance like so and anything in the Axios documentation is fair game to use:
 
@@ -527,7 +527,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 :rotating_light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
 
-## I Want to Automatically Show My In-App Messages with a Delay Between Each
+## I want to automatically show my in-app messages with a delay between each
 
 This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
@@ -679,7 +679,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 })();
 ```
 
-## I Want My Messages to Look Good on Every Device and Be Responsive
+## I want my messages to look good on every device and be responsive
 
 This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
 
