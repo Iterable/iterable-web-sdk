@@ -756,7 +756,7 @@ Upon those, we also may reserve more keywords in the future.
 
 ## Routing in Single-Page Apps
 
-Knowing now the custom link schemas available, let's explain how you can leverage them to add custom routing or callback functions. If for example you want to hook into a link click and send the user to your `/about` page with a client-side routing solution, you'd do something like this:
+Knowing now the custom link schemas available, let's explain how you can leverage them to add custom routing or callback functions. If for example you want to hook into a link click and send the user to your `/about` page with a client-side routing solution, you'd do something like this if you're using React Router:
 
 ```ts
 /* 
