@@ -17,6 +17,7 @@ This SDK helps you integrate your Web apps with Iterable.
 * [Usage](#usage)
 * [FAQ](#faq)
 * [A Note About Imports](#a-note-about-imports)
+* [About Links](#about-links)
 * [TypeScript](#typescript)
 * [Contributing](#contributing)
 * [License](#license)
@@ -494,11 +495,11 @@ import { track } from '@iterable/web-sdk/dist/events';
 })();
 ```
 
-## How Does the SDK Pass up My Email / User ID?
+## How does the SDK pass up my email / user ID?
 
 This SDK relies on a library called [Axios](https://github.com/axios/axios). For all outgoing XHR requests, the SDK utilities [Axios interceptors](https://github.com/axios/axios#interceptors) to add your user information to the requests.
 
-## Ok Cool. What if I Want to Handle This Intercepting Logic Myself Instead?
+## Ok cool. What if I want to handle this intercepting logic myself instead?
 
 You can do that! This SDK exposes the base Axios instance so you can do whatever you like with it and build upon that. You can import the Axios instance like so and anything in the Axios documentation is fair game to use:
 
@@ -526,7 +527,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 :rotating_light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
 
-## I Want to Automatically Show My In-App Messages with a Delay Between Each
+## I want to automatically show my in-app messages with a delay between each
 
 This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
@@ -678,7 +679,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 })();
 ```
 
-## I Want My Messages to Look Good on Every Device and Be Responsive
+## I want my messages to look good on every device and be responsive
 
 This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
 
@@ -695,6 +696,10 @@ Another example: If your in-app is positioned in the center and your browser if 
 
 This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so we recommend that you stick to percentage-based CSS widths when possible when creating your message**
 
+## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
+
+No problem! Please see [the link handling section](#about-links) for more information on how to create callback methods on link clicks. There, you'll find information on how to create a seamless link-clicking experience if you're using a library such as React Router.
+
 # A Note About Imports
 
 This library exposes UMD modules and a single-file build for you to import from. In other words, this means that you'll be able to import methods in these ways:
@@ -710,6 +715,74 @@ import { updateUser } from '@iterable/web-sdk/dist/users';
 ```
 
 For those using Webpack/Rollup/Some Other Build Tool, we recommend importing methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
+
+# About Links
+
+Since the Web SDK renders in-app messages in an iframe element on your website if you choose to render the messages automatically, the event handler that is responsible for clicking links is highjacked by the SDK code internally. To the user, this doesn't really change the experience. As expected, `<a />` tags will open the link in the same browser tab unless given the `target="_blank"` property.
+
+But there are few features which the SDK adds so that you can customize how you'd like links to behave:
+
+First, the [`handleLinks` option](#getInAppMessages) within the `getMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
+
+```ts
+import { getMessages } from '@iterable/web-sdk/dist/inapp'
+
+getMessages({ count: 5, packageName: 'my-website', handleLinks: 'external-new-tab' })
+```
+
+will ensure the following links open in the same tab if your domain is `mydomain.com`, for example:
+
+```
+/about
+https://mydomain.com
+https://mydomain.com/about
+```
+
+and these will open in a new tab
+
+```
+https://google.com
+https://hello.com
+```
+
+## Reserved Keyword Links
+
+Upon normal links, Iterable reserves the `iterable://` and `action://` schemas for custom actions that are performed when a link is clicked. The following are links that you can add to your in-app messages for enhanced functionality:
+
+1. `iterable://dismiss` - Removes the in-app message from the screen, queues the next one for presentation, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website.  It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+
+Upon those, we also may reserve more keywords in the future.
+
+## Routing in Single-Page Apps
+
+Knowing now the custom link schemas available, let's explain how you can leverage them to add custom routing or callback functions. If for example you want to hook into a link click and send the user to your `/about` page with a client-side routing solution, you'd do something like this if you're using React Router:
+
+```ts
+/* 
+  assuming you're clicking this link in your in-app message: 
+  
+  <a href="action://about">go to about page</a>
+*/
+
+import { useHistory } from "react-router-dom";
+
+
+const SomeComponent = () => {
+  const history = useHistory();
+
+  React.useEffect(() => {
+    global.addEventListener('message', (event) => {
+      if (event.data.type && event.data.type === 'iterable-action-link') {
+        /* route us to the content that comes after "action://" */
+        history.push(`/${event.data.data}`)
+      }
+    });
+  }, [])
+
+  return <></>
+}
+```
 
 # TypeScript
 
