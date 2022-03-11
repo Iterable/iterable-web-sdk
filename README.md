@@ -167,7 +167,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+  ({ email, userID }) => yourAsyncJWTGeneratorMethod({ email, userID }).then(({ jwt_token }) => jwt_token)
 )
 ```
 
@@ -406,7 +406,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 })();
 ```
@@ -421,7 +421,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -446,7 +446,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -475,7 +475,7 @@ import { track } from '@iterable/web-sdk/dist/events';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -540,7 +540,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -567,7 +567,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -600,7 +600,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -642,7 +642,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 (() => {
   const { setUserID } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod().then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
   );
 
   yourAsyncLoginMethod()
@@ -699,6 +699,47 @@ This chart also implies that your in-app message is taking 100% of its container
 ## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
 
 No problem! Please see [the link handling section](#about-links) for more information on how to create callback methods on link clicks. There, you'll find information on how to create a seamless link-clicking experience if you're using a library such as React Router.
+
+## What if my JWT expires?
+
+JWT expiration is handled for you automatically by the SDK. There are 3 points where we will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
+
+1. The JWT is within 1 minute of expiration
+2. An Iterable API request has failed with a 401 response
+3. Your code invoked the `updateUserEmail` method
+
+As previously explained, when initializing the SDK you need to pass a function that returns a Promise with the JWT, which looks something like this:
+
+```ts
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+
+initialize(
+  'API_KEY_HERE',
+  ({ email, userID }) => yourAsyncJWTGenerationMethod({ email, userID }).then(response => response.jwt_token)
+)
+```
+
+When the previous 3 listed events occur, we will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
+
+:rotating_light: *PLEASE NOTE*: When you call `updateUserEmail`, we will invoke `yourAsyncJWTGenerationMethod` with the new email address even if you originally authenticated with a user ID, so if you chose to first call `setUserID`, you will need to ensure your backend can also handle JWT generation with email addresses. In other words, you need to make sure both invocations of your async JWT generation method work:
+
+```ts
+/* 
+  the key "email" can be whatever. You just need to make sure your method can be passed an
+  email somehow when originally calling "initialize"
+*/
+yourAsyncJWTGenerationMethod({ email: 'email@email.com' })
+```
+
+```ts
+/* 
+  the key "userID" can be whatever. You just need to make sure your method can be passed a
+  user ID somehow when originally calling "initialize"
+*/
+yourAsyncJWTGenerationMethod({ userID: '1sfds32' })
+```
+
+Finally, if the request to regenerate the JWT fails however, we will not attempt to generate the JWT again so requests will start failing at that point.
 
 # A Note About Imports
 
