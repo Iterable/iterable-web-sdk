@@ -10,26 +10,34 @@ import {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    ({ email }) => {
-      return axios
-        .post(
-          'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response) => {
-          return response.data?.token;
-        });
-    }
+    'www.mywebsite.com ',
+    // ({ email }) => {
+    //   return axios
+    //     .post(
+    //       'http://localhost:5000/generate',
+    //       {
+    //         exp_minutes: 2,
+    //         email,
+    //         jwt_secret: process.env.JWT_SECRET
+    //       },
+    //       {
+    //         headers: {
+    //           'Content-Type': 'application/json'
+    //         }
+    //       }
+    //     )
+    //     .then((response) => {
+    //       return response.data?.token;
+    //     });
+    // },
+    () => Promise.resolve(''),
+    { showSmartBanner: true }
   );
+
+  // const metatag = document.createElement('meta');
+  // metatag.name = 'apple-itunes-app';
+  // metatag.content = `app-id=${370144476}`;
+  // document.getElementsByTagName('head')[0].prepend(metatag);
 
   const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     {
@@ -38,7 +46,6 @@ import {
       onOpenScreenReaderMessage:
         'hey screen reader here telling you something just popped up on your screen!',
       onOpenNodeToTakeFocus: 'input',
-      packageName: 'my-lil-website',
       rightOffset: '20px',
       topOffset: '20px',
       bottomOffset: '20px',

@@ -16,10 +16,10 @@ export interface InAppEventRequestParams {
     location?: string;
   };
   closeAction?: string;
-  deviceInfo: {
+  deviceInfo?: {
     // deviceId?: string; forced to userAgent
     // platform?: IterablePlatform; forced to "Web."
-    appPackageName: string; // customer-defined name
+    appPackageName?: string; // customer-defined name
   };
   inboxSessionId?: string;
   createdAt?: number;

@@ -411,7 +411,7 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
 
 export const trackMessagesDelivered = (
   messages: Partial<InAppMessage>[] = [],
-  packageName: string
+  packageName?: string
 ) => {
   return Promise.all(
     messages?.map((eachMessage) => {

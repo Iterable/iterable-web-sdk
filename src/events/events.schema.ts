@@ -22,7 +22,7 @@ export const eventRequestSchema = object().shape({
     .shape({
       deviceId: string().required(),
       platform: string().required(),
-      appPackageName: string().required()
+      appPackageName: string()
     })
     .required(),
   inboxSessionId: string(),

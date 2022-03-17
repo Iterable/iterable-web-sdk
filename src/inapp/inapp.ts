@@ -104,14 +104,14 @@ export function getInAppMessages(
             url
               ? {
                   messageId: activeMessage.messageId,
-                  clickedUrl: url,
-                  deviceInfo: {
-                    appPackageName: dupedPayload.packageName
-                  }
+                  clickedUrl: url
+                  // deviceInfo: {
+                  //   appPackageName: dupedPayload.packageName
+                  // }
                 }
               : {
-                  messageId: activeMessage.messageId,
-                  deviceInfo: { appPackageName: dupedPayload.packageName }
+                  messageId: activeMessage.messageId
+                  // deviceInfo: { appPackageName: dupedPayload.packageName }
                 }
           ).catch((e) => e);
 
@@ -338,24 +338,24 @@ export function getInAppMessages(
               !activeMessage?.saveToInbox
                 ? [
                     trackInAppOpen({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
+                      messageId: activeMessage.messageId
+                      // deviceInfo: {
+                      //   appPackageName: payload.packageName
+                      // }
                     }),
                     trackInAppConsume({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
+                      messageId: activeMessage.messageId
+                      // deviceInfo: {
+                      //   appPackageName: payload.packageName
+                      // }
                     })
                   ]
                 : [
                     trackInAppOpen({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
+                      messageId: activeMessage.messageId
+                      // deviceInfo: {
+                      //   appPackageName: payload.packageName
+                      // }
                     })
                   ]
             ).catch((e) => e);
@@ -404,10 +404,10 @@ export function getInAppMessages(
                 trackInAppClick(
                   {
                     clickedUrl,
-                    messageId: activeMessage?.messageId,
-                    deviceInfo: {
-                      appPackageName: dupedPayload.packageName
-                    }
+                    messageId: activeMessage?.messageId
+                    // deviceInfo: {
+                    //   appPackageName: dupedPayload.packageName
+                    // }
                   },
                   /* 
                     only call with the fetch API if we're linking in the 
@@ -515,8 +515,8 @@ export function getInAppMessages(
         })
           .then((response) => {
             trackMessagesDelivered(
-              response.data.inAppMessages || [],
-              dupedPayload.packageName
+              response.data.inAppMessages || []
+              // dupedPayload.packageName
             );
             return response;
           })
@@ -574,8 +574,8 @@ export function getInAppMessages(
     }
   }).then((response) => {
     trackMessagesDelivered(
-      response.data.inAppMessages || [],
-      dupedPayload.packageName
+      response.data.inAppMessages || []
+      // dupedPayload.packageName
     );
     return response;
   });

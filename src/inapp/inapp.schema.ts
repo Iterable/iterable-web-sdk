@@ -5,7 +5,7 @@ export const inAppMessagesParamSchema = object().shape({
   onOpenScreenReaderMessage: string(),
   onOpenNodeToTakeFocus: string(),
   count: number().required(),
-  packageName: string().required(),
+  packageName: string(),
   platform: string().required()
 });
 

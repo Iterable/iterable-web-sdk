@@ -24,7 +24,7 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   count: number;
   // platform?: IterablePlatform; forced to "Web"
   SDKVersion?: string;
-  packageName: string;
+  // packageName: string;
   /* 
     email and userID params omitted in favor of using the "setEmail" 
     or "setUserID" methods on the _initialize_ method

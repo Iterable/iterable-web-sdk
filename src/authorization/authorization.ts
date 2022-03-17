@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
+import { baseAxiosRequest, baseIterableRequest } from '../request';
+// import { IterableResponse } from "src/types";
 import { updateUser } from 'src/users';
 import { clearMessages } from 'src/inapp';
 import {
@@ -36,14 +37,34 @@ interface WithoutJWT {
   logout: () => void;
 }
 
+interface Options {
+  showSmartBanner?: boolean;
+}
+
+export const getLinkedMobileApp = (packageName: string) => {
+  return baseIterableRequest<{ appId: string }>({
+    method: 'GET',
+    url: `/getLinkedMobileApp?webPackage=${packageName}`
+  });
+};
+
 export function initialize(
   authToken: string,
-  generateJWT: (payload: GenerateJWTPayload) => Promise<string>
+  packageName: string,
+  generateJWT: (payload: GenerateJWTPayload) => Promise<string>,
+  options?: Options
 ): WithJWT;
-export function initialize(authToken: string): WithoutJWT;
 export function initialize(
   authToken: string,
-  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
+  packageName: string,
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>,
+  options?: Options
+): WithoutJWT;
+export function initialize(
+  authToken: string,
+  packageName: string,
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>,
+  options?: Options
 ) {
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
@@ -126,7 +147,11 @@ export function initialize(
           ...config,
           data: {
             ...(config.data || {}),
-            email
+            email,
+            deviceInfo: {
+              ...config.data.deviceInfo,
+              appPackageName: packageName
+            }
           }
         };
       }
@@ -159,7 +184,8 @@ export function initialize(
           ...config,
           params: {
             ...(config.params || {}),
-            email
+            email,
+            packageName
           }
         };
       }
@@ -238,7 +264,11 @@ export function initialize(
                 ...config,
                 data: {
                   ...(config.data || {}),
-                  userId
+                  userId,
+                  deviceInfo: {
+                    ...config.data.deviceInfo,
+                    appPackageName: packageName
+                  }
                 }
               };
             }
@@ -271,7 +301,8 @@ export function initialize(
                 ...config,
                 params: {
                   ...(config.params || {}),
-                  userId
+                  userId,
+                  packageName
                 }
               };
             }
@@ -564,6 +595,33 @@ export function initialize(
             }
           });
         });
+
+        if (options?.showSmartBanner) {
+          const linkedID = localStorage.getItem('iterable_linked_app_id');
+          if (linkedID) {
+            const metatag = document.createElement('meta');
+            metatag.name = 'apple-itunes-app';
+            metatag.content = `app-id=${linkedID}`;
+            document.getElementsByTagName('head')[0].prepend(metatag);
+          } else {
+            /* get linked mobile app and display smart banner */
+            getLinkedMobileApp(packageName)
+              .then((response) => {
+                if (response.data.appId) {
+                  const metatag = document.createElement('meta');
+                  const last10 = response.data.appId.substr(
+                    response.data.appId.length - 9
+                  );
+                  metatag.name = 'apple-itunes-app';
+                  metatag.content = `app-id=${last10}`;
+                  localStorage.setItem('iterable_linked_app_id', last10);
+                  document.getElementsByTagName('head')[0].prepend(metatag);
+                }
+              })
+              .catch((e) => alert(JSON.stringify(e)));
+          }
+        }
+
         return token;
       })
       .catch((error) => {
@@ -631,7 +689,11 @@ export function initialize(
             ...config,
             data: {
               ...(config.data || {}),
-              userId
+              userId,
+              deviceInfo: {
+                ...config.data.deviceInfo,
+                appPackageName: packageName
+              }
             }
           };
         }
@@ -664,7 +726,8 @@ export function initialize(
             ...config,
             params: {
               ...(config.params || {}),
-              userId
+              userId,
+              packageName
             }
           };
         }
