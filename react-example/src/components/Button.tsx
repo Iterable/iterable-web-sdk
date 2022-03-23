@@ -12,24 +12,25 @@ const _Button = styled.button`
   border-radius: 5px;
   margin-top: 1em;
   padding: 1em;
-  -webkit-box-shadow: 0 7px 0 0 #006be0fa;
-  box-shadow: 0 7px 0 0 #006be0fa;
-  -webkit-transition: all 0.05s ease;
-  -moz-transition: all 0.05s ease;
-  -ms-transition: all 0.05s ease;
-  -o-transition: all 0.05s ease;
-  transition: all 0.05s ease;
+  -webkit-box-shadow: 0 5px 0 0 #006be0fa;
+  box-shadow: 0 5px 0 0 #006be0fa;
+  -webkit-transition: box-shadow 0.05s ease 1ms transform 0.05s ease 1ms;
+  -moz-transition: box-shadow 0.05s ease 1ms transform 0.05s ease 1ms;
+  -ms-transition: box-shadow 0.05s ease 1ms transform 0.05s ease 1ms;
+  -o-transition: box-shadow 0.05s ease 1ms transform 0.05s ease 1ms;
+  transition: box-shadow 0.05s ease 1ms transform 0.05s ease 1ms;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
   &:active {
     background: #ab0457db;
     border: none;
     -webkit-box-shadow: 0 0 0 0 #006be0fa;
     box-shadow: 0 0 0 0 #006be0fa;
-    -moz-transform: translateY(3px);
-    -webkit-transform: translateY(3px);
-    -o-transform: translateY(3px);
-    -ms-transform: translateY(3px);
-    transform: translateY(3px);
+    -moz-transform: translateY(5px);
+    -webkit-transform: translateY(5px);
+    -o-transform: translateY(5px);
+    -ms-transform: translateY(5px);
+    transform: translateY(5px);
   }
 `;
 
