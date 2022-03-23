@@ -188,6 +188,7 @@ export const generateLayoutCSS = (
       right: 0%;
       top: 0%;
       bottom: 0%;
+      max-height: ${isMobileBreakpoint ? '85vh' : '95vh'};
     `;
   }
 
@@ -195,6 +196,7 @@ export const generateLayoutCSS = (
     styles = `
       right: ${isMobileBreakpoint ? '0%' : rightOffset || '0%'};
       top: ${isMobileBreakpoint ? '0%' : topOffset || '0%'};
+      max-height: ${isMobileBreakpoint ? '85vh' : '95vh'};
     `;
   }
 
@@ -202,6 +204,7 @@ export const generateLayoutCSS = (
     styles = `
       right: ${isMobileBreakpoint ? '0%' : rightOffset || '0%'};
       bottom: ${isMobileBreakpoint ? '0%' : bottomOffset || '0%'};
+      max-height: ${isMobileBreakpoint ? '85vh' : '95vh'};
     `;
   }
 
