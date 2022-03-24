@@ -634,6 +634,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('0%');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('95vh');
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
@@ -649,6 +650,7 @@ describe('Utils', () => {
         expect(styles.bottom).toBe('');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('95vh');
       });
 
       it('should paint the iframe in the bottom-right of the screen', async () => {
@@ -669,6 +671,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('95vh');
       });
 
       it('should paint the iframe full-screen', async () => {
@@ -685,6 +688,7 @@ describe('Utils', () => {
         expect(styles.zIndex).toBe('9999');
         expect(styles.height).toBe('100%');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('');
       });
 
       it('should paint TopRight iframes with custom offsets', async () => {
@@ -708,6 +712,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('10px');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('95vh');
       });
 
       it('should paint BottomRight iframes with custom offsets', async () => {
@@ -731,6 +736,7 @@ describe('Utils', () => {
         expect(styles.top).toBe('');
         expect(styles.zIndex).toBe('9999');
         expect(styles.width).toBe('100%');
+        expect(styles.maxHeight).toBe('95vh');
       });
 
       it('should call srSpeak if screen reader text passed', async () => {
