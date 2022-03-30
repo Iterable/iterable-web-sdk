@@ -1,46 +1,27 @@
 import { FC, FormEvent, useState } from 'react';
-import styled from 'styled-components';
+import {
+  Button,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from '../views/Components.styled';
 import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
-import Button from 'src/components/Button';
 
 interface Props {
   endpointName: string;
   heading: string;
+  needsEventName?: boolean;
   method: (...args: any) => IterablePromise<IterableResponse>;
 }
 
-const Form = styled.form`
-  display: flex;
-  flex-flow: column;
-  width: 45%;
-
-  @media (max-width: 850px) {
-    width: 100%;
-  }
-`;
-
-const Response = styled.pre`
-  width: 45%;
-  white-space: break-spaces;
-
-  @media (max-width: 850px) {
-    width: 100%;
-  }
-`;
-
-const EndpointWrapper = styled.div`
-  display: flex;
-  flex-flow: row;
-  width: 100%;
-  justify-content: space-between;
-`;
-
-const Heading = styled.h2`
-  margin-top: 3em;
-`;
-
-export const EventsForm: FC<Props> = ({ method, endpointName, heading }) => {
+export const EventsForm: FC<Props> = ({
+  method,
+  endpointName,
+  heading,
+  needsEventName
+}) => {
   const [trackResponse, setTrackResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -52,9 +33,12 @@ export const EventsForm: FC<Props> = ({ method, endpointName, heading }) => {
   const handleTrack = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingEvent(true);
+
+    const conditionalParams = needsEventName
+      ? { eventName: trackEvent }
+      : { messageId: trackEvent };
     method({
-      eventName: trackEvent,
-      messageId: 'mock-id',
+      ...conditionalParams,
       deviceInfo: {
         appPackageName: 'my-website'
       }
@@ -78,12 +62,14 @@ export const EventsForm: FC<Props> = ({ method, endpointName, heading }) => {
       <Heading>POST {heading}</Heading>
       <EndpointWrapper>
         <Form onSubmit={handleTrack} {...formAttr}>
-          <label htmlFor="item-1">Enter Event Name</label>
+          <label htmlFor="item-1">
+            {needsEventName ? 'Enter Event Name' : 'Enter Message ID'}
+          </label>
           <TextField
             value={trackEvent}
             onChange={(e) => setTrackEvent(e.target.value)}
             id="item-1"
-            placeholder="e.g. button-clicked"
+            placeholder={needsEventName ? 'e.g. button-clicked' : 'e.g. df3fe3'}
             {...inputAttr}
           />
           <Button disabled={isTrackingEvent} type="submit">
