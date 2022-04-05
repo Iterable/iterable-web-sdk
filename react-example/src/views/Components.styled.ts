@@ -8,6 +8,7 @@ export const Form = styled.form`
 
   @media (max-width: 850px) {
     width: 100%;
+    margin-bottom: 2em;
   }
 `;
 
@@ -25,6 +26,10 @@ export const EndpointWrapper = styled.div`
   flex-flow: row;
   width: 100%;
   justify-content: space-between;
+
+  @media (max-width: 850px) {
+    display: block;
+  }
 `;
 
 export const Heading = styled.h2`
