@@ -34,7 +34,6 @@ const HeaderWrapper = styled.div`
 
 const HomeLink = styled(Link)`
   width: 100px;
-  margin-left: 0.8em;
 `;
 
 ((): void => {
