@@ -21,6 +21,7 @@ export type IterableErrorStatus =
   | 'DatabaseError'
   | 'EmailAlreadyExists'
   | 'Forbidden'
+  | 'JwtUserIdentifiersMismatched'
   | 'InvalidJwtPayload';
 
 export type IterablePlatform = 'iOS' | 'Android' | 'Web';
