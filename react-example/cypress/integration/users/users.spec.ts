@@ -42,9 +42,9 @@ describe('Update User', () => {
 
     cy.get('[data-qa-update-user-response]').contains(
       JSON.stringify({
-        msg: 'No API key found on request',
-        code: 'BadApiKey',
-        params: { ip: '68.111.205.112', endpoint: '/api/users/update' }
+        msg: 'error mocked from cypress!',
+        code: 'CypressError',
+        params: {}
       })
     );
   });
@@ -94,9 +94,9 @@ describe('Update User Email', () => {
 
     cy.get('[data-qa-update-user-email-response]').contains(
       JSON.stringify({
-        msg: 'No API key found on request',
-        code: 'BadApiKey',
-        params: { ip: '68.111.205.112', endpoint: '/api/users/update' }
+        msg: 'error mocked from cypress!',
+        code: 'CypressError',
+        params: {}
       })
     );
   });
@@ -146,9 +146,9 @@ describe('Update Subscriptions', () => {
 
     cy.get('[data-qa-update-subscriptions-response]').contains(
       JSON.stringify({
-        msg: 'No API key found on request',
-        code: 'BadApiKey',
-        params: { ip: '68.111.205.112', endpoint: '/api/users/update' }
+        msg: 'error mocked from cypress!',
+        code: 'CypressError',
+        params: {}
       })
     );
   });
