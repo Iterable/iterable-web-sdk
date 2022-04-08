@@ -56,7 +56,6 @@ export function initialize(
     return;
   }
 
-  let timer: NodeJS.Timeout | null = null;
   /* 
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT
@@ -79,25 +78,37 @@ export function initialize(
     @param { string } jwt - JWT token to decode
     @param { (...args: any ) => Promise<any> } callback - promise to invoke before expiry
   */
-  const handleTokenExpiration = (
-    jwt: string,
-    callback: (...args: any) => Promise<any>
-  ) => {
-    const expTime = getEpochExpiryTimeInMS(jwt);
-    const millisecondsToExpired = getEpochDifferenceInMS(Date.now(), expTime);
-    timer = setTimeout(() => {
+  const createTokenExpirationTimer = () => {
+    let timer: NodeJS.Timeout | null;
+
+    return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
         clearTimeout(timer);
+        timer = null;
       }
-      /* get new token */
-      return callback().catch((e) => {
-        console.warn(e);
-        console.warn('Could not refresh JWT. Try identifying the user again.');
-      });
-      /* try to refresh one minute until expiry */
-    }, millisecondsToExpired - ONE_MINUTE);
+
+      if (callback) {
+        const expTime = getEpochExpiryTimeInMS(jwt);
+        const millisecondsToExpired = getEpochDifferenceInMS(
+          Date.now(),
+          expTime
+        );
+        timer = setTimeout(() => {
+          /* get new token */
+          return callback().catch((e) => {
+            console.warn(e);
+            console.warn(
+              'Could not refresh JWT. Try identifying the user again.'
+            );
+          });
+          /* try to refresh one minute until expiry */
+        }, millisecondsToExpired - ONE_MINUTE);
+      }
+    };
   };
+
+  const handleTokenExpiration = createTokenExpirationTimer();
 
   const addEmailToRequest = (email: string) => {
     userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
@@ -454,11 +465,9 @@ export function initialize(
                   /* 
                     important here to clear the timer first since there was one set up 
                     previously the first time the JWT was generated.
-                  */
-                  if (timer) {
-                    clearTimeout(timer);
-                  }
 
+                    handleTokenExpiration will clear the timeout for us.
+                  */
                   handleTokenExpiration(newToken, () => {
                     /* re-run the JWT generation */
                     return doRequest({ email: newEmail }).catch((e) => {
@@ -576,9 +585,8 @@ export function initialize(
   };
   return {
     clearRefresh: () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
+      /* this will just clear the existing timeout */
+      handleTokenExpiration('');
     },
     setEmail: (email: string) => {
       /* clear previous user */
@@ -709,10 +717,8 @@ export function initialize(
       /* clear fetched in-app messages */
       clearMessages();
 
-      if (timer) {
-        /* prevent any refreshing of JWT */
-        clearTimeout(timer);
-      }
+      /* this will just clear the existing timeout */
+      handleTokenExpiration('');
 
       if (typeof authInterceptor === 'number') {
         /* stop adding auth token to requests */
