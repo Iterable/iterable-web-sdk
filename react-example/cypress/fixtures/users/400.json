@@ -1,0 +1,5 @@
+{
+  "msg": "error mocked from cypress!",
+  "code": "CypressError",
+  "params": {  }
+}
