@@ -6,10 +6,13 @@ import './styles/index.css';
 import Home from 'src/views/Home';
 import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
+import Users from 'src/views/Users';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
+
+import { UserProvider } from 'src/context/Users';
 
 const Wrapper = styled.div`
   display: flex;
@@ -25,13 +28,12 @@ const HeaderWrapper = styled.div`
   display: flex;
   flex-flow: row;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin: 1em;
 `;
 
 const HomeLink = styled(Link)`
   width: 100px;
-  margin-left: 0.8em;
 `;
 
 ((): void => {
@@ -58,19 +60,22 @@ const HomeLink = styled(Link)`
   ReactDOM.render(
     <BrowserRouter>
       <Wrapper>
-        <HeaderWrapper>
-          <LoginForm setEmail={setEmail} />
-          <HomeLink renderAsButton to="/">
-            Home
-          </HomeLink>
-        </HeaderWrapper>
-        <RouteWrapper>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/commerce" element={<Commerce />} />
-            <Route path="/events" element={<Events />} />
-          </Routes>
-        </RouteWrapper>
+        <UserProvider>
+          <HeaderWrapper>
+            <HomeLink renderAsButton to="/">
+              Home
+            </HomeLink>
+            <LoginForm setEmail={setEmail} />
+          </HeaderWrapper>
+          <RouteWrapper>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/commerce" element={<Commerce />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/users" element={<Users />} />
+            </Routes>
+          </RouteWrapper>
+        </UserProvider>
       </Wrapper>
     </BrowserRouter>,
     document.getElementById('root')

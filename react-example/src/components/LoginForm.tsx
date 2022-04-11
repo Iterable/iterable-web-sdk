@@ -1,8 +1,10 @@
-import { FC, FormEvent, useState } from 'react';
+import { FC, FormEvent, useContext, useState } from 'react';
 import styled from 'styled-components';
 
 import _TextField from 'src/components/TextField';
 import _Button from 'src/components/Button';
+
+import { Context, UserContext } from 'src/context/Users';
 
 const TextField = styled(_TextField)``;
 
@@ -30,17 +32,19 @@ interface Props {
 
 export const LoginForm: FC<Props> = ({ setEmail }) => {
   const [email, updateEmail] = useState<string>('');
-  const [loggedInUser, setLoggedInUser] = useState<string>('');
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
+  const { state: loggedInUser, dispatch: setLoggedInUser } =
+    useContext<Context>(UserContext);
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setEditingUser(false);
 
     setEmail(email)
       .then(() => {
-        setLoggedInUser(email);
+        setEditingUser(false);
+        setLoggedInUser({ type: 'user_update', data: email });
         updateEmail('');
       })
       .catch(() => updateEmail('Something went wrong!'));
