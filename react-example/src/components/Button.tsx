@@ -10,7 +10,6 @@ const _Button = styled.button`
   background-color: #63abfb;
   border: none;
   border-radius: 5px;
-  margin-top: 1em;
   padding: 1em;
   -webkit-box-shadow: 0 5px 0 0 #006be0fa;
   box-shadow: 0 5px 0 0 #006be0fa;

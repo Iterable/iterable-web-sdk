@@ -1,14 +1,15 @@
-import './styles/index.css';
+import { initialize } from '@iterable/web-sdk';
 import axios from 'axios';
+import ReactDOM from 'react-dom';
+import './styles/index.css';
+
 import Home from 'src/views/Home';
 import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
-import ReactDOM from 'react-dom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
-
-import { initialize } from '@iterable/web-sdk';
+import LoginForm from 'src/components/LoginForm';
 
 const Wrapper = styled.div`
   display: flex;
@@ -20,10 +21,17 @@ const RouteWrapper = styled.div`
   margin: 0 auto;
 `;
 
-const HomeLink = styled(Link)`
-  align-self: flex-end;
-  width: 100px;
+const HeaderWrapper = styled.div`
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  justify-content: flex-end;
   margin: 1em;
+`;
+
+const HomeLink = styled(Link)`
+  width: 100px;
+  margin-left: 0.8em;
 `;
 
 ((): void => {
@@ -47,13 +55,15 @@ const HomeLink = styled(Link)`
       });
   });
 
-  setEmail('iterable.tester@gmail.com');
   ReactDOM.render(
     <BrowserRouter>
       <Wrapper>
-        <HomeLink renderAsButton to="/">
-          Home
-        </HomeLink>
+        <HeaderWrapper>
+          <LoginForm setEmail={setEmail} />
+          <HomeLink renderAsButton to="/">
+            Home
+          </HomeLink>
+        </HeaderWrapper>
         <RouteWrapper>
           <Routes>
             <Route path="/" element={<Home />} />

@@ -1,11 +1,15 @@
 import { FC } from 'react';
-import Link from 'src/components/Link';
+import _Link from 'src/components/Link';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
   display: flex;
   flex-flow: column;
   align-items: center;
+`;
+
+const Link = styled(_Link)`
+  margin-top: 1em;
 `;
 
 interface Props {}

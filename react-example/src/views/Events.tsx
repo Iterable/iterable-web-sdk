@@ -16,7 +16,12 @@ export const Events: FC<Props> = () => {
   return (
     <>
       <h1>Events Endpoints</h1>
-      <EventsForm heading="/track" endpointName="track" method={track} />
+      <EventsForm
+        heading="/track"
+        endpointName="track"
+        method={track}
+        needsEventName
+      />
       <EventsForm
         heading="/trackInAppClick"
         endpointName="track-click"
