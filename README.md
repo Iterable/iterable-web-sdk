@@ -598,7 +598,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 ## I want to automatically show my in-app messages with a delay between each
 
-This SDK allows that. Simply call the `getMessages` method but pass `{ display: 'immeidate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
+This SDK allows that. Simply call the `getMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
