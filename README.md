@@ -48,7 +48,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 | Method Name           	| Description                                                                                                               	|
 |-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `true` 	|
+| [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `DisplayOptions` 	|
 | [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
 | [`track`](#track)               	| Track custom events                                                                                                       	|
 | [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
@@ -135,7 +135,7 @@ const {
       topOffset: '20px'
     }
   },
-  true
+  { display: 'immediate' }
 );
 
 request()
@@ -598,7 +598,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 ## I want to automatically show my in-app messages with a delay between each
 
-This SDK allows that. Simply call the `getMessages` method but pass `true` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
+This SDK allows that. Simply call the `getMessages` method but pass `{ display: 'immeidate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
@@ -648,7 +648,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
               count: 20,
               packageName: 'my-website'
             },
-            true
+            { display: 'immediate' }
           );
 
           /* trigger the start of message presentation */
@@ -690,7 +690,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
               animationDuration: 400,
               handleLinks: 'external-new-tab'
             },
-            true
+            { display: 'immediate' }
           );
 
           /* trigger the start of message presentation */
@@ -727,7 +727,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
               count: 20,
               packageName: 'my-website'
             },
-            true
+            { display: 'immediate' }
           );
 
           /* trigger the start of message presentation */
