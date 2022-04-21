@@ -42,6 +42,13 @@ describe('getInAppMessages', () => {
       // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
     });
 
+    it('should not paint an iframe to the DOM', async () => {
+      await getInAppMessages({ count: 10, packageName: 'my-lil-website' });
+
+      const element = document.getElementById('iterable-iframe');
+      expect(element?.tagName).toBeUndefined();
+    });
+
     it('should reject if fails client-side validation', async () => {
       try {
         await getInAppMessages({} as any);
@@ -165,10 +172,56 @@ describe('getInAppMessages', () => {
       expect(response.config.params.userId).toBeUndefined();
     });
 
-    it('should paint an iframe to the DOM', async () => {
+    it('should paint an iframe to the DOM if second argument is true', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
         true
+      );
+      await request();
+
+      const element = document.getElementById('iterable-iframe');
+      expect(element?.tagName).toBe('IFRAME');
+    });
+
+    it('should paint an iframe to the DOM if second argument is { display: "immediate" }', async () => {
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        { display: 'immediate' }
+      );
+      await request();
+
+      const element = document.getElementById('iterable-iframe');
+      expect(element?.tagName).toBe('IFRAME');
+    });
+
+    it('should not paint an iframe to the DOM if second argument is { display: "deferred" }', async () => {
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        { display: 'deferred' }
+      );
+      await request();
+
+      const element = document.getElementById('iterable-iframe');
+      expect(element?.tagName).toBeUndefined();
+    });
+
+    it('should paint an iframe to the DOM if second argument is { display: "deferred" } and display fn is called', async () => {
+      const { request, triggerDisplayMessages } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        { display: 'deferred' }
+      );
+      await request().then((response) =>
+        triggerDisplayMessages(response.data.inAppMessages)
+      );
+
+      const element = document.getElementById('iterable-iframe');
+      expect(element?.tagName).toBe('IFRAME');
+    });
+
+    it('should paint an iframe to the DOM if second argument is { display: "nonsense" }', async () => {
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        { display: 'nonsense' as any }
       );
       await request();
 
