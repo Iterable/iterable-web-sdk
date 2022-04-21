@@ -31,7 +31,12 @@ import {
     }
   );
 
-  const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
+  const {
+    request,
+    pauseMessageStream,
+    resumeMessageStream,
+    triggerDisplayMessages
+  } = getInAppMessages(
     {
       count: 20,
       displayInterval: 1000,
@@ -52,7 +57,7 @@ import {
         // topOffset: '6%'
       }
     },
-    true
+    { display: 'deferred' }
   );
 
   const startBtn = document.getElementById('start');
@@ -68,6 +73,7 @@ import {
       startBtn.className = 'disabled';
       request()
         .then((response) => {
+          triggerDisplayMessages(response.data.inAppMessages);
           startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
         })
         .catch(console.warn);
