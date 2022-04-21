@@ -59,7 +59,20 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?: boolean
+  showInAppMessagesAutomatically: { display: 'immediate' | 'deferred' }
+): {
+  pauseMessageStream: () => void;
+  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
+  request: () => IterablePromise<InAppMessageResponse>;
+  triggerDisplayMessages: (
+    messages: Partial<InAppMessage>[]
+  ) => Promise<HTMLIFrameElement | ''>;
+};
+export function getInAppMessages(
+  payload: InAppMessagesRequestParams,
+  showInAppMessagesAutomatically?:
+    | boolean
+    | { display: 'immediate' | 'deferred' }
 ) {
   clearMessages();
 
@@ -499,6 +512,18 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
+    const maybeDisplayFn =
+      typeof showInAppMessagesAutomatically !== 'boolean' &&
+      showInAppMessagesAutomatically.display === 'deferred'
+        ? {
+            triggerDisplayMessages: (messages: Partial<InAppMessage>[]) => {
+              parsedMessages = messages as InAppMessage[];
+
+              return paintMessageToDOM();
+            }
+          }
+        : {};
+
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         baseIterableRequest<InAppMessageResponse>({
@@ -521,6 +546,21 @@ export function getInAppMessages(
             return response;
           })
           .then((response) => {
+            if (
+              typeof showInAppMessagesAutomatically !== 'boolean' &&
+              showInAppMessagesAutomatically.display === 'deferred'
+            ) {
+              /*
+                if the user passed "deferred" for the second argument to _getMessages_
+                then they're going to choose to display the in-app messages when they want
+                with the returned, _triggerDisplayMessages_ function. So early return here
+                with no filtering or sorting.
+              */
+              return response;
+            }
+
+            /* otherwise, they're choosing to show the messages automatically */
+
             /* 
               if the user passed the flag to automatically paint the in-app messages
               to the DOM, start a timer and show each in-app message upon close + timer countdown
@@ -553,7 +593,8 @@ export function getInAppMessages(
       },
       resumeMessageStream: () => {
         return paintMessageToDOM();
-      }
+      },
+      ...maybeDisplayFn
     };
   }
 
