@@ -803,9 +803,6 @@ import {
 })();
 ```
 
-:t
-
-
 ## I want my messages to look good on every device and be responsive
 
 This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
