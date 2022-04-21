@@ -10,3 +10,4 @@ log
 *.log
 results
 browserstack.json
+.DS_Store

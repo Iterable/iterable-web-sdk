@@ -60,7 +60,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
 | [`updateSubscriptions`](#updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
 | [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
-| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email address                                                                                             	|
+| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)                                                                                             	|
 
 # Usage
 
@@ -69,7 +69,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
 
 ```ts
-getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean) => Promise<TrackConsumeData> | PaintInAppMessageData
+getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean | { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
 SDK Specific Options:
@@ -112,7 +112,7 @@ getInAppMessages({
   .catch()
 ```
 
-or
+or if you want to show messages automatically
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
@@ -143,6 +143,57 @@ request()
   .catch();
 ```
 
+or if you want to show messages with your own custom filtering/sorting and choose to display later:
+
+```ts
+import { 
+  getInAppMessages,
+  sortInAppMessages,
+  filterHiddenInAppMessages
+} from '@iterable/web-sdk/dist/inapp';
+
+const { 
+  request,
+  pauseMessageStream, 
+  resumeMessageStream,
+  triggerDisplayMessages
+} = getInAppMessages(
+  { 
+    count: 20,
+    packageName: 'my-website',
+    displayInterval: 5000,
+    onOpenScreenReaderMessage:
+      'hey screen reader here telling you something just popped up on your screen!',
+    onOpenNodeToTakeFocus: 'input',
+    closeButton: {
+      color: 'red',
+      size: '16px',
+      topOffset: '20px'
+    }
+  },
+  { display: 'deferred' }
+);
+
+request()
+  .then(response => {
+    /* do your own manipulation here */
+    const filteredMessages = doStuffToMessages(response.data.inAppMessages);
+
+    /* also feel free to take advantage of the sorting/filtering methods we use internally */
+    const furtherManipulatedMessages = sortInAppMessages(
+      filterHiddenInAppMessages(response.data.inAppMessages)
+    ) as InAppMessage[];
+
+    /* then display them whenever you want */
+    triggerDisplayMessages(furtherManipulatedMessages)
+  })
+  .catch();
+```
+
+:rotating_light: *PLEASE NOTE*: If you choose the `deferred` option, we will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+
+If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods we provide.
+
 ## initialize
 
 API:
@@ -169,6 +220,24 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
   */
   ({ email, userID }) => yourAsyncJWTGeneratorMethod({ email, userID }).then(({ jwt_token }) => jwt_token)
 )
+```
+
+:rotating_light: *PLEASE NOTE*: When you call `updateUserEmail`, we will invoke `yourAsyncJWTGenerationMethod` with the new email address even if you originally authenticated with a user ID, so if you chose to first call `setUserID`, you will need to ensure your backend can also handle JWT generation with email addresses. In other words, you need to make sure both invocations of your async JWT generation method work:
+
+```ts
+/* 
+  the key "email" can be whatever. You just need to make sure your method can be passed an
+  email somehow when originally calling "initialize"
+*/
+yourAsyncJWTGenerationMethod({ email: 'email@email.com' })
+```
+
+```ts
+/* 
+  the key "userID" can be whatever. You just need to make sure your method can be passed a
+  user ID somehow when originally calling "initialize"
+*/
+yourAsyncJWTGenerationMethod({ userID: '1sfds32' })
 ```
 
 ## track
@@ -678,6 +747,64 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
     })
 })();
 ```
+
+Finally, you can also choose to do your own manipulation to the messages before choosing to display them:
+
+```ts
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { 
+  getInAppMessages,
+  sortInAppMessages,
+  filterHiddenInAppMessages
+} from '@iterable/web-sdk/dist/inapp';
+
+(() => {
+  const { setUserID } = initialize(
+    'YOUR_API_KEY_HERE',
+    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  );
+
+  yourAsyncLoginMethod()
+    .then(response => {
+      setUserID(response.user_id)
+        .then(() => {
+          const { 
+            request,
+            pauseMessageStream, 
+            resumeMessageStream
+           } = getInAppMessages(
+            { 
+              count: 20,
+              packageName: 'my-website'
+            },
+            { display: 'deferred' }
+          );
+
+          /* trigger the start of message presentation */
+          request()
+            .then(response => {
+              /* do your own manipulation here */
+              const filteredMessages = doStuffToMessages(response.data.inAppMessages);
+
+              /* 
+                also feel free to take advantage of the sorting/filtering 
+                methods we use internally 
+              */
+              const furtherManipulatedMessages = sortInAppMessages(
+                filterHiddenInAppMessages(response.data.inAppMessages)
+              ) as InAppMessage[];
+
+              /* then display them whenever you want */
+              triggerDisplayMessages(furtherManipulatedMessages)
+            })
+            .catch();
+        })
+    })
+})();
+```
+
+:t
+
 
 ## I want my messages to look good on every device and be responsive
 
