@@ -1,4 +1,11 @@
-import { createContext, Dispatch, FC, Reducer, useReducer } from 'react';
+import {
+  createContext,
+  Dispatch,
+  FC,
+  Reducer,
+  useContext,
+  useReducer
+} from 'react';
 
 type State = string;
 
@@ -19,21 +26,23 @@ export const reducer: Reducer<State, ActionWrapper> = (state, action) => {
 };
 
 export interface Context {
-  state: State;
-  dispatch: Dispatch<ActionWrapper>;
+  loggedInUser: State;
+  setLoggedInUser: Dispatch<ActionWrapper>;
 }
 
 export const UserContext = createContext<Context>({
-  state: initialState,
-  dispatch: () => null
+  loggedInUser: initialState,
+  setLoggedInUser: () => null
 });
 
 export const UserProvider: FC = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [loggedInUser, setLoggedInUser] = useReducer(reducer, initialState);
 
   return (
-    <UserContext.Provider value={{ state, dispatch }}>
+    <UserContext.Provider value={{ loggedInUser, setLoggedInUser }}>
       {children}
     </UserContext.Provider>
   );
 };
+
+export const useUser = () => useContext<Context>(UserContext);
