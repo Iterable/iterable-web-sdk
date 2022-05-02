@@ -12,6 +12,7 @@ const Button = styled(_Button)`
 
 const GetMessagesRawButton = styled(Button)`
   width: 45%;
+  max-height: 61px;
 
   @media (max-width: 850px) {
     width: 100%;
