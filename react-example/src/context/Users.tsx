@@ -11,7 +11,7 @@ type State = string;
 
 type Action = 'user_update';
 
-type ActionWrapper = { type: Action; data: any };
+type ActionWrapper = { type: Action; data: string };
 
 const initialState = '';
 

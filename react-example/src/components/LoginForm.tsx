@@ -27,7 +27,7 @@ const Form = styled.form`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<any>;
+  setEmail: (email: string) => Promise<string>;
 }
 
 export const LoginForm: FC<Props> = ({ setEmail }) => {
