@@ -10,6 +10,14 @@ const Button = styled(_Button)`
   margin-bottom: 1em;
 `;
 
+const GetMessagesRawButton = styled(Button)`
+  width: 45%;
+
+  @media (max-width: 850px) {
+    width: 100%;
+  }
+`;
+
 const AutoDisplayContainer = styled.div`
   width: 65%;
   margin: 0 auto;
@@ -44,7 +52,7 @@ export const InApp: FC<Props> = () => {
   const [autoMessageCount, setAutoMessageCount] = useState<number | null>(null);
   const [isPaused, setIsPaused] = useState<boolean>(false);
 
-  const getMessagesRaw = (e: FormEvent<HTMLFormElement>) => {
+  const getMessagesRaw = (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsGettingMessagesRaw(true);
 
@@ -90,42 +98,18 @@ export const InApp: FC<Props> = () => {
       <h1>inApp Endpoints</h1>
       <Heading>POST /inApp/getMessages</Heading>
       <EndpointWrapper>
-        <Form onSubmit={getMessagesRaw} data-qa-update-user-submit>
-          {/* <label htmlFor="item-1">
-            Enter Data Field Name (value will be &quot;test-data&quot;)
-          </label>
-          <TextField
-            value={userDataField}
-            onChange={(e) => setUserDataField(e.target.value)}
-            id="item-1"
-            placeholder="e.g. phone_number"
-            data-qa-update-user-input
-            required
-          /> */}
-          <Button
-            disabled={!loggedInUser || isGettingMessagesRaw}
-            type="submit"
-          >
-            {typeof rawMessageCount === 'number'
-              ? `Retrieved ${rawMessageCount} messages (try again)`
-              : 'Get Messages (do not auto-display)'}
-          </Button>
-        </Form>
+        <GetMessagesRawButton
+          disabled={!loggedInUser || isGettingMessagesRaw}
+          onClick={getMessagesRaw}
+        >
+          {typeof rawMessageCount === 'number'
+            ? `Retrieved ${rawMessageCount} messages (try again)`
+            : 'Get Messages (do not auto-display)'}
+        </GetMessagesRawButton>
         <Response data-qa-update-user-response>{getMessagesResponse}</Response>
       </EndpointWrapper>
       <Heading>POST /inApp/getMessages (auto-display)</Heading>
       <AutoDisplayContainer>
-        {/* <label htmlFor="item-1">
-            Enter Data Field Name (value will be &quot;test-data&quot;)
-          </label>
-          <TextField
-            value={userDataField}
-            onChange={(e) => setUserDataField(e.target.value)}
-            id="item-1"
-            placeholder="e.g. phone_number"
-            data-qa-update-user-input
-            required
-          /> */}
         <Button
           disabled={!loggedInUser || isGettingMessagesAuto}
           onClick={getMessagesAutoDisplay}
