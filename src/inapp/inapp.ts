@@ -573,6 +573,7 @@ export function getInAppMessages(
 
               so first filter out unwanted messages and sort them
             */
+            clearMessages();
             parsedMessages = sortInAppMessages(
               filterHiddenInAppMessages(response.data.inAppMessages)
             ) as InAppMessage[];
