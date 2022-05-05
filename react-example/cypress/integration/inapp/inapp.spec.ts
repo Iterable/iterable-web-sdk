@@ -1,32 +1,51 @@
-// describe('Auto-Painting In App Messages', () => {
-//   it('loads iframe successfully', () => {
-//     cy.intercept(
-//       {
-//         method: 'GET',
-//         url: '/api/inApp/getMessages*'
-//       },
-//       { fixture: 'inapp.json' }
-//     ).as('getInAppMessages');
+import * as mockMessages from '../../fixtures/inapp/200.json';
 
-//     cy.visit('/');
+describe('Requesting In-App Messages', () => {
+  it('should paint the correct 200 response', () => {
+    cy.intercept(
+      {
+        method: 'GET',
+        url: '/api/inApp/getMessages*'
+      },
+      { fixture: 'inapp/200.json' }
+    ).as('getInAppMessages');
 
-//     cy.intercept(
-//       {
-//         url: '/generate*',
-//         middleware: true
-//       },
-//       (req) => {
-//         req.on('response', (res) => {
-//           res.setThrottle(10000);
-//         });
-//       }
-//     ).as('generateToken');
+    cy.visit('/inApp');
 
-//     cy.get('#login').click();
-//     cy.wait('@generateToken');
-//     cy.get('#start').click();
-//     cy.wait('@getInAppMessages');
+    /* buttons are disabled without logging in */
+    cy.login();
 
-//     cy.get('#iterable-iframe').should('exist');
-//   });
-// });
+    cy.get('[data-qa-get-messages-raw]').click();
+
+    cy.wait('@getInAppMessages');
+
+    cy.get('[data-qa-get-messages-raw-response]').contains(
+      JSON.stringify(mockMessages)
+    );
+  });
+
+  it('should paint the correct 400 response', () => {
+    cy.intercept(
+      {
+        method: 'GET',
+        url: '/api/inApp/getMessages*'
+      },
+      { fixture: 'inapp/400.json', statusCode: 400 }
+    ).as('getInAppMessages');
+
+    cy.visit('/inApp');
+
+    /* buttons are disabled without logging in */
+    cy.login();
+
+    cy.get('[data-qa-get-messages-raw]').click();
+
+    cy.wait('@getInAppMessages');
+
+    cy.get('[data-qa-get-messages-raw-response]').contains(
+      JSON.stringify({
+        msg: 'error mocked from cypress'
+      })
+    );
+  });
+});
