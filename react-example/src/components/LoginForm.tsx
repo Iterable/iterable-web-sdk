@@ -83,13 +83,14 @@ export const LoginForm: FC<Props> = ({ setEmail }) => {
           </Button>
         )
       ) : (
-        <Form onSubmit={handleSubmit}>
+        <Form onSubmit={handleSubmit} data-qa-login-form>
           <TextField
             onChange={(e) => updateEmail(e.target.value)}
             value={email}
             placeholder="e.g. hello@gmail.com"
             type="email"
             required
+            data-qa-login-input
           />
           <Button type="submit">Login</Button>
         </Form>

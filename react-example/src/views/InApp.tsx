@@ -102,18 +102,22 @@ export const InApp: FC<Props> = () => {
         <GetMessagesRawButton
           disabled={!loggedInUser || isGettingMessagesRaw}
           onClick={getMessagesRaw}
+          data-qa-get-messages-raw
         >
           {typeof rawMessageCount === 'number'
             ? `Retrieved ${rawMessageCount} messages (try again)`
             : 'Get Messages (do not auto-display)'}
         </GetMessagesRawButton>
-        <Response data-qa-update-user-response>{getMessagesResponse}</Response>
+        <Response data-qa-get-messages-raw-response>
+          {getMessagesResponse}
+        </Response>
       </EndpointWrapper>
       <Heading>POST /inApp/getMessages (auto-display)</Heading>
       <AutoDisplayContainer>
         <Button
           disabled={!loggedInUser || isGettingMessagesAuto}
           onClick={getMessagesAutoDisplay}
+          data-qa-auto-display-messages
         >
           {typeof autoMessageCount === 'number'
             ? `Retrieved ${autoMessageCount} messages (try again)`
@@ -127,6 +131,7 @@ export const InApp: FC<Props> = () => {
             !autoMessageCount
           }
           onClick={handlePause}
+          data-qa-pause-messages
         >
           {isPaused ? 'Paused' : 'Pause Message Stream'}
         </Button>
@@ -138,6 +143,7 @@ export const InApp: FC<Props> = () => {
             !autoMessageCount
           }
           onClick={handleResume}
+          data-qa-resume-messages
         >
           Resume Message Stream
         </Button>
