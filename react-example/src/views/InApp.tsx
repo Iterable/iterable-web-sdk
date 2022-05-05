@@ -28,8 +28,6 @@ const AutoDisplayContainer = styled.div`
   }
 `;
 
-interface Props {}
-
 const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   {
     count: 20,
@@ -40,7 +38,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   { display: 'immediate' }
 );
 
-export const InApp: FC<Props> = () => {
+export const InApp: FC<{}> = () => {
   const [isGettingMessagesRaw, setIsGettingMessagesRaw] =
     useState<boolean>(false);
   const [isGettingMessagesAuto, setIsGettingMessagesAuto] =
