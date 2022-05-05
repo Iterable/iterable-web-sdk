@@ -26,7 +26,7 @@ describe('Track', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -79,7 +79,7 @@ describe('Track Click', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -132,7 +132,7 @@ describe('Track Click', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -185,7 +185,7 @@ describe('Track Close', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -242,7 +242,7 @@ describe('Track Consume', () => {
         method: 'POST',
         url: '/api/events/inAppConsume*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -295,7 +295,7 @@ describe('Track Delivery', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');
@@ -348,7 +348,7 @@ describe('Track Open', () => {
         method: 'POST',
         url: '/api/events/track*'
       },
-      { fixture: 'events/400.json' }
+      { fixture: 'events/400.json', statusCode: 400 }
     ).as('track');
 
     cy.visit('/events');

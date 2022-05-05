@@ -30,7 +30,7 @@ describe('Update User', () => {
         method: 'POST',
         url: '/api/users/update*'
       },
-      { fixture: 'users/400.json' }
+      { fixture: 'users/400.json', statusCode: 400 }
     ).as('updateUser');
 
     cy.visit('/users');
@@ -82,7 +82,7 @@ describe('Update User Email', () => {
         method: 'POST',
         url: '/api/users/updateEmail*'
       },
-      { fixture: 'users/400.json' }
+      { fixture: 'users/400.json', statusCode: 400 }
     ).as('updateUserEmail');
 
     cy.visit('/users');
@@ -134,7 +134,7 @@ describe('Update Subscriptions', () => {
         method: 'POST',
         url: '/api/users/updateSubscriptions*'
       },
-      { fixture: 'users/400.json' }
+      { fixture: 'users/400.json', statusCode: 400 }
     ).as('updateSubscriptions');
 
     cy.visit('/users');
