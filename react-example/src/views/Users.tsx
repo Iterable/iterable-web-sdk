@@ -1,4 +1,4 @@
-import { FC, FormEvent, useContext, useState } from 'react';
+import { FC, FormEvent, useState } from 'react';
 import TextField from 'src/components/TextField';
 import {
   Button,
@@ -13,13 +13,12 @@ import {
   updateUserEmail
 } from '@iterable/web-sdk';
 
-import { Context, UserContext } from 'src/context/Users';
+import { useUser } from 'src/context/Users';
 
 interface Props {}
 
 export const Users: FC<Props> = () => {
-  const { state: loggedInUser, dispatch: setLoggedInUser } =
-    useContext<Context>(UserContext);
+  const { loggedInUser, setLoggedInUser } = useUser();
 
   const [updateUserResponse, setUpdateUserResponse] = useState<string>(
     'Endpoint JSON goes here'

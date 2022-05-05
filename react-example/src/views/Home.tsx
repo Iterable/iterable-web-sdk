@@ -28,6 +28,9 @@ export const Home: FC<Props> = () => {
         <Link to="/users" renderAsButton>
           Users
         </Link>
+        <Link to="/inApp" renderAsButton>
+          inApp
+        </Link>
       </Wrapper>
     </>
   );

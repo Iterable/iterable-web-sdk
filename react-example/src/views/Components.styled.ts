@@ -15,6 +15,7 @@ export const Form = styled.form`
 export const Response = styled.pre`
   width: 45%;
   white-space: break-spaces;
+  overflow-x: auto;
 
   @media (max-width: 850px) {
     width: 100%;

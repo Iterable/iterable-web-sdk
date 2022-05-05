@@ -36,9 +36,21 @@ const _Button = styled.button`
 const DisabledButton = styled(_Button)`
   background-color: gray;
   color: #c7c7c7;
-  -webkit-box-shadow: 0 7px 0 0 #4d4d4d;
-  box-shadow: 0 7px 0 0 #4d4d4d;
+  -webkit-box-shadow: 0 5px 0 0 #4d4d4d;
+  box-shadow: 0 5px 0 0 #4d4d4d;
   cursor: not-allowed;
+
+  &:active {
+    background: gray;
+    border: none;
+    -webkit-box-shadow: 0 5px 0 0 #4d4d4d;
+    box-shadow: 0 5px 0 0 #4d4d4d;
+    -moz-transform: unset;
+    -webkit-transform: unset;
+    -o-transform: unset;
+    -ms-transform: unset;
+    transform: unset;
+  }
 `;
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {}
