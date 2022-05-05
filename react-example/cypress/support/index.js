@@ -1,3 +1,5 @@
+import './commands';
+
 /*
   setup file for each test. These run before each and every test
 */

@@ -23,3 +23,11 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
+
+/* eslint-disable */
+Cypress.Commands.add('login', () => {
+  cy.get('[data-qa-login-input]').type('cypress-tester@gmail.com');
+  cy.get('[data-qa-login-form]').submit();
+
+  cy.wait('@generateToken');
+});
