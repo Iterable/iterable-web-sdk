@@ -1,7 +1,7 @@
 import { FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 import _Button from 'src/components/Button';
-import { EndpointWrapper, Form, Heading, Response } from './Components.styled';
+import { EndpointWrapper, Heading, Response } from './Components.styled';
 import { useUser } from 'src/context/Users';
 import { getInAppMessages } from '@iterable/web-sdk';
 
