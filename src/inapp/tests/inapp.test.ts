@@ -467,7 +467,7 @@ describe('getInAppMessages', () => {
         ]
       });
       const mockRouteChange = jest.fn();
-      delete global.location;
+      delete (global as any).location;
       global.location = {} as any;
       global.location.assign = mockRouteChange;
 
@@ -549,7 +549,7 @@ describe('getInAppMessages', () => {
       });
 
       const mockRouteChange = jest.fn();
-      delete global.location;
+      delete (global as any).location;
       global.location = {} as any;
       global.location.assign = mockRouteChange;
 
@@ -593,7 +593,7 @@ describe('getInAppMessages', () => {
       const mockOpen = jest.fn();
       global.open = mockOpen;
       const mockRouteChange = jest.fn();
-      delete global.location;
+      delete (global as any).location;
       global.location = {} as any;
       global.location.assign = mockRouteChange;
       global.location.host = 'google.com';
