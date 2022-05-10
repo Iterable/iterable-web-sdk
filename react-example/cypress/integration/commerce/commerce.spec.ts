@@ -32,7 +32,7 @@ describe('Track Purchase', () => {
         method: 'POST',
         url: '/api/commerce/trackPurchase*'
       },
-      { fixture: 'commerce/400.json' }
+      { fixture: 'commerce/400.json', statusCode: 400 }
     ).as('trackPurchase');
 
     cy.visit('/commerce');
@@ -88,7 +88,7 @@ describe('Update Cart', () => {
         method: 'POST',
         url: '/api/commerce/updateCart*'
       },
-      { fixture: 'commerce/400.json' }
+      { fixture: 'commerce/400.json', statusCode: 400 }
     ).as('updateCart');
 
     cy.visit('/commerce');
