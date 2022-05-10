@@ -385,7 +385,7 @@ describe('getInAppMessages', () => {
       expect(document.body.innerHTML).toBe('');
     });
 
-    it('should paint next messsage to DOM if resumed', async () => {
+    it('should paint next message to DOM if resumed', async () => {
       const { request, pauseMessageStream, resumeMessageStream } =
         getInAppMessages({ count: 10, packageName: 'my-lil-website' }, true);
       await request();
