@@ -235,8 +235,13 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 /**
  *
  * @param html html you want to paint to the DOM inside the iframe
- * @param callback method to run after HTML has been written to iframe
+ * @param position screen position the message should appear in
+ * @param shouldAnimate if the in-app should animate in/out
  * @param srMessage The message you want the screen reader to read when popping up the message
+ * @param topOffset how many px or % buffer between the in-app message and the top of the screen
+ * @param bottomOffset how many px or % buffer between the in-app message and the bottom of the screen
+ * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
+ *
  * @returns { HTMLIFrameElement }
  */
 export const paintIFrame = (
