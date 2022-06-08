@@ -71,6 +71,22 @@ export function initialize(
       }));
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
+  /* 
+    AKA did the user auth with their email (setEmail) or user ID (setUserID) 
+
+    we're going to use this variable for one circumstance - when calling _updateUserEmail_.
+    Essentially, when we call the Iterable API to update a user's email address and we get a
+    successful 200 request, we're going to request a new JWT token, since it might need to
+    be re-signed with the new email address; however, if the customer code never authorized the
+    user with an email and instead a user ID, we'll just continue to sign the JWT with the user ID.
+
+    This is mainly just a quality-of-life feature, so that the customer's JWT generation code
+    doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
+    tokens by user ID.
+  */
+  let typeOfAuth: null | 'email' | 'userID' = null;
+  /* this will be the literal user ID or email they choose to auth with */
+  let authIdentifier: null | string = null;
 
   /**
     method that sets a timer one minute before JWT expiration
@@ -205,6 +221,8 @@ export function initialize(
         }
       },
       setEmail: (email: string) => {
+        typeOfAuth = 'email';
+        authIdentifier = email;
         clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -216,6 +234,8 @@ export function initialize(
         addEmailToRequest(email);
       },
       setUserID: async (userId: string) => {
+        typeOfAuth = 'userID';
+        authIdentifier = userId;
         clearMessages();
 
         if (typeof userInterceptor === 'number') {
@@ -398,7 +418,12 @@ export function initialize(
                 */
                 const newEmail = JSON.parse(config.config.data)?.newEmail;
 
-                return generateJWT({ email: newEmail }).then((newToken) => {
+                const payloadToPass =
+                  typeOfAuth === 'email'
+                    ? { email: newEmail }
+                    : { userID: authIdentifier! };
+
+                return generateJWT(payloadToPass).then((newToken) => {
                   /* 
                     clear any existing interceptors that are adding user info 
                     or API keys
@@ -470,7 +495,7 @@ export function initialize(
                   */
                   handleTokenExpiration(newToken, () => {
                     /* re-run the JWT generation */
-                    return doRequest({ email: newEmail }).catch((e) => {
+                    return doRequest(payloadToPass).catch((e) => {
                       console.warn(e);
                       console.warn(
                         'Could not refresh JWT. Try identifying the user again.'
@@ -589,6 +614,8 @@ export function initialize(
       handleTokenExpiration('');
     },
     setEmail: (email: string) => {
+      typeOfAuth = 'email';
+      authIdentifier = email;
       /* clear previous user */
       clearMessages();
       if (typeof userInterceptor === 'number') {
@@ -607,6 +634,8 @@ export function initialize(
       });
     },
     setUserID: async (userId: string) => {
+      typeOfAuth = 'userID';
+      authIdentifier = userId;
       clearMessages();
 
       if (typeof userInterceptor === 'number') {
@@ -714,6 +743,8 @@ export function initialize(
         });
     },
     logout: () => {
+      typeOfAuth = null;
+      authIdentifier = null;
       /* clear fetched in-app messages */
       clearMessages();
 

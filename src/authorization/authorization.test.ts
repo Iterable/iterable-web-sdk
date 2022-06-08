@@ -249,6 +249,69 @@ describe('API Key Interceptors', () => {
       });
       expect(response.config.params.email).toBe('helloworld@gmail.com');
     });
+
+    it('should try to generate JWT again with user ID if updateEmail is called after setUserID', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setUserID } = initialize('123', mockGenerateJWT);
+
+      await setUserID('mock-id');
+      await updateUserEmail('helloworld@gmail.com');
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+      expect(mockGenerateJWT).toHaveBeenCalledWith({ userID: 'mock-id' });
+      expect(mockGenerateJWT).not.toHaveBeenCalledWith({
+        email: 'helloworld@gmail.com'
+      });
+
+      jest.advanceTimersByTime(60000 * 4.1);
+      /* 
+        called once originally, a second time after the email was changed, 
+        and a third after the JWT was about to expire
+      */
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
+      expect(mockGenerateJWT).lastCalledWith({
+        userID: 'mock-id'
+      });
+    });
+
+    it('should try to generate JWT again with email if updateEmail is called after setEmail', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail } = initialize('123', mockGenerateJWT);
+
+      await setEmail('first@gmail.com');
+      await updateUserEmail('second@gmail.com');
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+      expect(mockGenerateJWT).toHaveBeenCalledWith({
+        email: 'first@gmail.com'
+      });
+      expect(mockGenerateJWT).toHaveBeenCalledWith({
+        email: 'second@gmail.com'
+      });
+      expect(mockGenerateJWT).not.toHaveBeenCalledWith({
+        userID: 'mock-id'
+      });
+
+      jest.advanceTimersByTime(60000 * 4.1);
+      /* 
+        called once originally, a second time after the email was changed, 
+        and a third after the JWT was about to expire
+      */
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
+      expect(mockGenerateJWT).lastCalledWith({
+        email: 'second@gmail.com'
+      });
+    });
   });
 });
 

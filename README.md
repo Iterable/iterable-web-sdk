@@ -222,24 +222,6 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
 )
 ```
 
-:rotating_light: *PLEASE NOTE*: When you call `updateUserEmail`, we will invoke `yourAsyncJWTGenerationMethod` with the new email address even if you originally authenticated with a user ID, so if you chose to first call `setUserID`, you will need to ensure your backend can also handle JWT generation with email addresses. In other words, you need to make sure both invocations of your async JWT generation method work:
-
-```ts
-/* 
-  the key "email" can be whatever. You just need to make sure your method can be passed an
-  email somehow when originally calling "initialize"
-*/
-yourAsyncJWTGenerationMethod({ email: 'email@email.com' })
-```
-
-```ts
-/* 
-  the key "userID" can be whatever. You just need to make sure your method can be passed a
-  user ID somehow when originally calling "initialize"
-*/
-yourAsyncJWTGenerationMethod({ userID: '1sfds32' })
-```
-
 ## track
 
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
@@ -844,24 +826,6 @@ initialize(
 ```
 
 When the previous 3 listed events occur, we will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
-
-:rotating_light: *PLEASE NOTE*: When you call `updateUserEmail`, we will invoke `yourAsyncJWTGenerationMethod` with the new email address even if you originally authenticated with a user ID, so if you chose to first call `setUserID`, you will need to ensure your backend can also handle JWT generation with email addresses. In other words, you need to make sure both invocations of your async JWT generation method work:
-
-```ts
-/* 
-  the key "email" can be whatever. You just need to make sure your method can be passed an
-  email somehow when originally calling "initialize"
-*/
-yourAsyncJWTGenerationMethod({ email: 'email@email.com' })
-```
-
-```ts
-/* 
-  the key "userID" can be whatever. You just need to make sure your method can be passed a
-  user ID somehow when originally calling "initialize"
-*/
-yourAsyncJWTGenerationMethod({ userID: '1sfds32' })
-```
 
 Finally, if the request to regenerate the JWT fails however, we will not attempt to generate the JWT again so requests will start failing at that point.
 
