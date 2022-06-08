@@ -338,6 +338,8 @@ export function initialize(
         }
       },
       logout: () => {
+        typeOfAuth = null;
+        authIdentifier = null;
         /* clear fetched in-app messages */
         clearMessages();
 
