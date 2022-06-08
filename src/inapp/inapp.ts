@@ -37,10 +37,12 @@ import schema from './inapp.schema';
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
 let messageIndex = 0;
+let isPaused = false;
 
 export const clearMessages = () => {
   parsedMessages = [];
   messageIndex = 0;
+  isPaused = false;
   if (timer) {
     clearTimeout(timer);
   }
@@ -589,11 +591,14 @@ export function getInAppMessages(
           }),
       pauseMessageStream: () => {
         if (timer) {
+          isPaused = true;
           clearTimeout(timer);
         }
       },
       resumeMessageStream: () => {
-        return paintMessageToDOM();
+        if (isPaused) {
+          return paintMessageToDOM();
+        }
       },
       ...maybeDisplayFn
     };
