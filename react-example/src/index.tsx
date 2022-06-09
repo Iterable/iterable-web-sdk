@@ -38,28 +38,25 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setUserID: setEmail } = initialize(
-    process.env.API_KEY || '',
-    ({ email, userID: user_id }) => {
-      return axios
-        .post(
-          'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            user_id,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
+  const { setEmail } = initialize(process.env.API_KEY || '', ({ email }) => {
+    return axios
+      .post(
+        'http://localhost:5000/generate',
+        {
+          exp_minutes: 2,
+          email,
+          jwt_secret: process.env.JWT_SECRET
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
           }
-        )
-        .then((response) => {
-          return response.data?.token;
-        });
-    }
-  );
+        }
+      )
+      .then((response) => {
+        return response.data?.token;
+      });
+  });
 
   ReactDOM.render(
     <BrowserRouter>
