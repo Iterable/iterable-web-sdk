@@ -597,6 +597,7 @@ export function getInAppMessages(
       },
       resumeMessageStream: () => {
         if (isPaused) {
+          isPaused = false;
           return paintMessageToDOM();
         }
       },
