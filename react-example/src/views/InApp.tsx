@@ -33,7 +33,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     count: 20,
     packageName: 'my-website',
     closeButton: {},
-    displayInterval: 2000
+    displayInterval: 10000
   },
   { display: 'immediate' }
 );
