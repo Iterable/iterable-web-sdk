@@ -239,7 +239,7 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('id', 'iterable-iframe');
-  iframe.setAttribute('sandbox', 'allow-same-origin');
+  iframe.setAttribute('sandbox', 'allow-same-origin allow-popups');
   /*
     _display: none_ would remove the ability to set event handlers on elements
     so instead we choose to hide it visibly with CSS but not actually remove
