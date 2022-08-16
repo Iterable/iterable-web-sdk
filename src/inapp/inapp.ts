@@ -1,4 +1,5 @@
 import { throttle } from 'throttle-debounce';
+import set from 'lodash/set';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
@@ -15,7 +16,8 @@ import {
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
-  trackMessagesDelivered
+  trackMessagesDelivered,
+  wrapWithIFrame
 } from './utils';
 import {
   trackInAppClick,
@@ -625,6 +627,19 @@ export function getInAppMessages(
       response.data.inAppMessages || [],
       dupedPayload.packageName
     );
-    return response;
+    const messages = response.data.inAppMessages;
+    const withIframes = messages?.map((message) => {
+      const html = message.content?.html;
+      return html
+        ? set(message, 'content.html', wrapWithIFrame(html))
+        : message;
+    });
+    return {
+      ...response,
+      data: {
+        ...response.data,
+        inAppMessages: withIframes
+      }
+    };
   });
 }
