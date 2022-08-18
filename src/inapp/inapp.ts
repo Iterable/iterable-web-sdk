@@ -258,18 +258,20 @@ export function getInAppMessages(
             );
           }
 
-          overlay.addEventListener('click', () => {
-            dismissMessage(activeIframe);
-            overlay.remove();
-            document.removeEventListener('keydown', handleDocumentEscPress);
-            if (activeIframe?.contentWindow?.document) {
-              activeIframe.contentWindow?.document.removeEventListener(
-                'keydown',
-                handleIFrameEscPress
-              );
-            }
-            global.removeEventListener('resize', throttledResize);
-          });
+          if (!payload.closeButton?.requiredToDismissMessage) {
+            overlay.addEventListener('click', () => {
+              dismissMessage(activeIframe);
+              overlay.remove();
+              document.removeEventListener('keydown', handleDocumentEscPress);
+              if (activeIframe?.contentWindow?.document) {
+                activeIframe.contentWindow?.document.removeEventListener(
+                  'keydown',
+                  handleIFrameEscPress
+                );
+              }
+              global.removeEventListener('resize', throttledResize);
+            });
+          }
 
           /*
             create an absolutely positioned button that lies underneath the
