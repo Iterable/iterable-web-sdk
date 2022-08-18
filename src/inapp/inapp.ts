@@ -258,7 +258,7 @@ export function getInAppMessages(
             );
           }
 
-          if (!payload.closeButton?.requiredToDismissMessage) {
+          if (!payload.closeButton?.isRequiredToDismissMessage) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
