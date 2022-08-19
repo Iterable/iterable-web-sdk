@@ -239,7 +239,12 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('id', 'iterable-iframe');
-  iframe.setAttribute('sandbox', 'allow-same-origin allow-popups');
+  // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
+  // event handlers on elements in it preventing our custom link handling
+  iframe.setAttribute(
+    'sandbox',
+    'allow-same-origin allow-popups allow-top-navigation'
+  );
   /*
     _display: none_ would remove the ability to set event handlers on elements
     so instead we choose to hide it visibly with CSS but not actually remove
@@ -262,16 +267,16 @@ const generateSecuredIFrame = () => {
 /**
  *
  * @param html
- * @returns { string } html string of an inapp message to wrap in an iframe for render
+ * @returns { HTMLIFrameElement } iframe with html string of an inapp message wrapped in onload
  */
-export const wrapWithIFrame = (html: string): string => {
+export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
   const iframe = generateSecuredIFrame();
-  return iframe.outerHTML.replace(
-    '<iframe',
-    `<iframe onload='((f) => {const doc = "${html
-      .replaceAll(/\r?\n|\r/g, '')
-      .replaceAll('"', '\\"')}";f.contentWindow.document.write(doc);})(this)'`
-  );
+  iframe.onload = () => {
+    iframe.contentWindow?.document.write(
+      html.replaceAll(/\r?\n|\r/g, '').replaceAll('"', '\\"')
+    );
+  };
+  return iframe;
 };
 
 /**

@@ -162,7 +162,7 @@ export function getInAppMessages(
 
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
-          activeMessage.content.html,
+          activeMessage.content.html as string,
           position,
           shouldAnimate,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
@@ -631,7 +631,7 @@ export function getInAppMessages(
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html
-        ? set(message, 'content.html', wrapWithIFrame(html))
+        ? set(message, 'content.html', wrapWithIFrame(html as string))
         : message;
     });
     return {

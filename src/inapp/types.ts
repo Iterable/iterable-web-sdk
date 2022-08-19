@@ -49,7 +49,7 @@ export interface InAppMessage {
   expiresAt: number;
   content: {
     payload?: Record<string, any>;
-    html: string;
+    html: string | HTMLIFrameElement;
     inAppDisplaySettings: {
       top: InAppDisplaySetting;
       right: InAppDisplaySetting;
