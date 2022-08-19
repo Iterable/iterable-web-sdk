@@ -90,14 +90,15 @@ Along with the API parameters, you can pass these options to the SDK method to h
 
 Close Button Options:
 
-| Property Name | Description                                                                    | Value                      | Default       |
-|---------------|--------------------------------------------------------------------------------|----------------------------|---------------|
-| color         | What color the button is (does not affect custom icons)                        | `string`                   | `undefined`   |
-| iconPath      | Custom pathname to an image or SVG you want to show instead of the default "X" | `string`                   | `undefined`   |
-| position      | Where to appear relative to the in-app message                                 | `'top-right \| 'top-left'` | `'top-right'` |
-| sideOffset    | How much space to leave between the button and side of the container           | `string`                   | `'4%'`        |
-| size          | How large to set the width, height, and font-size                              | `string \| number`         | `24`          |
-| topOffset     | How much space to leave between the button and the top of the container        | `string`                   | `'4%'`        |
+| Property Name              | Description                                                                                | Value                      | Default       |
+| -------------------------- | ------------------------------------------------------------------------------------------ | -------------------------- | ------------- |
+| color                      | What color the button is (does not affect custom icons)                                    | `string`                   | `undefined`   |
+| iconPath                   | Custom pathname to an image or SVG you want to show instead of the default "X"             | `string`                   | `undefined`   |
+| position                   | Where to appear relative to the in-app message                                             | `'top-right \| 'top-left'` | `'top-right'` |
+| isRequiredToDismissMessage | If set to true, prevent user from dismissing in-app message by clicking outside of message | `boolean`                  | `undefined`   |
+| sideOffset                 | How much space to leave between the button and side of the container                       | `string`                   | `'4%'`        |
+| size                       | How large to set the width, height, and font-size                                          | `string \| number`         | `24`          |
+| topOffset                  | How much space to leave between the button and the top of the container                    | `string`                   | `'4%'`        |
 
 Example:
 
