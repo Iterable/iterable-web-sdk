@@ -56,9 +56,7 @@ describe('getInAppMessages', () => {
       });
 
       response.data.inAppMessages.forEach((message) => {
-        expect(message.content?.html).toContain('iframe');
-        expect(message.content?.html).toContain('onload');
-        expect(message.content?.html).toContain('sandbox');
+        expect(message.content?.html).toBeInstanceOf(HTMLIFrameElement);
       });
     });
 
