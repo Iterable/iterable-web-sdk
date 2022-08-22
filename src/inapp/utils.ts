@@ -234,6 +234,51 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 
 /**
  *
+ * @returns { HTMLIFrameElement } iframe with sandbox and hidden styling applied for of an inapp message to render with
+ */
+const generateSecuredIFrame = () => {
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('id', 'iterable-iframe');
+  // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
+  // event handlers on elements in it preventing our custom link handling
+  iframe.setAttribute(
+    'sandbox',
+    'allow-same-origin allow-popups allow-top-navigation'
+  );
+  /*
+    _display: none_ would remove the ability to set event handlers on elements
+    so instead we choose to hide it visibly with CSS but not actually remove
+    its interact-ability
+
+    https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
+  */
+  iframe.style.cssText = `
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    height: 1px;
+    width: 1px;
+    overflow: hidden;
+  `;
+
+  return iframe;
+};
+
+/**
+ *
+ * @param html
+ * @returns { HTMLIFrameElement } iframe with html string of an inapp message wrapped in onload
+ */
+export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
+  const iframe = generateSecuredIFrame();
+  iframe.onload = () => {
+    iframe.contentWindow?.document.write(html);
+  };
+  return iframe;
+};
+
+/**
+ *
  * @param html html you want to paint to the DOM inside the iframe
  * @param position screen position the message should appear in
  * @param shouldAnimate if the in-app should animate in/out
@@ -254,26 +299,7 @@ export const paintIFrame = (
   rightOffset?: string
 ): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('id', 'iterable-iframe');
-    iframe.setAttribute('sandbox', 'allow-same-origin');
-    /* 
-      _display: none_ would remove the ability to set event handlers on elements
-      so instead we choose to hide it visibly with CSS but not actually remove
-      its interact-ability
-      
-      https://snook.ca/archives/html_and_css/hiding-content-for-accessibility 
-    */
-    iframe.style.cssText = `
-      position: fixed !important;
-      top: 0;
-      left: 0;
-      height: 1px;
-      width: 1px;
-      overflow: hidden;
-      clip: rect(1px 1px 1px 1px);
-      clip: rect(1px, 1px, 1px, 1px);
-    `;
+    const iframe = generateSecuredIFrame();
 
     /* 
       find all the images in the in-app message, preload them, and 

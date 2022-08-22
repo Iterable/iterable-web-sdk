@@ -1,4 +1,5 @@
 import { throttle } from 'throttle-debounce';
+import set from 'lodash/set';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
@@ -15,7 +16,8 @@ import {
   paintIFrame,
   paintOverlay,
   sortInAppMessages,
-  trackMessagesDelivered
+  trackMessagesDelivered,
+  wrapWithIFrame
 } from './utils';
 import {
   trackInAppClick,
@@ -160,7 +162,7 @@ export function getInAppMessages(
 
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
-          activeMessage.content.html,
+          activeMessage.content.html as string,
           position,
           shouldAnimate,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
@@ -627,6 +629,19 @@ export function getInAppMessages(
       response.data.inAppMessages || [],
       dupedPayload.packageName
     );
-    return response;
+    const messages = response.data.inAppMessages;
+    const withIframes = messages?.map((message) => {
+      const html = message.content?.html;
+      return html
+        ? set(message, 'content.html', wrapWithIFrame(html as string))
+        : message;
+    });
+    return {
+      ...response,
+      data: {
+        ...response.data,
+        inAppMessages: withIframes
+      }
+    };
   });
 }

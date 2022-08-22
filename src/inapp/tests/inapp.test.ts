@@ -49,6 +49,17 @@ describe('getInAppMessages', () => {
       expect(element?.tagName).toBeUndefined();
     });
 
+    it('should wrap each message in an iframe', async () => {
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+
+      response.data.inAppMessages.forEach((message) => {
+        expect(message.content?.html).toBeInstanceOf(HTMLIFrameElement);
+      });
+    });
+
     it('should reject if fails client-side validation', async () => {
       try {
         await getInAppMessages({} as any);
