@@ -272,9 +272,7 @@ const generateSecuredIFrame = () => {
 export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
   const iframe = generateSecuredIFrame();
   iframe.onload = () => {
-    iframe.contentWindow?.document.write(
-      html.replaceAll(/\r?\n|\r/g, '').replaceAll('"', '\\"')
-    );
+    iframe.contentWindow?.document.write(html);
   };
   return iframe;
 };
