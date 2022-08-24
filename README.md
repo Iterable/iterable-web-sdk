@@ -88,7 +88,7 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | topOffset                                        | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
 | closeButton                                      | Properties to show a custom close button on each in-app message                                                                                                                                                                   | `CloseButtonOptions` (see below)                                  | `undefined` |
 
-:rotating_light: Due to a limitation in Safari, web in-app messages displayed on Safari will not respect the value set for handleLinks. Customers who want to make sure links in their web in-app messages work in Safari will need to specify the **target** property in their message (`target="_blank"` for new tab, `target="_top"` / `target="_parent"` for same tab).
+:rotating_light: Due to a limitation in Safari, web in-app messages displayed in Safari do not respect the value set for `handleLinks`. As a workaround, give your links a `target` (`target="_blank"` for new tab, `target="_top"` / `target="_parent"` for same tab).
 
 Close Button Options:
 
@@ -97,7 +97,7 @@ Close Button Options:
 | color                      | What color the button is (does not affect custom icons)                                    | `string`                   | `undefined`   |
 | iconPath                   | Custom pathname to an image or SVG you want to show instead of the default "X"             | `string`                   | `undefined`   |
 | position                   | Where to appear relative to the in-app message                                             | `'top-right \| 'top-left'` | `'top-right'` |
-| isRequiredToDismissMessage | If set to true, prevent user from dismissing in-app message by clicking outside of message | `boolean`                  | `undefined`   |
+| isRequiredToDismissMessage | If `true`, prevent user from dismissing in-app message by clicking outside of message      | `boolean`                  | `undefined`   |
 | sideOffset                 | How much space to leave between the button and side of the container                       | `string`                   | `'4%'`        |
 | size                       | How large to set the width, height, and font-size                                          | `string \| number`         | `24`          |
 | topOffset                  | How much space to leave between the button and the top of the container                    | `string`                   | `'4%'`        |
