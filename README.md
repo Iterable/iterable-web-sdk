@@ -102,7 +102,7 @@ Close Button Options:
 
 Example:
 
-When using the method `getInAppMessages` with the `showInAppMessagesAutomatically` set to false or not set, the return value will be just the API response from the Iterable backend with the message data as the body. Inside there will be a list of inAppMessages and within each one the field `content.html` will be modified to be an instance of an `iframe` with the inAppMessage embedded inside. Iterable provides this `iframe` with the `sandbox` attribute set to provide an isolated render within a web application and to prevent any malicious JS execution.
+Calling `getInAppMessages` with `showInAppMessagesAutomatically` set to `false` (or not set) returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
@@ -117,9 +117,9 @@ getInAppMessages({ count: 20, packageName: 'mySite1' })
   .catch()
 ```
 
-At this point the iframe with the message will be rendered on the page but not visible. The CSS will need to be modified to have the styling desired to render properly on the webpage as well as appropriate click handlers to close the message and send tracking events.
+This code places an in-app on the page, but it won't be visible.  To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
 
-or if you want to show messages automatically
+Or, to show messages automatically:
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
