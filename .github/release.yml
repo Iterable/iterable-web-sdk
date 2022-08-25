@@ -6,7 +6,7 @@ changelog:
     - title: Breaking Changes
       labels:
         - breaking-change
-    - title: Changes
+    - title: Updates
       labels:
         - enhancement
         - refactor
