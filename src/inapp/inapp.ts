@@ -347,14 +347,13 @@ export function getInAppMessages(
           }
 
           /* 
-            track in-app consumes only when _trigger.type_ 
-            is NOT "never" or undefined and always track in-app opens
+            track in-app consumes only when _saveToInbox_ 
+            is falsy or undefined and always track in-app opens
 
             Also swallow any 400+ response errors. We don't care about them.
           */
           if (ENABLE_INAPP_CONSUME || IS_PRODUCTION) {
             const trackRequests = [
-              // TODO: Backend is not setting message to read
               trackInAppOpen({
                 messageId: activeMessage.messageId,
                 deviceInfo: {
@@ -362,7 +361,7 @@ export function getInAppMessages(
                 }
               })
             ];
-            if (!activeMessage?.saveToInbox)
+            if (!activeMessage.saveToInbox)
               trackRequests.push(
                 trackInAppConsume({
                   messageId: activeMessage.messageId,
