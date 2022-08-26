@@ -348,7 +348,7 @@ export function getInAppMessages(
 
           /* 
             track in-app consumes only when _trigger.type_ 
-            is NOT never or undefined and always track in-app opens
+            is NOT "never" or undefined and always track in-app opens
 
             Also swallow any 400+ response errors. We don't care about them.
           */
@@ -566,7 +566,7 @@ export function getInAppMessages(
               if the user passed the flag to automatically paint the in-app messages
               to the DOM, start a timer and show each in-app message upon close + timer countdown
               
-              However there are 4 conditions in which to not show a message:
+              However there are 3 conditions in which to not show a message:
               
               1. _read_ key is truthy
               2. _trigger.type_ key is "never" (deliver silently is checked)
