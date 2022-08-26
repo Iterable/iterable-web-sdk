@@ -354,6 +354,7 @@ export function getInAppMessages(
           */
           if (ENABLE_INAPP_CONSUME || IS_PRODUCTION) {
             const trackRequests = [
+              // TODO: Backend is not setting message to read
               trackInAppOpen({
                 messageId: activeMessage.messageId,
                 deviceInfo: {
@@ -361,7 +362,7 @@ export function getInAppMessages(
                 }
               })
             ];
-            if (activeMessage.trigger.type !== 'never')
+            if (!activeMessage?.saveToInbox)
               trackRequests.push(
                 trackInAppConsume({
                   messageId: activeMessage.messageId,
