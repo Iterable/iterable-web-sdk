@@ -353,31 +353,24 @@ export function getInAppMessages(
             Also swallow any 400+ response errors. We don't care about them.
           */
           if (ENABLE_INAPP_CONSUME || IS_PRODUCTION) {
-            Promise.all(
-              !activeMessage?.saveToInbox
-                ? [
-                    trackInAppOpen({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
-                    }),
-                    trackInAppConsume({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
-                    })
-                  ]
-                : [
-                    trackInAppOpen({
-                      messageId: activeMessage.messageId,
-                      deviceInfo: {
-                        appPackageName: payload.packageName
-                      }
-                    })
-                  ]
-            ).catch((e) => e);
+            const trackRequests = [
+              trackInAppOpen({
+                messageId: activeMessage.messageId,
+                deviceInfo: {
+                  appPackageName: payload.packageName
+                }
+              })
+            ];
+            if (!activeMessage.saveToInbox)
+              trackRequests.push(
+                trackInAppConsume({
+                  messageId: activeMessage.messageId,
+                  deviceInfo: {
+                    appPackageName: payload.packageName
+                  }
+                })
+              );
+            Promise.all(trackRequests).catch((e) => e);
           }
 
           /* now we'll add click tracking to _all_ anchor tags */
@@ -523,7 +516,9 @@ export function getInAppMessages(
       showInAppMessagesAutomatically.display === 'deferred'
         ? {
             triggerDisplayMessages: (messages: Partial<InAppMessage>[]) => {
-              parsedMessages = messages as InAppMessage[];
+              parsedMessages = filterHiddenInAppMessages(
+                messages
+              ) as InAppMessage[];
 
               return paintMessageToDOM();
             }
@@ -574,7 +569,7 @@ export function getInAppMessages(
               However there are 3 conditions in which to not show a message:
               
               1. _read_ key is truthy
-              2. _trigger.type_ key is "never"
+              2. _trigger.type_ key is "never" (deliver silently is checked)
               3. HTML body is blank
 
               so first filter out unwanted messages and sort them
