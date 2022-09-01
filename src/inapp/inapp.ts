@@ -79,7 +79,6 @@ export function getInAppMessages(
     | { display: 'immediate' | 'deferred' }
 ) {
   clearMessages();
-
   const dupedPayload = { ...payload };
 
   /* delete SDK-defined payload props and email and userId */
@@ -116,20 +115,18 @@ export function getInAppMessages(
                 : 'slide-out';
           }
 
+          const trackPayload = {
+            messageId: activeMessage.messageId,
+            deviceInfo: { appPackageName: dupedPayload.packageName }
+          };
           /* close the message and start a timer to show the next one */
           trackInAppClose(
             url
               ? {
-                  messageId: activeMessage.messageId,
-                  clickedUrl: url,
-                  deviceInfo: {
-                    appPackageName: dupedPayload.packageName
-                  }
+                  ...trackPayload,
+                  clickedUrl: url
                 }
-              : {
-                  messageId: activeMessage.messageId,
-                  deviceInfo: { appPackageName: dupedPayload.packageName }
-                }
+              : trackPayload
           ).catch((e) => e);
 
           if (shouldAnimate) {
@@ -353,23 +350,18 @@ export function getInAppMessages(
             Also swallow any 400+ response errors. We don't care about them.
           */
           if (ENABLE_INAPP_CONSUME || IS_PRODUCTION) {
+            const trackPayload = {
+              messageId: activeMessage.messageId,
+              deviceInfo: {
+                appPackageName: payload.packageName
+              }
+            };
             const trackRequests = [
-              trackInAppOpen({
-                messageId: activeMessage.messageId,
-                deviceInfo: {
-                  appPackageName: payload.packageName
-                }
-              })
+              trackInAppOpen(trackPayload),
+              ...(!activeMessage.saveToInbox
+                ? [trackInAppConsume(trackPayload)]
+                : [])
             ];
-            if (!activeMessage.saveToInbox)
-              trackRequests.push(
-                trackInAppConsume({
-                  messageId: activeMessage.messageId,
-                  deviceInfo: {
-                    appPackageName: payload.packageName
-                  }
-                })
-              );
             Promise.all(trackRequests).catch((e) => e);
           }
 
@@ -511,19 +503,21 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const maybeDisplayFn =
+    const isDeferred =
       typeof showInAppMessagesAutomatically !== 'boolean' &&
-      showInAppMessagesAutomatically.display === 'deferred'
-        ? {
-            triggerDisplayMessages: (messages: Partial<InAppMessage>[]) => {
-              parsedMessages = filterHiddenInAppMessages(
-                messages
-              ) as InAppMessage[];
+      showInAppMessagesAutomatically.display === 'deferred';
 
-              return paintMessageToDOM();
-            }
+    const triggerDisplayFn = isDeferred
+      ? {
+          triggerDisplayMessages: (messages: Partial<InAppMessage>[]) => {
+            parsedMessages = filterHiddenInAppMessages(
+              messages
+            ) as InAppMessage[];
+
+            return paintMessageToDOM();
           }
-        : {};
+        }
+      : {};
 
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
@@ -547,10 +541,7 @@ export function getInAppMessages(
             return response;
           })
           .then((response) => {
-            if (
-              typeof showInAppMessagesAutomatically !== 'boolean' &&
-              showInAppMessagesAutomatically.display === 'deferred'
-            ) {
+            if (isDeferred)
               /*
                 if the user passed "deferred" for the second argument to _getMessages_
                 then they're going to choose to display the in-app messages when they want
@@ -558,7 +549,6 @@ export function getInAppMessages(
                 with no filtering or sorting.
               */
               return response;
-            }
 
             /* otherwise, they're choosing to show the messages automatically */
 
@@ -600,7 +590,7 @@ export function getInAppMessages(
           return paintMessageToDOM();
         }
       },
-      ...maybeDisplayFn
+      ...triggerDisplayFn
     };
   }
 
@@ -620,11 +610,8 @@ export function getInAppMessages(
       SDKVersion: SDK_VERSION
     }
   }).then((response) => {
-    trackMessagesDelivered(
-      response.data.inAppMessages || [],
-      dupedPayload.packageName
-    );
     const messages = response.data.inAppMessages;
+    trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html
