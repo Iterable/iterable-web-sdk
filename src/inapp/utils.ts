@@ -423,8 +423,10 @@ export const paintIFrame = (
         };
 
         if (position !== 'Full') {
+          const iframeHeight =
+            iframe.contentWindow?.document?.body?.scrollHeight;
           iframe.style.height =
-            (iframe.contentWindow?.document?.body?.scrollHeight || 0) + 'px';
+            ((iframeHeight && iframeHeight + 16) || 0) + 'px';
         }
 
         clearTimeout(timeout);
