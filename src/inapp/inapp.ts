@@ -55,14 +55,6 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: true
-): {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-};
-export function getInAppMessages(
-  payload: InAppMessagesRequestParams,
   showInAppMessagesAutomatically: { display: 'immediate' | 'deferred' }
 ): {
   pauseMessageStream: () => void;
@@ -503,9 +495,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred =
-      typeof showInAppMessagesAutomatically !== 'boolean' &&
-      showInAppMessagesAutomatically.display === 'deferred';
+    const isDeferred = showInAppMessagesAutomatically.display === 'deferred';
 
     const triggerDisplayFn = isDeferred
       ? {
