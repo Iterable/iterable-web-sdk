@@ -131,7 +131,7 @@ describe('getInAppMessages', () => {
     it('should send up correct payload', async () => {
       const response = await getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       ).request();
 
       expect(response.config.params.packageName).toBe('my-lil-website');
@@ -141,7 +141,7 @@ describe('getInAppMessages', () => {
 
     it('should reject if fails client-side validation', async () => {
       try {
-        await getInAppMessages({} as any, true).request();
+        await getInAppMessages({} as any, { display: 'immediate' }).request();
       } catch (e) {
         expect(e).toEqual(
           createClientError([
@@ -161,7 +161,7 @@ describe('getInAppMessages', () => {
     it('should return correct values when auto-paint flag is true', async () => {
       const response = await getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       expect(response.pauseMessageStream).toBeDefined();
       expect(response.resumeMessageStream).toBeDefined();
@@ -176,22 +176,11 @@ describe('getInAppMessages', () => {
           count: 10,
           packageName: 'my-lil-website'
         } as any,
-        true
+        { display: 'immediate' }
       ).request();
 
       expect(response.config.params.email).toBeUndefined();
       expect(response.config.params.userId).toBeUndefined();
-    });
-
-    it('should paint an iframe to the DOM if second argument is true', async () => {
-      const { request } = getInAppMessages(
-        { count: 10, packageName: 'my-lil-website' },
-        true
-      );
-      await request();
-
-      const element = document.getElementById('iterable-iframe');
-      expect(element?.tagName).toBe('IFRAME');
     });
 
     it('should paint an iframe to the DOM if second argument is { display: "immediate" }', async () => {
@@ -243,7 +232,7 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when dismiss link is clicked', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -269,7 +258,7 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when esc key is pressed within the iframe', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -285,7 +274,7 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when esc key is pressed within the document body', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -300,7 +289,7 @@ describe('getInAppMessages', () => {
     it('should remove the iframe when overlay is clicked', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -323,7 +312,7 @@ describe('getInAppMessages', () => {
           packageName: 'my-lil-website',
           closeButton: {}
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -346,7 +335,7 @@ describe('getInAppMessages', () => {
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -376,7 +365,7 @@ describe('getInAppMessages', () => {
     it('should not paint next message to the DOM after 30s if queue is paused', async () => {
       const { request, pauseMessageStream } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -398,7 +387,10 @@ describe('getInAppMessages', () => {
 
     it('should paint next message to DOM if resumed', async () => {
       const { request, pauseMessageStream, resumeMessageStream } =
-        getInAppMessages({ count: 10, packageName: 'my-lil-website' }, true);
+        getInAppMessages(
+          { count: 10, packageName: 'my-lil-website' },
+          { display: 'immediate' }
+        );
       await request();
 
       const iframe = document.getElementById(
@@ -440,7 +432,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -484,7 +476,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -521,7 +513,7 @@ describe('getInAppMessages', () => {
           packageName: 'my-lil-website',
           handleLinks: 'open-all-new-tab'
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -570,7 +562,7 @@ describe('getInAppMessages', () => {
           packageName: 'my-lil-website',
           handleLinks: 'open-all-same-tab'
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -615,7 +607,7 @@ describe('getInAppMessages', () => {
           packageName: 'my-lil-website',
           handleLinks: 'external-new-tab'
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -660,7 +652,7 @@ describe('getInAppMessages', () => {
           onOpenNodeToTakeFocus: 'input',
           packageName: 'my-lil-website'
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -689,7 +681,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -706,7 +698,7 @@ describe('getInAppMessages', () => {
     it('should track in app messages delivered', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -720,7 +712,7 @@ describe('getInAppMessages', () => {
     it('should not paint another message after 30 seconds if logged out', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       const { logout } = initialize('fdsafsd');
       await request();
@@ -751,7 +743,7 @@ describe('getInAppMessages', () => {
     it('should call global.postMessage when action:// link is clicked', async () => {
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -799,7 +791,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -831,7 +823,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -863,7 +855,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -895,7 +887,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -936,7 +928,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -981,7 +973,7 @@ describe('getInAppMessages', () => {
           packageName: 'my-lil-website',
           handleLinks: 'open-all-same-tab'
         },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -1022,7 +1014,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
@@ -1063,7 +1055,7 @@ describe('getInAppMessages', () => {
 
       const { request } = getInAppMessages(
         { count: 10, packageName: 'my-lil-website' },
-        true
+        { display: 'immediate' }
       );
       await request();
 
