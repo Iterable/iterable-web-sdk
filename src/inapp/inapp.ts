@@ -66,16 +66,14 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?:
-    | boolean
-    | { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically?: { display: 'immediate' | 'deferred' }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
 
   /* delete SDK-defined payload props and email and userId */
-  delete (dupedPayload as any).userId;
-  delete (dupedPayload as any).email;
+  delete (dupedPayload as any).userId; // eslint-disable-line @typescript-eslint/no-explicit-any
+  delete (dupedPayload as any).email; // eslint-disable-line @typescript-eslint/no-explicit-any
   delete dupedPayload.displayInterval;
   delete dupedPayload.onOpenScreenReaderMessage;
   delete dupedPayload.onOpenNodeToTakeFocus;
