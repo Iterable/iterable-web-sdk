@@ -1,5 +1,6 @@
+import { entries, set } from 'idb-keyval';
 import { throttle } from 'throttle-debounce';
-import set from 'lodash/set';
+import _set from 'lodash/set';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
@@ -112,83 +113,67 @@ export function getInAppMessages(
     });
 
   const requestMessages = async () => {
-    /** create client-side cache */
-    const cache = await caches.open('inapp_cache');
+    try {
+      const cachedMessages: [string, InAppMessage][] = await entries();
 
-    const getCacheKeys = async () => await cache.keys();
-    const retrieveMessageFromCache = async (request: Request) =>
-      (await cache.match(request))?.json();
-
-    /** determine cached messages and find most recent message */
-    let latestCachedMessageId: string | undefined;
-    let mostRecentCreatedAtTimestamp: EpochTimeStamp = 0;
-    const getCachedMessages = async () => {
-      const cacheKeys = await getCacheKeys();
-      const cachedMessages = [];
-      for (const request of cacheKeys) {
-        const cachedMessage: InAppMessage | undefined = (
-          await retrieveMessageFromCache(request)
-        )?.message;
-        if (cachedMessage) {
-          if (cachedMessage.createdAt > mostRecentCreatedAtTimestamp) {
-            latestCachedMessageId = cachedMessage.messageId;
-            mostRecentCreatedAtTimestamp = cachedMessage.createdAt;
-          }
-          cachedMessages.push(cachedMessage);
+      /** determine most recent message */
+      let latestCachedMessageId: string | undefined;
+      let latestCreatedAtTimestamp: EpochTimeStamp = 0;
+      cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
+        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+          latestCachedMessageId = cachedMessageId;
+          latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
-      }
-      return cachedMessages;
-    };
-    const cachedMessages = await getCachedMessages();
+      });
 
-    /**
-     * call getMessages with latestCachedMessageId to get the message delta
-     * (uncached messages have full detail, rest just have messageId)
-     */
-    const response = await requestInAppMessages({ latestCachedMessageId });
-    const { inAppMessages } = response.data;
-
-    /** combine cached messages with NEW messages in delta response */
-    const allMessages: Partial<InAppMessage>[] = [];
-    const responseOptions = { headers: { 'content-type': 'application/json' } };
-    inAppMessages.forEach((message) => {
       /**
-       * if message in response has no content property, then that means it is
-       * older than the latest cached message and should be retrieved from the
-       * cache using the messageId
-       *
-       * expecting messages with no content to look like the last 2 messages...
-       * {
-       *   inAppMessages: [
-       *     { ...messageWithContentHasFullDetails01 },
-       *     { ...messageWithContentHasFullDetails02 },
-       *     { messageId: 'messageWithoutContentHasNoOtherProperties01' },
-       *     { messageId: 'messageWithoutContentHasNoOtherProperties02' }
-       *   ]
-       * }
+       * call getMessages with latestCachedMessageId to get the message delta
+       * (uncached messages have full detail, rest just have messageId)
        */
-      if (!message.content) {
-        const cachedMessage = cachedMessages.find(
-          (cachedMessage) => cachedMessage.messageId === message.messageId
-        );
-        if (cachedMessage) allMessages.push(cachedMessage);
-      } else {
-        allMessages.push(message);
-        /** add NEW messages from delta response to cache */
-        cache.put(
-          `/inAppMessages/${message.messageId}`,
-          new Response(JSON.stringify({ message }), responseOptions)
-        );
-      }
-    });
+      const response = await requestInAppMessages({ latestCachedMessageId });
+      const { inAppMessages } = response.data;
 
-    /** return combined response */
-    return {
-      ...response,
-      data: {
-        inAppMessages: allMessages
-      }
-    };
+      /** combine cached messages with NEW messages in delta response */
+      const allMessages: Partial<InAppMessage>[] = [];
+      inAppMessages.forEach((inAppMessage) => {
+        /**
+         * if message in response has no content property, then that means it is
+         * older than the latest cached message and should be retrieved from the
+         * cache using the messageId
+         *
+         * expecting messages with no content to look like the last 2 messages...
+         * {
+         *   inAppMessages: [
+         *     { ...messageWithContentHasFullDetails01 },
+         *     { ...messageWithContentHasFullDetails02 },
+         *     { messageId: 'messageWithoutContentHasNoOtherProperties01' },
+         *     { messageId: 'messageWithoutContentHasNoOtherProperties02' }
+         *   ]
+         * }
+         */
+        if (!inAppMessage.content) {
+          const cachedMessage = cachedMessages.find(
+            ([messageId, _]) => inAppMessage.messageId === messageId
+          );
+          if (cachedMessage) allMessages.push(cachedMessage[1]);
+        } else {
+          allMessages.push(inAppMessage);
+          /** add NEW messages from delta response to cache */
+          if (inAppMessage.messageId) set(inAppMessage.messageId, inAppMessage);
+        }
+      });
+
+      /** return combined response */
+      return {
+        ...response,
+        data: {
+          inAppMessages: allMessages
+        }
+      };
+    } catch (err) {
+      console.warn(err);
+    }
+    return await requestInAppMessages({});
   };
 
   if (showInAppMessagesAutomatically) {
@@ -690,7 +675,7 @@ export function getInAppMessages(
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html
-        ? set(message, 'content.html', wrapWithIFrame(html as string))
+        ? _set(message, 'content.html', wrapWithIFrame(html as string))
         : message;
     });
     return {
