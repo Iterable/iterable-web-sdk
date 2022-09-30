@@ -94,6 +94,103 @@ export function getInAppMessages(
   delete dupedPayload.handleLinks;
   delete dupedPayload.closeButton;
 
+  const requestInAppMessages = ({
+    latestCachedMessageId
+  }: {
+    latestCachedMessageId?: string;
+  }) =>
+    baseIterableRequest<InAppMessageResponse>({
+      method: 'GET',
+      url: '/inApp/getMessages',
+      validation: { params: schema },
+      params: {
+        ...dupedPayload,
+        platform: WEB_PLATFORM,
+        SDKVersion: SDK_VERSION,
+        latestCachedMessageId
+      }
+    });
+
+  const requestMessages = async () => {
+    /** create client-side cache */
+    const cache = await caches.open('inapp_cache');
+
+    const getCacheKeys = async () => await cache.keys();
+    const retrieveMessageFromCache = async (request: Request) =>
+      (await cache.match(request))?.json();
+
+    /** determine cached messages and find most recent message */
+    let latestCachedMessageId: string | undefined;
+    let mostRecentCreatedAtTimestamp: EpochTimeStamp = 0;
+    const getCachedMessages = async () => {
+      const cacheKeys = await getCacheKeys();
+      const cachedMessages = [];
+      for (const request of cacheKeys) {
+        const cachedMessage: InAppMessage | undefined = (
+          await retrieveMessageFromCache(request)
+        )?.message;
+        if (cachedMessage) {
+          if (cachedMessage.createdAt > mostRecentCreatedAtTimestamp) {
+            latestCachedMessageId = cachedMessage.messageId;
+            mostRecentCreatedAtTimestamp = cachedMessage.createdAt;
+          }
+          cachedMessages.push(cachedMessage);
+        }
+      }
+      return cachedMessages;
+    };
+    const cachedMessages = await getCachedMessages();
+
+    /**
+     * call getMessages with latestCachedMessageId to get the message delta
+     * (uncached messages have full detail, rest just have messageId)
+     */
+    const response = await requestInAppMessages({ latestCachedMessageId });
+    const { inAppMessages } = response.data;
+
+    /** combine cached messages with NEW messages in delta response */
+    const allMessages: Partial<InAppMessage>[] = [];
+    const responseOptions = { headers: { 'content-type': 'application/json' } };
+    inAppMessages.forEach((message) => {
+      /**
+       * if message in response has no content property, then that means it is
+       * older than the latest cached message and should be retrieved from the
+       * cache using the messageId
+       *
+       * expecting messages with no content to look like the last 2 messages...
+       * {
+       *   inAppMessages: [
+       *     { ...messageWithContentHasFullDetails01 },
+       *     { ...messageWithContentHasFullDetails02 },
+       *     { messageId: 'messageWithoutContentHasNoOtherProperties01' },
+       *     { messageId: 'messageWithoutContentHasNoOtherProperties02' }
+       *   ]
+       * }
+       */
+      if (!message.content) {
+        const cachedMessage = cachedMessages.find(
+          (cachedMessage) => cachedMessage.messageId === message.messageId
+        );
+        if (cachedMessage) allMessages.push(cachedMessage);
+      } else {
+        allMessages.push(message);
+        /** add NEW messages from delta response to cache */
+        cache.put(
+          `/inAppMessages/${message.messageId}`,
+          new Response(JSON.stringify({ message }), responseOptions)
+        );
+      }
+    });
+
+    /** return combined response */
+    return {
+      ...response,
+      data: {
+        inAppMessages: allMessages
+      }
+    };
+  };
+
   if (showInAppMessagesAutomatically) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
@@ -521,18 +618,7 @@ export function getInAppMessages(
 
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
-        baseIterableRequest<InAppMessageResponse>({
-          method: 'GET',
-          url: '/inApp/getMessages',
-          validation: {
-            params: schema
-          },
-          params: {
-            ...dupedPayload,
-            platform: WEB_PLATFORM,
-            SDKVersion: SDK_VERSION
-          }
-        })
+        requestMessages()
           .then((response) => {
             trackMessagesDelivered(
               response.data.inAppMessages || [],
@@ -598,18 +684,7 @@ export function getInAppMessages(
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
-  return baseIterableRequest<InAppMessageResponse>({
-    method: 'GET',
-    url: '/inApp/getMessages',
-    validation: {
-      params: schema
-    },
-    params: {
-      ...dupedPayload,
-      platform: WEB_PLATFORM,
-      SDKVersion: SDK_VERSION
-    }
-  }).then((response) => {
+  return requestMessages().then((response) => {
     const messages = response.data.inAppMessages;
     trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
