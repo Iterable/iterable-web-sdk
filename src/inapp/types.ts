@@ -20,6 +20,8 @@ interface SDKInAppMessagesParams {
     size?: string | number;
     topOffset?: string;
   };
+  /** messageId of the latest (i.e., most recent) message in the device's local cache */
+  latestCachedMessageId?: string;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
