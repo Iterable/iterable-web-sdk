@@ -141,7 +141,7 @@ export function getInAppMessages(
       /** combine cached messages with NEW messages in delta response */
       const allMessages: Partial<InAppMessage>[] = [];
       const newMessages: [string, InAppMessage][] = [];
-      inAppMessages.forEach((inAppMessage) => {
+      inAppMessages?.forEach((inAppMessage) => {
         /**
          * if message in response has no content property, then that means it is
          * older than the latest cached message and should be retrieved from the
@@ -205,8 +205,11 @@ export function getInAppMessages(
             ? messageQuota - idbUsage
             : usage && messageQuota - usage;
           return remainingQuota ? remainingQuota : 0;
-        } catch (err) {
-          console.warn('Error determining remaining storage quota', err);
+        } catch (err: any) {
+          console.warn(
+            'Error determining remaining storage quota',
+            err?.response?.data?.clientErrors ?? err
+          );
         }
         return 0;
       };
@@ -242,8 +245,11 @@ export function getInAppMessages(
           });
           try {
             await setMany(messagesToAddToCache);
-          } catch (err) {
-            console.warn('Error adding new messages to the browser cache', err);
+          } catch (err: any) {
+            console.warn(
+              'Error adding new messages to the browser cache',
+              err?.response?.data?.clientErrors ?? err
+            );
           }
         }
       };
@@ -256,8 +262,11 @@ export function getInAppMessages(
           inAppMessages: allMessages
         }
       };
-    } catch (err) {
-      console.warn('Error requesting in-app messages', err);
+    } catch (err: any) {
+      console.warn(
+        'Error requesting in-app messages',
+        err?.response?.data?.clientErrors ?? err
+      );
     }
     return await requestInAppMessages({});
   };
