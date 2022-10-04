@@ -102,7 +102,7 @@ export function getInAppMessages(
   }) =>
     baseIterableRequest<InAppMessageResponse>({
       method: 'GET',
-      url: '/inApp/getMessages',
+      url: '/inApp/web/getMessages',
       validation: { params: schema },
       params: {
         ...dupedPayload,

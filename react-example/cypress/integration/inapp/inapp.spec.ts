@@ -5,7 +5,7 @@ describe('Requesting In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -28,7 +28,7 @@ describe('Requesting In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/400.json', statusCode: 400 }
     ).as('getInAppMessages');
@@ -55,7 +55,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -76,7 +76,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -101,7 +101,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -130,7 +130,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url: '/api/inApp/web/getMessages*'
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');

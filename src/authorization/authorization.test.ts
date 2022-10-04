@@ -23,7 +23,7 @@ const MOCK_JWT_KEY =
 describe('API Key Interceptors', () => {
   beforeAll(() => {
     mockRequest = new MockAdapter(baseAxiosRequest);
-    mockRequest.onGet('/inApp/getMessages').reply(200, {
+    mockRequest.onGet('/inApp/web/getMessages').reply(200, {
       data: 'something'
     });
 
@@ -333,7 +333,7 @@ describe('User Identification', () => {
 
       mockRequest.onPost('/users/update').reply(200, {});
 
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet('/inApp/web/getMessages').reply(200, {
         data: 'something'
       });
     });
@@ -666,7 +666,7 @@ describe('User Identification', () => {
 
       mockRequest.onPost('/users/update').reply(200, {});
 
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet('/inApp/web/getMessages').reply(200, {
         data: 'something'
       });
     });
