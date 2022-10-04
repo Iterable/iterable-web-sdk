@@ -95,7 +95,7 @@ export const InApp: FC<{}> = () => {
   return (
     <>
       <h1>inApp Endpoints</h1>
-      <Heading>POST /inApp/getMessages</Heading>
+      <Heading>POST /inApp/web/getMessages</Heading>
       <EndpointWrapper>
         <GetMessagesRawButton
           disabled={!loggedInUser || isGettingMessagesRaw}
@@ -110,7 +110,7 @@ export const InApp: FC<{}> = () => {
           {getMessagesResponse}
         </Response>
       </EndpointWrapper>
-      <Heading>POST /inApp/getMessages (auto-display)</Heading>
+      <Heading>POST /inApp/web/getMessages (auto-display)</Heading>
       <AutoDisplayContainer>
         <Button
           disabled={!loggedInUser || isGettingMessagesAuto}

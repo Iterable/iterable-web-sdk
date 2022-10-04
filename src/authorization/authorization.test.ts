@@ -6,6 +6,7 @@ import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
+import { GETMESSAGES_PATH } from '../constants';
 
 let mockRequest: any = null;
 /*
@@ -23,7 +24,7 @@ const MOCK_JWT_KEY =
 describe('API Key Interceptors', () => {
   beforeAll(() => {
     mockRequest = new MockAdapter(baseAxiosRequest);
-    mockRequest.onGet('/inApp/getMessages').reply(200, {
+    mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
       data: 'something'
     });
 
@@ -333,7 +334,7 @@ describe('User Identification', () => {
 
       mockRequest.onPost('/users/update').reply(200, {});
 
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         data: 'something'
       });
     });
@@ -666,7 +667,7 @@ describe('User Identification', () => {
 
       mockRequest.onPost('/users/update').reply(200, {});
 
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         data: 'something'
       });
     });

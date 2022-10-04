@@ -2,12 +2,12 @@
  * @jest-environment jsdom
  */
 import MockAdapter from 'axios-mock-adapter';
+import { initialize } from '../../authorization';
+import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
+import { createClientError } from '../../utils/testUtils';
 import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
-import { initialize } from '../../authorization';
-import { SDK_VERSION, WEB_PLATFORM } from '../../constants';
-import { createClientError } from '../../utils/testUtils';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -21,7 +21,7 @@ describe('getInAppMessages', () => {
     jest.resetAllMocks();
     mockRequest.resetHistory();
 
-    mockRequest.onGet('/inApp/getMessages').reply(200, {
+    mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
       inAppMessages: messages
     });
     mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
@@ -114,7 +114,7 @@ describe('getInAppMessages', () => {
   describe('getInAppMessages with auto painting', () => {
     beforeAll(() => {
       jest.useFakeTimers();
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: messages
       });
       mockRequest.onPost('/events/trackInAppDelivery').reply(200, {});
@@ -426,7 +426,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should navigate offsite in a new tab if a clicked link has target _blank', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -466,7 +466,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should navigate to site in same tab upon link click', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -503,7 +503,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should navigate to site in new tab if _handleLinks_ is "open-all-new-tab"', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -547,7 +547,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should navigate to site in same tab if _handleLinks_ is "open-all-same-tab"', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -589,7 +589,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should navigate to site in new tab if _handleLinks_ is "external-new-tab" and is external link', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -642,7 +642,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should focus on element specified by user', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -675,7 +675,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should focus on first interactive element if no selector specified', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -785,7 +785,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should do nothing upon clicking itbl:// links', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -817,7 +817,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should do nothing upon clicking itbl://dismiss links', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -849,7 +849,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should do nothing upon clicking iterable:// non-dismiss links', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -881,7 +881,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should call /trackInAppClick with sendBeacon if linking in same tab', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -922,7 +922,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should call /trackInAppClick without sendBeacon if linking in new tab', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -963,7 +963,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should call /trackInAppClick with sendBeacon if linking in same tab due to handleLinks', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -1008,7 +1008,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should call /trackInAppClick without sendBeacon if clicking iterable://hi link', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
@@ -1049,7 +1049,7 @@ describe('getInAppMessages', () => {
     });
 
     it('should call /trackInAppClick without sendBeacon if clicking action:// link', async () => {
-      mockRequest.onGet('/inApp/getMessages').reply(200, {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: [
           {
             ...messages[0],
