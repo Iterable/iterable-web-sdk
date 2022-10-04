@@ -31,6 +31,7 @@ import {
   ANIMATION_STYLESHEET,
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
+  GETMESSAGES_PATH,
   IS_PRODUCTION,
   SDK_VERSION,
   WEB_PLATFORM
@@ -102,7 +103,7 @@ export function getInAppMessages(
   }) =>
     baseIterableRequest<InAppMessageResponse>({
       method: 'GET',
-      url: '/inApp/web/getMessages',
+      url: GETMESSAGES_PATH,
       validation: { params: schema },
       params: {
         ...dupedPayload,
