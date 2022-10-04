@@ -1,11 +1,13 @@
 import * as mockMessages from '../../fixtures/inapp/200.json';
 
+const url = `/api/inApp/web/getMessages*`;
+
 describe('Requesting In-App Messages', () => {
   it('should paint the correct 200 response', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -28,7 +30,7 @@ describe('Requesting In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/400.json', statusCode: 400 }
     ).as('getInAppMessages');
@@ -55,7 +57,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -76,7 +78,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -101,7 +103,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
@@ -130,7 +132,7 @@ describe('Auto-Display In-App Messages', () => {
     cy.intercept(
       {
         method: 'GET',
-        url: '/api/inApp/getMessages*'
+        url
       },
       { fixture: 'inapp/200.json' }
     ).as('getInAppMessages');
