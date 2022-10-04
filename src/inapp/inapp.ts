@@ -177,8 +177,7 @@ export function getInAppMessages(
       });
 
       /** add new messages to the cache if they fit in the cache */
-      const remainingQuota = await determineRemainingStorageQuota();
-      await addNewMessagesToCache(newMessages, remainingQuota);
+      await addNewMessagesToCache(newMessages);
 
       /** return combined response */
       return {

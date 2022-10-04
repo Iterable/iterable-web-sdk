@@ -128,7 +128,10 @@ export const determineRemainingStorageQuota = async () => {
 
     /** 50 MB is the typical web browser cache quota for mobile devices */
     const mobileBrowserQuota = 52428800;
-    /** max quota of browser storage that in-apps will potentially fill */
+    /**
+     * max quota of browser storage that in-apps will potentially fill,
+     * set to 60% of total quota for initial release
+     */
     const inAppMaxBrowserQuota = storage?.quota && storage.quota * 0.6;
     /** determine lower max quota that can be used for message cache */
     const messageQuota =
@@ -137,13 +140,8 @@ export const determineRemainingStorageQuota = async () => {
         : mobileBrowserQuota;
 
     /** how much local storage is being used */
-    const usage = storage?.usage && storage.usage;
-    const idbUsage =
-      storage?.usageDetails?.indexedDB && storage.usageDetails.indexedDB;
-
-    const remainingQuota = idbUsage
-      ? messageQuota - idbUsage
-      : usage && messageQuota - usage;
+    const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
+    const remainingQuota = usage && messageQuota - usage;
 
     return remainingQuota ? remainingQuota : 0;
   } catch (err: any) {
@@ -164,9 +162,9 @@ export const determineRemainingStorageQuota = async () => {
  * @param quota
  */
 export const addNewMessagesToCache = async (
-  messages: { messageId: string; message: InAppMessage }[],
-  quota: number
+  messages: { messageId: string; message: InAppMessage }[]
 ) => {
+  const quota = await determineRemainingStorageQuota();
   if (quota > 0) {
     /** determine total size (in bytes) of new messages to be added to cache */
     const messagesWithSizes: {
