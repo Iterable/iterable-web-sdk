@@ -130,18 +130,21 @@ export const determineRemainingStorageQuota = async () => {
     const mobileBrowserQuota = 52428800;
     /** max quota of browser storage that in-apps will potentially fill */
     const inAppMaxBrowserQuota = storage?.quota && storage.quota * 0.6;
-    /** determine lowest max quota that can be used for message cache */
+    /** determine lower max quota that can be used for message cache */
     const messageQuota =
       inAppMaxBrowserQuota && inAppMaxBrowserQuota < mobileBrowserQuota
         ? inAppMaxBrowserQuota
         : mobileBrowserQuota;
 
+    /** how much local storage is being used */
     const usage = storage?.usage && storage.usage;
     const idbUsage =
       storage?.usageDetails?.indexedDB && storage.usageDetails.indexedDB;
+
     const remainingQuota = idbUsage
       ? messageQuota - idbUsage
       : usage && messageQuota - usage;
+
     return remainingQuota ? remainingQuota : 0;
   } catch (err: any) {
     console.warn(
@@ -182,19 +185,22 @@ export const addNewMessagesToCache = async (
         size: sizeInBytes
       };
     });
+
     /** sort new messages oldest to newest (ascending createdAt property) */
     const sortedMessages = messagesWithSizes.sort(
       (a, b) => a.createdAt - b.createdAt
     );
+
     /** only add messages that fit in cache, starting from oldest messages */
-    let mutableQuota = quota;
+    let remainingQuota = quota;
     const messagesToAddToCache: [string, InAppMessage][] = [];
     sortedMessages.forEach(({ messageId, message, size }) => {
-      if (mutableQuota - size > 0) {
-        mutableQuota -= size;
-        return messagesToAddToCache.push([messageId, message]);
+      if (remainingQuota - size > 0) {
+        remainingQuota -= size;
+        messagesToAddToCache.push([messageId, message]);
       }
     });
+
     try {
       await setMany(messagesToAddToCache);
     } catch (err: any) {

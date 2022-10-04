@@ -122,9 +122,10 @@ export function getInAppMessages(
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
       const expiredMessagesInCache: string[] = [];
+      const now = Date.now();
 
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.expiresAt < Date.now()) {
+        if (cachedMessage.expiresAt < now) {
           expiredMessagesInCache.push(cachedMessageId);
         } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
@@ -161,7 +162,7 @@ export function getInAppMessages(
          */
         if (!inAppMessage.content) {
           const cachedMessage = cachedMessages.find(
-            ([messageId, _]) => inAppMessage.messageId === messageId
+            ([messageId]) => inAppMessage.messageId === messageId
           );
           if (cachedMessage) allMessages.push(cachedMessage[1]);
         } else {
