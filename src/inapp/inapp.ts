@@ -1,13 +1,29 @@
-import { entries, set } from 'idb-keyval';
-import { throttle } from 'throttle-debounce';
+import { delMany, entries, setMany } from 'idb-keyval';
 import _set from 'lodash/set';
 import {
-  InAppMessage,
-  InAppMessagesRequestParams,
-  InAppMessageResponse
-} from './types';
-import { IterablePromise } from '../types';
+  ANIMATION_DURATION,
+  ANIMATION_STYLESHEET,
+  DISPLAY_INTERVAL_DEFAULT,
+  ENABLE_INAPP_CONSUME,
+  IS_PRODUCTION,
+  SDK_VERSION,
+  WEB_PLATFORM
+} from 'src/constants';
+import { throttle } from 'throttle-debounce';
+import {
+  trackInAppClick,
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
+} from '../events';
 import { baseIterableRequest } from '../request';
+import { IterablePromise } from '../types';
+import schema from './inapp.schema';
+import {
+  InAppMessage,
+  InAppMessageResponse,
+  InAppMessagesRequestParams
+} from './types';
 import {
   addButtonAttrsToAnchorTag,
   addStyleSheet,
@@ -20,22 +36,6 @@ import {
   trackMessagesDelivered,
   wrapWithIFrame
 } from './utils';
-import {
-  trackInAppClick,
-  trackInAppClose,
-  trackInAppConsume,
-  trackInAppOpen
-} from '../events';
-import {
-  ANIMATION_DURATION,
-  ANIMATION_STYLESHEET,
-  DISPLAY_INTERVAL_DEFAULT,
-  ENABLE_INAPP_CONSUME,
-  IS_PRODUCTION,
-  SDK_VERSION,
-  WEB_PLATFORM
-} from 'src/constants';
-import schema from './inapp.schema';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -116,15 +116,20 @@ export function getInAppMessages(
     try {
       const cachedMessages: [string, InAppMessage][] = await entries();
 
-      /** determine most recent message */
+      /** determine most recent message & delete expired messages */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
+      const expiredMessagesInCache: string[] = [];
+
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.expiresAt < Date.now()) {
+          expiredMessagesInCache.push(cachedMessageId);
+        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
+      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -135,6 +140,7 @@ export function getInAppMessages(
 
       /** combine cached messages with NEW messages in delta response */
       const allMessages: Partial<InAppMessage>[] = [];
+      const newMessages: [string, InAppMessage][] = [];
       inAppMessages.forEach((inAppMessage) => {
         /**
          * if message in response has no content property, then that means it is
@@ -158,10 +164,90 @@ export function getInAppMessages(
           if (cachedMessage) allMessages.push(cachedMessage[1]);
         } else {
           allMessages.push(inAppMessage);
-          /** add NEW messages from delta response to cache */
-          if (inAppMessage.messageId) set(inAppMessage.messageId, inAppMessage);
+          if (inAppMessage.messageId)
+            newMessages.push([
+              inAppMessage.messageId,
+              inAppMessage as InAppMessage
+            ]);
         }
       });
+
+      /**
+       * detect amount of local storage remaining (quota) and used (usage).
+       * if usageDetails exist (not supported in Safari), use this instead of usage.
+       */
+      const determineRemainingStorageQuota = async () => {
+        type BrowserStorageEstimate = StorageEstimate & {
+          /** usageDetails not supported in Safari */
+          usageDetails?: { indexedDB?: number };
+        };
+        try {
+          const storage: BrowserStorageEstimate | undefined =
+            'storage' in navigator && 'estimate' in navigator.storage
+              ? await navigator.storage.estimate()
+              : undefined;
+
+          /** 50 MB is the typical web browser cache quota for mobile devices */
+          const mobileBrowserQuota = 52428800;
+          /** max quota of browser storage that Iterable will potentially use */
+          const iterableMaxBrowserQuota = storage?.quota && storage.quota * 0.6;
+          /** determine lowest max quota that can be used for message cache */
+          const messageQuota =
+            iterableMaxBrowserQuota &&
+            iterableMaxBrowserQuota < mobileBrowserQuota
+              ? iterableMaxBrowserQuota
+              : mobileBrowserQuota;
+
+          const usage = storage?.usage && storage.usage;
+          const idbUsage =
+            storage?.usageDetails?.indexedDB && storage.usageDetails.indexedDB;
+          const remainingQuota = idbUsage
+            ? messageQuota - idbUsage
+            : usage && messageQuota - usage;
+          return remainingQuota ? remainingQuota : 0;
+        } catch (err) {
+          console.warn('Error determining remaining storage quota', err);
+        }
+        return 0;
+      };
+      const remainingQuota = await determineRemainingStorageQuota();
+      const addNewMessagesToCache = async (quota: number) => {
+        if (quota > 0) {
+          /** determine total size (in bytes) of new messages to be added to cache */
+          const newMessagesWithSizes: [string, InAppMessage, number, number][] =
+            newMessages.map(([messageId, message]) => {
+              const messageSizeInBytes = JSON.stringify(message).replace(
+                /\[\[\],"\]/g,
+                ''
+              ).length;
+              return [
+                messageId,
+                message,
+                message.createdAt,
+                messageSizeInBytes
+              ];
+            });
+          /** sort new messages oldest to newest (ascending createdAt property) */
+          const sortedMessages = newMessagesWithSizes.sort(
+            (a, b) => a[2] - b[2]
+          );
+          /** only add messages that fit in cache, starting from oldest messages */
+          let mutableQuota = quota;
+          const messagesToAddToCache: [string, InAppMessage][] = [];
+          sortedMessages.forEach(([messageId, message, _, size]) => {
+            if (mutableQuota - size > 0) {
+              mutableQuota -= size;
+              return messagesToAddToCache.push([messageId, message]);
+            }
+          });
+          try {
+            await setMany(messagesToAddToCache);
+          } catch (err) {
+            console.warn('Error adding new messages to the browser cache', err);
+          }
+        }
+      };
+      addNewMessagesToCache(remainingQuota);
 
       /** return combined response */
       return {
@@ -171,7 +257,7 @@ export function getInAppMessages(
         }
       };
     } catch (err) {
-      console.warn(err);
+      console.warn('Error requesting in-app messages', err);
     }
     return await requestInAppMessages({});
   };
