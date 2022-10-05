@@ -29,7 +29,6 @@ import {
   addButtonAttrsToAnchorTag,
   addNewMessagesToCache,
   addStyleSheet,
-  determineRemainingStorageQuota,
   filterHiddenInAppMessages,
   generateCloseButton,
   getHostnameFromUrl,

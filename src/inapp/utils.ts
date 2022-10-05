@@ -166,33 +166,33 @@ export const addNewMessagesToCache = async (
 ) => {
   const quota = await determineRemainingStorageQuota();
   if (quota > 0) {
-    /** determine total size (in bytes) of new messages to be added to cache */
+    /**
+     * determine total size (in bytes) of new messages to be added to cache
+     * sorted oldest to newest (ascending createdAt property)
+     */
     const messagesWithSizes: {
       messageId: string;
       message: InAppMessage;
       createdAt: number;
       size: number;
-    }[] = messages.map(({ messageId, message }) => {
-      const sizeInBytes = new Blob([
-        JSON.stringify(message).replace(/\[\[\],"\]/g, '')
-      ]).size;
-      return {
-        messageId,
-        message,
-        createdAt: message.createdAt,
-        size: sizeInBytes
-      };
-    });
-
-    /** sort new messages oldest to newest (ascending createdAt property) */
-    const sortedMessages = messagesWithSizes.sort(
-      (a, b) => a.createdAt - b.createdAt
-    );
+    }[] = messages
+      .map(({ messageId, message }) => {
+        const sizeInBytes = new Blob([
+          JSON.stringify(message).replace(/\[\[\],"\]/g, '')
+        ]).size;
+        return {
+          messageId,
+          message,
+          createdAt: message.createdAt,
+          size: sizeInBytes
+        };
+      })
+      .sort((a, b) => a.createdAt - b.createdAt);
 
     /** only add messages that fit in cache, starting from oldest messages */
     let remainingQuota = quota;
     const messagesToAddToCache: [string, InAppMessage][] = [];
-    sortedMessages.forEach(({ messageId, message, size }) => {
+    messagesWithSizes.forEach(({ messageId, message, size }) => {
       if (remainingQuota - size > 0) {
         remainingQuota -= size;
         messagesToAddToCache.push([messageId, message]);
