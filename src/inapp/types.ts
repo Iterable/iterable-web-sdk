@@ -54,6 +54,11 @@ export interface WebInAppDisplaySettings {
   position: 'Center' | 'TopRight' | 'BottomRight' | 'Full';
 }
 
+export type BrowserStorageEstimate = StorageEstimate & {
+  /** usageDetails not supported in Safari */
+  usageDetails?: { indexedDB?: number };
+};
+
 export interface InAppMessage {
   messageId: string;
   campaignId: number;

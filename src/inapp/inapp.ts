@@ -1,33 +1,5 @@
-import { entries, set } from 'idb-keyval';
-import { throttle } from 'throttle-debounce';
+import { delMany, entries } from 'idb-keyval';
 import _set from 'lodash/set';
-import {
-  InAppMessage,
-  InAppMessagesRequestParams,
-  InAppMessageResponse,
-  DisplayOptions,
-  DISPLAY_OPTIONS
-} from './types';
-import { IterablePromise } from '../types';
-import { baseIterableRequest } from '../request';
-import {
-  addButtonAttrsToAnchorTag,
-  addStyleSheet,
-  filterHiddenInAppMessages,
-  generateCloseButton,
-  getHostnameFromUrl,
-  paintIFrame,
-  paintOverlay,
-  sortInAppMessages,
-  trackMessagesDelivered,
-  wrapWithIFrame
-} from './utils';
-import {
-  trackInAppClick,
-  trackInAppClose,
-  trackInAppConsume,
-  trackInAppOpen
-} from '../events';
 import {
   ANIMATION_DURATION,
   ANIMATION_STYLESHEET,
@@ -38,7 +10,36 @@ import {
   SDK_VERSION,
   WEB_PLATFORM
 } from 'src/constants';
+import { throttle } from 'throttle-debounce';
+import {
+  trackInAppClick,
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
+} from '../events';
+import { baseIterableRequest } from '../request';
+import { IterablePromise } from '../types';
 import schema from './inapp.schema';
+import {
+  DisplayOptions,
+  DISPLAY_OPTIONS,
+  InAppMessage,
+  InAppMessageResponse,
+  InAppMessagesRequestParams
+} from './types';
+import {
+  addButtonAttrsToAnchorTag,
+  addNewMessagesToCache,
+  addStyleSheet,
+  filterHiddenInAppMessages,
+  generateCloseButton,
+  getHostnameFromUrl,
+  paintIFrame,
+  paintOverlay,
+  sortInAppMessages,
+  trackMessagesDelivered,
+  wrapWithIFrame
+} from './utils';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -109,15 +110,21 @@ export function getInAppMessages(
     try {
       const cachedMessages: [string, InAppMessage][] = await entries();
 
-      /** determine most recent message */
+      /** determine most recent message & delete expired messages */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
+      const expiredMessagesInCache: string[] = [];
+      const now = Date.now();
+
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.expiresAt < now) {
+          expiredMessagesInCache.push(cachedMessageId);
+        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
+      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -128,7 +135,8 @@ export function getInAppMessages(
 
       /** combine cached messages with NEW messages in delta response */
       const allMessages: Partial<InAppMessage>[] = [];
-      inAppMessages.forEach((inAppMessage) => {
+      const newMessages: { messageId: string; message: InAppMessage }[] = [];
+      inAppMessages?.forEach((inAppMessage) => {
         /**
          * if message in response has no content property, then that means it is
          * older than the latest cached message and should be retrieved from the
@@ -146,15 +154,21 @@ export function getInAppMessages(
          */
         if (!inAppMessage.content) {
           const cachedMessage = cachedMessages.find(
-            ([messageId, _]) => inAppMessage.messageId === messageId
+            ([messageId]) => inAppMessage.messageId === messageId
           );
           if (cachedMessage) allMessages.push(cachedMessage[1]);
         } else {
           allMessages.push(inAppMessage);
-          /** add NEW messages from delta response to cache */
-          if (inAppMessage.messageId) set(inAppMessage.messageId, inAppMessage);
+          if (inAppMessage.messageId)
+            newMessages.push({
+              messageId: inAppMessage.messageId,
+              message: inAppMessage as InAppMessage
+            });
         }
       });
+
+      /** add new messages to the cache if they fit in the cache */
+      await addNewMessagesToCache(newMessages);
 
       /** return combined response */
       return {
@@ -163,8 +177,11 @@ export function getInAppMessages(
           inAppMessages: allMessages
         }
       };
-    } catch (err) {
-      console.warn(err);
+    } catch (err: any) {
+      console.warn(
+        'Error requesting in-app messages',
+        err?.response?.data?.clientErrors ?? err
+      );
     }
     return await requestInAppMessages({});
   };
