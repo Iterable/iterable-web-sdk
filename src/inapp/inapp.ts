@@ -5,7 +5,8 @@ import {
   InAppMessage,
   InAppMessagesRequestParams,
   InAppMessageResponse,
-  DisplayOptions
+  DisplayOptions,
+  DISPLAY_OPTIONS
 } from './types';
 import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
@@ -577,7 +578,8 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred = showInAppMessagesAutomatically.display === 'deferred';
+    const isDeferred =
+      showInAppMessagesAutomatically.display === DISPLAY_OPTIONS.deferred;
 
     const triggerDisplayFn = isDeferred
       ? {

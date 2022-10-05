@@ -42,6 +42,7 @@ export enum DISPLAY_OPTIONS {
   deferred = 'deferred'
 }
 
+/** template literal type: allows string literals to be used for display options */
 export type DisplayOptions = `${DISPLAY_OPTIONS}`;
 
 export interface InAppDisplaySetting {
