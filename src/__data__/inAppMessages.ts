@@ -1,6 +1,6 @@
 import { InAppMessage } from '../inapp/types';
 
-const normalMessage: Partial<InAppMessage> = {
+const normalMessage: InAppMessage = {
   messageId: 'normalMessage!',
   campaignId: 2642276,
   createdAt: 1627060811283,
@@ -51,7 +51,7 @@ const normalMessage: Partial<InAppMessage> = {
   read: false
 };
 
-const expiredMessage: Partial<InAppMessage> = {
+const expiredMessage: InAppMessage = {
   messageId: 'expiredMessage!',
   campaignId: 2641072,
   createdAt: 1627320168381,
@@ -108,7 +108,7 @@ const expiredMessage: Partial<InAppMessage> = {
   read: false
 };
 
-const previouslyCachedMessage: Partial<InAppMessage> = {
+const previouslyCachedMessage: InAppMessage = {
   messageId: 'previouslyCachedMessage!',
   campaignId: 2632531,
   createdAt: 1627332441416,
@@ -164,7 +164,7 @@ const previouslyCachedMessage: Partial<InAppMessage> = {
   read: false
 };
 
-export const messages: Partial<InAppMessage>[] = [
+export const messages: InAppMessage[] = [
   normalMessage,
   expiredMessage,
   previouslyCachedMessage
