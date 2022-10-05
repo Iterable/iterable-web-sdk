@@ -128,16 +128,17 @@ export const determineRemainingStorageQuota = async () => {
 
     /** 50 MB is the typical web browser cache quota for mobile devices */
     const mobileBrowserQuota = 52428800;
+    /** max quota of browser storage that in-apps will potentially fill */
+    const estimatedBrowserQuota = storage?.quota;
     /**
-     * max quota of browser storage that in-apps will potentially fill,
-     * set to 60% of total quota for initial release
+     * determine lower max quota that can be used for message cache,
+     * set to 60% of quota to leave space for other caching needs
+     * on that domain
      */
-    const inAppMaxBrowserQuota = storage?.quota && storage.quota * 0.6;
-    /** determine lower max quota that can be used for message cache */
     const messageQuota =
-      inAppMaxBrowserQuota && inAppMaxBrowserQuota < mobileBrowserQuota
-        ? inAppMaxBrowserQuota
-        : mobileBrowserQuota;
+      ((estimatedBrowserQuota &&
+        Math.min(estimatedBrowserQuota, mobileBrowserQuota)) ??
+        mobileBrowserQuota) * 0.6;
 
     /** how much local storage is being used */
     const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
