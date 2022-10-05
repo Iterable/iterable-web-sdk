@@ -4,7 +4,9 @@ import _set from 'lodash/set';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
-  InAppMessageResponse
+  InAppMessageResponse,
+  DisplayOptions,
+  DISPLAY_OPTIONS
 } from './types';
 import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
@@ -57,15 +59,7 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: true
-): {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-};
-export function getInAppMessages(
-  payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically: { display: DisplayOptions }
 ): {
   pauseMessageStream: () => void;
   resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
@@ -76,9 +70,7 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?:
-    | boolean
-    | { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically?: { display: DisplayOptions }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
@@ -587,8 +579,7 @@ export function getInAppMessages(
     };
 
     const isDeferred =
-      typeof showInAppMessagesAutomatically !== 'boolean' &&
-      showInAppMessagesAutomatically.display === 'deferred';
+      showInAppMessagesAutomatically.display === DISPLAY_OPTIONS.deferred;
 
     const triggerDisplayFn = isDeferred
       ? {

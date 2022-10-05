@@ -37,6 +37,14 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
+export enum DISPLAY_OPTIONS {
+  immediate = 'immediate',
+  deferred = 'deferred'
+}
+
+/** template literal type: allows string literals to be used for display options */
+export type DisplayOptions = `${DISPLAY_OPTIONS}`;
+
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;
