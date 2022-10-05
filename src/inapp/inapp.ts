@@ -4,7 +4,7 @@ import {
   InAppMessage,
   InAppMessagesRequestParams,
   InAppMessageResponse,
-  DISPLAY
+  DISPLAY_OPTIONS
 } from './types';
 import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
@@ -57,7 +57,7 @@ export function getInAppMessages(
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
   showInAppMessagesAutomatically: {
-    display: DISPLAY.immediate | DISPLAY.deferred;
+    display: DISPLAY_OPTIONS.immediate | DISPLAY_OPTIONS.deferred;
   }
 ): {
   pauseMessageStream: () => void;
@@ -70,7 +70,7 @@ export function getInAppMessages(
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
   showInAppMessagesAutomatically?: {
-    display: DISPLAY.immediate | DISPLAY.deferred;
+    display: DISPLAY_OPTIONS.immediate | DISPLAY_OPTIONS.deferred;
   }
 ) {
   clearMessages();

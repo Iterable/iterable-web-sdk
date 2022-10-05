@@ -35,7 +35,7 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
-export enum DISPLAY {
+export enum DISPLAY_OPTIONS {
   immediate = 'immediate',
   deferred = 'deferred'
 }
