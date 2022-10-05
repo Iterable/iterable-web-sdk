@@ -5,7 +5,7 @@ import {
   InAppMessage,
   InAppMessagesRequestParams,
   InAppMessageResponse,
-  DISPLAY_OPTIONS
+  DisplayOptions
 } from './types';
 import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
@@ -58,9 +58,7 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: {
-    display: DISPLAY_OPTIONS.immediate | DISPLAY_OPTIONS.deferred;
-  }
+  showInAppMessagesAutomatically: { display: DisplayOptions }
 ): {
   pauseMessageStream: () => void;
   resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
@@ -71,9 +69,7 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?: {
-    display: DISPLAY_OPTIONS.immediate | DISPLAY_OPTIONS.deferred;
-  }
+  showInAppMessagesAutomatically?: { display: DisplayOptions }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };

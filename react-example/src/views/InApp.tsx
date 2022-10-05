@@ -28,11 +28,6 @@ const AutoDisplayContainer = styled.div`
   }
 `;
 
-enum DISPLAY_OPTIONS {
-  immediate = 'immediate',
-  deferred = 'deferred'
-}
-
 const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   {
     count: 20,
@@ -40,7 +35,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     closeButton: {},
     displayInterval: 10000
   },
-  { display: DISPLAY_OPTIONS.immediate }
+  { display: 'immediate' }
 );
 
 export const InApp: FC<{}> = () => {

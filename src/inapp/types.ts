@@ -42,6 +42,8 @@ export enum DISPLAY_OPTIONS {
   deferred = 'deferred'
 }
 
+export type DisplayOptions = `${DISPLAY_OPTIONS}`;
+
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;
