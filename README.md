@@ -104,7 +104,7 @@ Close Button Options:
 
 Example:
 
-Calling `getInAppMessages` with `showInAppMessagesAutomatically` set to `false` (or not set) returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+Calling `getInAppMessages` with `showInAppMessagesAutomatically` not set returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
