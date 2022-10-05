@@ -35,6 +35,11 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
+export enum DISPLAY {
+  immediate = 'immediate',
+  deferred = 'deferred'
+}
+
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;

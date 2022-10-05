@@ -3,7 +3,8 @@ import set from 'lodash/set';
 import {
   InAppMessage,
   InAppMessagesRequestParams,
-  InAppMessageResponse
+  InAppMessageResponse,
+  DISPLAY
 } from './types';
 import { IterablePromise } from '../types';
 import { baseIterableRequest } from '../request';
@@ -55,7 +56,9 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically: {
+    display: DISPLAY.immediate | DISPLAY.deferred;
+  }
 ): {
   pauseMessageStream: () => void;
   resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
@@ -66,7 +69,9 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?: { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically?: {
+    display: DISPLAY.immediate | DISPLAY.deferred;
+  }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
