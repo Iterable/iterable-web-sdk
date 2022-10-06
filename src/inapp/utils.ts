@@ -525,9 +525,11 @@ export const paintIFrame = (
             For web in-app messages created with WYSIWYG editor,
             there is 8px margin all around the iframe document body.
             Add 16px to the iframe height to eliminate scrollbar.
+            Add 10px to eliminate discrepancy between the height
+            of the document html and that of the iframe itself.
           */
           iframe.style.height =
-            ((iframeHeight && iframeHeight + 16) || 0) + 'px';
+            ((iframeHeight && iframeHeight + 26) || 0) + 'px';
         }
 
         clearTimeout(timeout);
