@@ -121,12 +121,14 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
  */
 export const determineRemainingStorageQuota = async () => {
   try {
+    if (!('indexedDB' in window)) return 0;
+
     const storage: BrowserStorageEstimate | undefined =
       'storage' in navigator && 'estimate' in navigator.storage
         ? await navigator.storage.estimate()
         : undefined;
 
-    /** 50 MB is the typical web browser cache quota for mobile devices */
+    /** 50 MB is the lower common denominator on modern mobile browser caches */
     const mobileBrowserQuota = 52428800;
     /** max quota of browser storage that in-apps will potentially fill */
     const estimatedBrowserQuota = storage?.quota;
