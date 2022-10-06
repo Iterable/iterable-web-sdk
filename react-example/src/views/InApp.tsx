@@ -33,7 +33,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     count: 20,
     packageName: 'my-website',
     closeButton: {},
-    displayInterval: 10000
+    displayInterval: 1000
   },
   { display: 'immediate' }
 );
@@ -59,11 +59,11 @@ export const InApp: FC<{}> = () => {
       .then((response) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
-        setGetMessagesResponse(JSON.stringify(response.data));
+        setGetMessagesResponse(JSON.stringify(response.data, null, 2));
       })
       .catch((e) => {
         setIsGettingMessagesRaw(false);
-        setGetMessagesResponse(JSON.stringify(e.response.data));
+        setGetMessagesResponse(JSON.stringify(e.response.data, null, 2));
       });
   };
 
@@ -95,21 +95,6 @@ export const InApp: FC<{}> = () => {
   return (
     <>
       <h1>inApp Endpoints</h1>
-      <Heading>POST /inApp/web/getMessages</Heading>
-      <EndpointWrapper>
-        <GetMessagesRawButton
-          disabled={!loggedInUser || isGettingMessagesRaw}
-          onClick={getMessagesRaw}
-          data-qa-get-messages-raw
-        >
-          {typeof rawMessageCount === 'number'
-            ? `Retrieved ${rawMessageCount} messages (try again)`
-            : 'Get Messages (do not auto-display)'}
-        </GetMessagesRawButton>
-        <Response data-qa-get-messages-raw-response>
-          {getMessagesResponse}
-        </Response>
-      </EndpointWrapper>
       <Heading>POST /inApp/web/getMessages (auto-display)</Heading>
       <AutoDisplayContainer>
         <Button
@@ -146,6 +131,21 @@ export const InApp: FC<{}> = () => {
           Resume Message Stream
         </Button>
       </AutoDisplayContainer>
+      <Heading>POST /inApp/web/getMessages</Heading>
+      <EndpointWrapper>
+        <GetMessagesRawButton
+          disabled={!loggedInUser || isGettingMessagesRaw}
+          onClick={getMessagesRaw}
+          data-qa-get-messages-raw
+        >
+          {typeof rawMessageCount === 'number'
+            ? `Retrieved ${rawMessageCount} messages (try again)`
+            : 'Get Messages (do not auto-display)'}
+        </GetMessagesRawButton>
+        <Response data-qa-get-messages-raw-response>
+          {getMessagesResponse}
+        </Response>
+      </EndpointWrapper>
     </>
   );
 };
