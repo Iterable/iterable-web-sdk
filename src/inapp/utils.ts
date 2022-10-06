@@ -195,11 +195,11 @@ export const addNewMessagesToCache = async (
     /** only add messages that fit in cache, starting from oldest messages */
     let remainingQuota = quota;
     const messagesToAddToCache: [string, InAppMessage][] = [];
-    messagesWithSizes.forEach(({ messageId, message, size }) => {
-      if (remainingQuota - size > 0) {
-        remainingQuota -= size;
-        messagesToAddToCache.push([messageId, message]);
-      }
+    messagesWithSizes.every(({ messageId, message, size }) => {
+      if (remainingQuota - size < 0) return false;
+      remainingQuota -= size;
+      messagesToAddToCache.push([messageId, message]);
+      return true;
     });
 
     try {
