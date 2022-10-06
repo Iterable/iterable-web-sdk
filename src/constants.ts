@@ -6,8 +6,7 @@ export const RETRY_USER_ATTEMPTS = 0;
 
 export const BASE_URL = process.env.BASE_URL || 'https://api.iterable.com/api';
 
-export const GETMESSAGES_PATH =
-  process.env.GETMESSAGES_PATH ?? '/inApp/web/getMessages';
+export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
