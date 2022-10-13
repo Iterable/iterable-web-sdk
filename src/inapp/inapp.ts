@@ -615,11 +615,9 @@ export function getInAppMessages(
                     );
                     /**
                       Using target="_blank" without rel="noreferrer" and rel="noopener"
-                      makes the website vulnerable to window.opener API exploitation attacks...
+                      makes the website vulnerable to window.opener API exploitation attacks
+                      
                       @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
-
-                      If handleLinks is NOT set but target is set to "_blank", then we should
-                      open the new tab with rel="noopener,noreferrer"
                     */
                     if (openInNewTab)
                       global.open(clickedUrl, '_blank', 'noopener,noreferrer');
