@@ -505,7 +505,15 @@ export function getInAppMessages(
                 } else {
                   newTabAction();
                 }
-              } else if (openInNewTab && !link.getAttribute('rel')) {
+              } else if (
+                openInNewTab &&
+                /**
+                  Using target="_blank" without rel="noreferrer" and rel="noopener"
+                  makes the website vulnerable to window.opener API exploitation attacks
+                  @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
+                */
+                !link.getAttribute('rel')
+              ) {
                 newTabAction();
               } else if (link.getAttribute('target') === null) {
                 sameTabAction();
@@ -607,11 +615,6 @@ export function getInAppMessages(
                   if (!isIterableKeywordLink) {
                     manageHandleLinks(
                       () => global.location.assign(clickedUrl),
-                      /**
-                        Using target="_blank" without rel="noreferrer" and rel="noopener"
-                        makes the website vulnerable to window.opener API exploitation attacks
-                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
-                      */
                       () => {
                         global.open(
                           clickedUrl,
