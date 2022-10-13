@@ -532,7 +532,11 @@ export function getInAppMessages(
                     link.setAttribute('rel', 'noopener noreferrer');
                   }
                 );
-                if (!handleLinks && link.getAttribute('target') === null) {
+                const targetAttr = link.getAttribute('target');
+                if (
+                  !handleLinks &&
+                  (targetAttr === null || targetAttr === '_self')
+                ) {
                   link.setAttribute('target', '_top');
                 }
               }
