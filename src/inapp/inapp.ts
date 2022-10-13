@@ -474,7 +474,6 @@ export function getInAppMessages(
             const isDismissNode = !!clickedUrl.match(/iterable:\/\/dismiss/gim);
             const isActionLink = !!clickedUrl.match(/action:\/\//gim);
 
-            /* track the clicked link */
             const clickedHostname = getHostnameFromUrl(clickedUrl);
             /* !clickedHostname means the link was relative with no hostname */
             const isInternalLink =
@@ -482,12 +481,12 @@ export function getInAppMessages(
             const { handleLinks } = payload;
 
             /* 
-              if the _handleLinks_ option is set, we need to open links 
-              according to that enum. So the way this works is:
+              If the _handleLinks_ option is set, we need to open links 
+              according to that enum and override their target attributes.
 
-              1. If _open-all-same-tab, then open every link in the same tab
-              2. If _open-all-new-tab, open all in new tab
-              3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+              1. If _open-all-same-tab_, then open every link in the same tab
+              2. If _open-all-new-tab_, then open every link in a new tab
+              3. If _external-new-tab_, then open internal links in same tab, otherwise new tab.
 
               This was a fix to account for the fact that Bee editor templates force
               target="_blank" on all links, so we gave this option as an escape hatch for that.
