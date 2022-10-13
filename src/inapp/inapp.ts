@@ -532,7 +532,7 @@ export function getInAppMessages(
                   () => link.setAttribute('target', '_top'),
                   () => {
                     link.setAttribute('target', '_blank');
-                    link.setAttribute('rel', 'noopener,noreferrer');
+                    link.setAttribute('rel', 'noopener noreferrer');
                   }
                 );
               }
@@ -623,6 +623,7 @@ export function getInAppMessages(
                     */
                     if (openInNewTab)
                       global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    else global.location.assign(clickedUrl);
                   }
                 }
               });
