@@ -459,9 +459,7 @@ export function getInAppMessages(
 
           const ua = navigator.userAgent;
           const isSafari =
-            !!ua.match(/safari/i) &&
-            !ua.match(/chrome|chromium|crios/i) &&
-            !ua.match(/firefox|fxios/i);
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
 
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
