@@ -505,8 +505,6 @@ export function getInAppMessages(
                 } else {
                   newTabAction();
                 }
-              } else if (link.getAttribute('target') === null) {
-                sameTabAction();
               }
             };
 
@@ -535,6 +533,9 @@ export function getInAppMessages(
                     link.setAttribute('rel', 'noopener noreferrer');
                   }
                 );
+                if (!handleLinks && link.getAttribute('target') === null) {
+                  link.setAttribute('target', '_top');
+                }
               }
             } else {
               link.addEventListener('click', (event) => {
@@ -613,15 +614,21 @@ export function getInAppMessages(
                         );
                       }
                     );
-                    /**
-                      Using target="_blank" without rel="noreferrer" and rel="noopener"
-                      makes the website vulnerable to window.opener API exploitation attacks
-                      
-                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
-                    */
-                    if (openInNewTab)
-                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                    else global.location.assign(clickedUrl);
+                    if (!handleLinks) {
+                      if (openInNewTab)
+                        /**
+                          Using target="_blank" without rel="noreferrer" and rel="noopener"
+                          makes the website vulnerable to window.opener API exploitation attacks
+  
+                          @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
+                        */
+                        global.open(
+                          clickedUrl,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
+                      else global.location.assign(clickedUrl);
+                    }
                   }
                 }
               });
