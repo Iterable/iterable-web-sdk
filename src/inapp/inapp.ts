@@ -457,12 +457,15 @@ export function getInAppMessages(
             Promise.all(trackRequests).catch((e) => e);
           }
 
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
-            activeIframe.contentWindow?.document?.querySelectorAll('a') || [];
+            activeIframe.contentDocument?.querySelectorAll('a') || [];
 
-          for (let i = 0; i < links.length; i++) {
-            const link = links[i];
+          links.forEach((link) => {
             const clickedUrl = link.getAttribute('href') || '';
             const openInNewTab = link.getAttribute('target') === '_blank';
             const isIterableKeywordLink = !!clickedUrl.match(
@@ -470,6 +473,13 @@ export function getInAppMessages(
             );
             const isDismissNode = !!clickedUrl.match(/iterable:\/\/dismiss/gim);
             const isActionLink = !!clickedUrl.match(/action:\/\//gim);
+
+            /* track the clicked link */
+            const clickedHostname = getHostnameFromUrl(clickedUrl);
+            /* !clickedHostname means the link was relative with no hostname */
+            const isInternalLink =
+              clickedHostname === global.location.host || !clickedHostname;
+            const { handleLinks } = payload;
 
             if (isDismissNode || isActionLink) {
               /* 
@@ -479,114 +489,137 @@ export function getInAppMessages(
               addButtonAttrsToAnchorTag(link, 'close modal');
             }
 
-            link.addEventListener('click', (event) => {
-              /* 
-                remove default linking behavior because we're in an iframe 
-                so we need to link the user programatically
-              */
-              event.preventDefault();
-
-              if (clickedUrl) {
-                /* track the clicked link */
-                const clickedHostname = getHostnameFromUrl(clickedUrl);
-                /* !clickedHostname means the link was relative with no hostname */
-                const isInternalLink =
-                  clickedHostname === global.location.host || !clickedHostname;
-                const isOpeningLinkInSameTab =
-                  (!payload.handleLinks && !openInNewTab) ||
-                  payload.handleLinks === 'open-all-same-tab' ||
-                  (isInternalLink &&
-                    payload.handleLinks === 'external-new-tab');
-                trackInAppClick(
-                  {
-                    clickedUrl,
-                    messageId: activeMessage?.messageId,
-                    deviceInfo: {
-                      appPackageName: dupedPayload.packageName
-                    }
-                  },
-                  /* 
-                    only call with the fetch API if we're linking in the 
-                    same tab and it's not a reserved keyword link.
-                  */
-                  isOpeningLinkInSameTab && !isIterableKeywordLink
-                  /* swallow the network error */
-                ).catch((e) => e);
-
-                if (isDismissNode || isActionLink) {
-                  dismissMessage(activeIframe, clickedUrl);
-                  overlay.remove();
-                  document.removeEventListener(
-                    'keydown',
-                    handleDocumentEscPress
-                  );
-                  if (activeIframe?.contentWindow?.document) {
-                    activeIframe.contentWindow?.document.removeEventListener(
-                      'keydown',
-                      handleIFrameEscPress
-                    );
-                  }
-                  global.removeEventListener('resize', throttledResize);
-                }
-
-                if (isActionLink) {
-                  const filteredMatch = (new RegExp(
-                    /^.*action:\/\/(.*)$/,
-                    'gmi'
-                  )?.exec(clickedUrl) || [])?.[1];
-                  /* 
-                    just post the message to the window when clicking 
-                    action:// links and early return
-                  */
-                  return global.postMessage(
-                    { type: 'iterable-action-link', data: filteredMatch },
-                    '*'
-                  );
-                }
-
-                /*
-                  finally (since we're in an iframe), programatically click the link
-                  and send the user to where they need to go, only if it's not one
-                  of the reserved iterable keyword links
-                */
-                if (!isIterableKeywordLink) {
-                  const { handleLinks } = payload;
-                  if (typeof handleLinks === 'string') {
-                    /* 
-                      if the _handleLinks_ option is set, we need to open links 
-                      according to that enum. So the way this works is:
-
-                      1. If _open-all-same-tab, then open every link in the same tab
-                      2. If _open-all-new-tab, open all in new tab
-                      3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
-
-                      This was a fix to account for the fact that Bee editor templates force
-                      target="_blank" on all links, so we gave this option as an escape hatch for that.
-                    */
-                    if (
-                      handleLinks === 'open-all-same-tab' ||
-                      (isInternalLink && handleLinks === 'external-new-tab')
-                    ) {
-                      global.location.assign(clickedUrl);
-                    } else {
-                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                    }
-                  } else if (openInNewTab) {
-                    /**
-                      Using target="_blank" without rel="noreferrer" and rel="noopener"
-                      makes the website vulnerable to window.opener API exploitation attacks
-
-                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-                    */
-                    global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+            /*
+              Safari blocks all bound event handlers (including our click event handlers)
+              in iframes, so links will not work in Safari unless we circumvent the
+              restriction by appending target to each link tag.
+            */
+            if (isSafari) {
+              if (
+                !isIterableKeywordLink &&
+                link.getAttribute('target') === 'undefined'
+              ) {
+                if (typeof handleLinks === 'string') {
+                  if (
+                    handleLinks === 'open-all-same-tab' ||
+                    (isInternalLink && handleLinks === 'external-new-tab')
+                  ) {
+                    link.setAttribute('target', '_top');
                   } else {
-                    /* otherwise just link them in the same tab */
-                    global.location.assign(clickedUrl);
+                    link.setAttribute('target', '_blank');
                   }
+                } else {
+                  link.setAttribute('target', '_top');
                 }
               }
-            });
-          }
+            } else {
+              link.addEventListener('click', (event) => {
+                /* 
+                  remove default linking behavior because we're in an iframe 
+                  so we need to link the user programatically
+                */
+                event.preventDefault();
+
+                if (clickedUrl) {
+                  const isOpeningLinkInSameTab =
+                    (!handleLinks && !openInNewTab) ||
+                    handleLinks === 'open-all-same-tab' ||
+                    (isInternalLink && handleLinks === 'external-new-tab');
+
+                  trackInAppClick(
+                    {
+                      clickedUrl,
+                      messageId: activeMessage?.messageId,
+                      deviceInfo: {
+                        appPackageName: dupedPayload.packageName
+                      }
+                    },
+                    /* 
+                      only call with the fetch API if we're linking in the 
+                      same tab and it's not a reserved keyword link.
+                    */
+                    isOpeningLinkInSameTab && !isIterableKeywordLink
+                    /* swallow the network error */
+                  ).catch((e) => e);
+
+                  if (isDismissNode || isActionLink) {
+                    dismissMessage(activeIframe, clickedUrl);
+                    overlay.remove();
+                    document.removeEventListener(
+                      'keydown',
+                      handleDocumentEscPress
+                    );
+                    if (activeIframe?.contentWindow?.document) {
+                      activeIframe.contentWindow?.document.removeEventListener(
+                        'keydown',
+                        handleIFrameEscPress
+                      );
+                    }
+                    global.removeEventListener('resize', throttledResize);
+                  }
+
+                  if (isActionLink) {
+                    const filteredMatch = (new RegExp(
+                      /^.*action:\/\/(.*)$/,
+                      'gmi'
+                    )?.exec(clickedUrl) || [])?.[1];
+                    /* 
+                      just post the message to the window when clicking 
+                      action:// links and early return
+                    */
+                    return global.postMessage(
+                      { type: 'iterable-action-link', data: filteredMatch },
+                      '*'
+                    );
+                  }
+
+                  /*
+                    finally (since we're in an iframe), programatically click the link
+                    and send the user to where they need to go, only if it's not one
+                    of the reserved iterable keyword links
+                  */
+                  if (!isIterableKeywordLink) {
+                    if (typeof handleLinks === 'string') {
+                      /* 
+                        if the _handleLinks_ option is set, we need to open links 
+                        according to that enum. So the way this works is:
+  
+                        1. If _open-all-same-tab, then open every link in the same tab
+                        2. If _open-all-new-tab, open all in new tab
+                        3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+  
+                        This was a fix to account for the fact that Bee editor templates force
+                        target="_blank" on all links, so we gave this option as an escape hatch for that.
+                      */
+                      if (
+                        handleLinks === 'open-all-same-tab' ||
+                        (isInternalLink && handleLinks === 'external-new-tab')
+                      ) {
+                        global.location.assign(clickedUrl);
+                      } else {
+                        global.open(
+                          clickedUrl,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
+                      }
+                    } else if (openInNewTab) {
+                      /**
+                        Using target="_blank" without rel="noreferrer" and rel="noopener"
+                        makes the website vulnerable to window.opener API exploitation attacks
+  
+                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                      */
+                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    } else {
+                      /* otherwise just link them in the same tab */
+                      global.location.assign(clickedUrl);
+                    }
+                  }
+                }
+              });
+            }
+          });
 
           return activeIframe;
         });
