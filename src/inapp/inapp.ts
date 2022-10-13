@@ -515,13 +515,13 @@ export function getInAppMessages(
               addButtonAttrsToAnchorTag(link, 'close modal');
             }
 
-            /*
+            /**
               Safari blocks all bound event handlers (including our click event handlers)
               in iframes, so links will not work in Safari unless we circumvent the
               restriction by appending target to each link tag.
 
-              NOTE: Because click event handlers cannot be attached to iframe links in
-              Safari, we cannot track in-app clicks in metrics.
+              @note Because click event handlers cannot be attached to iframe links in
+              Safari, we cannot track in-app click metrics for Safari in Iterable analytics.
             */
             if (isSafari) {
               if (!isIterableKeywordLink) {
