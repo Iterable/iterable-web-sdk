@@ -481,6 +481,37 @@ export function getInAppMessages(
               clickedHostname === global.location.host || !clickedHostname;
             const { handleLinks } = payload;
 
+            /* 
+              if the _handleLinks_ option is set, we need to open links 
+              according to that enum. So the way this works is:
+
+              1. If _open-all-same-tab, then open every link in the same tab
+              2. If _open-all-new-tab, open all in new tab
+              3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+
+              This was a fix to account for the fact that Bee editor templates force
+              target="_blank" on all links, so we gave this option as an escape hatch for that.
+            */
+            const manageHandleLinks = (
+              sameTabAction: () => void,
+              newTabAction: () => void
+            ) => {
+              if (typeof handleLinks === 'string') {
+                if (
+                  handleLinks === 'open-all-same-tab' ||
+                  (isInternalLink && handleLinks === 'external-new-tab')
+                ) {
+                  sameTabAction();
+                } else {
+                  newTabAction();
+                }
+              } else if (openInNewTab && !link.getAttribute('rel')) {
+                newTabAction();
+              } else if (link.getAttribute('target') === null) {
+                sameTabAction();
+              }
+            };
+
             if (isDismissNode || isActionLink) {
               /* 
                 give the close anchor tag properties that make it 
@@ -499,18 +530,13 @@ export function getInAppMessages(
             */
             if (isSafari) {
               if (!isIterableKeywordLink) {
-                if (typeof handleLinks === 'string') {
-                  if (
-                    handleLinks === 'open-all-same-tab' ||
-                    (isInternalLink && handleLinks === 'external-new-tab')
-                  ) {
-                    link.setAttribute('target', '_top');
-                  } else {
+                manageHandleLinks(
+                  () => link.setAttribute('target', '_top'),
+                  () => {
                     link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener,noreferrer');
                   }
-                } else if (link.getAttribute('target') === null) {
-                  link.setAttribute('target', '_top');
-                }
+                );
               }
             } else {
               link.addEventListener('click', (event) => {
@@ -579,42 +605,21 @@ export function getInAppMessages(
                     of the reserved iterable keyword links
                   */
                   if (!isIterableKeywordLink) {
-                    if (typeof handleLinks === 'string') {
-                      /* 
-                        if the _handleLinks_ option is set, we need to open links 
-                        according to that enum. So the way this works is:
-  
-                        1. If _open-all-same-tab, then open every link in the same tab
-                        2. If _open-all-new-tab, open all in new tab
-                        3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
-  
-                        This was a fix to account for the fact that Bee editor templates force
-                        target="_blank" on all links, so we gave this option as an escape hatch for that.
+                    manageHandleLinks(
+                      () => global.location.assign(clickedUrl),
+                      /**
+                        Using target="_blank" without rel="noreferrer" and rel="noopener"
+                        makes the website vulnerable to window.opener API exploitation attacks
+                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                       */
-                      if (
-                        handleLinks === 'open-all-same-tab' ||
-                        (isInternalLink && handleLinks === 'external-new-tab')
-                      ) {
-                        global.location.assign(clickedUrl);
-                      } else {
+                      () => {
                         global.open(
                           clickedUrl,
                           '_blank',
                           'noopener,noreferrer'
                         );
                       }
-                    } else if (openInNewTab) {
-                      /**
-                        Using target="_blank" without rel="noreferrer" and rel="noopener"
-                        makes the website vulnerable to window.opener API exploitation attacks
-  
-                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
-                      */
-                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                    } else {
-                      /* otherwise just link them in the same tab */
-                      global.location.assign(clickedUrl);
-                    }
+                    );
                   }
                 }
               });
