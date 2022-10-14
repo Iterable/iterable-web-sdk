@@ -364,6 +364,11 @@ export function getInAppMessages(
             });
           }
 
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+          console.log('isSafari', isSafari);
+
           /*
             create an absolutely positioned button that lies underneath the
             in-app message and takes up full width and height
@@ -420,7 +425,7 @@ export function getInAppMessages(
               values. This button is just a quality-of-life feature so that the customer will
               have an easy way to close the modal outside of the other methods.
             */
-            if (payload.closeButton) {
+            if (payload.closeButton && !isSafari) {
               const newButton = generateCloseButton(
                 document,
                 payload.closeButton?.position,
@@ -456,10 +461,6 @@ export function getInAppMessages(
             ];
             Promise.all(trackRequests).catch((e) => e);
           }
-
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
 
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
