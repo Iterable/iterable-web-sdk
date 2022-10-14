@@ -1,31 +1,5 @@
-import { entries, set } from 'idb-keyval';
-import { throttle } from 'throttle-debounce';
+import { delMany, entries } from 'idb-keyval';
 import _set from 'lodash/set';
-import {
-  InAppMessage,
-  InAppMessagesRequestParams,
-  InAppMessageResponse
-} from './types';
-import { IterablePromise } from '../types';
-import { baseIterableRequest } from '../request';
-import {
-  addButtonAttrsToAnchorTag,
-  addStyleSheet,
-  filterHiddenInAppMessages,
-  generateCloseButton,
-  getHostnameFromUrl,
-  paintIFrame,
-  paintOverlay,
-  sortInAppMessages,
-  trackMessagesDelivered,
-  wrapWithIFrame
-} from './utils';
-import {
-  trackInAppClick,
-  trackInAppClose,
-  trackInAppConsume,
-  trackInAppOpen
-} from '../events';
 import {
   ANIMATION_DURATION,
   ANIMATION_STYLESHEET,
@@ -36,7 +10,36 @@ import {
   SDK_VERSION,
   WEB_PLATFORM
 } from 'src/constants';
+import { throttle } from 'throttle-debounce';
+import {
+  trackInAppClick,
+  trackInAppClose,
+  trackInAppConsume,
+  trackInAppOpen
+} from '../events';
+import { baseIterableRequest } from '../request';
+import { IterablePromise } from '../types';
 import schema from './inapp.schema';
+import {
+  DisplayOptions,
+  DISPLAY_OPTIONS,
+  InAppMessage,
+  InAppMessageResponse,
+  InAppMessagesRequestParams
+} from './types';
+import {
+  addButtonAttrsToAnchorTag,
+  addNewMessagesToCache,
+  addStyleSheet,
+  filterHiddenInAppMessages,
+  generateCloseButton,
+  getHostnameFromUrl,
+  paintIFrame,
+  paintOverlay,
+  sortInAppMessages,
+  trackMessagesDelivered,
+  wrapWithIFrame
+} from './utils';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -57,15 +60,7 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: true
-): {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-};
-export function getInAppMessages(
-  payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically: { display: DisplayOptions }
 ): {
   pauseMessageStream: () => void;
   resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
@@ -76,9 +71,7 @@ export function getInAppMessages(
 };
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?:
-    | boolean
-    | { display: 'immediate' | 'deferred' }
+  showInAppMessagesAutomatically?: { display: DisplayOptions }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
@@ -117,15 +110,21 @@ export function getInAppMessages(
     try {
       const cachedMessages: [string, InAppMessage][] = await entries();
 
-      /** determine most recent message */
+      /** determine most recent message & delete expired messages */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
+      const expiredMessagesInCache: string[] = [];
+      const now = Date.now();
+
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.expiresAt < now) {
+          expiredMessagesInCache.push(cachedMessageId);
+        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
+      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -136,7 +135,8 @@ export function getInAppMessages(
 
       /** combine cached messages with NEW messages in delta response */
       const allMessages: Partial<InAppMessage>[] = [];
-      inAppMessages.forEach((inAppMessage) => {
+      const newMessages: { messageId: string; message: InAppMessage }[] = [];
+      inAppMessages?.forEach((inAppMessage) => {
         /**
          * if message in response has no content property, then that means it is
          * older than the latest cached message and should be retrieved from the
@@ -154,15 +154,21 @@ export function getInAppMessages(
          */
         if (!inAppMessage.content) {
           const cachedMessage = cachedMessages.find(
-            ([messageId, _]) => inAppMessage.messageId === messageId
+            ([messageId]) => inAppMessage.messageId === messageId
           );
           if (cachedMessage) allMessages.push(cachedMessage[1]);
         } else {
           allMessages.push(inAppMessage);
-          /** add NEW messages from delta response to cache */
-          if (inAppMessage.messageId) set(inAppMessage.messageId, inAppMessage);
+          if (inAppMessage.messageId)
+            newMessages.push({
+              messageId: inAppMessage.messageId,
+              message: inAppMessage as InAppMessage
+            });
         }
       });
+
+      /** add new messages to the cache if they fit in the cache */
+      await addNewMessagesToCache(newMessages);
 
       /** return combined response */
       return {
@@ -171,8 +177,11 @@ export function getInAppMessages(
           inAppMessages: allMessages
         }
       };
-    } catch (err) {
-      console.warn(err);
+    } catch (err: any) {
+      console.warn(
+        'Error requesting in-app messages',
+        err?.response?.data?.clientErrors ?? err
+      );
     }
     return await requestInAppMessages({});
   };
@@ -448,12 +457,15 @@ export function getInAppMessages(
             Promise.all(trackRequests).catch((e) => e);
           }
 
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
-            activeIframe.contentWindow?.document?.querySelectorAll('a') || [];
+            activeIframe.contentDocument?.querySelectorAll('a') || [];
 
-          for (let i = 0; i < links.length; i++) {
-            const link = links[i];
+          links.forEach((link) => {
             const clickedUrl = link.getAttribute('href') || '';
             const openInNewTab = link.getAttribute('target') === '_blank';
             const isIterableKeywordLink = !!clickedUrl.match(
@@ -461,6 +473,42 @@ export function getInAppMessages(
             );
             const isDismissNode = !!clickedUrl.match(/iterable:\/\/dismiss/gim);
             const isActionLink = !!clickedUrl.match(/action:\/\//gim);
+
+            /* track the clicked link */
+            const clickedHostname = getHostnameFromUrl(clickedUrl);
+            /* !clickedHostname means the link was relative with no hostname */
+            const isInternalLink =
+              clickedHostname === global.location.host || !clickedHostname;
+            const { handleLinks } = payload;
+
+            /* 
+              if the _handleLinks_ option is set, we need to open links 
+              according to that enum. So the way this works is:
+
+              1. If _open-all-same-tab, then open every link in the same tab
+              2. If _open-all-new-tab, open all in new tab
+              3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+
+              This was a fix to account for the fact that Bee editor templates force
+              target="_blank" on all links, so we gave this option as an escape hatch for that.
+            */
+            const manageHandleLinks = (
+              sameTabAction: () => void,
+              newTabAction: () => void
+            ) => {
+              if (typeof handleLinks === 'string') {
+                if (
+                  handleLinks === 'open-all-same-tab' ||
+                  (isInternalLink && handleLinks === 'external-new-tab')
+                ) {
+                  sameTabAction();
+                } else {
+                  newTabAction();
+                }
+              } else if (link.getAttribute('target') === null) {
+                sameTabAction();
+              }
+            };
 
             if (isDismissNode || isActionLink) {
               /* 
@@ -470,114 +518,115 @@ export function getInAppMessages(
               addButtonAttrsToAnchorTag(link, 'close modal');
             }
 
-            link.addEventListener('click', (event) => {
-              /* 
-                remove default linking behavior because we're in an iframe 
-                so we need to link the user programatically
-              */
-              event.preventDefault();
+            /*
+              Safari blocks all bound event handlers (including our click event handlers)
+              in iframes, so links will not work in Safari unless we circumvent the
+              restriction by appending target to each link tag.
 
-              if (clickedUrl) {
-                /* track the clicked link */
-                const clickedHostname = getHostnameFromUrl(clickedUrl);
-                /* !clickedHostname means the link was relative with no hostname */
-                const isInternalLink =
-                  clickedHostname === global.location.host || !clickedHostname;
-                const isOpeningLinkInSameTab =
-                  (!payload.handleLinks && !openInNewTab) ||
-                  payload.handleLinks === 'open-all-same-tab' ||
-                  (isInternalLink &&
-                    payload.handleLinks === 'external-new-tab');
-                trackInAppClick(
-                  {
-                    clickedUrl,
-                    messageId: activeMessage?.messageId,
-                    deviceInfo: {
-                      appPackageName: dupedPayload.packageName
-                    }
-                  },
-                  /* 
-                    only call with the fetch API if we're linking in the 
-                    same tab and it's not a reserved keyword link.
-                  */
-                  isOpeningLinkInSameTab && !isIterableKeywordLink
-                  /* swallow the network error */
-                ).catch((e) => e);
+              NOTE: Because click event handlers cannot be attached to iframe links in
+              Safari, we cannot track in-app clicks in metrics.
+            */
+            if (isSafari) {
+              if (!isIterableKeywordLink) {
+                manageHandleLinks(
+                  () => link.setAttribute('target', '_top'),
+                  () => {
+                    link.setAttribute('target', '_blank');
+                    link.setAttribute('rel', 'noopener noreferrer');
+                  }
+                );
+              }
+            } else {
+              link.addEventListener('click', (event) => {
+                /* 
+                  remove default linking behavior because we're in an iframe 
+                  so we need to link the user programatically
+                */
+                event.preventDefault();
 
-                if (isDismissNode || isActionLink) {
-                  dismissMessage(activeIframe, clickedUrl);
-                  overlay.remove();
-                  document.removeEventListener(
-                    'keydown',
-                    handleDocumentEscPress
-                  );
-                  if (activeIframe?.contentWindow?.document) {
-                    activeIframe.contentWindow?.document.removeEventListener(
+                if (clickedUrl) {
+                  const isOpeningLinkInSameTab =
+                    (!handleLinks && !openInNewTab) ||
+                    handleLinks === 'open-all-same-tab' ||
+                    (isInternalLink && handleLinks === 'external-new-tab');
+
+                  trackInAppClick(
+                    {
+                      clickedUrl,
+                      messageId: activeMessage?.messageId,
+                      deviceInfo: {
+                        appPackageName: dupedPayload.packageName
+                      }
+                    },
+                    /* 
+                      only call with the fetch API if we're linking in the 
+                      same tab and it's not a reserved keyword link.
+                    */
+                    isOpeningLinkInSameTab && !isIterableKeywordLink
+                    /* swallow the network error */
+                  ).catch((e) => e);
+
+                  if (isDismissNode || isActionLink) {
+                    dismissMessage(activeIframe, clickedUrl);
+                    overlay.remove();
+                    document.removeEventListener(
                       'keydown',
-                      handleIFrameEscPress
+                      handleDocumentEscPress
+                    );
+                    if (activeIframe?.contentWindow?.document) {
+                      activeIframe.contentWindow?.document.removeEventListener(
+                        'keydown',
+                        handleIFrameEscPress
+                      );
+                    }
+                    global.removeEventListener('resize', throttledResize);
+                  }
+
+                  if (isActionLink) {
+                    const filteredMatch = (new RegExp(
+                      /^.*action:\/\/(.*)$/,
+                      'gmi'
+                    )?.exec(clickedUrl) || [])?.[1];
+                    /* 
+                      just post the message to the window when clicking 
+                      action:// links and early return
+                    */
+                    return global.postMessage(
+                      { type: 'iterable-action-link', data: filteredMatch },
+                      '*'
                     );
                   }
-                  global.removeEventListener('resize', throttledResize);
-                }
 
-                if (isActionLink) {
-                  const filteredMatch = (new RegExp(
-                    /^.*action:\/\/(.*)$/,
-                    'gmi'
-                  )?.exec(clickedUrl) || [])?.[1];
-                  /* 
-                    just post the message to the window when clicking 
-                    action:// links and early return
+                  /*
+                    finally (since we're in an iframe), programatically click the link
+                    and send the user to where they need to go, only if it's not one
+                    of the reserved iterable keyword links
                   */
-                  return global.postMessage(
-                    { type: 'iterable-action-link', data: filteredMatch },
-                    '*'
-                  );
-                }
-
-                /*
-                  finally (since we're in an iframe), programatically click the link
-                  and send the user to where they need to go, only if it's not one
-                  of the reserved iterable keyword links
-                */
-                if (!isIterableKeywordLink) {
-                  const { handleLinks } = payload;
-                  if (typeof handleLinks === 'string') {
-                    /* 
-                      if the _handleLinks_ option is set, we need to open links 
-                      according to that enum. So the way this works is:
-
-                      1. If _open-all-same-tab, then open every link in the same tab
-                      2. If _open-all-new-tab, open all in new tab
-                      3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
-
-                      This was a fix to account for the fact that Bee editor templates force
-                      target="_blank" on all links, so we gave this option as an escape hatch for that.
-                    */
-                    if (
-                      handleLinks === 'open-all-same-tab' ||
-                      (isInternalLink && handleLinks === 'external-new-tab')
-                    ) {
-                      global.location.assign(clickedUrl);
-                    } else {
-                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                    }
-                  } else if (openInNewTab) {
+                  if (!isIterableKeywordLink) {
+                    manageHandleLinks(
+                      () => global.location.assign(clickedUrl),
+                      () => {
+                        global.open(
+                          clickedUrl,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
+                      }
+                    );
                     /**
                       Using target="_blank" without rel="noreferrer" and rel="noopener"
                       makes the website vulnerable to window.opener API exploitation attacks
-
-                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a
+                      
+                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                     */
-                    global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                  } else {
-                    /* otherwise just link them in the same tab */
-                    global.location.assign(clickedUrl);
+                    if (openInNewTab)
+                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    else global.location.assign(clickedUrl);
                   }
                 }
-              }
-            });
-          }
+              });
+            }
+          });
 
           return activeIframe;
         });
@@ -587,8 +636,7 @@ export function getInAppMessages(
     };
 
     const isDeferred =
-      typeof showInAppMessagesAutomatically !== 'boolean' &&
-      showInAppMessagesAutomatically.display === 'deferred';
+      showInAppMessagesAutomatically.display === DISPLAY_OPTIONS.deferred;
 
     const triggerDisplayFn = isDeferred
       ? {

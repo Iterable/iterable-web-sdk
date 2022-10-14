@@ -37,6 +37,14 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
+export enum DISPLAY_OPTIONS {
+  immediate = 'immediate',
+  deferred = 'deferred'
+}
+
+/** template literal type: allows string literals to be used for display options */
+export type DisplayOptions = `${DISPLAY_OPTIONS}`;
+
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;
@@ -45,6 +53,11 @@ export interface InAppDisplaySetting {
 export interface WebInAppDisplaySettings {
   position: 'Center' | 'TopRight' | 'BottomRight' | 'Full';
 }
+
+export type BrowserStorageEstimate = StorageEstimate & {
+  /** usageDetails not supported in Safari */
+  usageDetails?: { indexedDB?: number };
+};
 
 export interface InAppMessage {
   messageId: string;

@@ -1,9 +1,10 @@
 import { by } from '@pabra/sortby';
-import { InAppMessage } from './types';
+import { setMany } from 'idb-keyval';
+import { ANIMATION_DURATION } from 'src/constants';
+import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import { WebInAppDisplaySettings } from 'src/inapp';
-import { ANIMATION_DURATION } from 'src/constants';
+import { BrowserStorageEstimate, InAppMessage } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -114,6 +115,104 @@ export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
   return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 };
 
+/**
+ * detect amount of local storage remaining (quota) and used (usage).
+ * if usageDetails exist (not supported in Safari), use this instead of usage.
+ */
+export const determineRemainingStorageQuota = async () => {
+  try {
+    if (!('indexedDB' in window)) return 0;
+
+    const storage: BrowserStorageEstimate | undefined =
+      'storage' in navigator && 'estimate' in navigator.storage
+        ? await navigator.storage.estimate()
+        : undefined;
+
+    /** 50 MB is the lower common denominator on modern mobile browser caches */
+    const mobileBrowserQuota = 52428800;
+    /** max quota of browser storage that in-apps will potentially fill */
+    const estimatedBrowserQuota = storage?.quota;
+    /**
+     * determine lower max quota that can be used for message cache,
+     * set to 60% of quota to leave space for other caching needs
+     * on that domain
+     */
+    const messageQuota =
+      ((estimatedBrowserQuota &&
+        Math.min(estimatedBrowserQuota, mobileBrowserQuota)) ??
+        mobileBrowserQuota) * 0.6;
+
+    /** how much local storage is being used */
+    const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
+    const remainingQuota = usage && messageQuota - usage;
+
+    return remainingQuota ? remainingQuota : 0;
+  } catch (err: any) {
+    console.warn(
+      'Error determining remaining storage quota',
+      err?.response?.data?.clientErrors ?? err
+    );
+  }
+  /** do not try to add to cache if we cannot determine storage space */
+  return 0;
+};
+
+/**
+ * adds messages to cache only if they fit within the quota, starting with
+ * oldest messages since newer messages can still be easily retrieved via
+ * new requests while passing in latestCachedMessageId param
+ * @param messages
+ * @param quota
+ */
+export const addNewMessagesToCache = async (
+  messages: { messageId: string; message: InAppMessage }[]
+) => {
+  const quota = await determineRemainingStorageQuota();
+  if (quota > 0) {
+    /**
+     * determine total size (in bytes) of new messages to be added to cache
+     * sorted oldest to newest (ascending createdAt property)
+     */
+    const messagesWithSizes: {
+      messageId: string;
+      message: InAppMessage;
+      createdAt: number;
+      size: number;
+    }[] = messages
+      .map(({ messageId, message }) => {
+        const sizeInBytes = new Blob([
+          JSON.stringify(message).replace(/\[\[\],"\]/g, '')
+        ]).size;
+        return {
+          messageId,
+          message,
+          createdAt: message.createdAt,
+          size: sizeInBytes
+        };
+      })
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    /** only add messages that fit in cache, starting from oldest messages */
+    let remainingQuota = quota;
+    const messagesToAddToCache: [string, InAppMessage][] = [];
+    messagesWithSizes.every(({ messageId, message, size }) => {
+      if (remainingQuota - size < 0) return false;
+      remainingQuota -= size;
+      messagesToAddToCache.push([messageId, message]);
+      return true;
+    });
+
+    try {
+      await setMany(messagesToAddToCache);
+    } catch (err: any) {
+      console.warn(
+        'Error adding new messages to the browser cache',
+        err?.response?.data?.clientErrors ?? err
+      );
+    }
+  }
+};
+
 export const generateCloseButton = (
   doc: Document,
   position?: 'top-right' | 'top-left',
@@ -167,7 +266,6 @@ export const generateCloseButton = (
     no idea why typescript is saying "ariaLabel" doesn't exist on type HTMLButtonElement.
     Most likely going to need to upgrade typescript to fix this, but in the meantime, we ignore it.
   */
-  /* @ts-ignore-next-line */
   button.ariaLabel = 'Close modal button';
   button.setAttribute('data-qa-custom-close-button', 'true');
   return button;
@@ -429,9 +527,11 @@ export const paintIFrame = (
             For web in-app messages created with WYSIWYG editor,
             there is 8px margin all around the iframe document body.
             Add 16px to the iframe height to eliminate scrollbar.
+            Add 10px to eliminate discrepancy between the height
+            of the document html and that of the iframe itself.
           */
           iframe.style.height =
-            ((iframeHeight && iframeHeight + 16) || 0) + 'px';
+            ((iframeHeight && iframeHeight + 26) || 0) + 'px';
         }
 
         clearTimeout(timeout);
