@@ -349,7 +349,11 @@ export function getInAppMessages(
             );
           }
 
-          if (!payload.closeButton?.isRequiredToDismissMessage) {
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
+          if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
@@ -363,11 +367,6 @@ export function getInAppMessages(
               global.removeEventListener('resize', throttledResize);
             });
           }
-
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
-          console.log('isSafari', isSafari);
 
           /*
             create an absolutely positioned button that lies underneath the
