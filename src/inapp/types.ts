@@ -15,7 +15,7 @@ interface SDKInAppMessagesParams {
     iconPath?: string;
     position?: 'top-left' | 'top-right';
     /* If true, prevent user from dismissing in-app message by clicking outside of message */
-    isRequiredToDismissMessage?: true;
+    isRequiredToDismissMessage?: boolean;
     sideOffset?: string;
     size?: string | number;
     topOffset?: string;
