@@ -349,7 +349,20 @@ export function getInAppMessages(
             );
           }
 
-          if (!payload.closeButton?.isRequiredToDismissMessage) {
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
+          /**
+           * We allow users to dismiss messages by clicking outside of the
+           * message not only when isRequiredToDismissMessage is not true
+           * but also when browser is detected to be Safari, regardless of
+           * whether isRequiredToDismissMessage is true. Safari blocks
+           * all bound event handlers and so we cannot execute Javascript
+           * to listen for click events. As such, we should not prevent users
+           * from being able to dismiss the message by clicking outside of it.
+           */
+          if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
@@ -415,12 +428,16 @@ export function getInAppMessages(
               absoluteDismissButton
             );
 
-            /*
-              here we paint an optional close button if the user provided configuration
-              values. This button is just a quality-of-life feature so that the customer will
-              have an easy way to close the modal outside of the other methods.
-            */
-            if (payload.closeButton) {
+            /**
+             * Here we paint an optional close button if the user provided configuration
+             * values. This button is just a quality-of-life feature so that the customer will
+             * have an easy way to close the modal outside of the other methods.
+             *
+             * Do not show close button if browser is detected to be Safari because the close
+             * button will not be able to dismiss the message (Safari blocks JS from running
+             * on bound event handlers)
+             */
+            if (payload.closeButton && !isSafari) {
               const newButton = generateCloseButton(
                 document,
                 payload.closeButton?.position,
@@ -456,10 +473,6 @@ export function getInAppMessages(
             ];
             Promise.all(trackRequests).catch((e) => e);
           }
-
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
 
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
