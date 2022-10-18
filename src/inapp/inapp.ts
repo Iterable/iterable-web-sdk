@@ -111,7 +111,7 @@ export function getInAppMessages(
     });
 
   const requestMessages = async () => {
-    /** @note method and associated parameter will be enabled once new endpoint is ready */
+    /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
     // if (!options?.useLocalCache) return await requestInAppMessages({});
     /** @note always early return until then */
     return await requestInAppMessages({});
