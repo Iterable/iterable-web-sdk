@@ -370,7 +370,7 @@ const generateSecuredIFrame = () => {
 export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
   const iframe = generateSecuredIFrame();
   iframe.onload = () => {
-    iframe.contentWindow?.document.write(html);
+    iframe.contentDocument?.write(html);
   };
   return iframe;
 };
