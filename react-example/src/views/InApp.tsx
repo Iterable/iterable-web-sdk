@@ -55,7 +55,11 @@ export const InApp: FC<{}> = () => {
     e.preventDefault();
     setIsGettingMessagesRaw(true);
 
-    return getInAppMessages({ count: 20, packageName: 'my-website' })
+    return getInAppMessages(
+      { count: 20, packageName: 'my-website' },
+      { display: 'deferred' }
+    )
+      .request()
       .then((response) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
