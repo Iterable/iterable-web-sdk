@@ -1,9 +1,5 @@
 ![Iterable-Logo](https://user-images.githubusercontent.com/7387001/129065810-44b39e27-e319-408c-b87c-4d6b37e1f3b2.png)
 
-# BETA FEATURE
-
-:rotating_light: Web in-app messages (along with the Iterable Web SDK) are in Beta. If you'd like to try them out, talk to your customer success manager. We cannot guarantee this SDK will function as expected if you are not in the Beta program. :rotating_light:
-
 # Iterable's Web SDK
 
 [Iterable](https://www.iterable.com) is a growth marketing platform that helps you to create better experiences for—and deeper relationships with—your customers. Use it to send customized email, SMS, push notification, in-app message, web push notification campaigns to your customers.
@@ -74,33 +70,35 @@ API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_g
 getInAppMessages: (payload: InAppMessagesRequestParams, options?: { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
+:rotating_light: Notice: As of v1.0.0 we have deprecated support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
+
 SDK Specific Options:
 
 Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
 
-| Property Name                                    | Description                                                                                                                                                                                                                       | Value                                                             | Default     |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------- |
-| animationDuration                                | How much time (in MS) for messages to animate in and out                                                                                                                                                                          | `number`                                                          | `400`       |
-| bottomOffset                                     | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
-| displayInterval                                  | How much time (in MS) to wait before showing next in-app message after closing the currently opened one                                                                                                                           | `number`                                                          | `30000`     |
-| handleLinks | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
-| onOpenScreenReaderMessage                        | What text do you want the screen reader to announce when opening in-app messages                                                                                                                                                  | `string`                                                          | `undefined` |
-| onOpenNodeToTakeFocus                            | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                     | `string`                                                          | `undefined` |
-| rightOffset                                      | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                                | `string`                                                          | `undefined` |
-| topOffset                                        | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
-| closeButton                                      | Properties to show a custom close button on each in-app message                                                                                                                                                                   | `CloseButtonOptions` (see below)                                  | `undefined` |
+| Property Name             | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
+| animationDuration         | How much time (in MS) for messages to animate in and out                                                                                                                                                                                                                                   | `number`                                                          | `400`       |
+| bottomOffset              | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                                                                                  | `string`                                                          | `undefined` |
+| displayInterval           | How much time (in MS) to wait before showing next in-app message after closing the currently opened one                                                                                                                                                                                    | `number`                                                          | `30000`     |
+| handleLinks               | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| onOpenScreenReaderMessage | What text do you want the screen reader to announce when opening in-app messages                                                                                                                                                                                                           | `string`                                                          | `undefined` |
+| onOpenNodeToTakeFocus     | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                                                                              | `string`                                                          | `undefined` |
+| rightOffset               | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                                                                                         | `string`                                                          | `undefined` |
+| topOffset                 | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                                                                                  | `string`                                                          | `undefined` |
+| closeButton               | Properties to show a custom close button on each in-app message                                                                                                                                                                                                                            | `CloseButtonOptions` (see below)                                  | `undefined` |
 
 Close Button Options:
 
-| Property Name              | Description                                                                                | Value                      | Default       |
-| -------------------------- | ------------------------------------------------------------------------------------------ | -------------------------- | ------------- |
-| color                      | What color the button is (does not affect custom icons)                                    | `string`                   | `undefined`   |
-| iconPath                   | Custom pathname to an image or SVG you want to show instead of the default "X"             | `string`                   | `undefined`   |
-| position                   | Where to appear relative to the in-app message                                             | `'top-right \| 'top-left'` | `'top-right'` |
-| isRequiredToDismissMessage | If `true`, prevent user from dismissing in-app message by clicking outside of message      | `boolean`                  | `undefined`   |
-| sideOffset                 | How much space to leave between the button and side of the container                       | `string`                   | `'4%'`        |
-| size                       | How large to set the width, height, and font-size                                          | `string \| number`         | `24`          |
-| topOffset                  | How much space to leave between the button and the top of the container                    | `string`                   | `'4%'`        |
+| Property Name              | Description                                                                           | Value                      | Default       |
+| -------------------------- | ------------------------------------------------------------------------------------- | -------------------------- | ------------- |
+| color                      | What color the button is (does not affect custom icons)                               | `string`                   | `undefined`   |
+| iconPath                   | Custom pathname to an image or SVG you want to show instead of the default "X"        | `string`                   | `undefined`   |
+| position                   | Where to appear relative to the in-app message                                        | `'top-right \| 'top-left'` | `'top-right'` |
+| isRequiredToDismissMessage | If `true`, prevent user from dismissing in-app message by clicking outside of message | `boolean`                  | `undefined`   |
+| sideOffset                 | How much space to leave between the button and side of the container                  | `string`                   | `'4%'`        |
+| size                       | How large to set the width, height, and font-size                                     | `string \| number`         | `24`          |
+| topOffset                  | How much space to leave between the button and the top of the container               | `string`                   | `'4%'`        |
 
 Example:
 
