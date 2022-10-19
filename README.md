@@ -88,9 +88,9 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | topOffset                    | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                                                                                  | `string`                                                          | `undefined` |
 | closeButton :rotating_light: | Properties to show a custom close button on each in-app message                                                                                                                                                                                                                            | `CloseButtonOptions` (see below)                                  | `undefined` |
 
-:rotating_light: 
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not be able to add an auto-generated close button and automatically fire `trackInAppClose` events with it for you.
 
-Close Button Options: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not be able to add an auto-generated close button and automatically fire `trackInAppClose` events with it for you.
+Close Button Options:
 
 | Property Name              | Description                                                                           | Value                      | Default       |
 | -------------------------- | ------------------------------------------------------------------------------------- | -------------------------- | ------------- |
@@ -105,21 +105,22 @@ Close Button Options: Due to a limitation in Safari browsers, web in-app message
 Example:
 
 Calling `getInAppMessages` with `options` not set returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 getInAppMessages({ count: 20, packageName: 'mySite1' })
   .then((resp) => {
-      /* This will be an iframe element that can be attached to the DOM */
-      const messageIframe = resp.data.inAppMessages[0].content.html;
-      document.body.appendChild(messageIframe);
+    /* This will be an iframe element that can be attached to the DOM */
+    const messageIframe = resp.data.inAppMessages[0].content.html;
+    document.body.appendChild(messageIframe);
 
-      /* Additional styling logic can be done here to customly render the message */
+    /* Additional styling logic can be done here to customly render the message */
   })
-  .catch()
+  .catch();
 ```
 
-This code places an in-app on the page, but it won't be visible.  To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
+This code places an in-app on the page, but it won't be visible. To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
 
 Or, to show messages automatically:
 
