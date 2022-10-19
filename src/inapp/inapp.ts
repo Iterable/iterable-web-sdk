@@ -110,21 +110,15 @@ export function getInAppMessages(
     try {
       const cachedMessages: [string, InAppMessage][] = await entries();
 
-      /** determine most recent message & delete expired messages */
+      /** determine most recent cached message */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
-      const expiredMessagesInCache: string[] = [];
-      const now = Date.now();
-
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.expiresAt < now) {
-          expiredMessagesInCache.push(cachedMessageId);
-        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
-      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -166,6 +160,25 @@ export function getInAppMessages(
             });
         }
       });
+
+      const cachedMessagesToDelete = cachedMessages.reduce(
+        (deleteQueue: string[], [cachedMessageId]) => {
+          const isCachedMessageInFetch = inAppMessages.reduce(
+            (isFound, { messageId }) => {
+              if (messageId === cachedMessageId) isFound = true;
+              return isFound;
+            },
+            false
+          );
+
+          if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
+          return deleteQueue;
+        },
+        []
+      );
+
+      /** delete messages not present in fetch from cache */
+      await delMany(cachedMessagesToDelete);
 
       /** add new messages to the cache if they fit in the cache */
       await addNewMessagesToCache(newMessages);
