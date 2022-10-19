@@ -12,15 +12,15 @@ This SDK helps you integrate your Web apps with Iterable.
 
 # Table of Contents
 
-* [Installation](#installation)
-* [API](#api)
-* [Usage](#usage)
-* [FAQ](#faq)
-* [A Note About Imports](#a-note-about-imports)
-* [About Links](#about-links)
-* [TypeScript](#typescript)
-* [Contributing](#contributing)
-* [License](#license)
+- [Installation](#installation)
+- [API](#api)
+- [Usage](#usage)
+- [FAQ](#faq)
+- [A Note About Imports](#a-note-about-imports)
+- [About Links](#about-links)
+- [TypeScript](#typescript)
+- [Contributing](#contributing)
+- [License](#license)
 
 # Installation
 
@@ -46,21 +46,23 @@ or with a CDN:
 
 Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) for information on what data to pass and what payload to receive from the HTTP requests.
 
-| Method Name           	| Description                                                                                                               	|
-|-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `DisplayOptions` 	|
-| [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
-| [`track`](#track)               	| Track custom events                                                                                                       	|
-| [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
-| [`trackInAppClose`](#trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
-| [`trackInAppConsume`](#trackInAppConsume)   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
-| [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
-| [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
-| [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
-| [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
-| [`updateSubscriptions`](#updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
-| [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
-| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)                                                                                             	|
+| Method Name                                            | Description                                                                                                                         |
+| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| [`getInAppMessages`](#getInAppMessages)                | Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `DisplayOptions` |
+| [`initialize`](#initialize)                            | Method for identifying users and setting a JWT                                                                                      |
+| [`track`](#track)                                      | Track custom events                                                                                                                 |
+| [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                       |
+| [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                              |
+| [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore                  |
+| [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                          |
+| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and marks it as read                                                                                 |
+| [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                               |
+| [`updateCart`](#updateCart)                            | Update _shoppingCartItems_ field on user profile                                                                                    |
+| [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                        |
+| [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                     |
+| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)          |
+
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not be able to fire `trackInAppClick` events automatically on all links in the template. This will impact analytics for users on Safari.
 
 # Usage
 
@@ -69,7 +71,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
 
 ```ts
-getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean | { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
+getInAppMessages: (payload: InAppMessagesRequestParams, options?: { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
 SDK Specific Options:
@@ -81,14 +83,12 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | animationDuration                                | How much time (in MS) for messages to animate in and out                                                                                                                                                                          | `number`                                                          | `400`       |
 | bottomOffset                                     | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
 | displayInterval                                  | How much time (in MS) to wait before showing next in-app message after closing the currently opened one                                                                                                                           | `number`                                                          | `30000`     |
-| handleLinks :rotating_light: | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| handleLinks | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
 | onOpenScreenReaderMessage                        | What text do you want the screen reader to announce when opening in-app messages                                                                                                                                                  | `string`                                                          | `undefined` |
 | onOpenNodeToTakeFocus                            | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                     | `string`                                                          | `undefined` |
 | rightOffset                                      | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                                | `string`                                                          | `undefined` |
 | topOffset                                        | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
 | closeButton                                      | Properties to show a custom close button on each in-app message                                                                                                                                                                   | `CloseButtonOptions` (see below)                                  | `undefined` |
-
-:rotating_light: Due to a limitation in Safari, web in-app messages displayed in Safari do not respect the value set for `handleLinks`. As a workaround, give your links a `target` (`target="_blank"` for new tab, `target="_top"` / `target="_parent"` for same tab).
 
 Close Button Options:
 
@@ -104,7 +104,7 @@ Close Button Options:
 
 Example:
 
-Calling `getInAppMessages` with `showInAppMessagesAutomatically` not set returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+Calling `getInAppMessages` with `options` not set returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
