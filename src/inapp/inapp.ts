@@ -161,6 +161,7 @@ export function getInAppMessages(
         }
       });
 
+      /** delete messages not present in fetch from cache */
       const cachedMessagesToDelete = cachedMessages.reduce(
         (deleteQueue: string[], [cachedMessageId]) => {
           const isCachedMessageInFetch = inAppMessages.reduce(
@@ -176,8 +177,6 @@ export function getInAppMessages(
         },
         []
       );
-
-      /** delete messages not present in fetch from cache */
       await delMany(cachedMessagesToDelete);
 
       /** add new messages to the cache if they fit in the cache */
