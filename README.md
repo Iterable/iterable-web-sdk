@@ -194,7 +194,7 @@ request()
   .catch();
 ```
 
-:rotating*light: *PLEASE NOTE*: If you choose the `deferred` option, the SDK will \_not* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: \_PLEASE NOTE*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
 If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides.
 
@@ -508,9 +508,9 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 
   yourAsyncLoginMethod().then((response) => {
     /* 
-        this code assumes you have some backend 
-        endpoint that will return a user's email address 
-      */
+      this code assumes you have some backend 
+      endpoint that will return a user's email address 
+    */
     setEmail(response.email).then(() => {
       /* now your user is set and you can begin hitting the Iterable API */
     });
@@ -541,9 +541,9 @@ import { track } from '@iterable/web-sdk/dist/events';
     setUserID(response.user_id).then(() => {
       document.getElementById('my-button').addEventListener('click', () => {
         /* 
-              no need to pass a user ID to this endpoint. 
-              _setUserID_ takes care of this for you
-            */
+          no need to pass a user ID to this endpoint. 
+          _setUserID_ takes care of this for you
+        */
         track({ eventName: 'button-clicked' });
       });
     });
