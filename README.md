@@ -58,7 +58,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                     |
 | [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, the SDK calls `setEmail` for the new email)          |
 
-:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not be able to fire `trackInAppClick` events automatically on all links in the template. This will impact analytics for users on Safari.
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari can't automatically fire `trackInAppClick` events when a link has been clicked. This will impact analytics for Safari users.
 
 # Usage
 
