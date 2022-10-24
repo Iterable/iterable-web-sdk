@@ -42,21 +42,21 @@ or with a CDN:
 
 Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) for information on what data to pass and what payload to receive from the HTTP requests.
 
-| Method Name                                            | Description                                                                                                                         |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| [`getInAppMessages`](#getInAppMessages)                | Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `DisplayOptions` |
-| [`initialize`](#initialize)                            | Method for identifying users and setting a JWT                                                                                      |
-| [`track`](#track)                                      | Track custom events                                                                                                                 |
-| [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                       |
-| [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                              |
-| [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed and delete the in-app message from the server so it won't be returned anymore.                  |
-| [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                          |
-| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and mark it as read                                                                                 |
-| [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                               |
-| [`updateCart`](#updateCart)                            | Update `shoppingCartItems` field on user profile                                                                                    |
-| [`updateSubscriptions`](#updateSubscriptions)          | Update the user's subscriptions.                                                                                                        |
-| [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                     |
-| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, the SDK calls `setEmail` for the new email)          |
+| Method Name                                            | Description                                                                                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
+| [`initialize`](#initialize)                            | Method for identifying users and setting a JWT                                                                                                                         |
+| [`track`](#track)                                      | Track custom events                                                                                                                                                    |
+| [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
+| [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                                                                 |
+| [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore                                                     |
+| [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                                                             |
+| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and marks it as read                                                                                                                    |
+| [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                                                                  |
+| [`updateCart`](#updateCart)                            | Update _shoppingCartItems_ field on user profile                                                                                                                       |
+| [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                                                           |
+| [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                                                        |
+| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)                                             |
 
 :rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari can't automatically fire `trackInAppClick` events when a link has been clicked. This will impact analytics for Safari users.
 
@@ -88,7 +88,7 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                            | `string`                                                          | `undefined` |
 | closeButton :rotating_light: | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                            | `CloseButtonOptions` (see below)                                  | `undefined` |
 
-:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not be able to add an auto-generated close button and automatically fire `trackInAppClose` events with it for you.
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not add an auto-generated close button (even if `closeButton` properties are set).
 
 Close Button Options:
 
