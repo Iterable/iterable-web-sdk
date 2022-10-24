@@ -1,5 +1,5 @@
 import { by } from '@pabra/sortby';
-import { delMany, setMany } from 'idb-keyval';
+import { setMany } from 'idb-keyval';
 import { ANIMATION_DURATION } from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
@@ -162,34 +162,22 @@ export const determineRemainingStorageQuota = async () => {
  * @param cachedMessages
  * @param fetchedMessages
  */
-export const deleteMessagesFromCache = async (
+export const getCachedMessagesToDelete = (
   cachedMessages: CachedMessage[],
   fetchedMessages: Partial<InAppMessage>[]
-) => {
-  const cachedMessagesToDelete = cachedMessages.reduce(
-    (deleteQueue: string[], [cachedMessageId]) => {
-      const isCachedMessageInFetch = fetchedMessages.reduce(
-        (isFound, { messageId }) => {
-          if (messageId === cachedMessageId) isFound = true;
-          return isFound;
-        },
-        false
-      );
-
-      if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
-      return deleteQueue;
-    },
-    []
-  );
-  try {
-    await delMany(cachedMessagesToDelete);
-  } catch (err: any) {
-    console.warn(
-      'Error deleting messages from the browser cache',
-      err?.response?.data?.clientErrors ?? err
+) =>
+  cachedMessages.reduce((deleteQueue: string[], [cachedMessageId]) => {
+    const isCachedMessageInFetch = fetchedMessages.reduce(
+      (isFound, { messageId }) => {
+        if (messageId === cachedMessageId) isFound = true;
+        return isFound;
+      },
+      false
     );
-  }
-};
+
+    if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
+    return deleteQueue;
+  }, []);
 
 /**
  * adds messages to cache only if they fit within the quota, starting with

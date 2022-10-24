@@ -3,11 +3,15 @@
  */
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
+import { srSpeak } from '../../utils/srSpeak';
+import { messages } from '../../__data__/inAppMessages';
+import { CachedMessage } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
   generateCloseButton,
   generateWidth,
+  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -15,8 +19,6 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from '../utils';
-import { messages } from '../../__data__/inAppMessages';
-import { srSpeak } from '../../utils/srSpeak';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -932,6 +934,33 @@ describe('Utils', () => {
       expect(rightButton.style.right).toBe('20px');
       expect(rightButton.style.left).toBe('');
       expect(rightButton.innerHTML).toBe('');
+    });
+  });
+
+  describe('Caching', () => {
+    it('should delete cached messages that are expired', () => {
+      const now = Date.now();
+
+      const cachedMessages: CachedMessage[] = messages.flatMap((msg) => [
+        [msg.messageId, msg]
+      ]);
+      const allMessages = [...messages];
+      const mockFetchedMessages = allMessages.filter(
+        (msg) => msg.expiresAt > now
+      );
+      const expiredMessageIds = allMessages.reduce(
+        (allFetchedIds: string[], message) => {
+          if (message.expiresAt < now) allFetchedIds.push(message.messageId);
+          return allFetchedIds;
+        },
+        []
+      );
+
+      const messagesForDeletion = getCachedMessagesToDelete(
+        cachedMessages,
+        mockFetchedMessages
+      );
+      expect(messagesForDeletion).toEqual(expiredMessageIds);
     });
   });
 });

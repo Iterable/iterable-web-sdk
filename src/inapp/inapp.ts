@@ -1,4 +1,4 @@
-import { entries } from 'idb-keyval';
+import { delMany, entries } from 'idb-keyval';
 import _set from 'lodash/set';
 import {
   ANIMATION_DURATION,
@@ -21,6 +21,7 @@ import { baseIterableRequest } from '../request';
 import { IterablePromise } from '../types';
 import schema from './inapp.schema';
 import {
+  CachedMessage,
   DisplayOptions,
   DISPLAY_OPTIONS,
   GetInAppMessagesResponse,
@@ -32,9 +33,9 @@ import {
   addButtonAttrsToAnchorTag,
   addNewMessagesToCache,
   addStyleSheet,
-  deleteMessagesFromCache,
   filterHiddenInAppMessages,
   generateCloseButton,
+  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -115,10 +116,10 @@ export function getInAppMessages(
     /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
     // if (!options?.useLocalCache) return await requestInAppMessages({});
     /** @note always early return until then */
-    return await requestInAppMessages({});
+    // return await requestInAppMessages({});
 
     try {
-      const cachedMessages: [string, InAppMessage][] = await entries();
+      const cachedMessages: CachedMessage[] = await entries();
 
       /** determine most recent cached message */
       let latestCachedMessageId: string | undefined;
@@ -172,7 +173,18 @@ export function getInAppMessages(
       });
 
       /** delete messages not present in fetch from cache */
-      await deleteMessagesFromCache(cachedMessages, inAppMessages);
+      const cachedMessagesToDelete = getCachedMessagesToDelete(
+        cachedMessages,
+        inAppMessages
+      );
+      try {
+        await delMany(cachedMessagesToDelete);
+      } catch (err: any) {
+        console.warn(
+          'Error deleting messages from the browser cache',
+          err?.response?.data?.clientErrors ?? err
+        );
+      }
 
       /** add new messages to the cache if they fit in the cache */
       await addNewMessagesToCache(newMessages);
