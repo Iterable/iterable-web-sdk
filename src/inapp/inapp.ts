@@ -116,7 +116,7 @@ export function getInAppMessages(
     /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
     // if (!options?.useLocalCache) return await requestInAppMessages({});
     /** @note always early return until then */
-    // return await requestInAppMessages({});
+    return await requestInAppMessages({});
 
     try {
       const cachedMessages: CachedMessage[] = await entries();

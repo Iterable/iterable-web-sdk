@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
 import { srSpeak } from '../../utils/srSpeak';
 import { messages } from '../../__data__/inAppMessages';
-import { CachedMessage } from '../types';
+import { CachedMessage, InAppMessage } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
@@ -938,14 +938,15 @@ describe('Utils', () => {
   });
 
   describe('Caching', () => {
-    it('should delete cached messages that are expired', () => {
-      const now = Date.now();
+    const now = Date.now();
+    const allMessages = [...messages];
 
-      const cachedMessages: CachedMessage[] = messages.flatMap((msg) => [
-        [msg.messageId, msg]
-      ]);
-      const allMessages = [...messages];
-      const mockFetchedMessages = allMessages.filter(
+    const cachedMessages: CachedMessage[] = allMessages.flatMap((msg) => [
+      [msg.messageId, msg]
+    ]);
+
+    it('should delete cached messages that are expired', () => {
+      const unexpiredMessages = allMessages.filter(
         (msg) => msg.expiresAt > now
       );
       const expiredMessageIds = allMessages.reduce(
@@ -958,9 +959,27 @@ describe('Utils', () => {
 
       const messagesForDeletion = getCachedMessagesToDelete(
         cachedMessages,
-        mockFetchedMessages
+        unexpiredMessages
       );
       expect(messagesForDeletion).toEqual(expiredMessageIds);
+    });
+
+    it('should delete any cached messages not included in the fetch', () => {
+      const validMessages: InAppMessage[] = [];
+      const invalidMessages: InAppMessage[] = [];
+      allMessages.forEach((msg) =>
+        msg.messageId === 'normalMessage!'
+          ? validMessages.push(msg)
+          : invalidMessages.push(msg)
+      );
+
+      const messagesForDeletion = getCachedMessagesToDelete(
+        cachedMessages,
+        validMessages
+      );
+      expect(messagesForDeletion).toEqual(
+        invalidMessages.map((msg) => msg.messageId)
+      );
     });
   });
 });
