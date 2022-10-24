@@ -21,6 +21,7 @@ import { baseIterableRequest } from '../request';
 import { IterablePromise } from '../types';
 import schema from './inapp.schema';
 import {
+  CachedMessage,
   DisplayOptions,
   DISPLAY_OPTIONS,
   GetInAppMessagesResponse,
@@ -34,6 +35,7 @@ import {
   addStyleSheet,
   filterHiddenInAppMessages,
   generateCloseButton,
+  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -117,23 +119,17 @@ export function getInAppMessages(
     return await requestInAppMessages({});
 
     try {
-      const cachedMessages: [string, InAppMessage][] = await entries();
+      const cachedMessages: CachedMessage[] = await entries();
 
-      /** determine most recent message & delete expired messages */
+      /** determine most recent cached message */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
-      const expiredMessagesInCache: string[] = [];
-      const now = Date.now();
-
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.expiresAt < now) {
-          expiredMessagesInCache.push(cachedMessageId);
-        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
-      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -175,6 +171,20 @@ export function getInAppMessages(
             });
         }
       });
+
+      /** delete messages not present in fetch from cache */
+      const cachedMessagesToDelete = getCachedMessagesToDelete(
+        cachedMessages,
+        inAppMessages
+      );
+      try {
+        await delMany(cachedMessagesToDelete);
+      } catch (err: any) {
+        console.warn(
+          'Error deleting messages from the browser cache',
+          err?.response?.data?.clientErrors ?? err
+        );
+      }
 
       /** add new messages to the cache if they fit in the cache */
       await addNewMessagesToCache(newMessages);

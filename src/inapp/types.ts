@@ -48,6 +48,8 @@ export interface GetInAppMessagesResponse {
   ) => Promise<HTMLIFrameElement | ''>;
 }
 
+export type CachedMessage = [string, InAppMessage];
+
 export enum DISPLAY_OPTIONS {
   immediate = 'immediate',
   deferred = 'deferred'
