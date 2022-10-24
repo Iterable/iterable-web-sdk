@@ -51,7 +51,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                              |
 | [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore                  |
 | [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                          |
-| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and marks it as read                                                                                 |
+| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and mark it as read                                                                                 |
 | [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                               |
 | [`updateCart`](#updateCart)                            | Update _shoppingCartItems_ field on user profile                                                                                    |
 | [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                        |
