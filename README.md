@@ -70,7 +70,7 @@ API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_g
 getInAppMessages: (payload: InAppMessagesRequestParams, options?: { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
 
-:rotating_light: Notice: As of v1.0.0 we have deprecated support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
+:rotating_light: Notice: v1.0.0 of this SDK deprecates support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
 
 SDK Specific Options:
 
