@@ -23,6 +23,7 @@ import schema from './inapp.schema';
 import {
   DisplayOptions,
   DISPLAY_OPTIONS,
+  GetInAppMessagesResponse,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -60,18 +61,19 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: { display: DisplayOptions }
-): {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-  triggerDisplayMessages: (
-    messages: Partial<InAppMessage>[]
-  ) => Promise<HTMLIFrameElement | ''>;
-};
+  options: {
+    display: DisplayOptions;
+    /** @note parameter will be enabled once new endpoint is ready */
+    // useLocalCache?: boolean;
+  }
+): GetInAppMessagesResponse;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?: { display: DisplayOptions }
+  options?: {
+    display: DisplayOptions;
+    /** @note parameter will be enabled once new endpoint is ready */
+    // useLocalCache?: boolean;
+  }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
@@ -96,6 +98,8 @@ export function getInAppMessages(
   }) =>
     baseIterableRequest<InAppMessageResponse>({
       method: 'GET',
+      /** @note parameter will be enabled once new endpoint is ready */
+      // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
       url: GETMESSAGES_PATH,
       validation: { params: schema },
       params: {
@@ -107,6 +111,11 @@ export function getInAppMessages(
     });
 
   const requestMessages = async () => {
+    /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
+    // if (!options?.useLocalCache) return await requestInAppMessages({});
+    /** @note always early return until then */
+    return await requestInAppMessages({});
+
     try {
       const cachedMessages: [string, InAppMessage][] = await entries();
 
@@ -198,7 +207,7 @@ export function getInAppMessages(
     return await requestInAppMessages({});
   };
 
-  if (showInAppMessagesAutomatically) {
+  if (options?.display) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
@@ -670,8 +679,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred =
-      showInAppMessagesAutomatically.display === DISPLAY_OPTIONS.deferred;
+    const isDeferred = options.display === DISPLAY_OPTIONS.deferred;
 
     const triggerDisplayFn = isDeferred
       ? {
