@@ -871,16 +871,15 @@ https://hello.com
 
 ## Reserved Keyword Links
 
-Upon normal links, Iterable reserves the `iterable://` and `action://` schemas for custom actions that are performed when a link is clicked. The following are links that you can add to your in-app messages for enhanced functionality:
+Iterable reserves the `iterable://` and `action://` URL schemas to define custom link click actions:
 
-1. `iterable://dismiss` - Removes the in-app message from the screen, queues the next one for presentation, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+1. `iterable://dismiss` - Removes the in-app message from the screen, grabs the next one to display, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
 
-2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website. It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with payload `{ type: 'iterable-action-link', data: '{anything}' }`, to be consumed by the parent website as needed. These links also dismiss the message and invoke [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
 
 The SDK may reserve more keywords in the future.
 
 :rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking a standard link or clicking away from the message.
-
 
 ## Routing in Single-Page Apps
 
