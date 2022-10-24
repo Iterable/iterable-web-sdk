@@ -56,7 +56,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | [`updateCart`](#updateCart)                            | Update _shoppingCartItems_ field on user profile                                                                                                                       |
 | [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                                                           |
 | [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                                                        |
-| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)                                             |
+| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, the SDK will call `setEmail` for you)                                        |
 
 :rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari can't automatically fire `trackInAppClick` events when a link has been clicked. This will impact analytics for Safari users.
 
@@ -183,7 +183,7 @@ request()
     /* do your own manipulation here */
     const filteredMessages = doStuffToMessages(response.data.inAppMessages);
 
-    /* also feel free to take advantage of the sorting/filtering methods we use internally */
+    /* also feel free to take advantage of the sorting/filtering methods used internally */
     const furtherManipulatedMessages = sortInAppMessages(
       filterHiddenInAppMessages(response.data.inAppMessages)
     ) as InAppMessage[];
@@ -194,9 +194,9 @@ request()
   .catch();
 ```
 
-:rotating*light: *PLEASE NOTE*: If you choose the `deferred` option, we will \_not* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: *PLEASE NOTE*: If you choose the `deferred` option, the SDK will \_not* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
-If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods we provide.
+If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides.
 
 ## initialize
 
@@ -448,7 +448,7 @@ updateUserEmail('hello@gmail.com').then().catch();
 First thing you need to do is generate an API key on [the Iterable app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the _Web_ key type. This will ensure the SDK has
 access to all the necessary endpoints when communicating with the Iterable API. After you generate your key, save both the API Key and JWT Secret somewhere handy. You'll need both of them.
 
-First, we'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, we can demo this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
+First, you'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, this can be demonstrated this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
 
 Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
 
@@ -713,9 +713,9 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
       pauseMessageStream();
 
       /* 
-            pick up where we left off and show the next message in the queue. 
-            And start the timer again.
-          */
+        pick up where you left off and show the next message in the queue. 
+        And start the timer again.
+      */
       resumeMessageStream();
     });
   });
@@ -759,9 +759,9 @@ import {
           );
 
           /* 
-                also feel free to take advantage of the sorting/filtering 
-                methods we use internally 
-              */
+            also feel free to take advantage of the sorting/filtering 
+            methods used internally 
+          */
           const furtherManipulatedMessages = sortInAppMessages(
             filterHiddenInAppMessages(response.data.inAppMessages)
           ) as InAppMessage[];
@@ -790,7 +790,7 @@ Looking at this table, you can see the browser sizes on the left, and the displa
 
 Another example: If your in-app is positioned in the center and your browser if at 700px, your in-app message will grow to take up 100% of the screen.
 
-This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so we recommend that you stick to percentage-based CSS widths when possible when creating your message**
+This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so it is recommended that you stick to percentage-based CSS widths when possible when creating your message**
 
 ## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
 
@@ -798,7 +798,7 @@ No problem! Please see [the link handling section](#about-links) for more inform
 
 ## What if my JWT expires?
 
-JWT expiration is handled for you automatically by the SDK. There are 3 points where we will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
+JWT expiration is handled for you automatically by the SDK. There are 3 points where the SDK will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
 
 1. The JWT is within 1 minute of expiration
 2. An Iterable API request has failed with a 401 response
@@ -816,9 +816,9 @@ initialize('API_KEY_HERE', ({ email, userID }) =>
 );
 ```
 
-When the previous 3 listed events occur, we will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
+When the previous 3 listed events occur, the SDK will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
 
-Finally, if the request to regenerate the JWT fails however, we will not attempt to generate the JWT again so requests will start failing at that point.
+Finally, if the request to regenerate the JWT fails however, the SDK will not attempt to generate the JWT again so requests will start failing at that point.
 
 # A Note About Imports
 
@@ -834,7 +834,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { updateUser } from '@iterable/web-sdk/dist/users';
 ```
 
-For those using Webpack/Rollup/Some Other Build Tool, we recommend importing methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
+For those using Webpack/Rollup/Some Other Build Tool, it is recommended to import methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
 
 # About Links
 
@@ -876,7 +876,7 @@ Upon normal links, Iterable reserves the `iterable://` and `action://` schemas f
 1. `iterable://dismiss` - Removes the in-app message from the screen, queues the next one for presentation, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
 2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website. It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
 
-Upon those, we also may reserve more keywords in the future.
+Upon those, the SDK may reserve more keywords in the future.
 
 ## Routing in Single-Page Apps
 
