@@ -1,4 +1,4 @@
-import { delMany, entries } from 'idb-keyval';
+import { entries } from 'idb-keyval';
 import _set from 'lodash/set';
 import {
   ANIMATION_DURATION,
@@ -32,6 +32,7 @@ import {
   addButtonAttrsToAnchorTag,
   addNewMessagesToCache,
   addStyleSheet,
+  deleteMessagesFromCache,
   filterHiddenInAppMessages,
   generateCloseButton,
   getHostnameFromUrl,
@@ -171,22 +172,7 @@ export function getInAppMessages(
       });
 
       /** delete messages not present in fetch from cache */
-      const cachedMessagesToDelete = cachedMessages.reduce(
-        (deleteQueue: string[], [cachedMessageId]) => {
-          const isCachedMessageInFetch = inAppMessages.reduce(
-            (isFound, { messageId }) => {
-              if (messageId === cachedMessageId) isFound = true;
-              return isFound;
-            },
-            false
-          );
-
-          if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
-          return deleteQueue;
-        },
-        []
-      );
-      await delMany(cachedMessagesToDelete);
+      await deleteMessagesFromCache(cachedMessages, inAppMessages);
 
       /** add new messages to the cache if they fit in the cache */
       await addNewMessagesToCache(newMessages);
