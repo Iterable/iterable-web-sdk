@@ -45,7 +45,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | Method Name                                            | Description                                                                                                                                                            |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
-| [`initialize`](#initialize)                            | Method for identifying users and setting a JWT                                                                                                                         |
+| [`initialize`](#initialize)                            | Return methods for identifying users and setting a JWT                                                                                                                 |
 | [`track`](#track)                                      | Track custom events                                                                                                                                                    |
 | [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
 | [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                                                                 |
@@ -78,29 +78,29 @@ Along with the API parameters, you can pass these options to the SDK method to h
 
 | Property Name                | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
-| animationDuration            | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                                   | `number`                                                          | `400`       |
-| bottomOffset                 | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                  | `string`                                                          | `undefined` |
-| displayInterval              | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                    | `number`                                                          | `30000`     |
+| animationDuration            | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
+| bottomOffset                 | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| displayInterval              | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
 | handleLinks                  | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
-| onOpenScreenReaderMessage    | The text a screen reader should read when opening the message.                                                                                                                                                                                                           | `string`                                                          | `undefined` |
-| onOpenNodeToTakeFocus        | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                               | `string`                                                          | `undefined` |
-| rightOffset                  | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                         | `string`                                                          | `undefined` |
-| topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                            | `string`                                                          | `undefined` |
-| closeButton :rotating_light: | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                            | `CloseButtonOptions` (see below)                                  | `undefined` |
+| onOpenScreenReaderMessage    | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
+| onOpenNodeToTakeFocus        | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
+| rightOffset                  | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| closeButton :rotating_light: | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
 
 :rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not add an auto-generated close button (even if `closeButton` properties are set).
 
 Close Button Options:
 
-| Property Name              | Description                                                                           | Value                      | Default       |
-| -------------------------- | ------------------------------------------------------------------------------------- | -------------------------- | ------------- |
-| color                      | The button's color (does not affect custom icons)                               | `string`                   | `undefined`   |
-| iconPath                   | Custom pathname to an image or SVG to use (instead of the default "X")        | `string`                   | `undefined`   |
-| position                   | Where the button should display on an in-app message                                        | `'top-right \| 'top-left'` | `'top-right'` |
+| Property Name              | Description                                                                  | Value                      | Default       |
+| -------------------------- | ---------------------------------------------------------------------------- | -------------------------- | ------------- |
+| color                      | The button's color (does not affect custom icons)                            | `string`                   | `undefined`   |
+| iconPath                   | Custom pathname to an image or SVG to use (instead of the default "X")       | `string`                   | `undefined`   |
+| position                   | Where the button should display on an in-app message                         | `'top-right \| 'top-left'` | `'top-right'` |
 | isRequiredToDismissMessage | If `true`, users cannot dismiss in-app messages by clicking outside of them. | `boolean`                  | `undefined`   |
-| sideOffset                 | How much space to leave between the button and side of the container                  | `string`                   | `'4%'`        |
-| size                       | How large to set the width, height, and font-size                                     | `string \| number`         | `24`          |
-| topOffset                  | How much space to leave between the button and the top of the container               | `string`                   | `'4%'`        |
+| sideOffset                 | How much space to leave between the button and side of the container         | `string`                   | `'4%'`        |
+| size                       | How large to set the width, height, and font-size                            | `string \| number`         | `24`          |
+| topOffset                  | How much space to leave between the button and the top of the container      | `string`                   | `'4%'`        |
 
 Example:
 
@@ -127,12 +127,8 @@ Or, to show messages automatically:
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
-const { 
-  request,
-  pauseMessageStream, 
-  resumeMessageStream
-} = getInAppMessages(
-  { 
+const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
+  {
     count: 20,
     packageName: 'my-website',
     displayInterval: 5000,
@@ -148,27 +144,25 @@ const {
   { display: 'immediate' }
 );
 
-request()
-  .then()
-  .catch();
+request().then().catch();
 ```
 
 or if you want to show messages with your own custom filtering/sorting and choose to display later:
 
 ```ts
-import { 
+import {
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
 } from '@iterable/web-sdk/dist/inapp';
 
-const { 
+const {
   request,
-  pauseMessageStream, 
+  pauseMessageStream,
   resumeMessageStream,
   triggerDisplayMessages
 } = getInAppMessages(
-  { 
+  {
     count: 20,
     packageName: 'my-website',
     displayInterval: 5000,
@@ -185,7 +179,7 @@ const {
 );
 
 request()
-  .then(response => {
+  .then((response) => {
     /* do your own manipulation here */
     const filteredMessages = doStuffToMessages(response.data.inAppMessages);
 
@@ -195,12 +189,12 @@ request()
     ) as InAppMessage[];
 
     /* then display them whenever you want */
-    triggerDisplayMessages(furtherManipulatedMessages)
+    triggerDisplayMessages(furtherManipulatedMessages);
   })
   .catch();
 ```
 
-:rotating_light: *PLEASE NOTE*: If you choose the `deferred` option, we will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: *PLEASE NOTE*: If you choose the `deferred` option, we will \_not* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
 If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods we provide.
 
@@ -209,7 +203,7 @@ If you want to keep the default sorting and filtering, please take advantage of 
 API:
 
 ```ts
-initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -228,8 +222,11 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) => yourAsyncJWTGeneratorMethod({ email, userID }).then(({ jwt_token }) => jwt_token)
-)
+  ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+);
 ```
 
 ## track
@@ -245,9 +242,7 @@ Example:
 ```ts
 import { track } from '@iterable/web-sdk/dist/events';
 
-track({ eventName: 'my-event' })
-  .then()
-  .catch()
+track({ eventName: 'my-event' }).then().catch();
 ```
 
 ## trackInAppClick
@@ -268,7 +263,7 @@ trackInAppClick({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppClose
@@ -289,7 +284,7 @@ trackInAppClose({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppConsume
@@ -310,7 +305,7 @@ trackInAppConsume({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppDelivery
@@ -331,7 +326,7 @@ trackInAppDelivery({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppOpen
@@ -352,7 +347,7 @@ trackInAppOpen({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackPurchase
@@ -373,7 +368,7 @@ trackPurchase({
   total: 200
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateCart
@@ -393,7 +388,7 @@ updateCart({
   items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateSubscriptions
@@ -411,7 +406,7 @@ import { updateSubscriptions } from '@iterable/web-sdk/dist/users';
 
 updateSubscriptions({ emailListIds: [1, 2, 3] })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateUser
@@ -427,9 +422,7 @@ Example:
 ```ts
 import { updateUser } from '@iterable/web-sdk/dist/users';
 
-updateUser({ dataFields: {} })
-  .then()
-  .catch()
+updateUser({ dataFields: {} }).then().catch();
 ```
 
 ## updateUserEmail
@@ -445,9 +438,7 @@ Example:
 ```ts
 import { updateUserEmail } from '@iterable/web-sdk/dist/users';
 
-updateUserEmail('hello@gmail.com')
-  .then()
-  .catch()
+updateUserEmail('hello@gmail.com').then().catch();
 ```
 
 # FAQ
@@ -465,9 +456,10 @@ Once you have a JWT or a service that can generate a JWT automatically, you're r
 import { initialize } from '@iterable/web-sdk/dist/authorization';
 
 (() => {
-  initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 })();
 ```
@@ -482,17 +474,18 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* this code assumes you have some backend endpoint that will return a user's ID */
-      setUserID(response.user_id)
-        .then(() => {
-          /* now your user is set and you can begin hitting the Iterable API */
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    /* this code assumes you have some backend endpoint that will return a user's ID */
+    setUserID(response.user_id).then(() => {
+      /* now your user is set and you can begin hitting the Iterable API */
+    });
+  });
 
   /* optionally logout the user when you don't need to hit the Iterable API anymore */
   logout();
@@ -507,20 +500,21 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* 
+  yourAsyncLoginMethod().then((response) => {
+    /* 
         this code assumes you have some backend 
         endpoint that will return a user's email address 
       */
-      setEmail(response.email)
-        .then(() => {
-          /* now your user is set and you can begin hitting the Iterable API */
-        })
-    })
+    setEmail(response.email).then(() => {
+      /* now your user is set and you can begin hitting the Iterable API */
+    });
+  });
 
   /* optionally logout the user when you don't need to hit the Iterable API anymore */
   logout();
@@ -536,23 +530,24 @@ import { track } from '@iterable/web-sdk/dist/events';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* this code assumes you have some backend endpoint that will return a user's ID */
-      setUserID(response.user_id)
-        .then(() => {
-          document.getElementById('my-button').addEventListener('click', () => {
-            /* 
+  yourAsyncLoginMethod().then((response) => {
+    /* this code assumes you have some backend endpoint that will return a user's ID */
+    setUserID(response.user_id).then(() => {
+      document.getElementById('my-button').addEventListener('click', () => {
+        /* 
               no need to pass a user ID to this endpoint. 
               _setUserID_ takes care of this for you
             */
-            track({ eventName: 'button-clicked' })
-          })
-        })
-    })
+        track({ eventName: 'button-clicked' });
+      });
+    });
+  });
 })();
 ```
 
@@ -581,8 +576,8 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
         ...config.params,
         email: 'hello@gmail.com'
       }
-    }
-  })
+    };
+  });
 })();
 ```
 
@@ -599,23 +594,22 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          getInAppMessages({ 
-            count: 20,
-            packageName: 'my-website'
-          })
-            .then()
-            .catch()
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      getInAppMessages({
+        count: 20,
+        packageName: 'my-website'
+      })
+        .then()
+        .catch();
+    });
+  });
 })();
 ```
 
@@ -626,29 +620,26 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { request } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request } = getInAppMessages(
+        {
+          count: 20,
+          packageName: 'my-website'
+        },
+        { display: 'immediate' }
+      );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
-        })
-    })
+      /* trigger the start of message presentation */
+      request().then().catch();
+    });
+  });
 })();
 ```
 
@@ -659,38 +650,35 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { request } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website',
-              displayInterval: 5000,
-              onOpenScreenReaderMessage:
-                'hey screen reader here telling you something just popped up on your screen!',
-              onOpenNodeToTakeFocus: 'input',
-              topOffset: '20px',
-              bottomOffset: '20px',
-              rightOffset: '20px',
-              animationDuration: 400,
-              handleLinks: 'external-new-tab'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request } = getInAppMessages(
+        {
+          count: 20,
+          packageName: 'my-website',
+          displayInterval: 5000,
+          onOpenScreenReaderMessage:
+            'hey screen reader here telling you something just popped up on your screen!',
+          onOpenNodeToTakeFocus: 'input',
+          topOffset: '20px',
+          bottomOffset: '20px',
+          rightOffset: '20px',
+          animationDuration: 400,
+          handleLinks: 'external-new-tab'
+        },
+        { display: 'immediate' }
+      );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
-        })
-    })
+      /* trigger the start of message presentation */
+      request().then().catch();
+    });
+  });
 })();
 ```
 
@@ -701,42 +689,36 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { 
-            request,
-            pauseMessageStream, 
-            resumeMessageStream
-           } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request, pauseMessageStream, resumeMessageStream } =
+        getInAppMessages(
+          {
+            count: 20,
+            packageName: 'my-website'
+          },
+          { display: 'immediate' }
+        );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
+      /* trigger the start of message presentation */
+      request().then().catch();
 
-          /* pause any more in-app messages from appearing for a little while */
-          pauseMessageStream();
+      /* pause any more in-app messages from appearing for a little while */
+      pauseMessageStream();
 
-          /* 
+      /* 
             pick up where we left off and show the next message in the queue. 
             And start the timer again.
           */
-          resumeMessageStream();
-        })
-    })
+      resumeMessageStream();
+    });
+  });
 })();
 ```
 
@@ -744,54 +726,52 @@ Finally, you can also choose to do your own manipulation to the messages before 
 
 ```ts
 import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { 
+import {
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
 } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { 
-            request,
-            pauseMessageStream, 
-            resumeMessageStream
-           } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'deferred' }
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request, pauseMessageStream, resumeMessageStream } =
+        getInAppMessages(
+          {
+            count: 20,
+            packageName: 'my-website'
+          },
+          { display: 'deferred' }
+        );
+
+      /* trigger the start of message presentation */
+      request()
+        .then((response) => {
+          /* do your own manipulation here */
+          const filteredMessages = doStuffToMessages(
+            response.data.inAppMessages
           );
 
-          /* trigger the start of message presentation */
-          request()
-            .then(response => {
-              /* do your own manipulation here */
-              const filteredMessages = doStuffToMessages(response.data.inAppMessages);
-
-              /* 
+          /* 
                 also feel free to take advantage of the sorting/filtering 
                 methods we use internally 
               */
-              const furtherManipulatedMessages = sortInAppMessages(
-                filterHiddenInAppMessages(response.data.inAppMessages)
-              ) as InAppMessage[];
+          const furtherManipulatedMessages = sortInAppMessages(
+            filterHiddenInAppMessages(response.data.inAppMessages)
+          ) as InAppMessage[];
 
-              /* then display them whenever you want */
-              triggerDisplayMessages(furtherManipulatedMessages)
-            })
-            .catch();
+          /* then display them whenever you want */
+          triggerDisplayMessages(furtherManipulatedMessages);
         })
-    })
+        .catch();
+    });
+  });
 })();
 ```
 
@@ -800,7 +780,7 @@ import {
 This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
 
 | Message Position &#8594; <br><br> Browser Size &#8595; | Center | Full | Top-Right | Bottom-Right |
-|--------------------------------------------------------|--------|------|-----------|--------------|
+| ------------------------------------------------------ | ------ | ---- | --------- | ------------ |
 | 0px - 850px                                            | 100%   | 100% | 100%      | 100%         |
 | 851px - 975px                                          | 50%    | 100% | 45%       | 45%          |
 | 976px - 1300px                                         | 50%    | 100% | 33%       | 33%          |
@@ -829,10 +809,11 @@ As previously explained, when initializing the SDK you need to pass a function t
 ```ts
 import { initialize } from '@iterable/web-sdk/dist/authorization';
 
-initialize(
-  'API_KEY_HERE',
-  ({ email, userID }) => yourAsyncJWTGenerationMethod({ email, userID }).then(response => response.jwt_token)
-)
+initialize('API_KEY_HERE', ({ email, userID }) =>
+  yourAsyncJWTGenerationMethod({ email, userID }).then(
+    (response) => response.jwt_token
+  )
+);
 ```
 
 When the previous 3 listed events occur, we will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
@@ -864,9 +845,13 @@ But there are few features which the SDK adds so that you can customize how you'
 First, the [`handleLinks` option](#getInAppMessages) within the `getMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
 
 ```ts
-import { getMessages } from '@iterable/web-sdk/dist/inapp'
+import { getMessages } from '@iterable/web-sdk/dist/inapp';
 
-getMessages({ count: 5, packageName: 'my-website', handleLinks: 'external-new-tab' })
+getMessages({
+  count: 5,
+  packageName: 'my-website',
+  handleLinks: 'external-new-tab'
+});
 ```
 
 will ensure the following links open in the same tab if your domain is `mydomain.com`, for example:
@@ -889,7 +874,7 @@ https://hello.com
 Upon normal links, Iterable reserves the `iterable://` and `action://` schemas for custom actions that are performed when a link is clicked. The following are links that you can add to your in-app messages for enhanced functionality:
 
 1. `iterable://dismiss` - Removes the in-app message from the screen, queues the next one for presentation, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
-2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website.  It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website. It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
 
 Upon those, we also may reserve more keywords in the future.
 
@@ -904,8 +889,7 @@ Knowing now the custom link schemas available, let's explain how you can leverag
   <a href="action://about">go to about page</a>
 */
 
-import { useHistory } from "react-router-dom";
-
+import { useHistory } from 'react-router-dom';
 
 const SomeComponent = () => {
   const history = useHistory();
@@ -914,13 +898,13 @@ const SomeComponent = () => {
     global.addEventListener('message', (event) => {
       if (event.data.type && event.data.type === 'iterable-action-link') {
         /* route us to the content that comes after "action://" */
-        history.push(`/${event.data.data}`)
+        history.push(`/${event.data.data}`);
       }
     });
-  }, [])
+  }, []);
 
-  return <></>
-}
+  return <></>;
+};
 ```
 
 # TypeScript
