@@ -881,7 +881,7 @@ Iterable reserves the `iterable://` and `action://` URL schemas to define custom
 
 The SDK may reserve more keywords in the future.
 
-:rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking a standard link or clicking away from the message.
+:rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking away from the message.
 
 ## Routing in Single-Page Apps
 
