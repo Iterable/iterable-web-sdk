@@ -16,7 +16,7 @@ import {
 } from './utils';
 import { config } from '../utils/config';
 
-const MAX_TIMEOUT = ONE_DAY;
+const MAX_TIMEOUT = 24 * ONE_DAY;
 
 interface GenerateJWTPayload {
   email?: string;
