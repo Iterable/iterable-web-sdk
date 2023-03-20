@@ -1,4 +1,8 @@
-import { getEpochDifferenceInMS, getEpochExpiryTimeInMS } from './utils';
+import {
+  getEpochDifferenceInMS,
+  getEpochExpiryTimeInMS,
+  validateAuthType
+} from './utils';
 
 describe('Utils', () => {
   it('should correctly decode JWT token and return exp time', () => {
@@ -15,5 +19,11 @@ describe('Utils', () => {
   it('should correctly diff between 2 epoch times', () => {
     expect(getEpochDifferenceInMS(1630432936000, 1630516731000)).toBe(83795000);
     expect(getEpochDifferenceInMS(1630432936, 1630516731)).toBe(83795000);
+  });
+
+  it('should correctly validate auth type email', () => {
+    expect(validateAuthType('hello@gmail.com')).toBe(true);
+    expect(validateAuthType('teststring')).toBe(false);
+    expect(validateAuthType('1esd3-3455sj-shghs-shjsj')).toBe(false);
   });
 });

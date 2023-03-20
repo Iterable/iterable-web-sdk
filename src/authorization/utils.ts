@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
 import axios, { AxiosRequestConfig } from 'axios';
+import { object, string } from 'yup';
 
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
@@ -93,4 +94,13 @@ export const cancelAxiosRequestAndMakeFetch = (
       cancel('Cancel repeated request');
     })
   };
+};
+
+export const validateAuthType = (authType: string): boolean => {
+  const schema = object().shape({
+    email: string().email().required()
+  });
+  const input = { email: authType };
+  const isValid = schema.isValidSync(input);
+  return isValid;
 };
