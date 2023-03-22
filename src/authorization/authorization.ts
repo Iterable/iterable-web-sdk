@@ -13,7 +13,7 @@ import {
   getEpochExpiryTimeInMS,
   ONE_MINUTE,
   ONE_DAY,
-  validateAuthType
+  isEmail
 } from './utils';
 import { config } from '../utils/config';
 
@@ -770,13 +770,10 @@ export function initialize(
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
     },
-    refreshJwtToken: async (authType: string) => {
+    refreshJwtToken: async (user: string) => {
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
-      const payloadToPass = validateAuthType(authType)
-        ? { email: authType }
-        : { userID: authType };
-
+      const payloadToPass = { [isEmail(user) ? 'email' : 'userID']: user };
       return doRequest(payloadToPass).catch((e) => {
         if (logLevel === 'verbose') {
           console.warn(e);

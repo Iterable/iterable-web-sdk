@@ -1,7 +1,7 @@
 import {
   getEpochDifferenceInMS,
   getEpochExpiryTimeInMS,
-  validateAuthType
+  isEmail
 } from './utils';
 
 describe('Utils', () => {
@@ -22,8 +22,8 @@ describe('Utils', () => {
   });
 
   it('should correctly validate auth type email', () => {
-    expect(validateAuthType('hello@gmail.com')).toBe(true);
-    expect(validateAuthType('teststring')).toBe(false);
-    expect(validateAuthType('1esd3-3455sj-shghs-shjsj')).toBe(false);
+    expect(isEmail('hello@gmail.com')).toBe(true);
+    expect(isEmail('teststring')).toBe(false);
+    expect(isEmail('1esd3-3455sj-shghs-shjsj')).toBe(false);
   });
 });

@@ -1,13 +1,12 @@
 import { Buffer } from 'buffer';
 import axios, { AxiosRequestConfig } from 'axios';
-import { object, string } from 'yup';
 
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 export const ONE_HOUR = 60 * ONE_MINUTE;
 export const ONE_DAY = 24 * ONE_HOUR;
 export const ONE_YEAR = 365 * ONE_DAY;
-
+export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MS_EPOCH_THRESHOLD = ONE_YEAR;
 
 export const getEpochExpiryTimeInMS = (jwt: string) => {
@@ -96,11 +95,6 @@ export const cancelAxiosRequestAndMakeFetch = (
   };
 };
 
-export const validateAuthType = (authType: string): boolean => {
-  const schema = object().shape({
-    email: string().email().required()
-  });
-  const input = { email: authType };
-  const isValid = schema.isValidSync(input);
-  return isValid;
+export const isEmail = (email: string): boolean => {
+  return EMAIL_REGEX.test(email);
 };
