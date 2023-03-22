@@ -94,3 +94,8 @@ export const cancelAxiosRequestAndMakeFetch = (
     })
   };
 };
+
+export const validateTokenTime = (expTime: number): boolean => {
+  const isValid = expTime < ONE_MINUTE;
+  return isValid;
+};

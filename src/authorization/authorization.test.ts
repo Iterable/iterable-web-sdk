@@ -20,7 +20,8 @@ let mockRequest: any = null;
 */
 const MOCK_JWT_KEY =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA2MTc3MzQsImlhdCI6MTYzMDYxNzQzNCwiZW1haWwiOiJ3aWR0aC50ZXN0ZXJAZ21haWwuY29tIn0.knLmbgO8kKM9CHP2TH2v85OSC2Jorh2JjRm76FFsPQc';
-
+const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE2Nzk0ODMyOTEsImlhdCI6MTY3OTQ4MzIzMX0.APaQAYy-lTE0o8rbR6b6-28eCICq36SQMBXmeZAvk1k';
 describe('API Key Interceptors', () => {
   beforeAll(() => {
     mockRequest = new MockAdapter(baseAxiosRequest);
@@ -312,6 +313,21 @@ describe('API Key Interceptors', () => {
       expect(mockGenerateJWT).lastCalledWith({
         email: 'second@gmail.com'
       });
+    });
+    it('should not request a new JWT if expiry time is less then a minute', async () => {
+      /* 5 minutes before the JWT expires */
+      Date.now = jest.fn(() => 1630617433001);
+      /* this JWT expires in 5 minutes */
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY));
+      const { setEmail } = initialize('123', mockGenerateJWT);
+      await setEmail('hello@gmail.com');
+      // clearRefresh();
+
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+      jest.advanceTimersByTime(60000 * 2);
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
     });
   });
 });
