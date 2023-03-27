@@ -4,7 +4,7 @@ import { ANIMATION_DURATION } from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import { BrowserStorageEstimate, InAppMessage } from './types';
+import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -156,6 +156,28 @@ export const determineRemainingStorageQuota = async () => {
   /** do not try to add to cache if we cannot determine storage space */
   return 0;
 };
+
+/**
+ * deletes cached messages not present in latest getMessages fetch
+ * @param cachedMessages
+ * @param fetchedMessages
+ */
+export const getCachedMessagesToDelete = (
+  cachedMessages: CachedMessage[],
+  fetchedMessages: Partial<InAppMessage>[]
+) =>
+  cachedMessages.reduce((deleteQueue: string[], [cachedMessageId]) => {
+    const isCachedMessageInFetch = fetchedMessages.reduce(
+      (isFound, { messageId }) => {
+        if (messageId === cachedMessageId) isFound = true;
+        return isFound;
+      },
+      false
+    );
+
+    if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
+    return deleteQueue;
+  }, []);
 
 /**
  * adds messages to cache only if they fit within the quota, starting with
@@ -370,7 +392,7 @@ const generateSecuredIFrame = () => {
 export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
   const iframe = generateSecuredIFrame();
   iframe.onload = () => {
-    iframe.contentWindow?.document.write(html);
+    iframe.contentDocument?.write(html);
   };
   return iframe;
 };

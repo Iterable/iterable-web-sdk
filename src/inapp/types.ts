@@ -1,3 +1,5 @@
+import { IterablePromise } from 'src/types';
+
 interface SDKInAppMessagesParams {
   displayInterval?: number;
   /* what should the screen reader say once the message opens */
@@ -36,6 +38,17 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  email?: string;
   //  userId?: string
 }
+
+export interface GetInAppMessagesResponse {
+  pauseMessageStream: () => void;
+  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
+  request: () => IterablePromise<InAppMessageResponse>;
+  triggerDisplayMessages: (
+    messages: Partial<InAppMessage>[]
+  ) => Promise<HTMLIFrameElement | ''>;
+}
+
+export type CachedMessage = [string, InAppMessage];
 
 export enum DISPLAY_OPTIONS {
   immediate = 'immediate',

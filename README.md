@@ -1,9 +1,5 @@
 ![Iterable-Logo](https://user-images.githubusercontent.com/7387001/129065810-44b39e27-e319-408c-b87c-4d6b37e1f3b2.png)
 
-# BETA FEATURE
-
-:rotating_light: Web in-app messages (along with the Iterable Web SDK) are in Beta. If you'd like to try them out, talk to your customer success manager. We cannot guarantee this SDK will function as expected if you are not in the Beta program. :rotating_light:
-
 # Iterable's Web SDK
 
 [Iterable](https://www.iterable.com) is a growth marketing platform that helps you to create better experiences for—and deeper relationships with—your customers. Use it to send customized email, SMS, push notification, in-app message, web push notification campaigns to your customers.
@@ -12,15 +8,15 @@ This SDK helps you integrate your Web apps with Iterable.
 
 # Table of Contents
 
-* [Installation](#installation)
-* [API](#api)
-* [Usage](#usage)
-* [FAQ](#faq)
-* [A Note About Imports](#a-note-about-imports)
-* [About Links](#about-links)
-* [TypeScript](#typescript)
-* [Contributing](#contributing)
-* [License](#license)
+- [Installation](#installation)
+- [API](#api)
+- [Usage](#usage)
+- [FAQ](#faq)
+- [A Note About Imports](#a-note-about-imports)
+- [About Links](#about-links)
+- [TypeScript](#typescript)
+- [Contributing](#contributing)
+- [License](#license)
 
 # Installation
 
@@ -46,21 +42,25 @@ or with a CDN:
 
 Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) for information on what data to pass and what payload to receive from the HTTP requests.
 
-| Method Name           	| Description                                                                                                               	|
-|-----------------------	|---------------------------------------------------------------------------------------------------------------------------	|
-| [`getInAppMessages`](#getInAppMessages)    	| Either return in-app messages as a Promise or automatically paint them to the DOM if the second argument is passed `DisplayOptions` 	|
-| [`initialize`](#initialize)        	| Method for identifying users and setting a JWT                                                                            	|
-| [`track`](#track)               	| Track custom events                                                                                                       	|
-| [`trackInAppClick`](#trackInAppClick)     	| Track when a user clicks on a button or link within a message                                                             	|
-| [`trackInAppClose`](#trackInAppClose)     	| Track when an in-app message is closed                                                                                    	|
-| [`trackInAppConsume`](#trackInAppConsume)   	| Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore        	|
-| [`trackInAppDelivery`](#trackInAppDelivery)  	| Track when a message has been delivered to a user's device                                                                	|
-| [`trackInAppOpen`](#trackInAppOpen)      	| Track when a message is opened and marks it as read                                                                       	|
-| [`trackPurchase`](#trackPurchase)       	| Track purchase events                                                                                                     	|
-| [`updateCart`](#updateCart)          	| Update _shoppingCartItems_ field on user profile                                                                          	|
-| [`updateSubscriptions`](#updateSubscriptions) 	| Updates user's subscriptions                                                                                              	|
-| [`updateUser`](#updateUser)          	| Change data on a user's profile or create a user if none exists                                                           	|
-| [`updateUserEmail`](#updateUserEmail)     	| Change a user's email and reauthenticate user with the new email address (in other words, we will call `setEmail` for you)                                                                                             	|
+| Method Name                                            | Description                                                                                                                                                            |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
+| [`initialize`](#initialize)                            | Return methods for identifying users and setting a JWT                                                                                                                 |
+| [`track`](#track)                                      | Track custom events                                                                                                                                                    |
+| [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
+| [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                                                                 |
+| [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore                                                     |
+| [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                                                             |
+| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and marks it as read                                                                                                                    |
+| [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                                                                  |
+| [`updateCart`](#updateCart)                            | Update `shoppingCartItems` field on user profile                                                                                                                       |
+| [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                                                           |
+| [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                                                        |
+| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, the SDK will call `setEmail` for you)                                        |
+
+The SDK does not track `inAppDelete` events.
+
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari can't automatically fire `trackInAppClick` events when a link has been clicked. This will impact analytics for Safari users.
 
 # Usage
 
@@ -69,69 +69,68 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
 
 ```ts
-getInAppMessages: (payload: InAppMessagesRequestParams, showMessagesAutomatically?: boolean | { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
+getInAppMessages: (payload: InAppMessagesRequestParams, options?: { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
 ```
+
+:rotating_light: Notice: v1.0.0 of this SDK deprecates support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
 
 SDK Specific Options:
 
 Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
 
-| Property Name                                    | Description                                                                                                                                                                                                                       | Value                                                             | Default     |
-| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ----------- |
-| animationDuration                                | How much time (in MS) for messages to animate in and out                                                                                                                                                                          | `number`                                                          | `400`       |
-| bottomOffset                                     | How much space (px or %) to create between the bottom of the screen and messages. Not applicable for center, top, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
-| displayInterval                                  | How much time (in MS) to wait before showing next in-app message after closing the currently opened one                                                                                                                           | `number`                                                          | `30000`     |
-| handleLinks :rotating_light: | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
-| onOpenScreenReaderMessage                        | What text do you want the screen reader to announce when opening in-app messages                                                                                                                                                  | `string`                                                          | `undefined` |
-| onOpenNodeToTakeFocus                            | What DOM element do you want to take keyboard focus when the in-app message opens. (Will open the first interact-able element if not specified). Any query selector is valid.                                                     | `string`                                                          | `undefined` |
-| rightOffset                                      | How much space (px or %) to create between the right of the screen and messages. Not applicable for center or full-screen messages                                                                                                | `string`                                                          | `undefined` |
-| topOffset                                        | How much space (px or %) to create between the top of the screen and messages. Not applicable for center, bottom, or full-screen messages                                                                                         | `string`                                                          | `undefined` |
-| closeButton                                      | Properties to show a custom close button on each in-app message                                                                                                                                                                   | `CloseButtonOptions` (see below)                                  | `undefined` |
+| Property Name                | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
+| animationDuration            | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
+| bottomOffset                 | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| displayInterval              | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
+| handleLinks                  | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| onOpenScreenReaderMessage    | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
+| onOpenNodeToTakeFocus        | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
+| rightOffset                  | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| closeButton :rotating_light: | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
 
-:rotating_light: Due to a limitation in Safari, web in-app messages displayed in Safari do not respect the value set for `handleLinks`. As a workaround, give your links a `target` (`target="_blank"` for new tab, `target="_top"` / `target="_parent"` for same tab).
+:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not add an auto-generated close button (even if `closeButton` properties are set).
 
 Close Button Options:
 
-| Property Name              | Description                                                                                | Value                      | Default       |
-| -------------------------- | ------------------------------------------------------------------------------------------ | -------------------------- | ------------- |
-| color                      | What color the button is (does not affect custom icons)                                    | `string`                   | `undefined`   |
-| iconPath                   | Custom pathname to an image or SVG you want to show instead of the default "X"             | `string`                   | `undefined`   |
-| position                   | Where to appear relative to the in-app message                                             | `'top-right \| 'top-left'` | `'top-right'` |
-| isRequiredToDismissMessage | If `true`, prevent user from dismissing in-app message by clicking outside of message      | `boolean`                  | `undefined`   |
-| sideOffset                 | How much space to leave between the button and side of the container                       | `string`                   | `'4%'`        |
-| size                       | How large to set the width, height, and font-size                                          | `string \| number`         | `24`          |
-| topOffset                  | How much space to leave between the button and the top of the container                    | `string`                   | `'4%'`        |
+| Property Name              | Description                                                                  | Value                      | Default       |
+| -------------------------- | ---------------------------------------------------------------------------- | -------------------------- | ------------- |
+| color                      | The button's color (does not affect custom icons)                            | `string`                   | `undefined`   |
+| iconPath                   | Custom pathname to an image or SVG to use (instead of the default "X")       | `string`                   | `undefined`   |
+| position                   | Where the button should display on an in-app message                         | `'top-right \| 'top-left'` | `'top-right'` |
+| isRequiredToDismissMessage | If `true`, users cannot dismiss in-app messages by clicking outside of them. | `boolean`                  | `undefined`   |
+| sideOffset                 | How much space to leave between the button and side of the container         | `string`                   | `'4%'`        |
+| size                       | How large to set the width, height, and font-size                            | `string \| number`         | `24`          |
+| topOffset                  | How much space to leave between the button and the top of the container      | `string`                   | `'4%'`        |
 
 Example:
 
-Calling `getInAppMessages` with `showInAppMessagesAutomatically` not set returns a JSON API response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+Calling `getInAppMessages` with `options` not set returns a JSON response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 getInAppMessages({ count: 20, packageName: 'mySite1' })
   .then((resp) => {
-      /* This will be an iframe element that can be attached to the DOM */
-      const messageIframe = resp.data.inAppMessages[0].content.html;
-      document.body.appendChild(messageIframe);
+    /* This will be an iframe element that can be attached to the DOM */
+    const messageIframe = resp.data.inAppMessages[0].content.html;
+    document.body.appendChild(messageIframe);
 
-      /* Additional styling logic can be done here to customly render the message */
+    /* Additional styling logic can be done here to customly render the message */
   })
-  .catch()
+  .catch();
 ```
 
-This code places an in-app on the page, but it won't be visible.  To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
+This code places an in-app on the page, but it won't be visible. To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
 
 Or, to show messages automatically:
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
-const { 
-  request,
-  pauseMessageStream, 
-  resumeMessageStream
-} = getInAppMessages(
-  { 
+const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
+  {
     count: 20,
     packageName: 'my-website',
     displayInterval: 5000,
@@ -147,27 +146,25 @@ const {
   { display: 'immediate' }
 );
 
-request()
-  .then()
-  .catch();
+request().then().catch();
 ```
 
 or if you want to show messages with your own custom filtering/sorting and choose to display later:
 
 ```ts
-import { 
+import {
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
 } from '@iterable/web-sdk/dist/inapp';
 
-const { 
+const {
   request,
-  pauseMessageStream, 
+  pauseMessageStream,
   resumeMessageStream,
   triggerDisplayMessages
 } = getInAppMessages(
-  { 
+  {
     count: 20,
     packageName: 'my-website',
     displayInterval: 5000,
@@ -184,31 +181,31 @@ const {
 );
 
 request()
-  .then(response => {
+  .then((response) => {
     /* do your own manipulation here */
     const filteredMessages = doStuffToMessages(response.data.inAppMessages);
 
-    /* also feel free to take advantage of the sorting/filtering methods we use internally */
+    /* also feel free to take advantage of the sorting/filtering methods used internally */
     const furtherManipulatedMessages = sortInAppMessages(
       filterHiddenInAppMessages(response.data.inAppMessages)
     ) as InAppMessage[];
 
     /* then display them whenever you want */
-    triggerDisplayMessages(furtherManipulatedMessages)
+    triggerDisplayMessages(furtherManipulatedMessages);
   })
   .catch();
 ```
 
-:rotating_light: *PLEASE NOTE*: If you choose the `deferred` option, we will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: \_PLEASE NOTE*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
-If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods we provide.
+If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides.
 
 ## initialize
 
 API:
 
 ```ts
-initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => { 
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -227,8 +224,11 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) => yourAsyncJWTGeneratorMethod({ email, userID }).then(({ jwt_token }) => jwt_token)
-)
+  ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+);
 ```
 
 ## track
@@ -244,9 +244,7 @@ Example:
 ```ts
 import { track } from '@iterable/web-sdk/dist/events';
 
-track({ eventName: 'my-event' })
-  .then()
-  .catch()
+track({ eventName: 'my-event' }).then().catch();
 ```
 
 ## trackInAppClick
@@ -267,7 +265,7 @@ trackInAppClick({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppClose
@@ -288,7 +286,7 @@ trackInAppClose({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppConsume
@@ -309,7 +307,7 @@ trackInAppConsume({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppDelivery
@@ -330,7 +328,7 @@ trackInAppDelivery({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackInAppOpen
@@ -351,7 +349,7 @@ trackInAppOpen({
   deviceInfo: { appPackageName: 'my-website' }
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## trackPurchase
@@ -372,7 +370,7 @@ trackPurchase({
   total: 200
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateCart
@@ -392,7 +390,7 @@ updateCart({
   items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
 })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateSubscriptions
@@ -410,7 +408,7 @@ import { updateSubscriptions } from '@iterable/web-sdk/dist/users';
 
 updateSubscriptions({ emailListIds: [1, 2, 3] })
   .then()
-  .catch()
+  .catch();
 ```
 
 ## updateUser
@@ -426,9 +424,7 @@ Example:
 ```ts
 import { updateUser } from '@iterable/web-sdk/dist/users';
 
-updateUser({ dataFields: {} })
-  .then()
-  .catch()
+updateUser({ dataFields: {} }).then().catch();
 ```
 
 ## updateUserEmail
@@ -444,9 +440,7 @@ Example:
 ```ts
 import { updateUserEmail } from '@iterable/web-sdk/dist/users';
 
-updateUserEmail('hello@gmail.com')
-  .then()
-  .catch()
+updateUserEmail('hello@gmail.com').then().catch();
 ```
 
 # FAQ
@@ -456,7 +450,7 @@ updateUserEmail('hello@gmail.com')
 First thing you need to do is generate an API key on [the Iterable app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the _Web_ key type. This will ensure the SDK has
 access to all the necessary endpoints when communicating with the Iterable API. After you generate your key, save both the API Key and JWT Secret somewhere handy. You'll need both of them.
 
-First, we'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, we can demo this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
+First, you'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, this can be demonstrated this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
 
 Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
 
@@ -464,9 +458,10 @@ Once you have a JWT or a service that can generate a JWT automatically, you're r
 import { initialize } from '@iterable/web-sdk/dist/authorization';
 
 (() => {
-  initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 })();
 ```
@@ -481,17 +476,18 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* this code assumes you have some backend endpoint that will return a user's ID */
-      setUserID(response.user_id)
-        .then(() => {
-          /* now your user is set and you can begin hitting the Iterable API */
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    /* this code assumes you have some backend endpoint that will return a user's ID */
+    setUserID(response.user_id).then(() => {
+      /* now your user is set and you can begin hitting the Iterable API */
+    });
+  });
 
   /* optionally logout the user when you don't need to hit the Iterable API anymore */
   logout();
@@ -506,20 +502,21 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 (() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* 
-        this code assumes you have some backend 
-        endpoint that will return a user's email address 
-      */
-      setEmail(response.email)
-        .then(() => {
-          /* now your user is set and you can begin hitting the Iterable API */
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    /* 
+      this code assumes you have some backend 
+      endpoint that will return a user's email address 
+    */
+    setEmail(response.email).then(() => {
+      /* now your user is set and you can begin hitting the Iterable API */
+    });
+  });
 
   /* optionally logout the user when you don't need to hit the Iterable API anymore */
   logout();
@@ -535,23 +532,24 @@ import { track } from '@iterable/web-sdk/dist/events';
 (() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+    ({ email, userID }) =>
+      yourAsyncJWTGeneratorMethod({ email, userID }).then(
+        ({ jwt_token }) => jwt_token
+      )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      /* this code assumes you have some backend endpoint that will return a user's ID */
-      setUserID(response.user_id)
-        .then(() => {
-          document.getElementById('my-button').addEventListener('click', () => {
-            /* 
-              no need to pass a user ID to this endpoint. 
-              _setUserID_ takes care of this for you
-            */
-            track({ eventName: 'button-clicked' })
-          })
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    /* this code assumes you have some backend endpoint that will return a user's ID */
+    setUserID(response.user_id).then(() => {
+      document.getElementById('my-button').addEventListener('click', () => {
+        /* 
+          no need to pass a user ID to this endpoint. 
+          _setUserID_ takes care of this for you
+        */
+        track({ eventName: 'button-clicked' });
+      });
+    });
+  });
 })();
 ```
 
@@ -580,8 +578,8 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
         ...config.params,
         email: 'hello@gmail.com'
       }
-    }
-  })
+    };
+  });
 })();
 ```
 
@@ -598,23 +596,22 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          getInAppMessages({ 
-            count: 20,
-            packageName: 'my-website'
-          })
-            .then()
-            .catch()
-        })
-    })
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      getInAppMessages({
+        count: 20,
+        packageName: 'my-website'
+      })
+        .then()
+        .catch();
+    });
+  });
 })();
 ```
 
@@ -625,29 +622,26 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { request } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request } = getInAppMessages(
+        {
+          count: 20,
+          packageName: 'my-website'
+        },
+        { display: 'immediate' }
+      );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
-        })
-    })
+      /* trigger the start of message presentation */
+      request().then().catch();
+    });
+  });
 })();
 ```
 
@@ -658,38 +652,35 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { request } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website',
-              displayInterval: 5000,
-              onOpenScreenReaderMessage:
-                'hey screen reader here telling you something just popped up on your screen!',
-              onOpenNodeToTakeFocus: 'input',
-              topOffset: '20px',
-              bottomOffset: '20px',
-              rightOffset: '20px',
-              animationDuration: 400,
-              handleLinks: 'external-new-tab'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request } = getInAppMessages(
+        {
+          count: 20,
+          packageName: 'my-website',
+          displayInterval: 5000,
+          onOpenScreenReaderMessage:
+            'hey screen reader here telling you something just popped up on your screen!',
+          onOpenNodeToTakeFocus: 'input',
+          topOffset: '20px',
+          bottomOffset: '20px',
+          rightOffset: '20px',
+          animationDuration: 400,
+          handleLinks: 'external-new-tab'
+        },
+        { display: 'immediate' }
+      );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
-        })
-    })
+      /* trigger the start of message presentation */
+      request().then().catch();
+    });
+  });
 })();
 ```
 
@@ -700,42 +691,36 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { 
-            request,
-            pauseMessageStream, 
-            resumeMessageStream
-           } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'immediate' }
-          );
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request, pauseMessageStream, resumeMessageStream } =
+        getInAppMessages(
+          {
+            count: 20,
+            packageName: 'my-website'
+          },
+          { display: 'immediate' }
+        );
 
-          /* trigger the start of message presentation */
-          request()
-            .then()
-            .catch();
+      /* trigger the start of message presentation */
+      request().then().catch();
 
-          /* pause any more in-app messages from appearing for a little while */
-          pauseMessageStream();
+      /* pause any more in-app messages from appearing for a little while */
+      pauseMessageStream();
 
-          /* 
-            pick up where we left off and show the next message in the queue. 
-            And start the timer again.
-          */
-          resumeMessageStream();
-        })
-    })
+      /* 
+        pick up where you left off and show the next message in the queue. 
+        And start the timer again.
+      */
+      resumeMessageStream();
+    });
+  });
 })();
 ```
 
@@ -743,54 +728,52 @@ Finally, you can also choose to do your own manipulation to the messages before 
 
 ```ts
 import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { 
+import {
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
 } from '@iterable/web-sdk/dist/inapp';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    ({ email, userID }) => yourAsyncJWTGeneratorMethod(({ email, userID })).then(({ jwt_token }) => jwt_token)
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
-  yourAsyncLoginMethod()
-    .then(response => {
-      setUserID(response.user_id)
-        .then(() => {
-          const { 
-            request,
-            pauseMessageStream, 
-            resumeMessageStream
-           } = getInAppMessages(
-            { 
-              count: 20,
-              packageName: 'my-website'
-            },
-            { display: 'deferred' }
+  yourAsyncLoginMethod().then((response) => {
+    setUserID(response.user_id).then(() => {
+      const { request, pauseMessageStream, resumeMessageStream } =
+        getInAppMessages(
+          {
+            count: 20,
+            packageName: 'my-website'
+          },
+          { display: 'deferred' }
+        );
+
+      /* trigger the start of message presentation */
+      request()
+        .then((response) => {
+          /* do your own manipulation here */
+          const filteredMessages = doStuffToMessages(
+            response.data.inAppMessages
           );
 
-          /* trigger the start of message presentation */
-          request()
-            .then(response => {
-              /* do your own manipulation here */
-              const filteredMessages = doStuffToMessages(response.data.inAppMessages);
+          /* 
+            also feel free to take advantage of the sorting/filtering 
+            methods used internally 
+          */
+          const furtherManipulatedMessages = sortInAppMessages(
+            filterHiddenInAppMessages(response.data.inAppMessages)
+          ) as InAppMessage[];
 
-              /* 
-                also feel free to take advantage of the sorting/filtering 
-                methods we use internally 
-              */
-              const furtherManipulatedMessages = sortInAppMessages(
-                filterHiddenInAppMessages(response.data.inAppMessages)
-              ) as InAppMessage[];
-
-              /* then display them whenever you want */
-              triggerDisplayMessages(furtherManipulatedMessages)
-            })
-            .catch();
+          /* then display them whenever you want */
+          triggerDisplayMessages(furtherManipulatedMessages);
         })
-    })
+        .catch();
+    });
+  });
 })();
 ```
 
@@ -799,7 +782,7 @@ import {
 This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
 
 | Message Position &#8594; <br><br> Browser Size &#8595; | Center | Full | Top-Right | Bottom-Right |
-|--------------------------------------------------------|--------|------|-----------|--------------|
+| ------------------------------------------------------ | ------ | ---- | --------- | ------------ |
 | 0px - 850px                                            | 100%   | 100% | 100%      | 100%         |
 | 851px - 975px                                          | 50%    | 100% | 45%       | 45%          |
 | 976px - 1300px                                         | 50%    | 100% | 33%       | 33%          |
@@ -809,7 +792,7 @@ Looking at this table, you can see the browser sizes on the left, and the displa
 
 Another example: If your in-app is positioned in the center and your browser if at 700px, your in-app message will grow to take up 100% of the screen.
 
-This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so we recommend that you stick to percentage-based CSS widths when possible when creating your message**
+This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so it is recommended that you stick to percentage-based CSS widths when possible when creating your message**
 
 ## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
 
@@ -817,7 +800,7 @@ No problem! Please see [the link handling section](#about-links) for more inform
 
 ## What if my JWT expires?
 
-JWT expiration is handled for you automatically by the SDK. There are 3 points where we will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
+JWT expiration is handled for you automatically by the SDK. There are 3 points where the SDK will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
 
 1. The JWT is within 1 minute of expiration
 2. An Iterable API request has failed with a 401 response
@@ -828,15 +811,16 @@ As previously explained, when initializing the SDK you need to pass a function t
 ```ts
 import { initialize } from '@iterable/web-sdk/dist/authorization';
 
-initialize(
-  'API_KEY_HERE',
-  ({ email, userID }) => yourAsyncJWTGenerationMethod({ email, userID }).then(response => response.jwt_token)
-)
+initialize('API_KEY_HERE', ({ email, userID }) =>
+  yourAsyncJWTGenerationMethod({ email, userID }).then(
+    (response) => response.jwt_token
+  )
+);
 ```
 
-When the previous 3 listed events occur, we will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
+When the previous 3 listed events occur, the SDK will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
 
-Finally, if the request to regenerate the JWT fails however, we will not attempt to generate the JWT again so requests will start failing at that point.
+Finally, if the request to regenerate the JWT fails however, the SDK will not attempt to generate the JWT again so requests will start failing at that point.
 
 # A Note About Imports
 
@@ -852,7 +836,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 import { updateUser } from '@iterable/web-sdk/dist/users';
 ```
 
-For those using Webpack/Rollup/Some Other Build Tool, we recommend importing methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
+For those using Webpack/Rollup/Some Other Build Tool, it is recommended to import methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
 
 # About Links
 
@@ -863,9 +847,13 @@ But there are few features which the SDK adds so that you can customize how you'
 First, the [`handleLinks` option](#getInAppMessages) within the `getMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
 
 ```ts
-import { getMessages } from '@iterable/web-sdk/dist/inapp'
+import { getMessages } from '@iterable/web-sdk/dist/inapp';
 
-getMessages({ count: 5, packageName: 'my-website', handleLinks: 'external-new-tab' })
+getMessages({
+  count: 5,
+  packageName: 'my-website',
+  handleLinks: 'external-new-tab'
+});
 ```
 
 will ensure the following links open in the same tab if your domain is `mydomain.com`, for example:
@@ -885,12 +873,15 @@ https://hello.com
 
 ## Reserved Keyword Links
 
-Upon normal links, Iterable reserves the `iterable://` and `action://` schemas for custom actions that are performed when a link is clicked. The following are links that you can add to your in-app messages for enhanced functionality:
+Iterable reserves the `iterable://` and `action://` URL schemas to define custom link click actions:
 
-1. `iterable://dismiss` - Removes the in-app message from the screen, queues the next one for presentation, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
-2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with the payload `{ type: 'iterable-action-link', data: '{anything}' }` that can be consumed by the parent website.  It also dismisses the message and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick)
+1. `iterable://dismiss` - Removes the in-app message from the screen, grabs the next one to display, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
 
-Upon those, we also may reserve more keywords in the future.
+2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with payload `{ type: 'iterable-action-link', data: '{anything}' }`, to be consumed by the parent website as needed. These links also dismiss the message and invoke [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
+
+The SDK may reserve more keywords in the future.
+
+:rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking away from the message.
 
 ## Routing in Single-Page Apps
 
@@ -903,8 +894,7 @@ Knowing now the custom link schemas available, let's explain how you can leverag
   <a href="action://about">go to about page</a>
 */
 
-import { useHistory } from "react-router-dom";
-
+import { useHistory } from 'react-router-dom';
 
 const SomeComponent = () => {
   const history = useHistory();
@@ -913,13 +903,13 @@ const SomeComponent = () => {
     global.addEventListener('message', (event) => {
       if (event.data.type && event.data.type === 'iterable-action-link') {
         /* route us to the content that comes after "action://" */
-        history.push(`/${event.data.data}`)
+        history.push(`/${event.data.data}`);
       }
     });
-  }, [])
+  }, []);
 
-  return <></>
-}
+  return <></>;
+};
 ```
 
 # TypeScript

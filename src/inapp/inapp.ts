@@ -21,8 +21,10 @@ import { baseIterableRequest } from '../request';
 import { IterablePromise } from '../types';
 import schema from './inapp.schema';
 import {
+  CachedMessage,
   DisplayOptions,
   DISPLAY_OPTIONS,
+  GetInAppMessagesResponse,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -33,6 +35,7 @@ import {
   addStyleSheet,
   filterHiddenInAppMessages,
   generateCloseButton,
+  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -60,18 +63,19 @@ export function getInAppMessages(
 ): IterablePromise<InAppMessageResponse>;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically: { display: DisplayOptions }
-): {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-  triggerDisplayMessages: (
-    messages: Partial<InAppMessage>[]
-  ) => Promise<HTMLIFrameElement | ''>;
-};
+  options: {
+    display: DisplayOptions;
+    /** @note parameter will be enabled once new endpoint is ready */
+    // useLocalCache?: boolean;
+  }
+): GetInAppMessagesResponse;
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
-  showInAppMessagesAutomatically?: { display: DisplayOptions }
+  options?: {
+    display: DisplayOptions;
+    /** @note parameter will be enabled once new endpoint is ready */
+    // useLocalCache?: boolean;
+  }
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
@@ -96,6 +100,8 @@ export function getInAppMessages(
   }) =>
     baseIterableRequest<InAppMessageResponse>({
       method: 'GET',
+      /** @note parameter will be enabled once new endpoint is ready */
+      // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
       url: GETMESSAGES_PATH,
       validation: { params: schema },
       params: {
@@ -107,24 +113,23 @@ export function getInAppMessages(
     });
 
   const requestMessages = async () => {
-    try {
-      const cachedMessages: [string, InAppMessage][] = await entries();
+    /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
+    // if (!options?.useLocalCache) return await requestInAppMessages({});
+    /** @note always early return until then */
+    return await requestInAppMessages({});
 
-      /** determine most recent message & delete expired messages */
+    try {
+      const cachedMessages: CachedMessage[] = await entries();
+
+      /** determine most recent cached message */
       let latestCachedMessageId: string | undefined;
       let latestCreatedAtTimestamp: EpochTimeStamp = 0;
-      const expiredMessagesInCache: string[] = [];
-      const now = Date.now();
-
       cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.expiresAt < now) {
-          expiredMessagesInCache.push(cachedMessageId);
-        } else if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
+        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
           latestCachedMessageId = cachedMessageId;
           latestCreatedAtTimestamp = cachedMessage.createdAt;
         }
       });
-      await delMany(expiredMessagesInCache);
 
       /**
        * call getMessages with latestCachedMessageId to get the message delta
@@ -167,6 +172,20 @@ export function getInAppMessages(
         }
       });
 
+      /** delete messages not present in fetch from cache */
+      const cachedMessagesToDelete = getCachedMessagesToDelete(
+        cachedMessages,
+        inAppMessages
+      );
+      try {
+        await delMany(cachedMessagesToDelete);
+      } catch (err: any) {
+        console.warn(
+          'Error deleting messages from the browser cache',
+          err?.response?.data?.clientErrors ?? err
+        );
+      }
+
       /** add new messages to the cache if they fit in the cache */
       await addNewMessagesToCache(newMessages);
 
@@ -186,7 +205,7 @@ export function getInAppMessages(
     return await requestInAppMessages({});
   };
 
-  if (showInAppMessagesAutomatically) {
+  if (options?.display) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
@@ -349,7 +368,20 @@ export function getInAppMessages(
             );
           }
 
-          if (!payload.closeButton?.isRequiredToDismissMessage) {
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
+          /**
+           * We allow users to dismiss messages by clicking outside of the
+           * message not only when isRequiredToDismissMessage is not true
+           * but also when browser is detected to be Safari, regardless of
+           * whether isRequiredToDismissMessage is true. Safari blocks
+           * all bound event handlers and so we cannot execute Javascript
+           * to listen for click events. As such, we should not prevent users
+           * from being able to dismiss the message by clicking outside of it.
+           */
+          if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
@@ -415,12 +447,16 @@ export function getInAppMessages(
               absoluteDismissButton
             );
 
-            /*
-              here we paint an optional close button if the user provided configuration
-              values. This button is just a quality-of-life feature so that the customer will
-              have an easy way to close the modal outside of the other methods.
-            */
-            if (payload.closeButton) {
+            /**
+             * Here we paint an optional close button if the user provided configuration
+             * values. This button is just a quality-of-life feature so that the customer will
+             * have an easy way to close the modal outside of the other methods.
+             *
+             * Do not show close button if browser is detected to be Safari because the close
+             * button will not be able to dismiss the message (Safari blocks JS from running
+             * on bound event handlers)
+             */
+            if (payload.closeButton && !isSafari) {
               const newButton = generateCloseButton(
                 document,
                 payload.closeButton?.position,
@@ -457,10 +493,6 @@ export function getInAppMessages(
             Promise.all(trackRequests).catch((e) => e);
           }
 
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
-
           /* now we'll add click tracking to _all_ anchor tags */
           const links =
             activeIframe.contentDocument?.querySelectorAll('a') || [];
@@ -474,7 +506,6 @@ export function getInAppMessages(
             const isDismissNode = !!clickedUrl.match(/iterable:\/\/dismiss/gim);
             const isActionLink = !!clickedUrl.match(/action:\/\//gim);
 
-            /* track the clicked link */
             const clickedHostname = getHostnameFromUrl(clickedUrl);
             /* !clickedHostname means the link was relative with no hostname */
             const isInternalLink =
@@ -482,12 +513,12 @@ export function getInAppMessages(
             const { handleLinks } = payload;
 
             /* 
-              if the _handleLinks_ option is set, we need to open links 
-              according to that enum. So the way this works is:
+              If the _handleLinks_ option is set, we need to open links 
+              according to that enum and override their target attributes.
 
-              1. If _open-all-same-tab, then open every link in the same tab
-              2. If _open-all-new-tab, open all in new tab
-              3. If _external-new-tab_, open internal links in same tab, otherwise new tab.
+              1. If _open-all-same-tab_, then open every link in the same tab
+              2. If _open-all-new-tab_, then open every link in a new tab
+              3. If _external-new-tab_, then open internal links in same tab, otherwise new tab.
 
               This was a fix to account for the fact that Bee editor templates force
               target="_blank" on all links, so we gave this option as an escape hatch for that.
@@ -505,8 +536,6 @@ export function getInAppMessages(
                 } else {
                   newTabAction();
                 }
-              } else if (link.getAttribute('target') === null) {
-                sameTabAction();
               }
             };
 
@@ -518,13 +547,13 @@ export function getInAppMessages(
               addButtonAttrsToAnchorTag(link, 'close modal');
             }
 
-            /*
+            /**
               Safari blocks all bound event handlers (including our click event handlers)
               in iframes, so links will not work in Safari unless we circumvent the
               restriction by appending target to each link tag.
 
-              NOTE: Because click event handlers cannot be attached to iframe links in
-              Safari, we cannot track in-app clicks in metrics.
+              @note Because click event handlers cannot be attached to iframe links in
+              Safari, we cannot track in-app click metrics for Safari in Iterable analytics.
             */
             if (isSafari) {
               if (!isIterableKeywordLink) {
@@ -535,6 +564,13 @@ export function getInAppMessages(
                     link.setAttribute('rel', 'noopener noreferrer');
                   }
                 );
+                const targetAttr = link.getAttribute('target');
+                if (
+                  !handleLinks &&
+                  (targetAttr === null || targetAttr === '_self')
+                ) {
+                  link.setAttribute('target', '_top');
+                }
               }
             } else {
               link.addEventListener('click', (event) => {
@@ -613,15 +649,21 @@ export function getInAppMessages(
                         );
                       }
                     );
-                    /**
-                      Using target="_blank" without rel="noreferrer" and rel="noopener"
-                      makes the website vulnerable to window.opener API exploitation attacks
-                      
-                      @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
-                    */
-                    if (openInNewTab)
-                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
-                    else global.location.assign(clickedUrl);
+                    if (!handleLinks) {
+                      if (openInNewTab)
+                        /**
+                          Using target="_blank" without rel="noreferrer" and rel="noopener"
+                          makes the website vulnerable to window.opener API exploitation attacks
+  
+                          @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
+                        */
+                        global.open(
+                          clickedUrl,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
+                      else global.location.assign(clickedUrl);
+                    }
                   }
                 }
               });
@@ -635,8 +677,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred =
-      showInAppMessagesAutomatically.display === DISPLAY_OPTIONS.deferred;
+    const isDeferred = options.display === DISPLAY_OPTIONS.deferred;
 
     const triggerDisplayFn = isDeferred
       ? {

@@ -1,6 +1,14 @@
 import { Buffer } from 'buffer';
 import axios, { AxiosRequestConfig } from 'axios';
 
+export const ONE_SECOND = 1000;
+export const ONE_MINUTE = 60 * ONE_SECOND;
+export const ONE_HOUR = 60 * ONE_MINUTE;
+export const ONE_DAY = 24 * ONE_HOUR;
+export const ONE_YEAR = 365 * ONE_DAY;
+
+const MS_EPOCH_THRESHOLD = ONE_YEAR;
+
 export const getEpochExpiryTimeInMS = (jwt: string) => {
   /** @thanks https://stackoverflow.com/a/38552302/7455960  */
   try {
@@ -18,7 +26,7 @@ export const getEpochExpiryTimeInMS = (jwt: string) => {
     );
 
     const expTime = JSON.parse(jsonPayload)?.exp;
-    return expTime < 10000000000 ? expTime * 1000 : expTime;
+    return expTime < MS_EPOCH_THRESHOLD ? expTime * ONE_SECOND : expTime;
   } catch {
     return 0;
   }
@@ -35,13 +43,13 @@ export const getEpochDifferenceInMS = (
 ) => {
   let parsedNow = epochNow;
   let parsedFuture = epochFuture;
-  if (epochNow < 10000000000) {
+  if (epochNow < MS_EPOCH_THRESHOLD) {
     /* convert to MS if in seconds */
-    parsedNow = epochNow * 1000;
+    parsedNow = epochNow * ONE_SECOND;
   }
-  if (epochFuture < 10000000000) {
+  if (epochFuture < MS_EPOCH_THRESHOLD) {
     /* convert to MS if in seconds */
-    parsedFuture = epochFuture * 1000;
+    parsedFuture = epochFuture * ONE_SECOND;
   }
   return parsedFuture - parsedNow;
 };

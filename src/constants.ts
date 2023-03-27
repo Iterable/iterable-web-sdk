@@ -8,6 +8,9 @@ export const BASE_URL = process.env.BASE_URL || 'http://localhost:9000/api';
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 
+/** @todo update once new endpoint is ready */
+export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
+
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
     return JSON.parse(process.env.ENABLE_INAPP_CONSUME);

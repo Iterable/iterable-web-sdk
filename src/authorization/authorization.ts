@@ -10,11 +10,13 @@ import {
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
-  getEpochExpiryTimeInMS
+  getEpochExpiryTimeInMS,
+  ONE_MINUTE,
+  ONE_DAY
 } from './utils';
 import { config } from '../utils/config';
 
-const ONE_MINUTE = 60000;
+const MAX_TIMEOUT = ONE_DAY;
 
 interface GenerateJWTPayload {
   email?: string;
@@ -110,16 +112,19 @@ export function initialize(
           Date.now(),
           expTime
         );
-        timer = setTimeout(() => {
-          /* get new token */
-          return callback().catch((e) => {
-            console.warn(e);
-            console.warn(
-              'Could not refresh JWT. Try identifying the user again.'
-            );
-          });
-          /* try to refresh one minute until expiry */
-        }, millisecondsToExpired - ONE_MINUTE);
+
+        if (millisecondsToExpired < MAX_TIMEOUT) {
+          timer = setTimeout(() => {
+            /* get new token */
+            return callback().catch((e) => {
+              console.warn(e);
+              console.warn(
+                'Could not refresh JWT. Try identifying the user again.'
+              );
+            });
+            /* try to refresh one minute until expiry */
+          }, millisecondsToExpired - ONE_MINUTE);
+        }
       }
     };
   };
