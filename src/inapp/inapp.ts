@@ -439,10 +439,6 @@ export function getInAppMessages(
              * Here we paint an optional close button if the user provided configuration
              * values. This button is just a quality-of-life feature so that the customer will
              * have an easy way to close the modal outside of the other methods.
-             *
-             * Do not show close button if browser is detected to be Safari because the close
-             * button will not be able to dismiss the message (Safari blocks JS from running
-             * on bound event handlers)
              */
             if (payload.closeButton) {
               const newButton = generateCloseButton(
