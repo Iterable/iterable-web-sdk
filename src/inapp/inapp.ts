@@ -368,20 +368,7 @@ export function getInAppMessages(
             );
           }
 
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
-
-          /**
-           * We allow users to dismiss messages by clicking outside of the
-           * message not only when isRequiredToDismissMessage is not true
-           * but also when browser is detected to be Safari, regardless of
-           * whether isRequiredToDismissMessage is true. Safari blocks
-           * all bound event handlers and so we cannot execute Javascript
-           * to listen for click events. As such, we should not prevent users
-           * from being able to dismiss the message by clicking outside of it.
-           */
-          if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
+          if (!payload.closeButton?.isRequiredToDismissMessage) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
               overlay.remove();
@@ -431,6 +418,7 @@ export function getInAppMessages(
             */
             absoluteDismissButton.tabIndex = -1;
             const triggerClose = () => {
+              console.log('hit');
               dismissMessage(activeIframe);
               overlay.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
@@ -456,7 +444,7 @@ export function getInAppMessages(
              * button will not be able to dismiss the message (Safari blocks JS from running
              * on bound event handlers)
              */
-            if (payload.closeButton && !isSafari) {
+            if (payload.closeButton) {
               const newButton = generateCloseButton(
                 document,
                 payload.closeButton?.position,
@@ -547,127 +535,92 @@ export function getInAppMessages(
               addButtonAttrsToAnchorTag(link, 'close modal');
             }
 
-            /**
-              Safari blocks all bound event handlers (including our click event handlers)
-              in iframes, so links will not work in Safari unless we circumvent the
-              restriction by appending target to each link tag.
+            link.addEventListener('click', (event) => {
+              /* 
+                remove default linking behavior because we're in an iframe 
+                so we need to link the user programatically
+              */
+              event.preventDefault();
 
-              @note Because click event handlers cannot be attached to iframe links in
-              Safari, we cannot track in-app click metrics for Safari in Iterable analytics.
-            */
-            if (isSafari) {
-              if (!isIterableKeywordLink) {
-                manageHandleLinks(
-                  () => link.setAttribute('target', '_top'),
-                  () => {
-                    link.setAttribute('target', '_blank');
-                    link.setAttribute('rel', 'noopener noreferrer');
+              if (clickedUrl) {
+                const isOpeningLinkInSameTab =
+                  (!handleLinks && !openInNewTab) ||
+                  handleLinks === 'open-all-same-tab' ||
+                  (isInternalLink && handleLinks === 'external-new-tab');
+
+                trackInAppClick(
+                  {
+                    clickedUrl,
+                    messageId: activeMessage?.messageId,
+                    deviceInfo: {
+                      appPackageName: dupedPayload.packageName
+                    }
+                  },
+                  /* 
+                    only call with the fetch API if we're linking in the 
+                    same tab and it's not a reserved keyword link.
+                  */
+                  isOpeningLinkInSameTab && !isIterableKeywordLink
+                  /* swallow the network error */
+                ).catch((e) => e);
+
+                if (isDismissNode || isActionLink) {
+                  dismissMessage(activeIframe, clickedUrl);
+                  overlay.remove();
+                  document.removeEventListener(
+                    'keydown',
+                    handleDocumentEscPress
+                  );
+                  if (activeIframe?.contentWindow?.document) {
+                    activeIframe.contentWindow?.document.removeEventListener(
+                      'keydown',
+                      handleIFrameEscPress
+                    );
                   }
-                );
-                const targetAttr = link.getAttribute('target');
-                if (
-                  !handleLinks &&
-                  (targetAttr === null || targetAttr === '_self')
-                ) {
-                  link.setAttribute('target', '_top');
+                  global.removeEventListener('resize', throttledResize);
+                }
+
+                if (isActionLink) {
+                  const filteredMatch = (new RegExp(
+                    /^.*action:\/\/(.*)$/,
+                    'gmi'
+                  )?.exec(clickedUrl) || [])?.[1];
+                  /* 
+                    just post the message to the window when clicking 
+                    action:// links and early return
+                  */
+                  return global.postMessage(
+                    { type: 'iterable-action-link', data: filteredMatch },
+                    '*'
+                  );
+                }
+
+                /*
+                  finally (since we're in an iframe), programatically click the link
+                  and send the user to where they need to go, only if it's not one
+                  of the reserved iterable keyword links
+                */
+                if (!isIterableKeywordLink) {
+                  manageHandleLinks(
+                    () => global.location.assign(clickedUrl),
+                    () => {
+                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    }
+                  );
+                  if (!handleLinks) {
+                    if (openInNewTab)
+                      /**
+                        Using target="_blank" without rel="noreferrer" and rel="noopener"
+                        makes the website vulnerable to window.opener API exploitation attacks
+ 
+                        @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
+                      */
+                      global.open(clickedUrl, '_blank', 'noopener,noreferrer');
+                    else global.location.assign(clickedUrl);
+                  }
                 }
               }
-            } else {
-              link.addEventListener('click', (event) => {
-                /* 
-                  remove default linking behavior because we're in an iframe 
-                  so we need to link the user programatically
-                */
-                event.preventDefault();
-
-                if (clickedUrl) {
-                  const isOpeningLinkInSameTab =
-                    (!handleLinks && !openInNewTab) ||
-                    handleLinks === 'open-all-same-tab' ||
-                    (isInternalLink && handleLinks === 'external-new-tab');
-
-                  trackInAppClick(
-                    {
-                      clickedUrl,
-                      messageId: activeMessage?.messageId,
-                      deviceInfo: {
-                        appPackageName: dupedPayload.packageName
-                      }
-                    },
-                    /* 
-                      only call with the fetch API if we're linking in the 
-                      same tab and it's not a reserved keyword link.
-                    */
-                    isOpeningLinkInSameTab && !isIterableKeywordLink
-                    /* swallow the network error */
-                  ).catch((e) => e);
-
-                  if (isDismissNode || isActionLink) {
-                    dismissMessage(activeIframe, clickedUrl);
-                    overlay.remove();
-                    document.removeEventListener(
-                      'keydown',
-                      handleDocumentEscPress
-                    );
-                    if (activeIframe?.contentWindow?.document) {
-                      activeIframe.contentWindow?.document.removeEventListener(
-                        'keydown',
-                        handleIFrameEscPress
-                      );
-                    }
-                    global.removeEventListener('resize', throttledResize);
-                  }
-
-                  if (isActionLink) {
-                    const filteredMatch = (new RegExp(
-                      /^.*action:\/\/(.*)$/,
-                      'gmi'
-                    )?.exec(clickedUrl) || [])?.[1];
-                    /* 
-                      just post the message to the window when clicking 
-                      action:// links and early return
-                    */
-                    return global.postMessage(
-                      { type: 'iterable-action-link', data: filteredMatch },
-                      '*'
-                    );
-                  }
-
-                  /*
-                    finally (since we're in an iframe), programatically click the link
-                    and send the user to where they need to go, only if it's not one
-                    of the reserved iterable keyword links
-                  */
-                  if (!isIterableKeywordLink) {
-                    manageHandleLinks(
-                      () => global.location.assign(clickedUrl),
-                      () => {
-                        global.open(
-                          clickedUrl,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
-                      }
-                    );
-                    if (!handleLinks) {
-                      if (openInNewTab)
-                        /**
-                          Using target="_blank" without rel="noreferrer" and rel="noopener"
-                          makes the website vulnerable to window.opener API exploitation attacks
-  
-                          @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
-                        */
-                        global.open(
-                          clickedUrl,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
-                      else global.location.assign(clickedUrl);
-                    }
-                  }
-                }
-              });
-            }
+            });
           });
 
           return activeIframe;

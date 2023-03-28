@@ -359,12 +359,11 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('id', 'iterable-iframe');
-  // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
-  // event handlers on elements in it preventing our custom link handling
-  iframe.setAttribute(
-    'sandbox',
-    'allow-same-origin allow-popups allow-top-navigation'
-  );
+  /**
+   * Most other browsers, if "allow-same-origin" enabled, already "allow-scripts". Safari does not by default, and same with some older browsers so
+   * we must manually set it here. See https://caniuse.com/mdn-html_elements_iframe_sandbox-allow-same-origin for more information.
+   */
+  iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
   /*
     _display: none_ would remove the ability to set event handlers on elements
     so instead we choose to hide it visibly with CSS but not actually remove
