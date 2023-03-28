@@ -39,10 +39,9 @@ const HomeLink = styled(Link)`
 
 ((): void => {
   const { setEmail } = initialize(process.env.API_KEY || '', ({ email }) => {
-    console.log('env', process.env.JWT_SECRET);
     return axios
       .post(
-        'http://localhost:6001/generate',
+        'http://localhost:5000/generate',
         {
           exp_minutes: 2,
           email,

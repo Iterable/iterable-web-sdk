@@ -13,7 +13,7 @@ import {
     ({ email }) => {
       return axios
         .post(
-          'https://jwt-generator.stg-itbl.co/generate',
+          'http://localhost:5000/generate',
           {
             exp_minutes: 2,
             email,
@@ -82,7 +82,7 @@ import {
 
   const handleLoginClick = (event: MouseEvent) => {
     const email =
-      localStorage.getItem('iterable-email') || 'mitch.prewitt@iterable.com';
+      localStorage.getItem('iterable-email') || 'iterable.tester@gmailcom';
 
     /* disable login btn */
     if (loginBtn.getAttribute('aria-disabled') !== 'true') {
