@@ -418,7 +418,6 @@ export function getInAppMessages(
             */
             absoluteDismissButton.tabIndex = -1;
             const triggerClose = () => {
-              console.log('hit');
               dismissMessage(activeIframe);
               overlay.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
