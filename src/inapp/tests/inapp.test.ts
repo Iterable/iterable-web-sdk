@@ -239,6 +239,9 @@ describe('getInAppMessages', () => {
       );
       await request();
 
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
       const element = document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
@@ -369,7 +372,10 @@ describe('getInAppMessages', () => {
       );
       await request();
 
-      const element = document.body?.querySelector(
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const element = iframe?.contentWindow?.document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
 
