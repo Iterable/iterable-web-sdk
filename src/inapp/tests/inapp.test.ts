@@ -242,7 +242,7 @@ describe('getInAppMessages', () => {
       const iframe = document.getElementById(
         'iterable-iframe'
       ) as HTMLIFrameElement;
-      const element = iframe?.contentWindow?.document.body?.querySelector(
+      const element = document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
 
@@ -325,7 +325,7 @@ describe('getInAppMessages', () => {
 
       expect(frame?.tagName).toBe('IFRAME');
 
-      const element = frame?.contentWindow?.document.body.querySelector(
+      const element = document.body.querySelector(
         '[data-qa-custom-close-button]'
       );
 
@@ -372,10 +372,7 @@ describe('getInAppMessages', () => {
       );
       await request();
 
-      const iframe = document.getElementById(
-        'iterable-iframe'
-      ) as HTMLIFrameElement;
-      const element = iframe?.contentWindow?.document.body?.querySelector(
+      const element = document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
 
