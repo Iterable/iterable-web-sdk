@@ -239,9 +239,6 @@ describe('getInAppMessages', () => {
       );
       await request();
 
-      const iframe = document.getElementById(
-        'iterable-iframe'
-      ) as HTMLIFrameElement;
       const element = document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
