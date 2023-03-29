@@ -263,6 +263,7 @@ export const generateCloseButton = (
     height: ${parsedSize};
     font-size: ${parsedSize};
     color: ${color};
+    z-index: 1000000;
   `;
   const button = doc.createElement('button');
   button.style.cssText =

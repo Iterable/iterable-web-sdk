@@ -407,9 +407,9 @@ export function getInAppMessages(
             The overlay doesn't handle this because the overlay only surrounds the iframe,
             not the in-app message. So imagine an in-app looking like this:
           */
-          if (activeIframe.contentWindow?.document) {
-            const absoluteDismissButton =
-              activeIframe.contentWindow.document.createElement('button');
+          console.log({ document });
+          if (activeIframe?.contentWindow) {
+            const absoluteDismissButton = document.createElement('button');
             absoluteDismissButton.style.cssText = `
                 background: none;
                 color: inherit;
@@ -443,9 +443,7 @@ export function getInAppMessages(
               global.removeEventListener('resize', throttledResize);
             };
             absoluteDismissButton.addEventListener('click', triggerClose);
-            activeIframe.contentWindow.document.body.appendChild(
-              absoluteDismissButton
-            );
+            document.body.appendChild(absoluteDismissButton);
 
             /**
              * Here we paint an optional close button if the user provided configuration
@@ -456,7 +454,7 @@ export function getInAppMessages(
              * button will not be able to dismiss the message (Safari blocks JS from running
              * on bound event handlers)
              */
-            if (payload.closeButton && !isSafari) {
+            if (payload.closeButton) {
               const newButton = generateCloseButton(
                 document,
                 payload.closeButton?.position,
@@ -467,7 +465,7 @@ export function getInAppMessages(
                 payload.closeButton.sideOffset
               );
               newButton.addEventListener('click', triggerClose);
-              activeIframe.contentWindow.document.body.appendChild(newButton);
+              document.body.appendChild(newButton);
             }
           }
 
