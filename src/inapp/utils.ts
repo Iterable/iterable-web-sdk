@@ -236,6 +236,7 @@ export const addNewMessagesToCache = async (
 };
 
 export const generateCloseButton = (
+  id: string,
   doc: Document,
   position?: 'top-right' | 'top-left',
   color?: string,
@@ -291,6 +292,7 @@ export const generateCloseButton = (
   */
   button.ariaLabel = 'Close modal button';
   button.setAttribute('data-qa-custom-close-button', 'true');
+  button.setAttribute('id', id);
   return button;
 };
 

@@ -408,7 +408,10 @@ export function getInAppMessages(
             not the in-app message. So imagine an in-app looking like this:
           */
           if (activeIframe?.contentWindow?.document) {
+            const closeXButtonId = 'close-x';
             const absoluteDismissButton = document.createElement('button');
+            const absoluteDismissId = 'absolute-dismiss';
+            absoluteDismissButton.setAttribute('id', absoluteDismissId);
             absoluteDismissButton.style.cssText = `
                 background: none;
                 color: inherit;
@@ -440,6 +443,12 @@ export function getInAppMessages(
                 );
               }
               global.removeEventListener('resize', throttledResize);
+              const closeXButtonElement =
+                document.getElementById(closeXButtonId);
+              const absoluteDismissButtonElement =
+                document.getElementById(absoluteDismissId);
+              closeXButtonElement?.remove();
+              absoluteDismissButtonElement?.remove();
             };
             absoluteDismissButton.addEventListener('click', triggerClose);
             document.body.appendChild(absoluteDismissButton);
@@ -454,7 +463,8 @@ export function getInAppMessages(
              * on bound event handlers)
              */
             if (payload.closeButton) {
-              const newButton = generateCloseButton(
+              const closeXButton = generateCloseButton(
+                closeXButtonId,
                 document,
                 payload.closeButton?.position,
                 payload.closeButton?.color,
@@ -463,8 +473,8 @@ export function getInAppMessages(
                 payload.closeButton.topOffset,
                 payload.closeButton.sideOffset
               );
-              newButton.addEventListener('click', triggerClose);
-              document.body.appendChild(newButton);
+              closeXButton.addEventListener('click', triggerClose);
+              document.body.appendChild(closeXButton);
             }
           }
 
