@@ -325,7 +325,7 @@ describe('getInAppMessages', () => {
 
       expect(frame?.tagName).toBe('IFRAME');
 
-      const element = frame?.contentWindow?.document.body.querySelector(
+      const element = document.body.querySelector(
         '[data-qa-custom-close-button]'
       );
 
@@ -385,7 +385,9 @@ describe('getInAppMessages', () => {
       pauseMessageStream();
       jest.advanceTimersByTime(32000);
 
-      expect(document.body.innerHTML).toBe('');
+      expect(document.body.innerHTML).toBe(
+        '<button id="absolute-dismiss" style="background: none; padding: 0px; cursor: unset; outline: inherit; height: 100vh; width: 100vw; position: fixed; top: 0px; left: 0px; z-index: -1;" tabindex="-1"></button>'
+      );
     });
 
     it('should paint next message to DOM if resumed', async () => {
