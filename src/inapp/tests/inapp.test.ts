@@ -242,7 +242,7 @@ describe('getInAppMessages', () => {
       const iframe = document.getElementById(
         'iterable-iframe'
       ) as HTMLIFrameElement;
-      const element = document.body?.querySelector(
+      const element = iframe?.contentWindow?.document.body?.querySelector(
         'a[href="javascript:undefined"]'
       ) as Element;
 
@@ -385,7 +385,9 @@ describe('getInAppMessages', () => {
       pauseMessageStream();
       jest.advanceTimersByTime(32000);
 
-      expect(document.body.innerHTML).toBe('');
+      expect(document.body.innerHTML).toBe(
+        '<button style="background: none; padding: 0px; cursor: unset; outline: inherit; height: 100vh; width: 100vw; position: fixed; top: 0px; left: 0px; z-index: -1;" tabindex="-1"></button>'
+      );
     });
 
     it('should paint next message to DOM if resumed', async () => {
