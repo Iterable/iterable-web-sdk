@@ -407,7 +407,7 @@ export function getInAppMessages(
             The overlay doesn't handle this because the overlay only surrounds the iframe,
             not the in-app message. So imagine an in-app looking like this:
           */
-          if (activeIframe?.contentWindow) {
+          if (activeIframe?.contentWindow?.document) {
             const absoluteDismissButton = document.createElement('button');
             absoluteDismissButton.style.cssText = `
                 background: none;
