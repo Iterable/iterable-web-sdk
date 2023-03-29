@@ -407,9 +407,11 @@ export function getInAppMessages(
             The overlay doesn't handle this because the overlay only surrounds the iframe,
             not the in-app message. So imagine an in-app looking like this:
           */
-          if (activeIframe.contentWindow?.document) {
-            const absoluteDismissButton =
-              activeIframe.contentWindow.document.createElement('button');
+          if (activeIframe?.contentWindow?.document) {
+            const closeXButtonId = 'close-x';
+            const absoluteDismissButton = document.createElement('button');
+            const absoluteDismissId = 'absolute-dismiss';
+            absoluteDismissButton.setAttribute('id', absoluteDismissId);
             absoluteDismissButton.style.cssText = `
                 background: none;
                 color: inherit;
@@ -441,11 +443,15 @@ export function getInAppMessages(
                 );
               }
               global.removeEventListener('resize', throttledResize);
+              const closeXButtonElement =
+                document.getElementById(closeXButtonId);
+              const absoluteDismissButtonElement =
+                document.getElementById(absoluteDismissId);
+              closeXButtonElement?.remove();
+              absoluteDismissButtonElement?.remove();
             };
             absoluteDismissButton.addEventListener('click', triggerClose);
-            activeIframe.contentWindow.document.body.appendChild(
-              absoluteDismissButton
-            );
+            document.body.appendChild(absoluteDismissButton);
 
             /**
              * Here we paint an optional close button if the user provided configuration
@@ -456,8 +462,9 @@ export function getInAppMessages(
              * button will not be able to dismiss the message (Safari blocks JS from running
              * on bound event handlers)
              */
-            if (payload.closeButton && !isSafari) {
-              const newButton = generateCloseButton(
+            if (payload.closeButton) {
+              const closeXButton = generateCloseButton(
+                closeXButtonId,
                 document,
                 payload.closeButton?.position,
                 payload.closeButton?.color,
@@ -466,8 +473,8 @@ export function getInAppMessages(
                 payload.closeButton.topOffset,
                 payload.closeButton.sideOffset
               );
-              newButton.addEventListener('click', triggerClose);
-              activeIframe.contentWindow.document.body.appendChild(newButton);
+              closeXButton.addEventListener('click', triggerClose);
+              document.body.appendChild(closeXButton);
             }
           }
 

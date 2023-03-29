@@ -895,7 +895,9 @@ describe('Utils', () => {
 
   describe('Close Button', () => {
     it('should paint the close button with the correct properties', () => {
+      const buttonId = 'some-test-id';
       const button = generateCloseButton(
+        buttonId,
         document,
         'top-left',
         'blue',
@@ -905,6 +907,7 @@ describe('Utils', () => {
         '20px'
       );
 
+      expect(button.id).toEqual(buttonId);
       expect(button.style.width).toBe('20px');
       expect(button.style.height).toBe('20px');
       expect(button.style.fontSize).toBe('20px');
@@ -916,6 +919,7 @@ describe('Utils', () => {
       expect(button.innerHTML).toBe('✕');
 
       const rightButton = generateCloseButton(
+        buttonId,
         document,
         'top-right',
         'blue',
@@ -925,6 +929,7 @@ describe('Utils', () => {
         '20px'
       );
 
+      expect(button.id).toEqual(buttonId);
       expect(rightButton.style.width).toBe('20px');
       expect(rightButton.style.height).toBe('20px');
       expect(rightButton.style.fontSize).toBe('20px');
