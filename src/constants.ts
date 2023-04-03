@@ -4,7 +4,17 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 /* how many times we try to create a new user when _setUserID_ is invoked */
 export const RETRY_USER_ATTEMPTS = 0;
 
-export const BASE_URL = process.env.BASE_URL || 'http://localhost:9000/api';
+const IS_EU_SERVICE = process.env.IS_EU_SERVICE === 'true' ? true : false;
+
+const US_ITERABLE_DOMAIN = 'api.iterable.com';
+
+const EU_ITERABLE_DOMAIN = 'eu.iterable.com';
+
+const ITERABLE_API_URL = `https://${
+  IS_EU_SERVICE ? EU_ITERABLE_DOMAIN : US_ITERABLE_DOMAIN
+}/api`;
+
+export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 
