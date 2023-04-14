@@ -1046,5 +1046,77 @@ describe('User Identification', () => {
         }
       });
     });
+
+    describe('refreshJwtToken', () => {
+      beforeEach(() => {
+        mockRequest.resetHistory();
+      });
+
+      it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
+        const { refreshJwtToken } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+
+        await refreshJwtToken('hello@gmail.com');
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+        expect(response.config.headers['Api-Key']).toBe('123');
+        expect(response.config.headers['Authorization']).toBe(
+          `Bearer ${MOCK_JWT_KEY}`
+        );
+      });
+
+      it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
+        const { refreshJwtToken } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+
+        await refreshJwtToken('123ffdas');
+
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+        expect(response.config.headers['Api-Key']).toBe('123');
+        expect(response.config.headers['Authorization']).toBe(
+          `Bearer ${MOCK_JWT_KEY}`
+        );
+      });
+
+      it('should request a new JWT after 1 minute before exp time', async () => {
+        /* 5 minutes before the JWT expires */
+        Date.now = jest.fn(() => 1630617433001);
+        /* this JWT expires in 5 minutes */
+        const mockGenerateJWT = jest
+          .fn()
+          .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
+        await refreshJwtToken('hello@gmail.com');
+
+        expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+        jest.advanceTimersByTime(60000 * 4.1);
+        expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+      });
+
+      it('should not request a new JWT if the first request failed', async () => {
+        /* 5 minutes before the JWT expires */
+        Date.now = jest.fn(() => 1630617433001);
+        /* this JWT expires in 5 minutes */
+        const mockGenerateJWT = jest
+          .fn()
+          .mockReturnValue(Promise.reject(MOCK_JWT_KEY));
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
+
+        try {
+          await refreshJwtToken('hello@gmail.com');
+        } catch {
+          expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+          jest.advanceTimersByTime(60000 * 4.1);
+          expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+        }
+      });
+    });
   });
 });
