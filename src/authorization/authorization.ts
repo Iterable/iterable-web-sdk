@@ -13,6 +13,7 @@ import {
   getEpochExpiryTimeInMS,
   ONE_MINUTE,
   ONE_DAY,
+  validateTokenTime,
   isEmail
 } from './utils';
 import { config } from '../utils/config';
@@ -114,6 +115,10 @@ export function initialize(
           Date.now(),
           expTime
         );
+        if (validateTokenTime(millisecondsToExpired))
+          return console.warn(
+            'Could not refresh JWT. Try generating the token again.'
+          );
 
         if (millisecondsToExpired < MAX_TIMEOUT) {
           timer = setTimeout(() => {
