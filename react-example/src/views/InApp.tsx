@@ -31,7 +31,7 @@ const AutoDisplayContainer = styled.div`
 const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   {
     count: 20,
-    packageName: 'my-website',
+    packageName: 'mitch-site',
     closeButton: {},
     displayInterval: 1000
   },

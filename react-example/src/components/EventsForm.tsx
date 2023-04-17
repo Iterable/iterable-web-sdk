@@ -40,7 +40,7 @@ export const EventsForm: FC<Props> = ({
     method({
       ...conditionalParams,
       deviceInfo: {
-        appPackageName: 'my-website'
+        appPackageName: 'mitch-site'
       }
     })
       .then((response) => {

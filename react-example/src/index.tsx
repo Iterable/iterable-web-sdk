@@ -42,7 +42,7 @@ const HomeLink = styled(Link)`
     console.log('env', process.env.JWT_SECRET);
     return axios
       .post(
-        'http://localhost:6001/generate',
+        'https://jwt-generator.stg-itbl.co/generate',
         {
           exp_minutes: 2,
           email,
