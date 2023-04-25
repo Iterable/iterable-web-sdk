@@ -38,26 +38,28 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail } = initialize(process.env.API_KEY || '', ({ email }) => {
-    console.log('env', process.env.JWT_SECRET);
-    return axios
-      .post(
-        'http://localhost:6001/generate',
-        {
-          exp_minutes: 2,
-          email,
-          jwt_secret: process.env.JWT_SECRET
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json'
+  const { setEmail, logout, refreshJwtToken } = initialize(
+    process.env.API_KEY || '',
+    ({ email }) => {
+      return axios
+        .post(
+          'http://localhost:5000/generate',
+          {
+            exp_minutes: 2,
+            email,
+            jwt_secret: process.env.JWT_SECRET
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
           }
-        }
-      )
-      .then((response) => {
-        return response.data?.token;
-      });
-  });
+        )
+        .then((response) => {
+          return response.data?.token;
+        });
+    }
+  );
 
   ReactDOM.render(
     <BrowserRouter>
@@ -67,7 +69,11 @@ const HomeLink = styled(Link)`
             <HomeLink renderAsButton to="/">
               Home
             </HomeLink>
-            <LoginForm setEmail={setEmail} />
+            <LoginForm
+              setEmail={setEmail}
+              logout={logout}
+              refreshJwt={refreshJwtToken}
+            />
           </HeaderWrapper>
           <RouteWrapper>
             <Routes>
