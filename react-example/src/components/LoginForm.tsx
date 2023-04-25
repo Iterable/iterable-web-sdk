@@ -28,10 +28,13 @@ const Form = styled.form`
 
 interface Props {
   setEmail: (email: string) => Promise<string>;
+  logout: () => void;
+  refreshJwt: (authTypes: string) => Promise<string>;
 }
 
-export const LoginForm: FC<Props> = ({ setEmail }) => {
+export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
   const [email, updateEmail] = useState<string>('mitch.prewitt@iterable.com');
+  console.log({ email });
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
@@ -44,9 +47,17 @@ export const LoginForm: FC<Props> = ({ setEmail }) => {
       .then(() => {
         setEditingUser(false);
         setLoggedInUser({ type: 'user_update', data: email });
-        updateEmail('');
       })
       .catch(() => updateEmail('Something went wrong!'));
+  };
+
+  const handleLogout = () => {
+    logout();
+    setLoggedInUser({ type: 'user_update', data: '' });
+  };
+
+  const handleJwtRefresh = () => {
+    refreshJwt(email);
   };
 
   const handleEditUser = () => {
@@ -78,9 +89,15 @@ export const LoginForm: FC<Props> = ({ setEmail }) => {
             <Button onClick={handleCancelEditUser}>Cancel</Button>
           </Form>
         ) : (
-          <Button onClick={handleEditUser}>
-            Logged In As {`${first5}...${last9}`} (change)
-          </Button>
+          <>
+            <Button onClick={handleEditUser}>
+              Logged in as {`${first5}...${last9}`} (change)
+            </Button>
+            <Button onClick={handleJwtRefresh}>
+              Manually Refresh JWT Token
+            </Button>
+            <Button onClick={handleLogout}>Logout</Button>
+          </>
         )
       ) : (
         <Form onSubmit={handleSubmit} data-qa-login-form>
