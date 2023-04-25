@@ -41,7 +41,6 @@ const HomeLink = styled(Link)`
   const { setEmail, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
     ({ email }) => {
-      console.log('env', process.env.JWT_SECRET);
       return axios
         .post(
           'http://localhost:6001/generate',
