@@ -43,7 +43,7 @@ const HomeLink = styled(Link)`
     ({ email }) => {
       return axios
         .post(
-          'http://localhost:5000/generate',
+          'http://localhost:6001/generate',
           {
             exp_minutes: 2,
             email,
