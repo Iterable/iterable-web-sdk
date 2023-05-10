@@ -33,7 +33,7 @@ interface Props {
 }
 
 export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
-  const [email, updateEmail] = useState<string>('mitch.prewitt@iterable.com');
+  const [email, updateEmail] = useState<string>('');
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
