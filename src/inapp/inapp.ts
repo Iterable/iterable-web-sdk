@@ -215,7 +215,7 @@ export function getInAppMessages(
         const position =
           activeMessage?.content?.webInAppDisplaySettings?.position || 'Center';
 
-        const dismissMessage = (
+        const dismissMessage = async (
           activeIframe: HTMLIFrameElement,
           url?: string
         ) => {
@@ -231,7 +231,7 @@ export function getInAppMessages(
             deviceInfo: { appPackageName: dupedPayload.packageName }
           };
           /* close the message and start a timer to show the next one */
-          trackInAppClose(
+          await trackInAppClose(
             url
               ? {
                   ...trackPayload,
@@ -368,9 +368,25 @@ export function getInAppMessages(
             );
           }
 
-          const ua = navigator.userAgent;
-          const isSafari =
-            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+          const closeXButtonId = 'close-x';
+          const absoluteDismissId = 'absolute-dismiss';
+          const triggerClose = async () => {
+            overlay.remove();
+            document.removeEventListener('keydown', handleDocumentEscPress);
+            if (activeIframe?.contentWindow?.document) {
+              activeIframe.contentWindow?.document.removeEventListener(
+                'keydown',
+                handleIFrameEscPress
+              );
+            }
+            global.removeEventListener('resize', throttledResize);
+            const closeXButtonElement = document.getElementById(closeXButtonId);
+            const absoluteDismissButtonElement =
+              document.getElementById(absoluteDismissId);
+            closeXButtonElement?.remove();
+            absoluteDismissButtonElement?.remove();
+            await dismissMessage(activeIframe);
+          };
 
           /**
            * We allow users to dismiss messages by clicking outside of the
@@ -381,19 +397,12 @@ export function getInAppMessages(
            * to listen for click events. As such, we should not prevent users
            * from being able to dismiss the message by clicking outside of it.
            */
+          const ua = navigator.userAgent;
+          const isSafari =
+            !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
           if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
-            overlay.addEventListener('click', () => {
-              dismissMessage(activeIframe);
-              overlay.remove();
-              document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframe?.contentWindow?.document) {
-                activeIframe.contentWindow?.document.removeEventListener(
-                  'keydown',
-                  handleIFrameEscPress
-                );
-              }
-              global.removeEventListener('resize', throttledResize);
-            });
+            overlay.addEventListener('click', () => triggerClose);
           }
 
           /*
@@ -432,24 +441,7 @@ export function getInAppMessages(
               It's not necessarily for blind folks to tab over 
             */
             absoluteDismissButton.tabIndex = -1;
-            const triggerClose = () => {
-              dismissMessage(activeIframe);
-              overlay.remove();
-              document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframe?.contentWindow?.document) {
-                activeIframe.contentWindow?.document.removeEventListener(
-                  'keydown',
-                  handleIFrameEscPress
-                );
-              }
-              global.removeEventListener('resize', throttledResize);
-              const closeXButtonElement =
-                document.getElementById(closeXButtonId);
-              const absoluteDismissButtonElement =
-                document.getElementById(absoluteDismissId);
-              closeXButtonElement?.remove();
-              absoluteDismissButtonElement?.remove();
-            };
+
             absoluteDismissButton.addEventListener('click', triggerClose);
             document.body.appendChild(absoluteDismissButton);
 
@@ -457,10 +449,6 @@ export function getInAppMessages(
              * Here we paint an optional close button if the user provided configuration
              * values. This button is just a quality-of-life feature so that the customer will
              * have an easy way to close the modal outside of the other methods.
-             *
-             * Do not show close button if browser is detected to be Safari because the close
-             * button will not be able to dismiss the message (Safari blocks JS from running
-             * on bound event handlers)
              */
             if (payload.closeButton) {
               const closeXButton = generateCloseButton(
