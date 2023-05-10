@@ -443,11 +443,6 @@ export const paintIFrame = (
       document.body.appendChild(iframe);
       iframe.contentWindow?.document?.open();
       iframe.contentWindow?.document?.write(html);
-      const beeBuilderRootTable =
-        iframe.contentWindow?.document.getElementsByClassName(
-          'nl-container'
-        )[0] as HTMLElement;
-      if (beeBuilderRootTable) beeBuilderRootTable.style.height = '100vh';
       iframe.contentWindow?.document?.close();
 
       const timeout = setTimeout(() => {
