@@ -6,7 +6,7 @@
 
 This SDK helps you integrate your Web apps with Iterable.
 
-# Table of Contents
+# Table of contents
 
 - [Installation](#installation)
 - [API](#api)
@@ -46,6 +46,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
 | [`initialize`](#initialize)                            | Return methods for identifying users and setting a JWT                                                                                                                 |
+| [`refreshJwtToken`](#refreshJwtToken)                  | Fetch a new JWT token for the specified user and configure the SDK to use it for future requests. Only for manual token refresh.                                       |
 | [`track`](#track)                                      | Track custom events                                                                                                                                                    |
 | [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
 | [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                                                                 |
@@ -230,6 +231,23 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     )
 );
 ```
+
+## refreshJwtToken
+
+API:
+
+```ts
+refreshJwtToken: (authTypes: string) => Promise<string>;
+```
+
+Example:
+
+```ts
+import { initialize } from '@iterable/web-sdk/dist/authorization';
+
+refreshJwtToken("user@example.com").then().catch();
+```
+
 
 ## track
 
@@ -440,7 +458,7 @@ Example:
 ```ts
 import { updateUserEmail } from '@iterable/web-sdk/dist/users';
 
-updateUserEmail('hello@gmail.com').then().catch();
+updateUserEmail('user@example.com').then().catch();
 ```
 
 # FAQ
@@ -576,7 +594,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
       ...config,
       params: {
         ...config.params,
-        email: 'hello@gmail.com'
+        email: 'user@example.com'
       }
     };
   });
@@ -822,7 +840,9 @@ When the previous 3 listed events occur, the SDK will invoke the method passed a
 
 Finally, if the request to regenerate the JWT fails however, the SDK will not attempt to generate the JWT again so requests will start failing at that point.
 
-# A Note About Imports
+To perform a manual JWT token refresh, call [`refreshJwtToken`](#refreshjwttoken).
+
+# A note about imports
 
 This library exposes UMD modules and a single-file build for you to import from. In other words, this means that you'll be able to import methods in these ways:
 
@@ -838,7 +858,7 @@ import { updateUser } from '@iterable/web-sdk/dist/users';
 
 For those using Webpack/Rollup/Some Other Build Tool, it is recommended to import methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
 
-# About Links
+# About links
 
 Since the Web SDK renders in-app messages in an iframe element on your website if you choose to render the messages automatically, the event handler that is responsible for clicking links is highjacked by the SDK code internally. To the user, this doesn't really change the experience. As expected, `<a />` tags will open the link in the same browser tab unless given the `target="_blank"` property.
 
@@ -871,7 +891,7 @@ https://google.com
 https://hello.com
 ```
 
-## Reserved Keyword Links
+## Reserved keyword links
 
 Iterable reserves the `iterable://` and `action://` URL schemas to define custom link click actions:
 
@@ -883,7 +903,7 @@ The SDK may reserve more keywords in the future.
 
 :rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking away from the message.
 
-## Routing in Single-Page Apps
+## Routing in single-page apps
 
 Knowing now the custom link schemas available, let's explain how you can leverage them to add custom routing or callback functions. If for example you want to hook into a link click and send the user to your `/about` page with a client-side routing solution, you'd do something like this if you're using React Router:
 
