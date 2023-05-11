@@ -237,7 +237,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
 API:
 
 ```ts
-refreshJwtToken: (authTypes: string) => Promise<string>;
+refreshJwtToken: (authTypes: string) => Promise<string>
 ```
 
 Example:
