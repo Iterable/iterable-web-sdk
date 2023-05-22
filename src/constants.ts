@@ -40,6 +40,10 @@ export const STATIC_HEADERS = {
 /* how long animations fade/side in for. */
 export const ANIMATION_DURATION = 400;
 
+export const DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE = 4;
+export const CLOSE_X_BUTTON_ID = 'close-x-button';
+export const ABSOLUTE_DISMISS_BUTTON_ID = 'absolute-dismiss-button';
+
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION
 ) => `

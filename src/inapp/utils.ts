@@ -1,6 +1,9 @@
 import { by } from '@pabra/sortby';
 import { setMany } from 'idb-keyval';
-import { ANIMATION_DURATION } from 'src/constants';
+import {
+  ANIMATION_DURATION,
+  DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
+} from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
@@ -259,7 +262,7 @@ export const generateCloseButton = (
     -moz-osx-font-smoothing: inherit;
     -webkit-appearance: none;
     position: absolute;
-    top: ${topOffset || '4%'};
+    top: ${topOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
     width: ${parsedSize};
     height: ${parsedSize};
     font-size: ${parsedSize};
@@ -271,11 +274,11 @@ export const generateCloseButton = (
     position === 'top-left'
       ? `
     ${sharedStyles}
-    left: ${sideOffset || '4%'};
+    left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
   `
       : `
     ${sharedStyles}
-    right: ${sideOffset || '4%'};
+    right: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
   `;
 
   if (iconPath) {
@@ -569,6 +572,7 @@ export const paintIFrame = (
     }
     return iframe;
   });
+
 export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
