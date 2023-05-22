@@ -31,6 +31,7 @@ import {
   addButtonAttrsToAnchorTag,
   addStyleSheet,
   filterHiddenInAppMessages,
+  generateAbsoluteDismissButton,
   generateCloseButton,
   getHostnameFromUrl,
   paintIFrame,
@@ -140,6 +141,8 @@ export function getInAppMessages(
             activeIframe.remove();
           }
 
+          overlay.remove();
+
           const timeToNextMessage = shouldAnimate
             ? (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) +
               ANIMATION_DURATION
@@ -151,8 +154,6 @@ export function getInAppMessages(
 
             paintMessageToDOM();
           }, timeToNextMessage);
-
-          overlay.remove();
         };
 
         /* add the message's html to an iframe and paint it to the DOM */
@@ -291,31 +292,11 @@ export function getInAppMessages(
             not the in-app message.
           */
           if (activeIframeDocument) {
-            const absoluteDismissButton = document.createElement('button');
-            absoluteDismissButton.setAttribute(
-              'id',
-              ABSOLUTE_DISMISS_BUTTON_ID
-            );
-            absoluteDismissButton.style.cssText = `
-                background: none;
-                color: inherit;
-                border: none;
-                padding: 0;
-                font: inherit;
-                cursor: unset;
-                outline: inherit;
-                height: 100vh;
-                width: 100vw;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: -1;
-              `;
-            /* 
-              don't let the user tab to this button. 
-              It's not necessarily for blind folks to tab over 
-            */
-            absoluteDismissButton.tabIndex = -1;
+            const absoluteDismissButton = generateAbsoluteDismissButton({
+              id: ABSOLUTE_DISMISS_BUTTON_ID,
+              document: isSafari ? document : activeIframeDocument
+            });
+
             const triggerClose = () => {
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', handleDocumentEscPress);
@@ -325,6 +306,7 @@ export function getInAppMessages(
                   handleIFrameEscPress
                 );
               global.removeEventListener('resize', throttledResize);
+
               const closeXButtonElement =
                 document.getElementById(CLOSE_X_BUTTON_ID);
               const absoluteDismissButtonElement = document.getElementById(
@@ -351,7 +333,7 @@ export function getInAppMessages(
 
               const closeXButton = generateCloseButton(
                 CLOSE_X_BUTTON_ID,
-                document,
+                isSafari ? document : activeIframeDocument,
                 position,
                 color,
                 size,

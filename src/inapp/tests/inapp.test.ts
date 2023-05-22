@@ -325,12 +325,12 @@ describe('getInAppMessages', () => {
 
       expect(frame?.tagName).toBe('IFRAME');
 
-      const element = document.body.querySelector(
+      const closeButton = document.body.querySelector(
         '[data-qa-custom-close-button]'
       );
 
       const clickEvent = new MouseEvent('click');
-      element?.dispatchEvent(clickEvent);
+      closeButton?.dispatchEvent(clickEvent);
 
       expect(document.getElementById('iterable-iframe')).toBe(null);
     });
@@ -386,7 +386,7 @@ describe('getInAppMessages', () => {
       jest.advanceTimersByTime(32000);
 
       expect(document.body.innerHTML).toBe(
-        '<button id="absolute-dismiss" style="background: none; padding: 0px; cursor: unset; outline: inherit; height: 100vh; width: 100vw; position: fixed; top: 0px; left: 0px; z-index: -1;" tabindex="-1"></button>'
+        '<button id="absolute-dismiss-button" style="background: none; padding: 0px; cursor: unset; outline: inherit; height: 100vh; width: 100vw; position: fixed; top: 0px; left: 0px; z-index: -1;" tabindex="-1"></button>'
       );
     });
 

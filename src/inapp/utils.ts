@@ -289,13 +289,41 @@ export const generateCloseButton = (
     button.innerHTML = '&#x2715';
   }
 
-  /* 
-    no idea why typescript is saying "ariaLabel" doesn't exist on type HTMLButtonElement.
-    Most likely going to need to upgrade typescript to fix this, but in the meantime, we ignore it.
-  */
   button.ariaLabel = 'Close modal button';
   button.setAttribute('data-qa-custom-close-button', 'true');
   button.setAttribute('id', id);
+  return button;
+};
+
+export const generateAbsoluteDismissButton = ({
+  id,
+  document
+}: {
+  id: string;
+  document: Document;
+}) => {
+  const button = document.createElement('button');
+
+  button.setAttribute('id', id);
+  button.style.cssText = `
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: unset;
+    outline: inherit;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  `;
+
+  /* Don't let the user tab to this button. It's not necessary to tab over. */
+  button.tabIndex = -1;
+
   return button;
 };
 
