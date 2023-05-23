@@ -1,4 +1,3 @@
-import { isEmpty } from 'lodash';
 import _set from 'lodash/set';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
@@ -325,7 +324,7 @@ export function getInAppMessages(
              * button will not be able to dismiss the message (Safari blocks JS from running
              * on bound event handlers)
              */
-            if (payload.closeButton && !isEmpty(payload.closeButton)) {
+            if (payload.closeButton) {
               const { position, color, size, iconPath, topOffset, sideOffset } =
                 payload.closeButton;
 

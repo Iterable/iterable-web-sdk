@@ -313,9 +313,7 @@ describe('getInAppMessages', () => {
         {
           count: 10,
           packageName: 'my-lil-website',
-          closeButton: {
-            position: 'top-right'
-          }
+          closeButton: {}
         },
         { display: DISPLAY_OPTIONS.immediate }
       );
