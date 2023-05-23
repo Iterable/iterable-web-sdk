@@ -36,6 +36,7 @@ import {
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
+  setCloseButtonPosition,
   sortInAppMessages,
   trackMessagesDelivered,
   wrapWithIFrame
@@ -173,8 +174,6 @@ export function getInAppMessages(
               ? throttle(750, () => {
                   activeIframe.style.height =
                     (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
-
-                  // TODO: update postion of x button upon resize
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
@@ -327,13 +326,19 @@ export function getInAppMessages(
              * on bound event handlers)
              */
             if (payload.closeButton && !isEmpty(payload.closeButton)) {
-              const { position, color, size, iconPath, topOffset, sideOffset } =
-                payload.closeButton;
+              const {
+                position: closePosition,
+                color,
+                size,
+                iconPath,
+                topOffset,
+                sideOffset
+              } = payload.closeButton;
 
               const closeXButton = generateCloseButton(
                 CLOSE_X_BUTTON_ID,
                 isSafari ? document : activeIframeDocument,
-                position,
+                closePosition,
                 color,
                 size,
                 iconPath,
@@ -343,34 +348,22 @@ export function getInAppMessages(
               closeXButton.addEventListener('click', triggerClose);
 
               if (isSafari) {
-                let iframeRect;
-
                 /**
                  * Due to DOM manipulations made in other timeouts when painting the iframe,
                  * getBoundingClientRect() will not work unless it waits for those manipulations
                  * to complete. Setting a trivial timeout here to account for this.
                  */
-                setTimeout(() => {
-                  iframeRect = activeIframe.getBoundingClientRect();
-
-                  // TODO: handle when offset values are provided
-                  // TODO: handle when position is NOT top right
-
-                  closeXButton.style.top = `${
-                    iframeRect.top +
-                    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) *
-                      iframeRect.height
-                  }px`;
-
-                  closeXButton.style.left = `${
-                    iframeRect.right -
-                    parseInt(closeXButton.style.width, 10) -
-                    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) *
-                      iframeRect.width
-                  }px`;
-                }, 100);
-
+                setTimeout(
+                  () => setCloseButtonPosition(activeIframe, closeXButton),
+                  100
+                );
                 document.body.appendChild(closeXButton);
+
+                const repositionCloseButton = () => {
+                  if (position === 'Full') return null;
+                  return setCloseButtonPosition(activeIframe, closeXButton);
+                };
+                global.addEventListener('resize', repositionCloseButton);
               } else activeIframeDocument?.body.appendChild(closeXButton);
             }
           }

@@ -697,3 +697,24 @@ export const getHostnameFromUrl = (url: string): string | undefined => {
   const linkHost = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
   return linkHost?.[1];
 };
+
+export const setCloseButtonPosition = (
+  iframe: HTMLIFrameElement,
+  closeButton: HTMLButtonElement
+) => {
+  const iframeRect = iframe.getBoundingClientRect();
+
+  // TODO: handle when offset values are provided
+  // TODO: handle when position is NOT top right
+
+  closeButton.style.top = `${
+    iframeRect.top +
+    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.height
+  }px`;
+
+  closeButton.style.left = `${
+    iframeRect.right -
+    parseInt(closeButton.style.width, 10) -
+    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.width
+  }px`;
+};
