@@ -707,30 +707,29 @@ export const getHostnameFromUrl = (url: string): string | undefined => {
 export const setCloseButtonPosition = (
   iframe: HTMLIFrameElement,
   closeButton: HTMLButtonElement,
-  buttonParams?: {
+  buttonParams: {
     position?: CloseButtonPosition;
-    topOffset?: string;
     sideOffset?: string;
+    topOffset?: string;
   }
 ) => {
   const iframeRect = iframe.getBoundingClientRect();
+  const defaultOffset = DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100;
 
   // TODO: handle when offset values are provided
-  // TODO: handle when position is NOT top right
-
-  // position?: 'top-left' | 'top-right';
-  // sideOffset?: string;
-  // topOffset?: string;
 
   closeButton.style.top = `${
-    iframeRect.top +
-    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.height
+    iframeRect.top + defaultOffset * iframeRect.height
   }px`;
 
-  if (buttonParams?.position === CLOSE_BUTTON_POSITION.TopRight)
+  if (buttonParams.position === CLOSE_BUTTON_POSITION.TopLeft)
+    closeButton.style.left = `${
+      iframeRect.left + defaultOffset * iframeRect.width
+    }px`;
+  else
     closeButton.style.left = `${
       iframeRect.right -
       parseInt(closeButton.style.width, 10) -
-      (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.width
+      defaultOffset * iframeRect.width
     }px`;
 };

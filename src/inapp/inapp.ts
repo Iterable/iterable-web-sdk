@@ -351,8 +351,8 @@ export function getInAppMessages(
                   () =>
                     setCloseButtonPosition(activeIframe, closeXButton, {
                       position,
-                      topOffset,
-                      sideOffset
+                      sideOffset,
+                      topOffset
                     }),
                   100
                 );
@@ -360,7 +360,11 @@ export function getInAppMessages(
 
                 const repositionCloseButton = () =>
                   messagePosition !== 'Full'
-                    ? setCloseButtonPosition(activeIframe, closeXButton)
+                    ? setCloseButtonPosition(activeIframe, closeXButton, {
+                        position,
+                        sideOffset,
+                        topOffset
+                      })
                     : null;
 
                 global.addEventListener('resize', repositionCloseButton);
