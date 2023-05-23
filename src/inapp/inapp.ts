@@ -341,34 +341,25 @@ export function getInAppMessages(
               closeXButton.addEventListener('click', triggerClose);
 
               if (isSafari) {
+                const setPosition = () =>
+                  setCloseButtonPosition(
+                    activeIframe,
+                    closeXButton,
+                    position,
+                    sideOffset,
+                    topOffset
+                  );
+
                 /**
                  * Due to DOM manipulations made in other timeouts when painting the iframe,
                  * getBoundingClientRect() will not work unless it waits for those manipulations
                  * to complete. Setting a trivial timeout here to account for this.
                  */
-                setTimeout(
-                  () =>
-                    setCloseButtonPosition(
-                      activeIframe,
-                      closeXButton,
-                      position,
-                      sideOffset,
-                      topOffset
-                    ),
-                  100
-                );
+                setTimeout(() => setPosition(), 100);
                 document.body.appendChild(closeXButton);
 
                 const repositionCloseButton = () =>
-                  messagePosition !== 'Full'
-                    ? setCloseButtonPosition(
-                        activeIframe,
-                        closeXButton,
-                        position,
-                        sideOffset,
-                        topOffset
-                      )
-                    : null;
+                  messagePosition !== 'Full' ? setPosition() : null;
 
                 global.addEventListener('resize', repositionCloseButton);
               } else {
