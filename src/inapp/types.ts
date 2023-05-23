@@ -1,5 +1,20 @@
 import { IterablePromise } from 'src/types';
 
+export enum CLOSE_BUTTON_POSITION {
+  TopLeft = 'top-left',
+  TopRight = 'top-right'
+}
+
+export type CloseButtonPosition = `${CLOSE_BUTTON_POSITION}`;
+
+export enum HANDLE_LINKS {
+  OpenAllNewTab = 'open-all-new-tab',
+  OpenAllSameTab = 'open-all-same-tab',
+  ExternalNewTab = 'external-new-tab'
+}
+
+export type HandleLinks = `${HANDLE_LINKS}`;
+
 interface SDKInAppMessagesParams {
   displayInterval?: number;
   /* what should the screen reader say once the message opens */
@@ -11,13 +26,13 @@ interface SDKInAppMessagesParams {
   rightOffset?: string;
   /* how long the in-app messages take to animate in/out */
   animationDuration?: number;
-  handleLinks?: 'open-all-new-tab' | 'open-all-same-tab' | 'external-new-tab';
+  handleLinks?: HandleLinks;
   closeButton?: {
     color?: string;
     iconPath?: string;
-    position?: 'top-left' | 'top-right';
     /* If true, prevent user from dismissing in-app message by clicking outside of message */
     isRequiredToDismissMessage?: boolean;
+    position?: CloseButtonPosition;
     sideOffset?: string;
     size?: string | number;
     topOffset?: string;

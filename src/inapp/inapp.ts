@@ -5,7 +5,6 @@ import {
   ANIMATION_DURATION,
   ANIMATION_STYLESHEET,
   CLOSE_X_BUTTON_ID,
-  DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE,
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
@@ -23,6 +22,7 @@ import {
   DISPLAY_OPTIONS,
   DisplayOptions,
   GetInAppMessagesResponse,
+  HANDLE_LINKS,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -99,7 +99,7 @@ export function getInAppMessages(
 
         const shouldAnimate =
           activeMessage?.content?.inAppDisplaySettings?.shouldAnimate;
-        const position =
+        const messagePosition =
           activeMessage?.content?.webInAppDisplaySettings?.position || 'Center';
 
         const overlay = paintOverlay(
@@ -114,7 +114,7 @@ export function getInAppMessages(
         ) => {
           if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
             activeIframe.className =
-              position === 'Center' || position === 'Full'
+              messagePosition === 'Center' || messagePosition === 'Full'
                 ? 'fade-out'
                 : 'slide-out';
           }
@@ -160,7 +160,7 @@ export function getInAppMessages(
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
           activeMessage.content.html as string,
-          position,
+          messagePosition,
           shouldAnimate,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
           payload.topOffset,
@@ -170,7 +170,7 @@ export function getInAppMessages(
           const activeIframeDocument = activeIframe?.contentDocument;
 
           const throttledResize =
-            position !== 'Full'
+            messagePosition !== 'Full'
               ? throttle(750, () => {
                   activeIframe.style.height =
                     (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
@@ -326,19 +326,13 @@ export function getInAppMessages(
              * on bound event handlers)
              */
             if (payload.closeButton && !isEmpty(payload.closeButton)) {
-              const {
-                position: closePosition,
-                color,
-                size,
-                iconPath,
-                topOffset,
-                sideOffset
-              } = payload.closeButton;
+              const { position, color, size, iconPath, topOffset, sideOffset } =
+                payload.closeButton;
 
               const closeXButton = generateCloseButton(
                 CLOSE_X_BUTTON_ID,
                 isSafari ? document : activeIframeDocument,
-                closePosition,
+                position,
                 color,
                 size,
                 iconPath,
@@ -354,17 +348,25 @@ export function getInAppMessages(
                  * to complete. Setting a trivial timeout here to account for this.
                  */
                 setTimeout(
-                  () => setCloseButtonPosition(activeIframe, closeXButton),
+                  () =>
+                    setCloseButtonPosition(activeIframe, closeXButton, {
+                      position,
+                      topOffset,
+                      sideOffset
+                    }),
                   100
                 );
                 document.body.appendChild(closeXButton);
 
-                const repositionCloseButton = () => {
-                  if (position === 'Full') return null;
-                  return setCloseButtonPosition(activeIframe, closeXButton);
-                };
+                const repositionCloseButton = () =>
+                  messagePosition !== 'Full'
+                    ? setCloseButtonPosition(activeIframe, closeXButton)
+                    : null;
+
                 global.addEventListener('resize', repositionCloseButton);
-              } else activeIframeDocument?.body.appendChild(closeXButton);
+              } else {
+                activeIframeDocument?.body.appendChild(closeXButton);
+              }
             }
           }
 
@@ -425,8 +427,9 @@ export function getInAppMessages(
             ) => {
               if (typeof handleLinks === 'string') {
                 if (
-                  handleLinks === 'open-all-same-tab' ||
-                  (isInternalLink && handleLinks === 'external-new-tab')
+                  handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                  (isInternalLink &&
+                    handleLinks === HANDLE_LINKS.ExternalNewTab)
                 ) {
                   sameTabAction();
                 } else {
@@ -479,8 +482,9 @@ export function getInAppMessages(
                 if (clickedUrl) {
                   const isOpeningLinkInSameTab =
                     (!handleLinks && !openInNewTab) ||
-                    handleLinks === 'open-all-same-tab' ||
-                    (isInternalLink && handleLinks === 'external-new-tab');
+                    handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                    (isInternalLink &&
+                      handleLinks === HANDLE_LINKS.ExternalNewTab);
 
                   trackInAppClick(
                     {

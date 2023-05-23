@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
 import { srSpeak } from '../../utils/srSpeak';
 import { messages } from '../../__data__/inAppMessages';
-import { CachedMessage, InAppMessage } from '../types';
+import { CachedMessage, CloseButtonPosition, InAppMessage } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
@@ -899,7 +899,7 @@ describe('Utils', () => {
       const button = generateCloseButton(
         buttonId,
         document,
-        'top-left',
+        CloseButtonPosition.TopLeft,
         'blue',
         20,
         undefined,
@@ -921,7 +921,7 @@ describe('Utils', () => {
       const rightButton = generateCloseButton(
         buttonId,
         document,
-        'top-right',
+        CloseButtonPosition.TopRight,
         'blue',
         20,
         './assets/something.svg',

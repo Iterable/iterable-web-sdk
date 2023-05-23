@@ -7,7 +7,13 @@ import {
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
+import {
+  BrowserStorageEstimate,
+  CLOSE_BUTTON_POSITION,
+  CachedMessage,
+  CloseButtonPosition,
+  InAppMessage
+} from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -241,7 +247,7 @@ export const addNewMessagesToCache = async (
 export const generateCloseButton = (
   id: string,
   doc: Document,
-  position?: 'top-right' | 'top-left',
+  position?: CloseButtonPosition,
   color?: string,
   size?: string | number,
   iconPath?: string,
@@ -271,7 +277,7 @@ export const generateCloseButton = (
   `;
   const button = doc.createElement('button');
   button.style.cssText =
-    position === 'top-left'
+    position === CLOSE_BUTTON_POSITION.TopLeft
       ? `
     ${sharedStyles}
     left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
@@ -700,21 +706,31 @@ export const getHostnameFromUrl = (url: string): string | undefined => {
 
 export const setCloseButtonPosition = (
   iframe: HTMLIFrameElement,
-  closeButton: HTMLButtonElement
+  closeButton: HTMLButtonElement,
+  buttonParams?: {
+    position?: CloseButtonPosition;
+    topOffset?: string;
+    sideOffset?: string;
+  }
 ) => {
   const iframeRect = iframe.getBoundingClientRect();
 
   // TODO: handle when offset values are provided
   // TODO: handle when position is NOT top right
 
+  // position?: 'top-left' | 'top-right';
+  // sideOffset?: string;
+  // topOffset?: string;
+
   closeButton.style.top = `${
     iframeRect.top +
     (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.height
   }px`;
 
-  closeButton.style.left = `${
-    iframeRect.right -
-    parseInt(closeButton.style.width, 10) -
-    (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.width
-  }px`;
+  if (buttonParams?.position === CLOSE_BUTTON_POSITION.TopRight)
+    closeButton.style.left = `${
+      iframeRect.right -
+      parseInt(closeButton.style.width, 10) -
+      (DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100) * iframeRect.width
+    }px`;
 };
