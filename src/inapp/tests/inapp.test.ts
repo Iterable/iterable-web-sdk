@@ -2,11 +2,11 @@
  * @jest-environment jsdom
  */
 import MockAdapter from 'axios-mock-adapter';
+import { messages } from '../../__data__/inAppMessages';
 import { initialize } from '../../authorization';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
 import { createClientError } from '../../utils/testUtils';
-import { messages } from '../../__data__/inAppMessages';
 import { getInAppMessages } from '../inapp';
 import { DISPLAY_OPTIONS } from '../types';
 
@@ -313,7 +313,9 @@ describe('getInAppMessages', () => {
         {
           count: 10,
           packageName: 'my-lil-website',
-          closeButton: {}
+          closeButton: {
+            position: 'top-right'
+          }
         },
         { display: DISPLAY_OPTIONS.immediate }
       );
@@ -325,15 +327,14 @@ describe('getInAppMessages', () => {
 
       expect(frame?.tagName).toBe('IFRAME');
 
-      const closeButton = document.body.querySelector(
-        '[data-qa-custom-close-button]'
-      );
+      const closeButton = (
+        frame.contentDocument ?? document
+      )?.body.querySelector('[data-qa-custom-close-button]');
 
       const clickEvent = new MouseEvent('click');
       closeButton?.dispatchEvent(clickEvent);
 
-      // TODO: Fix this test! closeButton is not found by querySelector...
-      // expect(document.getElementById('iterable-iframe')).toBe(null);
+      expect(document.getElementById('iterable-iframe')).toBe(null);
     });
 
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
