@@ -715,21 +715,20 @@ export const setCloseButtonPosition = (
 ) => {
   const iframeRect = iframe.getBoundingClientRect();
   const defaultOffset = DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100;
+  const buttonWidth = parseInt(closeButton.style.width, 10);
 
-  // TODO: handle when offset values are provided
-
-  closeButton.style.top = `${
-    iframeRect.top + defaultOffset * iframeRect.height
-  }px`;
+  closeButton.style.top = buttonParams.topOffset
+    ? `calc(${iframeRect.top}px + ${buttonParams.topOffset})`
+    : `${iframeRect.top + defaultOffset * iframeRect.height}px`;
 
   if (buttonParams.position === CLOSE_BUTTON_POSITION.TopLeft)
-    closeButton.style.left = `${
-      iframeRect.left + defaultOffset * iframeRect.width
-    }px`;
+    closeButton.style.left = buttonParams.sideOffset
+      ? `calc(${iframeRect.left}px + ${buttonParams.sideOffset})`
+      : `${iframeRect.left + defaultOffset * iframeRect.width}px`;
   else
-    closeButton.style.left = `${
-      iframeRect.right -
-      parseInt(closeButton.style.width, 10) -
-      defaultOffset * iframeRect.width
-    }px`;
+    closeButton.style.left = buttonParams.sideOffset
+      ? `calc(${iframeRect.right - buttonWidth}px - ${buttonParams.sideOffset})`
+      : `${
+          iframeRect.right - buttonWidth - defaultOffset * iframeRect.width
+        }px`;
 };
