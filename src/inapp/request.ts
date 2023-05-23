@@ -21,7 +21,7 @@ export const requestInAppMessages = ({
 }: RequestInAppMessagesProps) =>
   baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
-    /** @note parameter will be enabled once new endpoint is ready */
+    /** @note Parameter will be enabled once new endpoint is ready */
     // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
     url: GETMESSAGES_PATH,
     validation: { params: schema },
@@ -38,15 +38,15 @@ type RequestMessagesProps = {
 };
 
 export const requestMessages = async ({ payload }: RequestMessagesProps) => {
-  /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
+  /** @note Caching implementation and associated parameter will be enabled once new endpoint is ready */
   // if (!options?.useLocalCache) return await requestInAppMessages({});
-  /** @note always early return until then */
+  /** @note Always early return until then */
   return await requestInAppMessages({ payload });
 
   try {
     const cachedMessages: CachedMessage[] = await entries();
 
-    /** determine most recent cached message */
+    /** Determine most recent cached message */
     let latestCachedMessageId: string | undefined;
     let latestCreatedAtTimestamp: EpochTimeStamp = 0;
     cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
@@ -57,7 +57,7 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
     });
 
     /**
-     * call getMessages with latestCachedMessageId to get the message delta
+     * Call getMessages with latestCachedMessageId to get the message delta
      * (uncached messages have full detail, rest just have messageId)
      */
     const response = await requestInAppMessages({
@@ -66,16 +66,16 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
     });
     const { inAppMessages } = response.data;
 
-    /** combine cached messages with NEW messages in delta response */
+    /** Combine cached messages with NEW messages in delta response */
     const allMessages: Partial<InAppMessage>[] = [];
     const newMessages: { messageId: string; message: InAppMessage }[] = [];
     inAppMessages?.forEach((inAppMessage) => {
       /**
-       * if message in response has no content property, then that means it is
+       * If message in response has no content property, then that means it is
        * older than the latest cached message and should be retrieved from the
        * cache using the messageId
        *
-       * expecting messages with no content to look like the last 2 messages...
+       * Expecting messages with no content to look like the last 2 messages...
        * {
        *   inAppMessages: [
        *     { ...messageWithContentHasFullDetails01 },
@@ -100,7 +100,7 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
       }
     });
 
-    /** delete messages not present in fetch from cache */
+    /** Delete messages not present in fetch from cache */
     const cachedMessagesToDelete = getCachedMessagesToDelete(
       cachedMessages,
       inAppMessages
@@ -114,10 +114,10 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
       );
     }
 
-    /** add new messages to the cache if they fit in the cache */
+    /** Add new messages to the cache if they fit in the cache */
     await addNewMessagesToCache(newMessages);
 
-    /** return combined response */
+    /** Return combined response */
     return {
       ...response,
       data: {

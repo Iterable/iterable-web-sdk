@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { isEmpty } from 'lodash';
 import _set from 'lodash/set';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
@@ -270,12 +270,11 @@ export function getInAppMessages(
               dismissMessage(activeIframe);
               document.getElementById(CLOSE_X_BUTTON_ID)?.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframeDocument) {
+              if (activeIframeDocument)
                 activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
                 );
-              }
               global.removeEventListener('resize', throttledResize);
             });
           }
@@ -327,7 +326,7 @@ export function getInAppMessages(
              * button will not be able to dismiss the message (Safari blocks JS from running
              * on bound event handlers)
              */
-            if (payload.closeButton && !_.isEmpty(payload.closeButton)) {
+            if (payload.closeButton && !isEmpty(payload.closeButton)) {
               const { position, color, size, iconPath, topOffset, sideOffset } =
                 payload.closeButton;
 
