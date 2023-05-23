@@ -707,27 +707,25 @@ export const getHostnameFromUrl = (url: string): string | undefined => {
 export const setCloseButtonPosition = (
   iframe: HTMLIFrameElement,
   closeButton: HTMLButtonElement,
-  buttonParams: {
-    position?: CloseButtonPosition;
-    sideOffset?: string;
-    topOffset?: string;
-  }
+  position?: CloseButtonPosition,
+  sideOffset?: string,
+  topOffset?: string
 ) => {
   const iframeRect = iframe.getBoundingClientRect();
   const defaultOffset = DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100;
   const buttonWidth = parseInt(closeButton.style.width, 10);
 
-  closeButton.style.top = buttonParams.topOffset
-    ? `calc(${iframeRect.top}px + ${buttonParams.topOffset})`
+  closeButton.style.top = topOffset
+    ? `calc(${iframeRect.top}px + ${topOffset})`
     : `${iframeRect.top + defaultOffset * iframeRect.height}px`;
 
-  if (buttonParams.position === CLOSE_BUTTON_POSITION.TopLeft)
-    closeButton.style.left = buttonParams.sideOffset
-      ? `calc(${iframeRect.left}px + ${buttonParams.sideOffset})`
+  if (position === CLOSE_BUTTON_POSITION.TopLeft)
+    closeButton.style.left = sideOffset
+      ? `calc(${iframeRect.left}px + ${sideOffset})`
       : `${iframeRect.left + defaultOffset * iframeRect.width}px`;
   else
-    closeButton.style.left = buttonParams.sideOffset
-      ? `calc(${iframeRect.right - buttonWidth}px - ${buttonParams.sideOffset})`
+    closeButton.style.left = sideOffset
+      ? `calc(${iframeRect.right - buttonWidth}px - ${sideOffset})`
       : `${
           iframeRect.right - buttonWidth - defaultOffset * iframeRect.width
         }px`;

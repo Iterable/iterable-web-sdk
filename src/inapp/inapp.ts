@@ -349,22 +349,26 @@ export function getInAppMessages(
                  */
                 setTimeout(
                   () =>
-                    setCloseButtonPosition(activeIframe, closeXButton, {
+                    setCloseButtonPosition(
+                      activeIframe,
+                      closeXButton,
                       position,
                       sideOffset,
                       topOffset
-                    }),
+                    ),
                   100
                 );
                 document.body.appendChild(closeXButton);
 
                 const repositionCloseButton = () =>
                   messagePosition !== 'Full'
-                    ? setCloseButtonPosition(activeIframe, closeXButton, {
+                    ? setCloseButtonPosition(
+                        activeIframe,
+                        closeXButton,
                         position,
                         sideOffset,
                         topOffset
-                      })
+                      )
                     : null;
 
                 global.addEventListener('resize', repositionCloseButton);
