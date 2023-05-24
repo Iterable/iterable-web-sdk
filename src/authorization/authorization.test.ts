@@ -20,7 +20,8 @@ let mockRequest: any = null;
 */
 const MOCK_JWT_KEY =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA2MTc3MzQsImlhdCI6MTYzMDYxNzQzNCwiZW1haWwiOiJ3aWR0aC50ZXN0ZXJAZ21haWwuY29tIn0.knLmbgO8kKM9CHP2TH2v85OSC2Jorh2JjRm76FFsPQc';
-
+const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE2Nzk0ODMyOTEsImlhdCI6MTY3OTQ4MzIzMX0.APaQAYy-lTE0o8rbR6b6-28eCICq36SQMBXmeZAvk1k';
 describe('API Key Interceptors', () => {
   beforeAll(() => {
     mockRequest = new MockAdapter(baseAxiosRequest);
@@ -312,6 +313,21 @@ describe('API Key Interceptors', () => {
       expect(mockGenerateJWT).lastCalledWith({
         email: 'second@gmail.com'
       });
+    });
+    it('should not request a new JWT if expiry time is less then a minute', async () => {
+      /* 5 minutes before the JWT expires */
+      Date.now = jest.fn(() => 1630617433001);
+      /* this JWT expires in 5 minutes */
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY));
+      const { setEmail } = initialize('123', mockGenerateJWT);
+      await setEmail('hello@gmail.com');
+      // clearRefresh();
+
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+      jest.advanceTimersByTime(60000 * 2);
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
     });
   });
 });
@@ -1027,6 +1043,78 @@ describe('User Identification', () => {
               (e: any) => !!e.url?.match(/users\/update/gim)
             ).length
           ).toBe(1);
+        }
+      });
+    });
+
+    describe('refreshJwtToken', () => {
+      beforeEach(() => {
+        mockRequest.resetHistory();
+      });
+
+      it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
+        const { refreshJwtToken } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+
+        await refreshJwtToken('hello@gmail.com');
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+        expect(response.config.headers['Api-Key']).toBe('123');
+        expect(response.config.headers['Authorization']).toBe(
+          `Bearer ${MOCK_JWT_KEY}`
+        );
+      });
+
+      it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
+        const { refreshJwtToken } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+
+        await refreshJwtToken('123ffdas');
+
+        const response = await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+        expect(response.config.headers['Api-Key']).toBe('123');
+        expect(response.config.headers['Authorization']).toBe(
+          `Bearer ${MOCK_JWT_KEY}`
+        );
+      });
+
+      it('should request a new JWT after 1 minute before exp time', async () => {
+        /* 5 minutes before the JWT expires */
+        Date.now = jest.fn(() => 1630617433001);
+        /* this JWT expires in 5 minutes */
+        const mockGenerateJWT = jest
+          .fn()
+          .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
+        await refreshJwtToken('hello@gmail.com');
+
+        expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+        jest.advanceTimersByTime(60000 * 4.1);
+        expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+      });
+
+      it('should not request a new JWT if the first request failed', async () => {
+        /* 5 minutes before the JWT expires */
+        Date.now = jest.fn(() => 1630617433001);
+        /* this JWT expires in 5 minutes */
+        const mockGenerateJWT = jest
+          .fn()
+          .mockReturnValue(Promise.reject(MOCK_JWT_KEY));
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
+
+        try {
+          await refreshJwtToken('hello@gmail.com');
+        } catch {
+          expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
+          jest.advanceTimersByTime(60000 * 4.1);
+          expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         }
       });
     });

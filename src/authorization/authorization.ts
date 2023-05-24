@@ -12,7 +12,9 @@ import {
   getEpochDifferenceInMS,
   getEpochExpiryTimeInMS,
   ONE_MINUTE,
-  ONE_DAY
+  ONE_DAY,
+  validateTokenTime,
+  isEmail
 } from './utils';
 import { config } from '../utils/config';
 
@@ -28,6 +30,7 @@ interface WithJWT {
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
   logout: () => void;
+  refreshJwtToken: (authTypes: string) => Promise<string>;
 }
 
 interface WithoutJWT {
@@ -112,6 +115,10 @@ export function initialize(
           Date.now(),
           expTime
         );
+        if (validateTokenTime(millisecondsToExpired))
+          return console.warn(
+            'Could not refresh JWT. Try generating the token again.'
+          );
 
         if (millisecondsToExpired < MAX_TIMEOUT) {
           timer = setTimeout(() => {
@@ -767,6 +774,17 @@ export function initialize(
         /* stop adding JWT to requests */
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
+    },
+    refreshJwtToken: async (user: string) => {
+      /* this will just clear the existing timeout */
+      handleTokenExpiration('');
+      const payloadToPass = { [isEmail(user) ? 'email' : 'userID']: user };
+      return doRequest(payloadToPass).catch((e) => {
+        if (logLevel === 'verbose') {
+          console.warn(e);
+          console.warn('Could not refresh JWT. Try Refresh the JWT again.');
+        }
+      });
     }
   };
 }
