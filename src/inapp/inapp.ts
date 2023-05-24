@@ -355,12 +355,13 @@ export function getInAppMessages(
                  * getBoundingClientRect() will not work unless it waits for those manipulations
                  * to complete. Setting a trivial timeout here to account for this.
                  */
-                setTimeout(() => setPosition(), 100);
-                document.body.appendChild(closeXButton);
+                setTimeout(() => {
+                  setPosition();
+                  document.body.appendChild(closeXButton);
+                }, 100);
 
                 const repositionCloseButton = () =>
                   messagePosition !== 'Full' ? setPosition() : null;
-
                 global.addEventListener('resize', repositionCloseButton);
               } else {
                 activeIframeDocument?.body.appendChild(closeXButton);
