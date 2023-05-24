@@ -1,13 +1,13 @@
+import { delMany, entries } from 'idb-keyval';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from 'src/constants';
+import { baseIterableRequest } from 'src/request';
+import schema from './inapp.schema';
 import {
   CachedMessage,
   InAppMessage,
   InAppMessageResponse,
-  InAppMessagesRequestParams,
-  baseIterableRequest
-} from '..';
-import schema from './inapp.schema';
-import { delMany, entries } from 'idb-keyval';
+  InAppMessagesRequestParams
+} from './types';
 import { addNewMessagesToCache, getCachedMessagesToDelete } from './utils';
 
 type RequestInAppMessagesProps = {
