@@ -1,10 +1,19 @@
 import { by } from '@pabra/sortby';
 import { setMany } from 'idb-keyval';
-import { ANIMATION_DURATION } from 'src/constants';
+import {
+  ANIMATION_DURATION,
+  DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
+} from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
+import {
+  BrowserStorageEstimate,
+  CLOSE_BUTTON_POSITION,
+  CachedMessage,
+  CloseButtonPosition,
+  InAppMessage
+} from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -238,7 +247,7 @@ export const addNewMessagesToCache = async (
 export const generateCloseButton = (
   id: string,
   doc: Document,
-  position?: 'top-right' | 'top-left',
+  position?: CloseButtonPosition,
   color?: string,
   size?: string | number,
   iconPath?: string,
@@ -259,7 +268,7 @@ export const generateCloseButton = (
     -moz-osx-font-smoothing: inherit;
     -webkit-appearance: none;
     position: absolute;
-    top: ${topOffset || '4%'};
+    top: ${topOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
     width: ${parsedSize};
     height: ${parsedSize};
     font-size: ${parsedSize};
@@ -268,14 +277,14 @@ export const generateCloseButton = (
   `;
   const button = doc.createElement('button');
   button.style.cssText =
-    position === 'top-left'
+    position === CLOSE_BUTTON_POSITION.TopLeft
       ? `
     ${sharedStyles}
-    left: ${sideOffset || '4%'};
+    left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
   `
       : `
     ${sharedStyles}
-    right: ${sideOffset || '4%'};
+    right: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
   `;
 
   if (iconPath) {
@@ -286,13 +295,41 @@ export const generateCloseButton = (
     button.innerHTML = '&#x2715';
   }
 
-  /* 
-    no idea why typescript is saying "ariaLabel" doesn't exist on type HTMLButtonElement.
-    Most likely going to need to upgrade typescript to fix this, but in the meantime, we ignore it.
-  */
   button.ariaLabel = 'Close modal button';
   button.setAttribute('data-qa-custom-close-button', 'true');
   button.setAttribute('id', id);
+  return button;
+};
+
+export const generateAbsoluteDismissButton = ({
+  id,
+  document
+}: {
+  id: string;
+  document: Document;
+}) => {
+  const button = document.createElement('button');
+
+  button.setAttribute('id', id);
+  button.style.cssText = `
+    background: none;
+    color: inherit;
+    border: none;
+    padding: 0;
+    font: inherit;
+    cursor: unset;
+    outline: inherit;
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  `;
+
+  /* Don't let the user tab to this button. It's not necessary to tab over. */
+  button.tabIndex = -1;
+
   return button;
 };
 
@@ -569,6 +606,7 @@ export const paintIFrame = (
     }
     return iframe;
   });
+
 export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
@@ -664,4 +702,34 @@ export const paintOverlay = (
 export const getHostnameFromUrl = (url: string): string | undefined => {
   const linkHost = url.match(/^https?:\/\/([^/?#]+)(?:[/?#]|$)/i);
   return linkHost?.[1];
+};
+
+export const setCloseButtonPosition = (
+  iframe: HTMLIFrameElement,
+  closeButton: HTMLButtonElement,
+  position?: CloseButtonPosition,
+  sideOffset?: string,
+  topOffset?: string
+) => {
+  const iframeRect = iframe.getBoundingClientRect();
+
+  const defaultOffset = DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE / 100;
+  const defaultTop = defaultOffset * iframeRect.height;
+  const defaultSide = defaultOffset * iframeRect.width;
+
+  const buttonWidth = parseInt(closeButton.style.width, 10);
+  const iframeRightEdge = iframeRect.right - buttonWidth;
+
+  closeButton.style.top = topOffset
+    ? `calc(${iframeRect.top}px + ${topOffset})`
+    : `${iframeRect.top + defaultTop}px`;
+
+  if (position === CLOSE_BUTTON_POSITION.TopLeft)
+    closeButton.style.left = sideOffset
+      ? `calc(${iframeRect.left}px + ${sideOffset})`
+      : `${iframeRect.left + defaultSide}px`;
+  else
+    closeButton.style.left = sideOffset
+      ? `calc(${iframeRightEdge}px - ${sideOffset})`
+      : `${iframeRightEdge - defaultSide}px`;
 };

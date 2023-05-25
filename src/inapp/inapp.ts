@@ -1,14 +1,12 @@
-import { delMany, entries } from 'idb-keyval';
 import _set from 'lodash/set';
 import {
+  ABSOLUTE_DISMISS_BUTTON_ID,
   ANIMATION_DURATION,
   ANIMATION_STYLESHEET,
+  CLOSE_X_BUTTON_ID,
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
-  GETMESSAGES_PATH,
-  IS_PRODUCTION,
-  SDK_VERSION,
-  WEB_PLATFORM
+  IS_PRODUCTION
 } from 'src/constants';
 import { throttle } from 'throttle-debounce';
 import {
@@ -17,28 +15,27 @@ import {
   trackInAppConsume,
   trackInAppOpen
 } from '../events';
-import { baseIterableRequest } from '../request';
 import { IterablePromise } from '../types';
-import schema from './inapp.schema';
+import { requestMessages } from './request';
 import {
-  CachedMessage,
-  DisplayOptions,
   DISPLAY_OPTIONS,
+  DisplayOptions,
   GetInAppMessagesResponse,
+  HANDLE_LINKS,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
 } from './types';
 import {
   addButtonAttrsToAnchorTag,
-  addNewMessagesToCache,
   addStyleSheet,
   filterHiddenInAppMessages,
+  generateAbsoluteDismissButton,
   generateCloseButton,
-  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
+  setCloseButtonPosition,
   sortInAppMessages,
   trackMessagesDelivered,
   wrapWithIFrame
@@ -93,127 +90,22 @@ export function getInAppMessages(
   delete dupedPayload.handleLinks;
   delete dupedPayload.closeButton;
 
-  const requestInAppMessages = ({
-    latestCachedMessageId
-  }: {
-    latestCachedMessageId?: string;
-  }) =>
-    baseIterableRequest<InAppMessageResponse>({
-      method: 'GET',
-      /** @note parameter will be enabled once new endpoint is ready */
-      // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
-      url: GETMESSAGES_PATH,
-      validation: { params: schema },
-      params: {
-        ...dupedPayload,
-        platform: WEB_PLATFORM,
-        SDKVersion: SDK_VERSION,
-        latestCachedMessageId
-      }
-    });
-
-  const requestMessages = async () => {
-    /** @note caching implementation and associated parameter will be enabled once new endpoint is ready */
-    // if (!options?.useLocalCache) return await requestInAppMessages({});
-    /** @note always early return until then */
-    return await requestInAppMessages({});
-
-    try {
-      const cachedMessages: CachedMessage[] = await entries();
-
-      /** determine most recent cached message */
-      let latestCachedMessageId: string | undefined;
-      let latestCreatedAtTimestamp: EpochTimeStamp = 0;
-      cachedMessages.forEach(([cachedMessageId, cachedMessage]) => {
-        if (cachedMessage.createdAt > latestCreatedAtTimestamp) {
-          latestCachedMessageId = cachedMessageId;
-          latestCreatedAtTimestamp = cachedMessage.createdAt;
-        }
-      });
-
-      /**
-       * call getMessages with latestCachedMessageId to get the message delta
-       * (uncached messages have full detail, rest just have messageId)
-       */
-      const response = await requestInAppMessages({ latestCachedMessageId });
-      const { inAppMessages } = response.data;
-
-      /** combine cached messages with NEW messages in delta response */
-      const allMessages: Partial<InAppMessage>[] = [];
-      const newMessages: { messageId: string; message: InAppMessage }[] = [];
-      inAppMessages?.forEach((inAppMessage) => {
-        /**
-         * if message in response has no content property, then that means it is
-         * older than the latest cached message and should be retrieved from the
-         * cache using the messageId
-         *
-         * expecting messages with no content to look like the last 2 messages...
-         * {
-         *   inAppMessages: [
-         *     { ...messageWithContentHasFullDetails01 },
-         *     { ...messageWithContentHasFullDetails02 },
-         *     { messageId: 'messageWithoutContentHasNoOtherProperties01' },
-         *     { messageId: 'messageWithoutContentHasNoOtherProperties02' }
-         *   ]
-         * }
-         */
-        if (!inAppMessage.content) {
-          const cachedMessage = cachedMessages.find(
-            ([messageId]) => inAppMessage.messageId === messageId
-          );
-          if (cachedMessage) allMessages.push(cachedMessage[1]);
-        } else {
-          allMessages.push(inAppMessage);
-          if (inAppMessage.messageId)
-            newMessages.push({
-              messageId: inAppMessage.messageId,
-              message: inAppMessage as InAppMessage
-            });
-        }
-      });
-
-      /** delete messages not present in fetch from cache */
-      const cachedMessagesToDelete = getCachedMessagesToDelete(
-        cachedMessages,
-        inAppMessages
-      );
-      try {
-        await delMany(cachedMessagesToDelete);
-      } catch (err: any) {
-        console.warn(
-          'Error deleting messages from the browser cache',
-          err?.response?.data?.clientErrors ?? err
-        );
-      }
-
-      /** add new messages to the cache if they fit in the cache */
-      await addNewMessagesToCache(newMessages);
-
-      /** return combined response */
-      return {
-        ...response,
-        data: {
-          inAppMessages: allMessages
-        }
-      };
-    } catch (err: any) {
-      console.warn(
-        'Error requesting in-app messages',
-        err?.response?.data?.clientErrors ?? err
-      );
-    }
-    return await requestInAppMessages({});
-  };
-
   if (options?.display) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
     const paintMessageToDOM = (): Promise<HTMLIFrameElement | ''> => {
       if (parsedMessages?.[messageIndex]) {
         const activeMessage = parsedMessages[messageIndex];
+
         const shouldAnimate =
           activeMessage?.content?.inAppDisplaySettings?.shouldAnimate;
-        const position =
+        const messagePosition =
           activeMessage?.content?.webInAppDisplaySettings?.position || 'Center';
+
+        const overlay = paintOverlay(
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.hex,
+          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha,
+          shouldAnimate
+        );
 
         const dismissMessage = (
           activeIframe: HTMLIFrameElement,
@@ -221,7 +113,7 @@ export function getInAppMessages(
         ) => {
           if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
             activeIframe.className =
-              position === 'Center' || position === 'Full'
+              messagePosition === 'Center' || messagePosition === 'Full'
                 ? 'fade-out'
                 : 'slide-out';
           }
@@ -249,6 +141,8 @@ export function getInAppMessages(
             activeIframe.remove();
           }
 
+          overlay.remove();
+
           const timeToNextMessage = shouldAnimate
             ? (payload.displayInterval || DISPLAY_INTERVAL_DEFAULT) +
               ANIMATION_DURATION
@@ -262,44 +156,38 @@ export function getInAppMessages(
           }, timeToNextMessage);
         };
 
-        const overlay = paintOverlay(
-          activeMessage?.content?.inAppDisplaySettings?.bgColor?.hex,
-          activeMessage?.content?.inAppDisplaySettings?.bgColor?.alpha,
-          shouldAnimate
-        );
-
         /* add the message's html to an iframe and paint it to the DOM */
         return paintIFrame(
           activeMessage.content.html as string,
-          position,
+          messagePosition,
           shouldAnimate,
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
           payload.topOffset,
           payload.bottomOffset,
           payload.rightOffset
         ).then((activeIframe) => {
+          const activeIframeDocument = activeIframe?.contentDocument;
+
           const throttledResize =
-            position !== 'Full'
+            messagePosition !== 'Full'
               ? throttle(750, () => {
                   activeIframe.style.height =
-                    (activeIframe.contentWindow?.document?.body?.scrollHeight ||
-                      0) + 'px';
+                    (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
 
           try {
-            const elementToFocus =
-              activeIframe.contentWindow?.document.body?.querySelector(
-                payload.onOpenNodeToTakeFocus || ''
-              );
+            const elementToFocus = activeIframeDocument?.body?.querySelector(
+              payload.onOpenNodeToTakeFocus || ''
+            );
 
             /* try to focus on the query selector the customer provided  */
             (elementToFocus as HTMLElement).focus();
           } catch (e) {
             /* otherwise, find the first focusable element and focus on that */
             const firstFocusableElement =
-              activeIframe.contentWindow?.document.body?.querySelector(
+              activeIframeDocument?.body?.querySelector(
                 'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
               );
 
@@ -315,17 +203,12 @@ export function getInAppMessages(
           ) => {
             if (event.key === 'Escape') {
               dismissMessage(activeIframe);
-              overlay.remove();
               document.removeEventListener('keydown', documentEventHandler);
-              if (
-                activeIframe?.contentWindow?.document &&
-                !!iframeEventHandler
-              ) {
-                activeIframe.contentWindow?.document.removeEventListener(
+              if (activeIframeDocument && !!iframeEventHandler)
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   iframeEventHandler
                 );
-              }
               global.removeEventListener('resize', throttledResize);
             }
           };
@@ -361,12 +244,11 @@ export function getInAppMessages(
 
           document.addEventListener('keydown', handleDocumentEscPress);
 
-          if (activeIframe?.contentWindow?.document) {
-            activeIframe.contentWindow?.document.addEventListener(
+          if (activeIframeDocument)
+            activeIframeDocument.addEventListener(
               'keydown',
               handleIFrameEscPress
             );
-          }
 
           const ua = navigator.userAgent;
           const isSafari =
@@ -384,14 +266,13 @@ export function getInAppMessages(
           if (!payload.closeButton?.isRequiredToDismissMessage || isSafari) {
             overlay.addEventListener('click', () => {
               dismissMessage(activeIframe);
-              overlay.remove();
+              document.getElementById(CLOSE_X_BUTTON_ID)?.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframe?.contentWindow?.document) {
-                activeIframe.contentWindow?.document.removeEventListener(
+              if (activeIframeDocument)
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
                 );
-              }
               global.removeEventListener('resize', throttledResize);
             });
           }
@@ -405,48 +286,29 @@ export function getInAppMessages(
             their in-app, but within the bounds of the iframe to dismiss it.
 
             The overlay doesn't handle this because the overlay only surrounds the iframe,
-            not the in-app message. So imagine an in-app looking like this:
+            not the in-app message.
           */
-          if (activeIframe?.contentWindow?.document) {
-            const closeXButtonId = 'close-x';
-            const absoluteDismissButton = document.createElement('button');
-            const absoluteDismissId = 'absolute-dismiss';
-            absoluteDismissButton.setAttribute('id', absoluteDismissId);
-            absoluteDismissButton.style.cssText = `
-                background: none;
-                color: inherit;
-                border: none;
-                padding: 0;
-                font: inherit;
-                cursor: unset;
-                outline: inherit;
-                height: 100vh;
-                width: 100vw;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: -1;
-              `;
-            /* 
-              don't let the user tab to this button. 
-              It's not necessarily for blind folks to tab over 
-            */
-            absoluteDismissButton.tabIndex = -1;
+          if (activeIframeDocument) {
+            const absoluteDismissButton = generateAbsoluteDismissButton({
+              id: ABSOLUTE_DISMISS_BUTTON_ID,
+              document: isSafari ? document : activeIframeDocument
+            });
+
             const triggerClose = () => {
               dismissMessage(activeIframe);
-              overlay.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframe?.contentWindow?.document) {
-                activeIframe.contentWindow?.document.removeEventListener(
+              if (activeIframeDocument)
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
                 );
-              }
               global.removeEventListener('resize', throttledResize);
+
               const closeXButtonElement =
-                document.getElementById(closeXButtonId);
-              const absoluteDismissButtonElement =
-                document.getElementById(absoluteDismissId);
+                document.getElementById(CLOSE_X_BUTTON_ID);
+              const absoluteDismissButtonElement = document.getElementById(
+                ABSOLUTE_DISMISS_BUTTON_ID
+              );
               closeXButtonElement?.remove();
               absoluteDismissButtonElement?.remove();
             };
@@ -463,18 +325,47 @@ export function getInAppMessages(
              * on bound event handlers)
              */
             if (payload.closeButton) {
+              const { position, color, size, iconPath, topOffset, sideOffset } =
+                payload.closeButton;
+
               const closeXButton = generateCloseButton(
-                closeXButtonId,
-                document,
-                payload.closeButton?.position,
-                payload.closeButton?.color,
-                payload.closeButton?.size,
-                payload.closeButton?.iconPath,
-                payload.closeButton.topOffset,
-                payload.closeButton.sideOffset
+                CLOSE_X_BUTTON_ID,
+                isSafari ? document : activeIframeDocument,
+                position,
+                color,
+                size,
+                iconPath,
+                topOffset,
+                sideOffset
               );
               closeXButton.addEventListener('click', triggerClose);
-              document.body.appendChild(closeXButton);
+
+              if (isSafari) {
+                const setPosition = () =>
+                  setCloseButtonPosition(
+                    activeIframe,
+                    closeXButton,
+                    position,
+                    sideOffset,
+                    topOffset
+                  );
+
+                /**
+                 * Due to DOM manipulations made in other timeouts when painting the iframe,
+                 * getBoundingClientRect() will not work unless it waits for those manipulations
+                 * to complete. Setting a trivial timeout here to account for this.
+                 */
+                setTimeout(() => {
+                  setPosition();
+                  document.body.appendChild(closeXButton);
+                }, 100);
+
+                const repositionCloseButton = () =>
+                  messagePosition !== 'Full' ? setPosition() : null;
+                global.addEventListener('resize', repositionCloseButton);
+              } else {
+                activeIframeDocument?.body.appendChild(closeXButton);
+              }
             }
           }
 
@@ -501,8 +392,7 @@ export function getInAppMessages(
           }
 
           /* now we'll add click tracking to _all_ anchor tags */
-          const links =
-            activeIframe.contentDocument?.querySelectorAll('a') || [];
+          const links = activeIframeDocument?.querySelectorAll('a') || [];
 
           links.forEach((link) => {
             const clickedUrl = link.getAttribute('href') || '';
@@ -536,8 +426,9 @@ export function getInAppMessages(
             ) => {
               if (typeof handleLinks === 'string') {
                 if (
-                  handleLinks === 'open-all-same-tab' ||
-                  (isInternalLink && handleLinks === 'external-new-tab')
+                  handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                  (isInternalLink &&
+                    handleLinks === HANDLE_LINKS.ExternalNewTab)
                 ) {
                   sameTabAction();
                 } else {
@@ -590,8 +481,9 @@ export function getInAppMessages(
                 if (clickedUrl) {
                   const isOpeningLinkInSameTab =
                     (!handleLinks && !openInNewTab) ||
-                    handleLinks === 'open-all-same-tab' ||
-                    (isInternalLink && handleLinks === 'external-new-tab');
+                    handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                    (isInternalLink &&
+                      handleLinks === HANDLE_LINKS.ExternalNewTab);
 
                   trackInAppClick(
                     {
@@ -611,17 +503,15 @@ export function getInAppMessages(
 
                   if (isDismissNode || isActionLink) {
                     dismissMessage(activeIframe, clickedUrl);
-                    overlay.remove();
                     document.removeEventListener(
                       'keydown',
                       handleDocumentEscPress
                     );
-                    if (activeIframe?.contentWindow?.document) {
-                      activeIframe.contentWindow?.document.removeEventListener(
+                    if (activeIframeDocument)
+                      activeIframeDocument.removeEventListener(
                         'keydown',
                         handleIFrameEscPress
                       );
-                    }
                     global.removeEventListener('resize', throttledResize);
                   }
 
@@ -700,7 +590,7 @@ export function getInAppMessages(
 
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
-        requestMessages()
+        requestMessages({ payload: dupedPayload })
           .then((response) => {
             trackMessagesDelivered(
               response.data.inAppMessages || [],
@@ -766,7 +656,7 @@ export function getInAppMessages(
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
-  return requestMessages().then((response) => {
+  return requestMessages({ payload: dupedPayload }).then((response) => {
     const messages = response.data.inAppMessages;
     trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
