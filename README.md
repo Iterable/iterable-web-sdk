@@ -603,7 +603,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk';
 
 ## I want to automatically show my in-app messages with a delay between each
 
-This SDK allows that. Simply call the `getMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
+This SDK allows that. Simply call the `getInAppMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
@@ -856,12 +856,12 @@ Since the Web SDK renders in-app messages in an iframe element on your website i
 
 But there are few features which the SDK adds so that you can customize how you'd like links to behave:
 
-First, the [`handleLinks` option](#getInAppMessages) within the `getMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
+First, the [`handleLinks` option](#getInAppMessages) within the `getInAppMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
 
 ```ts
-import { getMessages } from '@iterable/web-sdk';
+import { getInAppMessages } from '@iterable/web-sdk';
 
-getMessages({
+getInAppMessages({
   count: 5,
   packageName: 'my-website',
   handleLinks: 'external-new-tab'
