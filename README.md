@@ -856,7 +856,7 @@ Since the Web SDK renders in-app messages in an iframe element on your website i
 
 But there are few features which the SDK adds so that you can customize how you'd like links to behave:
 
-First, the [`handleLinks` option](#getInAppMessages) within the `getInAppMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
+First, the `handleLinks` option provided by [`getInAppMessages`](#getInAppMessages) allows you to specify how the SDK opens links: in the current tab, in a new tab, or a combination (external links in a new tab, internal links in the current tab). For example, this code:
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk';
