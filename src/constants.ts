@@ -8,6 +8,8 @@ export const BASE_URL = process.env.BASE_URL || 'https://api.iterable.com/api';
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 
+export const REGISTER_TOKEN = '/users/registerBrowserToken';
+
 /** @todo update once new endpoint is ready */
 export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
 
