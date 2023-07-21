@@ -29,23 +29,25 @@ https://github.com/firebase/quickstart-js/blob/master/messaging/firebase-messagi
 # Example
 
 ```ts
-import { configureMessageService, fireAppInstance, messaging } from '@iterable/web-sdk';
+import { PMessaging } from '@iterable/web-sdk';
 
 function App() {
 
     React.useEffect(() => {
         const init = async () => {
-            await configureMessageService({
-                apiKey: string,
-                authDomain: string,
-                projectId: string,
-                storageBucket: string,
-                messagingSenderId: string,
-                appId: string,
-                vapidkey: string,
+            const PMObject = new PMessaging({
+                apiKey: "AIzaSyBQ_MAq2O-lTxq7eHGfn_H1_u9j9b0JgZU",
+                authDomain: "iterable-web-sdk.firebaseapp.com",
+                projectId: "iterable-web-sdk",
+                storageBucket: "iterable-web-sdk.appspot.com",
+                messagingSenderId: "254172754825",
+                appId: "1:254172754825:web:71536f92e90c2a5969e758",
+                vapidkey: "BHmd6SK5uHsX57m-e-wB3cbVA3cGjezIud1kr3iAnz5As_-71NiamK3r_W3frdESinzDVpopyBylU1JdkY9gIyI",
             });
 
-            console.log("initialized", fireAppInstance, messaging)
+            PMObject.addEventListener((data: any) => {
+                console.log("On-Message Triggered", data);
+            });
         }
 
         init();
@@ -53,34 +55,5 @@ function App() {
 }
 ```
 
-# Methods
-
-## configureMessageService(config)
-
-This method will take firebase config params, which is available on firebase account at the time of project creation,
-and one more param vapidkey is also required, to subscribe to fcm service of firebase to send push notification
-
-```
-apiKey: string
-authDomain: string
-projectId: string
-storageBucket: string
-messagingSenderId: string
-appId: string
-vapidkey: string // public key
-```
-
-# Properties
-
-## fireAppInstance
-
-Firebase App Instance is a powerful and versatile feature that allows developers to uniquely identify
-and target individual app installations across different devices and platforms. It provides a simple 
-and efficient way to engage with users and deliver personalized experiences within the context of specific app installation.
-
-## messaging
-
-Firebase Messaging Instance is a key component of Firebase Cloud Messaging (FCM), 
-Google's cloud-based messaging platform that enables developers to send real-time notifications 
-and messages to users across various devices and platforms. The Messaging Instance is a unique representation of an app's registration with FCM, 
-providing developers with the necessary tools to manage and send messages to specific devices or user groups seamlessly
+By passing configuration params, initialize PMessaging instance which internally create instace of firebase app and messaging module, 
+Listene push notifications by adding listener using PMObject.addEventListener(callback).
