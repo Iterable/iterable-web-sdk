@@ -95,9 +95,8 @@ Along with the API parameters, you can pass these options to the SDK method to h
 | onOpenNodeToTakeFocus        | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
 | rightOffset                  | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
 | topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| closeButton :rotating_light: | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
+| closeButton | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
 
-:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari will not add an auto-generated close button (even if `closeButton` properties are set).
 
 Close Button Options:
 
@@ -116,7 +115,7 @@ Example:
 Calling `getInAppMessages` with `options` not set returns a JSON response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
 
 ```ts
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { getInAppMessages } from '@iterable/web-sdk';
 
 getInAppMessages({ count: 20, packageName: 'mySite1' })
   .then((resp) => {
@@ -134,7 +133,7 @@ This code places an in-app on the page, but it won't be visible. To render it, y
 Or, to show messages automatically:
 
 ```ts
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { getInAppMessages } from '@iterable/web-sdk';
 
 const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   {
@@ -163,7 +162,7 @@ import {
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
-} from '@iterable/web-sdk/dist/inapp';
+} from '@iterable/web-sdk';
 
 const {
   request,
@@ -223,7 +222,7 @@ initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string 
 Example:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 const { clearRefresh, setEmail, setUserID, logout } = initialize(
   'my-API-key',
@@ -249,7 +248,7 @@ refreshJwtToken: (authTypes: string) => Promise<string>
 Example:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 refreshJwtToken("user@example.com").then().catch();
 ```
@@ -266,7 +265,7 @@ track: (payload: InAppTrackRequestParams) => Promise<TrackData>
 Example:
 
 ```ts
-import { track } from '@iterable/web-sdk/dist/events';
+import { track } from '@iterable/web-sdk';
 
 track({ eventName: 'my-event' }).then().catch();
 ```
@@ -282,7 +281,7 @@ trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
 Example:
 
 ```ts
-import { trackInAppClick } from '@iterable/web-sdk/dist/events';
+import { trackInAppClick } from '@iterable/web-sdk';
 
 trackInAppClick({
   messageId: '123',
@@ -303,7 +302,7 @@ trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
 Example:
 
 ```ts
-import { trackInAppClose } from '@iterable/web-sdk/dist/events';
+import { trackInAppClose } from '@iterable/web-sdk';
 
 trackInAppClose({
   messageId: '123',
@@ -324,7 +323,7 @@ trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeDat
 Example:
 
 ```ts
-import { trackInAppConsume } from '@iterable/web-sdk/dist/events';
+import { trackInAppConsume } from '@iterable/web-sdk';
 
 trackInAppConsume({
   messageId: '123',
@@ -345,7 +344,7 @@ trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryD
 Example:
 
 ```ts
-import { trackInAppDelivery } from '@iterable/web-sdk/dist/events';
+import { trackInAppDelivery } from '@iterable/web-sdk';
 
 trackInAppDelivery({
   messageId: '123',
@@ -366,7 +365,7 @@ trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
 Example:
 
 ```ts
-import { trackInAppOpen } from '@iterable/web-sdk/dist/events';
+import { trackInAppOpen } from '@iterable/web-sdk';
 
 trackInAppOpen({
   messageId: '123',
@@ -387,7 +386,7 @@ trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseDat
 Example:
 
 ```ts
-import { trackPurchase } from '@iterable/web-sdk/dist/commerce';
+import { trackPurchase } from '@iterable/web-sdk';
 
 trackPurchase({
   items: [{ id: '123', name: 'keyboard', price: 100, quantity: 2 }],
@@ -408,7 +407,7 @@ updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
 Example:
 
 ```ts
-import { updateCart } from '@iterable/web-sdk/dist/commerce';
+import { updateCart } from '@iterable/web-sdk';
 
 updateCart({
   items: [{ id: '123', price: 100, name: 'keyboard', quantity: 1 }]
@@ -428,7 +427,7 @@ updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsD
 Example:
 
 ```ts
-import { updateSubscriptions } from '@iterable/web-sdk/dist/users';
+import { updateSubscriptions } from '@iterable/web-sdk';
 
 updateSubscriptions({ emailListIds: [1, 2, 3] })
   .then()
@@ -446,7 +445,7 @@ updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
 Example:
 
 ```ts
-import { updateUser } from '@iterable/web-sdk/dist/users';
+import { updateUser } from '@iterable/web-sdk';
 
 updateUser({ dataFields: {} }).then().catch();
 ```
@@ -462,7 +461,7 @@ updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
 Example:
 
 ```ts
-import { updateUserEmail } from '@iterable/web-sdk/dist/users';
+import { updateUserEmail } from '@iterable/web-sdk';
 
 updateUserEmail('user@example.com').then().catch();
 ```
@@ -480,7 +479,7 @@ First, you'll deal with the JWT Secret. Typically, you need some backend service
 Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 (() => {
   initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -496,7 +495,7 @@ Now that we've set our authorization logic within our app, it's time to set the 
 The syntax for identifying a user by user ID looks like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID, logout } = initialize(
@@ -522,7 +521,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 Doing this with an email is similar:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 (() => {
   const { setEmail, logout } = initialize(
@@ -551,8 +550,7 @@ import { initialize } from '@iterable/web-sdk/dist/authorization';
 Now let's put it altogether with an Iterable API method:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { track } from '@iterable/web-sdk/dist/events';
+import { initialize, track } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID, logout } = initialize(
@@ -584,16 +582,16 @@ This SDK relies on a library called [Axios](https://github.com/axios/axios). For
 
 ## Ok cool. What if I want to handle this intercepting logic myself instead?
 
-You can do that! This SDK exposes the base Axios instance so you can do whatever you like with it and build upon that. You can import the Axios instance like so and anything in the Axios documentation is fair game to use:
+You can do that! This SDK exposes the base Axios request instance so you can do whatever you like with it and build upon that. You can import the Axios request like so and anything in the Axios documentation is fair game to use:
 
 ```ts
-import { baseAxiosInstance } from '@iterable/web-sdk/dist/request';
+import { baseAxiosRequest } from '@iterable/web-sdk';
 ```
 
 For example, if you want to set an `email` query param on every outgoing request, you would just implement the way Axios advises like so:
 
 ```ts
-import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
+import { baseAxiosRequest } from '@iterable/web-sdk';
 
 (() => {
   baseAxiosRequest.interceptors.request.use((config) => {
@@ -612,13 +610,12 @@ import { baseAxiosRequest } from '@iterable/web-sdk/dist/request';
 
 ## I want to automatically show my in-app messages with a delay between each
 
-This SDK allows that. Simply call the `getMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
+This SDK allows that. Simply call the `getInAppMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -643,8 +640,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 In order to take advantage of the SDK showing them automatically, you would implement the same method in this way:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -673,8 +669,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 Optionally, you can pass arguments to fine-tune how you want the messages to appear. See the [usage section](#getInAppMessages) to see all available options and what they do.
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -712,8 +707,7 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 You can also pause and resume the messages stream if you like
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
+import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
   const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -752,12 +746,12 @@ import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
 Finally, you can also choose to do your own manipulation to the messages before choosing to display them:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
 import {
+  initialize,
   getInAppMessages,
   sortInAppMessages,
   filterHiddenInAppMessages
-} from '@iterable/web-sdk/dist/inapp';
+} from '@iterable/web-sdk';
 
 (() => {
   const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
@@ -834,7 +828,7 @@ JWT expiration is handled for you automatically by the SDK. There are 3 points w
 As previously explained, when initializing the SDK you need to pass a function that returns a Promise with the JWT, which looks something like this:
 
 ```ts
-import { initialize } from '@iterable/web-sdk/dist/authorization';
+import { initialize } from '@iterable/web-sdk';
 
 initialize('API_KEY_HERE', ({ email, userID }) =>
   yourAsyncJWTGenerationMethod({ email, userID }).then(
@@ -858,9 +852,7 @@ import { getInAppMessages, initialize, updateUser } from '@iterable/web-sdk';
 ```
 
 ```ts
-import { getInAppMessages } from '@iterable/web-sdk/dist/inapp';
-import { initialize } from '@iterable/web-sdk/dist/authorization';
-import { updateUser } from '@iterable/web-sdk/dist/users';
+import { initialize, getInAppMessages, updateUser } from '@iterable/web-sdk';
 ```
 
 For those using Webpack/Rollup/Some Other Build Tool, it is recommended to import methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
@@ -871,12 +863,12 @@ Since the Web SDK renders in-app messages in an iframe element on your website i
 
 But there are few features which the SDK adds so that you can customize how you'd like links to behave:
 
-First, the [`handleLinks` option](#getInAppMessages) within the `getMessages` call will allow you to either open all links in a new tab, the same tab, or ensure that external links open in a new tab, while internal ones keep the experience within the same tab. So for example, this code:
+First, the `handleLinks` option provided by [`getInAppMessages`](#getInAppMessages) allows you to specify how the SDK opens links: in the current tab, in a new tab, or a combination (external links in a new tab, internal links in the current tab). For example, this code:
 
 ```ts
-import { getMessages } from '@iterable/web-sdk/dist/inapp';
+import { getInAppMessages } from '@iterable/web-sdk';
 
-getMessages({
+getInAppMessages({
   count: 5,
   packageName: 'my-website',
   handleLinks: 'external-new-tab'

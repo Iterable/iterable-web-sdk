@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 import MockAdapter from 'axios-mock-adapter';
+import { messages } from '../../__data__/inAppMessages';
 import { baseAxiosRequest } from '../../request';
 import { srSpeak } from '../../utils/srSpeak';
-import { messages } from '../../__data__/inAppMessages';
-import { CachedMessage, InAppMessage } from '../types';
+import { CLOSE_BUTTON_POSITION, CachedMessage, InAppMessage } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
@@ -899,7 +899,7 @@ describe('Utils', () => {
       const button = generateCloseButton(
         buttonId,
         document,
-        'top-left',
+        CLOSE_BUTTON_POSITION.TopLeft,
         'blue',
         20,
         undefined,
@@ -921,7 +921,7 @@ describe('Utils', () => {
       const rightButton = generateCloseButton(
         buttonId,
         document,
-        'top-right',
+        CLOSE_BUTTON_POSITION.TopRight,
         'blue',
         20,
         './assets/something.svg',
