@@ -42,8 +42,10 @@ function App() {
                 storageBucket: "iterable-web-sdk.appspot.com",
                 messagingSenderId: "254172754825",
                 appId: "1:254172754825:web:71536f92e90c2a5969e758",
-                vapidkey: "BHmd6SK5uHsX57m-e-wB3cbVA3cGjezIud1kr3iAnz5As_-71NiamK3r_W3frdESinzDVpopyBylU1JdkY9gIyI",
+                vapidkey: "BKab2TK0UC8jpQRWHRVXkb58MXGMJE6KidcuUxIUIvPHME3il_JXImADp7_JKdU7ViU0TLOiu4yt_DRaMbugEoc",
             });
+
+            PMObject.setUserId("user1234");
 
             PMObject.addEventListener((data: any) => {
                 console.log("On-Message Triggered", data);
