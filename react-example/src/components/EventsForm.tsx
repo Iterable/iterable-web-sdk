@@ -7,7 +7,11 @@ import {
   Heading,
   Response
 } from '../views/Components.styled';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
+import {
+  initialize,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 import { useAnonContext } from '../anonContext';
 import { useUser } from 'src/context/Users';
@@ -51,22 +55,17 @@ export const EventsForm: FC<Props> = ({
         appPackageName: 'my-website'
       }
     };
-
-    console.log('Event name: ' + trackEvent + ' tracked locally');
     await anonymousUserEventManager.trackAnonEvent(eventDetails);
-    console.log('checking criteria...');
     const isCriteriaCompleted =
       await anonymousUserEventManager.checkCriteriaCompletion();
-    console.log('Is criteria satisfied? ' + isCriteriaCompleted);
 
     if (isCriteriaCompleted) {
       const userId = uuidv4();
+      const App = await initialize(process.env.API_KEY);
+      await App.setUserID(userId);
       await anonymousUserEventManager.createUser(userId, process.env.API_KEY);
-      console.log('Created new user with id: ' + userId);
       setLoggedInUser({ type: 'user_update', data: userId });
-      console.log('Syncing events stored locally to server...');
       await anonymousUserEventManager.syncEvents();
-      console.log('Events synced completed');
     }
   };
 

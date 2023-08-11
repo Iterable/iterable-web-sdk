@@ -15,9 +15,6 @@ export const track = (payload: InAppTrackRequestParams) => {
     data: payload,
     validation: {
       data: trackSchema
-    },
-    headers: {
-      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };

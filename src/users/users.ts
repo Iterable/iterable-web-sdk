@@ -33,9 +33,6 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
     },
     validation: {
       data: updateUserSchema
-    },
-    headers: {
-      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };

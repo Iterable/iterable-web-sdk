@@ -5,7 +5,6 @@ export interface InAppTrackRequestParams {
   dataFields?: Record<string, any>;
   campaignId?: number;
   templateId?: number;
-  headers?: Record<string, any>;
 }
 
 export interface InAppEventRequestParams {

@@ -9,7 +9,6 @@ export function AnonProvider({ children }: any) {
 
   useEffect(() => {
     if (!anonymousUserEventManager) {
-      console.log('App started');
       setAnonymousUserEventManager(new AnonymousUserEventManager());
     }
   }, []);

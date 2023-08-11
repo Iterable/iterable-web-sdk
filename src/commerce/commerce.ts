@@ -22,9 +22,6 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
     },
     validation: {
       data: updateCartSchema
-    },
-    headers: {
-      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };
@@ -48,9 +45,6 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
     },
     validation: {
       data: trackPurchaseSchema
-    },
-    headers: {
-      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };

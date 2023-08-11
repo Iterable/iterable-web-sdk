@@ -7,12 +7,10 @@ import { updateCart, trackPurchase } from '../commerce/commerce';
 import { InAppTrackRequestParams } from './types';
 import { track } from './events';
 import { updateUser } from '../users/users';
-import { initialize } from '../authorization/authorization';
 
 export class AnonymousUserEventManager {
   private isUserLoggedIn = false;
   private userId = '';
-  private apiKey = '';
 
   constructor() {
     this.updateAnonSession();
@@ -52,7 +50,6 @@ export class AnonymousUserEventManager {
 
   public async trackAnonEvent(payload: InAppTrackRequestParams) {
     if (this.isUserLoggedIn) {
-      payload.headers = { 'Api-Key': this.apiKey };
       return track(payload);
     } else {
       // localstorage
@@ -62,7 +59,6 @@ export class AnonymousUserEventManager {
 
   public async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
     if (this.isUserLoggedIn) {
-      payload.headers = { 'Api-Key': this.apiKey };
       return trackPurchase(payload);
     } else {
       // localstorage
@@ -72,7 +68,6 @@ export class AnonymousUserEventManager {
 
   public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
     if (this.isUserLoggedIn) {
-      payload.headers = { 'Api-Key': this.apiKey };
       return updateCart(payload);
     } else {
       // localstorage
@@ -100,22 +95,17 @@ export class AnonymousUserEventManager {
     localStorage.setItem('itbl_anon_sessions', JSON.stringify(anonSessionInfo));
   }
 
-  public async createUser(userId: string, apiKey: string) {
+  public async createUser(userId: string) {
     const str = localStorage.getItem('itbl_anon_sessions');
     const userSessionInfo = str ? JSON.parse(str) : {};
-    const App = await initialize(apiKey);
-
-    this.apiKey = apiKey;
 
     await updateUser({
       dataFields: {
         userId: userId,
         ...{ itbl_anon_sessions: { ...userSessionInfo } }
       },
-      headers: { 'Api-Key': apiKey },
       userId: userId
     });
-    await App.setUserID(userId);
     this.userId = userId;
   }
 
