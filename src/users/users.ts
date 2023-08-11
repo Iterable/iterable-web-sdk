@@ -21,8 +21,8 @@ export const updateUserEmail = (newEmail: string) => {
 
 export const updateUser = (payload: UpdateUserParams = {}) => {
   /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // delete (payload as any).userId;
+  // delete (payload as any).email;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -33,6 +33,9 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
     },
     validation: {
       data: updateUserSchema
+    },
+    headers: {
+      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };

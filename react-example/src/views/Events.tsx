@@ -1,7 +1,5 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import EventsForm from 'src/components/EventsForm';
-import { AnonymousUserEventManager } from '@iterable/web-sdk';
-import { useAnonContext } from '../anonContext';
 
 import {
   track,
@@ -15,15 +13,6 @@ import {
 interface Props {}
 
 export const Events: FC<Props> = () => {
-  const { anonymousUserEventManager, setAnonymousUserEventManager } =
-    useAnonContext();
-
-  useState(() => {
-    if (!anonymousUserEventManager) {
-      setAnonymousUserEventManager(new AnonymousUserEventManager());
-    }
-  });
-
   return (
     <>
       <h1>Events Endpoints</h1>

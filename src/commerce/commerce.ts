@@ -5,10 +5,10 @@ import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
-  if (payload.user) {
-    delete (payload as any).user.userId;
-    delete (payload as any).user.email;
-  }
+  // if (payload.user) {
+  //   delete (payload as any).user.userId;
+  //   delete (payload as any).user.email;
+  // }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -22,16 +22,19 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
     },
     validation: {
       data: updateCartSchema
+    },
+    headers: {
+      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
-  if (payload.user) {
-    delete (payload as any).user.userId;
-    delete (payload as any).user.email;
-  }
+  // if (payload.user) {
+  //   delete (payload as any).user.userId;
+  //   delete (payload as any).user.email;
+  // }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -45,6 +48,9 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
     },
     validation: {
       data: trackPurchaseSchema
+    },
+    headers: {
+      'Api-Key': payload?.headers ? payload?.headers['Api-Key'] : ''
     }
   });
 };

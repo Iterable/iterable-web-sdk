@@ -7,32 +7,36 @@ import { updateCart, trackPurchase } from '../commerce/commerce';
 import { InAppTrackRequestParams } from './types';
 import { track } from './events';
 import { updateUser } from '../users/users';
+import { initialize } from '../authorization/authorization';
 
 export class AnonymousUserEventManager {
   private isUserLoggedIn = false;
   private userId = '';
+  private apiKey = '';
 
   constructor() {
     this.updateAnonSession();
   }
 
   public async getAnonCriteria() {
-    return {
-      criteriaId: 'String',
-      criteriaList: [
-        {
-          criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
-          comparator: 'equal',
-          name: 'browseWebsite'
-        },
-        {
-          criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
-          comparator: 'equal',
-          name: 'viewedLipstick',
-          aggregateCount: 3 // count over 3
-        }
-      ]
-    };
+    return [
+      {
+        criteriaId: 'String',
+        criteriaList: [
+          {
+            criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
+            comparator: 'equal',
+            name: 'browseWebsite'
+          },
+          {
+            criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
+            comparator: 'equal',
+            name: 'viewedLipstick',
+            aggregateCount: 3 // count over 3
+          }
+        ]
+      }
+    ];
   }
 
   public storeEventLocally(payload: any) {
@@ -48,6 +52,7 @@ export class AnonymousUserEventManager {
 
   public async trackAnonEvent(payload: InAppTrackRequestParams) {
     if (this.isUserLoggedIn) {
+      payload.headers = { 'Api-Key': this.apiKey };
       return track(payload);
     } else {
       // localstorage
@@ -57,6 +62,7 @@ export class AnonymousUserEventManager {
 
   public async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
     if (this.isUserLoggedIn) {
+      payload.headers = { 'Api-Key': this.apiKey };
       return trackPurchase(payload);
     } else {
       // localstorage
@@ -66,6 +72,7 @@ export class AnonymousUserEventManager {
 
   public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
     if (this.isUserLoggedIn) {
+      payload.headers = { 'Api-Key': this.apiKey };
       return updateCart(payload);
     } else {
       // localstorage
@@ -93,15 +100,22 @@ export class AnonymousUserEventManager {
     localStorage.setItem('itbl_anon_sessions', JSON.stringify(anonSessionInfo));
   }
 
-  public async createUser(userId: string) {
+  public async createUser(userId: string, apiKey: string) {
     const str = localStorage.getItem('itbl_anon_sessions');
     const userSessionInfo = str ? JSON.parse(str) : {};
+    const App = await initialize(apiKey);
+
+    this.apiKey = apiKey;
 
     await updateUser({
-      dataFields: { userId: userId, ...userSessionInfo },
-      preferUserId: true
+      dataFields: {
+        userId: userId,
+        ...{ itbl_anon_sessions: { ...userSessionInfo } }
+      },
+      headers: { 'Api-Key': apiKey },
+      userId: userId
     });
-
+    await App.setUserID(userId);
     this.userId = userId;
   }
 
@@ -116,18 +130,22 @@ export class AnonymousUserEventManager {
 
     if (trackEventList.length) {
       for (let i = 0; i < trackEventList.length; i++) {
-        trackEventList[i].user = {
-          userId: this.userId,
-          createNewFields: true
-        };
-
         if (trackEventList[i].dataFields['eventType'] === 'track') {
+          trackEventList[i].userId = this.userId;
           await this.trackAnonEvent(trackEventList[i]);
         } else if (
           trackEventList[i].dataFields['eventType'] === 'trackPurchase'
         ) {
+          trackEventList[i].user = {
+            userId: this.userId,
+            createNewFields: true
+          };
           await this.trackAnonPurchaseEvent(trackEventList[i]);
         } else if (trackEventList[i].dataFields['eventType'] === 'cartUpdate') {
+          trackEventList[i].user = {
+            userId: this.userId,
+            createNewFields: true
+          };
           await this.trackAnonUpdateCart(trackEventList[i]);
         }
       }
@@ -136,24 +154,28 @@ export class AnonymousUserEventManager {
 
   public async checkCriteriaCompletion() {
     let isCompleted = false;
-    const criteriaResult: any = this.getAnonCriteria();
+    const criteriaResult: any = await this.getAnonCriteria();
     const strTrackEventList = localStorage.getItem('track_event_list');
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
       : [];
 
-    if (criteriaResult?.criteriaList?.length && trackEventList?.length) {
-      criteriaResult?.criteriaList.forEach((criteria: any) => {
-        const countToMatch = criteria?.aggregateCount
-          ? criteria.aggregateCount
-          : 1;
-        const matchedResults = trackEventList.filter(
-          (event: any) => criteria.name === event.eventName
-        );
+    if (criteriaResult?.length) {
+      criteriaResult?.forEach((criteria: any) => {
+        if (criteria?.criteriaList?.length && trackEventList?.length) {
+          criteria?.criteriaList.forEach((subcriteria: any) => {
+            const countToMatch = subcriteria?.aggregateCount
+              ? subcriteria.aggregateCount
+              : 1;
+            const matchedResults = trackEventList.filter(
+              (event: any) => subcriteria.name === event.eventName
+            );
 
-        if (matchedResults?.length >= countToMatch) {
-          isCompleted = true;
-          return;
+            if (matchedResults?.length >= countToMatch) {
+              isCompleted = true;
+              return;
+            }
+          });
         }
       });
     }

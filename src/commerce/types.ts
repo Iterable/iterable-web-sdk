@@ -20,6 +20,7 @@ interface CommerceUser {
 export interface UpdateCartRequestParams {
   user?: CommerceUser;
   items: CommerceItem[];
+  headers?: Record<string, any>;
 }
 
 export interface TrackPurchaseRequestParams {
@@ -31,4 +32,5 @@ export interface TrackPurchaseRequestParams {
   total: number;
   createdAt?: number;
   dataFields?: Record<string, any>;
+  headers?: Record<string, any>;
 }

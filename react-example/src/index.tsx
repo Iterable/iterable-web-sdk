@@ -39,8 +39,6 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  console.log('process.env.API_KEY', process.env.API_KEY);
-
   const { setEmail, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
     ({ email }) => {
