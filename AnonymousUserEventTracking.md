@@ -43,10 +43,71 @@ or with a CDN:
 
 # Usage
 
-## trackAnonEvent
+1. `trackAnonEvent`
+The 'trackAnonEvent' function within the Iterable-Web SDK empowers seamless tracking of diverse web events. Developers can enrich event data with specific metadata using the 'dataFields' attribute. This function intelligently distinguishes between logged-in and non-logged-in users, securely storing event data on the server post-login, while locally preserving data for anonymous users, ensuring comprehensive event monitoring in both scenarios.
 
 ```ts
+const eventDetails = {
+    ...conditionalParams,
+    createNewFields: true,
+    createdAt: (Date.now() / 1000) | 0,
+    dataFields: { website: { domain: 'omni.com' }, eventType: 'track' },
+};
+    
 await anonymousUserEventManager.trackAnonEvent(eventDetails);
+```
+
+2. `trackAnonPurchaseEvent`
+The 'trackAnonPurchaseEvent' function in the Iterable-Web SDK enables precise tracking of purchase-related web events. Developers can seamlessly include specific details about purchased items. With an innate understanding of user authentication status, the function securely stores event data on the server post-login, while also providing localized storage for non-logged-in users, guaranteeing comprehensive event monitoring in both usage scenarios.
+
+```ts
+const eventDetails = {
+    ...conditionalParams,
+    items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
+    total: 200
+}
+
+await anonymousUserEventManager.trackAnonPurchaseEvent(eventDetails);
+```
+
+3. `trackAnonUpdateCart`
+The 'trackAnonUpdateCart' function in the Iterable-Web SDK empowers effortless tracking of web events related to cart updates. Developers can accurately outline details for multiple items within the cart. It seamlessly handles data, securely transmitting events to the server upon user login, while also providing local storage for event details in the absence of user login, ensuring comprehensive event tracking in all scenarios.
+
+```ts
+const eventDetails = {
+    ...conditionalParams,
+    items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
+}
+
+await anonymousUserEventManager.trackAnonUpdateCart(eventDetails);
+```
+
+4. `createUser`
+The 'createUser' function in the Iterable-Web SDK facilitates user creation by assigning a unique user UUID. This function also supports the seamless updating of user details on the server, providing a comprehensive solution for managing user data within your application.
+
+```ts
+await anonymousUserEventManager.createUser(uuid, process.env.API_KEY);
+```
+
+5. `getAnonCriteria`
+The 'getAnonCriteria' function within the Iterable-Web SDK retrieves criteria from the server for matching purposes. It efficiently fetches and returns an array of criteria, providing developers with essential tools to enhance their application's functionality through data-driven decision-making.
+
+```ts
+const criteriaList = await anonymousUserEventManager.getAnonCriteria();
+```
+
+6. `checkCriteriaCompletion`
+The 'checkCriteriaCompletion' function in the Iterable-Web SDK performs a local assessment of stored events to determine if they fulfill specific criteria. If any of the stored events satisfy the criteria, the function returns 'true', offering developers a reliable method to validate the completion status of predefined conditions based on accumulated event data.
+
+```ts
+const isCriteriaCompleted = await anonymousUserEventManager.checkCriteriaCompletion();
+```
+
+7. `syncEvents`
+The 'syncEvents' function within the Iterable-Web SDK facilitates the seamless synchronization of locally stored events to the server while sequentially maintaining their order. This function efficiently transfers all accumulated events, clearing the local storage in the process, ensuring data consistency and integrity between the client and server-side environments.
+
+```ts
+await anonymousUserEventManager.syncEvents();
 ```
 
 # Example
