@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 import { IEmbeddedSession, IEmbeddedImpression } from '../events/types';
 import { IEmbeddedImpressionData } from './types';
 import { trackEmbeddedSession } from '../events/events';
@@ -14,7 +15,7 @@ class EmbeddedSession {
         this.end = end;
         this.placementId = placementId;
         this.impressions = impressions;
-        this.id = '12345';
+        this.id = uuidv4();
     }
 }
 
@@ -23,7 +24,7 @@ class EmbeddedImpressionData
     public messageId: string;
     public displayCount: number;
     public duration: number;
-    public start?: Date = undefined
+    public start?: Date = undefined;
 
     constructor(messageId: string, displayCount?: number, duration?: number) {
         this.messageId = messageId;
