@@ -70,15 +70,15 @@ export interface IEmbeddedMessage {
 }
 
 export interface IEmbeddedImpression {
-  messageId: string,
-  displayCount: number,
+  messageId: string
+  displayCount: number
   duration: number
 }
 
 export interface IEmbeddedSession {
-  start?: Date,
-  end?: Date,
-  placementId?: string,
-  impressions?: Array<IEmbeddedImpression>,
+  start?: Date
+  end?: Date
+  placementId?: string
+  impressions?: Array<IEmbeddedImpression>
   id: string
 }

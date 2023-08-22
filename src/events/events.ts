@@ -19,7 +19,7 @@ export const track = (payload: InAppTrackRequestParams) => {
   });
 };
 
-export const trackEmbeddedMessage = (payload: IEmbeddedMessage) => {
+export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/received',

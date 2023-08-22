@@ -34,7 +34,7 @@ class EmbeddedImpressionData
 }
 
 export class EmbeddedSessionManager {
-    private impressions: Map<string, EmbeddedImpressionData> = new Map();
+    private impressions: Map<string, IEmbeddedImpression> = new Map();
     public session: IEmbeddedSession = new EmbeddedSession(undefined, undefined, "0", undefined);
 
     public isTracking(): Boolean {
@@ -56,14 +56,22 @@ export class EmbeddedSessionManager {
             return
         }
 
+        this.impressions.forEach((impressionData, messageId) => this.pauseImpression(messageId));
+        this.session.end = new Date();
+
+        if (!this.session.impressions?.length) {
+            console.log("No impressions in the session. Skipping tracking.");
+            return;
+        }
+
         if(this.impressions.size) {
-            this.endAllImpressions();
+            //reset session for next session start
+            this.session = new EmbeddedSession(undefined, undefined, "0", undefined);
 
             const sessionToTrack = new EmbeddedSession(this.session.start, new Date(), "0", this.getImpressionList());
 
             await trackEmbeddedSession(sessionToTrack)
-            //reset session for next session start
-            this.session = new EmbeddedSession(undefined, undefined, "0", undefined);
+            
             this.impressions = new Map();
         }
     }

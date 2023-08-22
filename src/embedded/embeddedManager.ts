@@ -3,7 +3,7 @@ import { EmbeddedMessageUpdateHandler, EmbeddedMessageActionHandler } from './ty
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
-import { trackEmbeddedMessage } from '..';
+import { trackEmbeddedMessageReceived } from '..';
 
 export class EmbeddedManager {
     private messages: IEmbeddedMessage[] = [];
@@ -48,7 +48,7 @@ export class EmbeddedManager {
         const msgsList = _processor.newlyRetrievedMessages();
 
         for (let i = 0; i < msgsList.length; i++) {
-            await trackEmbeddedMessage(msgsList[i]);
+            await trackEmbeddedMessageReceived(msgsList[i]);
         }
     }
 
