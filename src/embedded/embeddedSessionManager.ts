@@ -103,9 +103,9 @@ export class EmbeddedSessionManager {
         this.updateDisplayCountAndDuration(impressionData)
     }
 
-    private endAllImpressions() {
-        this.impressions.forEach((impressionData) => this.updateDisplayCountAndDuration(impressionData))
-    }
+    // private endAllImpressions() {
+    //     this.impressions.forEach((impressionData) => this.updateDisplayCountAndDuration(impressionData))
+    // }
 
     private getImpressionList() {
         const impressionList: Array<EmbeddedImpressionData> = new Array();

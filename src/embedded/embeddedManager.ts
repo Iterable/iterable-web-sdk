@@ -60,11 +60,11 @@ export class EmbeddedManager {
         this.actionListeners.push(actionHandler);
     }
 
-    private notifyUpdateDelegates() {
-        this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
-            updateListener.onMessagesUpdated(); 
-        });
-    }
+    // private notifyUpdateDelegates() {
+    //     this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
+    //         updateListener.onMessagesUpdated(); 
+    //     });
+    // }
     
     private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
         this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
