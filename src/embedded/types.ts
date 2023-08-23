@@ -4,7 +4,7 @@ export interface EmbeddedMessageUpdateHandler {
 }
 
 export interface EmbeddedMessageActionHandler {
-    onTapAction(): Function
+    onTapAction(url: string): Function
 }
 
 export interface IEmbeddedImpressionData
