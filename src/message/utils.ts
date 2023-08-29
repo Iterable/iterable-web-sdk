@@ -59,9 +59,6 @@ export class PMessaging {
     return baseIterableRequest<IterableResponse>({
       method: 'POST',
       url: REGISTER_TOKEN,
-      headers: {
-        "Api-Key": "1d925bbf54f34bcb92a15da14bfb5d1d"
-      },
       data: {
         userId: this.userId,
         browserToken: token

@@ -35,6 +35,8 @@ function App() {
 
     React.useEffect(() => {
         const init = async () => {
+            await initialize(process.env.API_KEY);
+            
             const PMObject = new PMessaging({
                 apiKey: "AIzaSyBQ_MAq2O-lTxq7eHGfn_H1_u9j9b0JgZU",
                 authDomain: "iterable-web-sdk.firebaseapp.com",
