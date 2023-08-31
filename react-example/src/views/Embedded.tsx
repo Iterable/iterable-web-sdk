@@ -34,6 +34,7 @@ export const EmbeddedMessage: FC<Props> = () => {
   const submitEmbeddedMessagesReceivedEvent = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const receivedMessage = {
+      messageId: 'abc123',
       metadata: {
         messageId: 'abc123',
         campaignId: 1,
@@ -42,6 +43,7 @@ export const EmbeddedMessage: FC<Props> = () => {
         title: 'Welcome Message',
         body: 'Thank you for using our app!',
       },
+      deviceInfo: { appPackageName: 'my-lil-site' }
     };
 
     trackEmbeddedMessageReceived(receivedMessage)
@@ -62,7 +64,7 @@ export const EmbeddedMessage: FC<Props> = () => {
 
     const buttonIdentifier = 'button-123';
     const clickedUrl = 'https://example.com';
-    const appPackageName = 'com.example.app';
+    const appPackageName = 'my-lil-site';
 
     trackEmbeddedMessageClick(payload, buttonIdentifier, clickedUrl, appPackageName)
       .then(response => {
@@ -76,21 +78,26 @@ export const EmbeddedMessage: FC<Props> = () => {
   const submitEmbeddedMessagesImpressionEvent = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const sessionData = {
-      id: '123',
-      start: new Date(),
-      end: new Date(),
-      impressions: [
+      "session": {
+        "id": "123",
+        "start": 18686876876876,
+        "end": 1008083828723
+      },
+      "impressions": [
         {
-          messageId: 'abc123',
-          displayCount: 3,
-          duration: 10,
+          "messageId": "abc123",
+          "displayCount": 3,
+          "duration": 10,
+          "displayDuration": 10
         },
         {
-          messageId: 'def456',
-          displayCount: 2,
-          duration: 8,
-        },
+          "messageId": "def456",
+          "displayCount": 2,
+          "duration": 8,
+          "displayDuration": 8
+        }
       ],
+      deviceInfo: { appPackageName: 'my-lil-site' }
     };
 
     trackEmbeddedSession(sessionData)

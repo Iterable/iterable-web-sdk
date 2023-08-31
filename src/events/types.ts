@@ -17,8 +17,6 @@ export interface InAppEventRequestParams {
   };
   closeAction?: string;
   deviceInfo: {
-    // deviceId?: string; forced to userAgent
-    // platform?: IterablePlatform; forced to "Web."
     appPackageName: string; // customer-defined name
   };
   inboxSessionId?: string;
@@ -64,21 +62,41 @@ export interface IEmbeddedMessageElements {
 }
 
 export interface IEmbeddedMessage {
+  messageId: string
   metadata: IEmbeddedMessageMetadata
   elements?: IEmbeddedMessageElements
-  payload?: Array<any> 
+  payload?: Array<any>
+  deviceInfo: {
+    appPackageName: string; // customer-defined name
+  };
 }
 
 export interface IEmbeddedImpression {
   messageId: string
   displayCount: number
   duration: number
+  displayDuration?: number
+}
+
+export interface ISession {
+  start?: number
+  end?: number
+  id: string
+}
+
+export interface IEventEmbeddedSession {
+  session: ISession
+  placementId?: string
+  impressions?: Array<IEmbeddedImpression>
+  deviceInfo: {
+    appPackageName: string; // customer-defined name
+  };
 }
 
 export interface IEmbeddedSession {
   start?: Date
   end?: Date
+  id: string
   placementId?: string
   impressions?: Array<IEmbeddedImpression>
-  id: string
 }

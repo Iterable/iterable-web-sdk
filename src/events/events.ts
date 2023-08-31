@@ -1,5 +1,5 @@
 import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams, InAppTrackRequestParams, IEmbeddedMessage, IEmbeddedMessageMetadata, IEmbeddedSession } from './types';
+import { InAppEventRequestParams, InAppTrackRequestParams, IEmbeddedMessage, IEmbeddedMessageMetadata, IEventEmbeddedSession } from './types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import { eventRequestSchema, trackSchema, trackEmbeddedMessageSchema, trackEmbeddedMessageClickSchema, trackEmbeddedSessionSchema } from './events.schema';
@@ -23,7 +23,14 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/received',
-    data: payload,
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    },
     validation: {
       data: trackEmbeddedMessageSchema
     }
@@ -39,6 +46,8 @@ export const trackEmbeddedMessageClick = (payload: IEmbeddedMessageMetadata, but
       buttonIdentifier: buttonIdentifier,
       targetUrl: clickedUrl,
       deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
         appPackageName: appPackageName
       }
     },
@@ -48,11 +57,18 @@ export const trackEmbeddedMessageClick = (payload: IEmbeddedMessageMetadata, but
   });
 };
 
-export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
+export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/impression',
-    data: payload,
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    },
     validation: {
       data: trackEmbeddedSessionSchema
     }

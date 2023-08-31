@@ -70,7 +70,15 @@ export class EmbeddedSessionManager {
 
             const sessionToTrack = new EmbeddedSession(this.session.start, new Date(), "0", this.getImpressionList());
 
-            await trackEmbeddedSession(sessionToTrack)
+            await trackEmbeddedSession({
+                session: {
+                    end: sessionToTrack.end?.getTime(),
+                    start: sessionToTrack.start?.getTime(),
+                    id: sessionToTrack.id
+                },
+                deviceInfo: { appPackageName: 'my-lil-site' },
+                ...sessionToTrack,
+            })
             
             this.impressions = new Map();
         }
@@ -102,10 +110,6 @@ export class EmbeddedSessionManager {
 
         this.updateDisplayCountAndDuration(impressionData)
     }
-
-    // private endAllImpressions() {
-    //     this.impressions.forEach((impressionData) => this.updateDisplayCountAndDuration(impressionData))
-    // }
 
     private getImpressionList() {
         const impressionList: Array<EmbeddedImpressionData> = new Array();

@@ -6,7 +6,10 @@ import {
   trackInAppClose,
   trackInAppConsume,
   trackInAppDelivery,
-  trackInAppOpen
+  trackInAppOpen,
+  trackEmbeddedMessageReceived,
+  trackEmbeddedMessageClick,
+  trackEmbeddedSession
 } from './events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
@@ -31,6 +34,15 @@ describe('Events Requests', () => {
       msg: 'hello'
     });
     mockRequest.onPost('/events/trackInAppOpen').reply(200, {
+      msg: 'hello'
+    });
+    mockRequest.onPost('/embedded-messaging/events/received').reply(200, {
+      msg: 'hello'
+    });
+    mockRequest.onPost('/embedded-messaging/events/click').reply(200, {
+      msg: 'hello'
+    });
+    mockRequest.onPost('/embedded-messaging/events/impression').reply(200, {
       msg: 'hello'
     });
   });
@@ -244,6 +256,116 @@ describe('Events Requests', () => {
     }
   });
 
+  it('return the correct payload for embedded message received', async () => {
+    const payload = {
+      messageId: 'abc123',
+      metadata: {
+        messageId: 'abc123',
+        campaignId: 1,
+      },
+      elements: {
+        title: 'Welcome Message',
+        body: 'Thank you for using our app!',
+      },
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    }
+    const response = await trackEmbeddedMessageReceived(payload);
+
+    const result = JSON.parse(response.config.data)?.placements?.some(obj => obj.message["text"][0]["text"] === payload.elements.title);
+
+    expect(result).toBe(true);
+    expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject embedded message received on bad params', async () => {
+    try {
+      await trackEmbeddedMessageReceived({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          }
+        ])
+      );
+    }
+  });
+
+  it('return the correct payload for embedded message click', async () => {
+    const payload = {
+      messageId: 'abc123',
+      campaignId: 1,
+    };
+
+    const buttonIdentifier = 'button-123';
+    const clickedUrl = 'https://example.com';
+    const appPackageName = 'my-lil-site';
+    const response = await trackEmbeddedMessageClick(payload, buttonIdentifier, clickedUrl, appPackageName);
+
+    expect(JSON.parse(response.config.data).msg).toBe("Event successfully tracked.");
+    expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject embedded message click on bad params', async () => {
+    try {
+      await trackEmbeddedMessageClick({} as any, '', '', '');
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'messageId is a required field',
+            field: 'messageId'
+          }
+        ])
+      );
+    }
+  });
+
+  it('return the correct payload for embedded message received', async () => {
+    const payload = {
+      "session": {
+        "id": "123",
+        "start": 18686876876876,
+        "end": 1008083828723
+      },
+      "impressions": [
+        {
+          "messageId": "abc123",
+          "displayCount": 3,
+          "duration": 10,
+          "displayDuration": 10
+        },
+        {
+          "messageId": "def456",
+          "displayCount": 2,
+          "duration": 8,
+          "displayDuration": 8
+        }
+      ],
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    }
+    const response = await trackEmbeddedSession(payload);
+
+    expect(JSON.parse(response.config.data).msg).toBe("Event successfully tracked.");
+    expect(response.data.msg).toBe('hello');
+  });
+
+  it('should reject embedded message received on bad params', async () => {
+    try {
+      await trackEmbeddedSession({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'session is a required field',
+            field: 'session'
+          }
+        ])
+      );
+    }
+  });
+
   it('should not send up passed email or userId params', async () => {
     const trackResponse = await track({
       email: 'hello@gmail.com',
@@ -279,6 +401,44 @@ describe('Events Requests', () => {
       email: 'hello@gmail.com',
       userId: '1234',
       messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackEmMsgRecvdResponse = await trackEmbeddedMessageReceived({
+      messageId: 'abc123',
+      metadata: {
+        messageId: 'abc123',
+        campaignId: 1,
+      },
+      elements: {
+        title: 'Welcome Message',
+        body: 'Thank you for using our app!',
+      },
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    });
+    const trackEmClickResponse = await trackEmbeddedMessageClick({
+      messageId: 'abc123',
+      campaignId: 1,
+    }, 'button-123', 'https://example.com', 'my-lil-site');
+    const trackSessionResponse = await trackEmbeddedSession({
+      "session": {
+        "id": "123",
+        "start": 18686876876876,
+        "end": 1008083828723
+      },
+      "impressions": [
+        {
+          "messageId": "abc123",
+          "displayCount": 3,
+          "duration": 10,
+          "displayDuration": 10
+        },
+        {
+          "messageId": "def456",
+          "displayCount": 2,
+          "duration": 8,
+          "displayDuration": 8
+        }
+      ],
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
 
@@ -334,5 +494,14 @@ describe('Events Requests', () => {
     expect(JSON.parse(trackOpenResponse.config.data).deviceInfo.platform).toBe(
       WEB_PLATFORM
     );
+
+    expect(JSON.parse(trackEmMsgRecvdResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackEmMsgRecvdResponse.config.data).userId).toBeUndefined();
+
+    expect(JSON.parse(trackEmClickResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBeUndefined();
+
+    expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
   });
 });

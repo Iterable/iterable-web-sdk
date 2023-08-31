@@ -40,11 +40,11 @@ export class EmbeddedManager {
         }
     }
 
-    private setMessages(_processor: EmbeddedMessagingProcessor) {
+    public setMessages(_processor: EmbeddedMessagingProcessor) {
         this.messages = _processor.processedMessagesList()
     }
 
-    private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
+    public async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
         const msgsList = _processor.newlyRetrievedMessages();
 
         for (let i = 0; i < msgsList.length; i++) {
@@ -59,14 +59,8 @@ export class EmbeddedManager {
     public addActionHandler(actionHandler: EmbeddedMessageActionHandler) {
         this.actionListeners.push(actionHandler);
     }
-
-    // private notifyUpdateDelegates() {
-    //     this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
-    //         updateListener.onMessagesUpdated(); 
-    //     });
-    // }
     
-    private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
+    public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
         this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
             updateListener.onEmbeddedMessagingDisabled(); 
         });
