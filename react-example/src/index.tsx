@@ -12,6 +12,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
+import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
 
@@ -82,6 +83,7 @@ const HomeLink = styled(Link)`
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
               <Route path="/inApp" element={<InApp />} />
+              <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
             </Routes>
           </RouteWrapper>
         </UserProvider>

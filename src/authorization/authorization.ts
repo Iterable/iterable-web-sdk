@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { baseAxiosRequest } from '../request';
-import { updateUser } from 'src/users';
-import { clearMessages } from 'src/inapp';
+import { updateUser } from '../users';
+import { clearMessages } from '../inapp';
 import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS
-} from 'src/constants';
+} from '../constants';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,

@@ -16,7 +16,7 @@ function getParsedEnv() {
 
 module.exports = {
   mode: 'production',
-  entry: './dist/index.js',
+  entry: './src/index.ts',
   output: {
     filename: './index.js',
     path: path.resolve(__dirname),
@@ -27,5 +27,21 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(getParsedEnv())
     })
-  ]
+  ],
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'babel-loader',
+        exclude: /node_modules/
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
+      }
+    ]
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js']
+  }
 };
