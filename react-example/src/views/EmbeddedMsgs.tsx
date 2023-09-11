@@ -69,7 +69,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             images: [
               {
                 id: 'image-background',
-                url: 'https://www.google.com/images/branding/googlelogo/1x/googlelogo_dark_color_272x92dp.png'
+                url: 'https://codesymphony.in/assets/technology/home-page/apple.png'
               },
               {
                 id: 'image-reward-button',
@@ -98,14 +98,21 @@ export const EmbeddedMsgs: FC<Props> = () => {
   return (
     <>
       <h1>Fetch Embedded Msgs</h1>
-      <div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start'
+        }}
+      >
         {messages.length &&
           messages.map((message: any, index: number) => (
             <Card
               key={index.toString()}
-              text={message.messages[0].text[0].text}
-              title={message.messages[0].text[1].text}
-              imgSrc={message.messages[0].images[0].url}
+              cardStyle={{ margin: 0 }}
+              text={message.messages[0]?.elements?.text[0]?.text}
+              title={message.messages[0]?.elements?.text[1]?.text}
+              imgSrc={message.messages[0]?.elements?.images[0]?.url}
             />
           ))}
       </div>
