@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import Card from '../../../src/components/card';
+import { Card } from '@iterable/web-sdk';
 
 export const Cards = () => {
   return (
