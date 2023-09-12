@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import logo from '../../assets/iterable_logo.png';
+import './style.css';
 
 interface ICardProps {
   imgSrc?: string;
@@ -19,7 +19,7 @@ interface ICardProps {
   secondaryBtnStyle?: CSSProperties;
 }
 
-const Card = (props: ICardProps) => {
+export const Card = (props: ICardProps) => {
   const {
     text,
     title,
@@ -71,11 +71,12 @@ const Card = (props: ICardProps) => {
     borderRadius: 0,
     cursor: 'pointer'
   };
+
   return (
     <div className="card" style={{ ...defaultCardStyles, ...cardStyle }}>
       <img
         style={{ ...defaultImageStyles, ...imgStyle }}
-        src={imgSrc ? imgSrc : logo}
+        src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
         alt={'logo'}
       />
       <div>
@@ -121,5 +122,3 @@ const Card = (props: ICardProps) => {
     </div>
   );
 };
-
-export default Card;
