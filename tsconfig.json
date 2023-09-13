@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "target": "esnext",
-    "emitDeclarationOnly": true,
     "declaration": true,
+    "jsx": "react",
+    "module": "commonjs",
+    "target": "es2019",
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
     "outDir": "./dist",
     "allowJs": true,
-    "esModuleInterop": true,
     "moduleResolution": "node",
     "strict": true,
     "baseUrl": ".",
@@ -17,9 +19,7 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "**/__tests__/*",

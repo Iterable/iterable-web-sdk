@@ -11,7 +11,7 @@ interface NotificationProps {
   onClickSecondaryBtn?: () => void;
 }
 
-const Notification: React.FC<NotificationProps> = ({
+export const Notification: React.FC<NotificationProps> = ({
   title,
   description,
   primaryButtonLabel,
@@ -69,5 +69,3 @@ const Notification: React.FC<NotificationProps> = ({
     </div>
   );
 };
-
-export default Notification;

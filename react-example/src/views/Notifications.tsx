@@ -1,5 +1,4 @@
-import { FC } from 'react';
-import Notification from '../../../src/components/notification';
+import { Notification } from '@iterable/web-sdk';
 
 export const Notifications = () => {
   return (
