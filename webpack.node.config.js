@@ -17,7 +17,7 @@ function getParsedEnv() {
 
 module.exports = {
   mode: 'production',
-  entry: './dist/index.js',
+  entry: './src/index.ts',
   target: 'node',
   output: {
     filename: './index.node.js',
@@ -47,6 +47,6 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js', '.css']
   }
 };
