@@ -1,0 +1,18 @@
+@media (max-width: 600px) {
+  .banner-container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .banner-container>.content-container {
+    margin-bottom: 20px;
+    order: 2;
+    max-width: 75%;
+  }
+
+  .banner-container>div:last-child {
+    order: 1;
+    margin-bottom: 0;
+  }
+}

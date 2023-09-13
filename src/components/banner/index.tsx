@@ -1,4 +1,6 @@
 import React, { CSSProperties } from 'react';
+import '../style.css';
+
 interface IBannerProps {
   heading: string;
   body: string;
@@ -9,10 +11,10 @@ interface IBannerProps {
   logoStyles?: CSSProperties;
   headingStyles?: CSSProperties;
   bodyStyles?: CSSProperties;
-  buttonClickHandler?: Function;
+  buttonClickHandler?: (e: any) => void;
 }
 
-const Banner = (props: IBannerProps) => {
+export const Banner = (props: IBannerProps) => {
   const {
     heading,
     body,
@@ -86,5 +88,3 @@ const Banner = (props: IBannerProps) => {
     </div>
   );
 };
-
-export default Banner;

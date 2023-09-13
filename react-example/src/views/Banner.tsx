@@ -1,4 +1,4 @@
-import Banner from '../../../src/components/banner';
+import { Banner } from '@iterable/web-sdk';
 
 export const BannerView = () => {
   return (
@@ -11,4 +11,4 @@ export const BannerView = () => {
   );
 };
 
-export default Banners;
+export default BannerView;
