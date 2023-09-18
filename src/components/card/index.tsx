@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react';
+import '../style.css';
 
 interface ICardProps {
   imgSrc?: string;

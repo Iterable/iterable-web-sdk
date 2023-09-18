@@ -1,12 +1,30 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
     "declaration": true,
     "jsx": "react",
     "module": "commonjs",
     "target": "es2019",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "baseUrl": ".",
+    "noUnusedLocals": true,
+    "paths": {
+      "src/*": ["src/*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths", "afterDeclarations": true }
+    ]
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    "**/__tests__/*",
+    "**/*.test.ts",
+    "**/*.spec.ts",
+    "example"
+  ]
 }

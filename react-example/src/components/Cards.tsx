@@ -1,4 +1,3 @@
-import { FC } from 'react';
 import { Card } from '@iterable/web-sdk';
 
 export const Cards = () => {

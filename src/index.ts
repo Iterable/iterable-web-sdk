@@ -4,5 +4,5 @@ export * from './inapp';
 export * from './events';
 export * from './commerce';
 export * from './types';
-export * from './components/card/index';
+export * from './components/card';
 export { config } from './utils/config';

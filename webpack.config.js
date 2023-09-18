@@ -2,6 +2,7 @@ const path = require('path');
 const env = require('dotenv').config({ path: './.env' });
 const webpack = require('webpack');
 const { version } = require('./package.json');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 function getParsedEnv() {
   if (!env.error) {
@@ -26,6 +27,9 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(getParsedEnv())
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'dist/components/style.css' // Output CSS filename
     })
   ],
   module: {
@@ -37,11 +41,11 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       }
     ]
   },
   resolve: {
-    extensions: ['.tsx', '.ts', '.js']
+    extensions: ['.tsx', '.ts', '.js', '.css']
   }
 };
