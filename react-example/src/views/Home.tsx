@@ -34,6 +34,9 @@ export const Home: FC<Props> = () => {
         <Link to="/embedded-msgs" renderAsButton>
           Embedded Msgs
         </Link>
+        <Link to="/embedded" renderAsButton>
+          embedded
+        </Link>
       </Wrapper>
     </>
   );

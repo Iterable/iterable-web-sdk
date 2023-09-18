@@ -5,5 +5,6 @@ export * from './events';
 export * from './commerce';
 export * from './types';
 export * from './components/card';
+export * from './embedded';
 export * from './components/notification';
 export { config } from './utils/config';
