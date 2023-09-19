@@ -216,7 +216,7 @@ export class EmbeddedMessageElements {
   static fromJSONObject(
     elementsJson: any | null
   ): EmbeddedMessageElements | null {
-    if (elementsJson === null) {
+    if (!elementsJson) {
       return null;
     }
 
@@ -236,7 +236,7 @@ export class EmbeddedMessageElements {
     const buttonsJson: [] | null = parsedJson['buttons'];
     let buttons: EmbeddedMessageElementsButton[] | null = [];
 
-    if (buttonsJson !== null) {
+    if (buttonsJson) {
       for (let i = 0; i < buttonsJson.length; i++) {
         const buttonJson: any = buttonsJson[i];
         const button: EmbeddedMessageElementsButton =
@@ -250,7 +250,7 @@ export class EmbeddedMessageElements {
     const textsJson: [] | null = elementsJson['text'];
     let texts: EmbeddedMessageElementsText[] | null = [];
 
-    if (textsJson !== null) {
+    if (textsJson) {
       for (let i = 0; i < textsJson.length; i++) {
         const textJson: any = textsJson[i];
         const text: EmbeddedMessageElementsText =
