@@ -41,22 +41,28 @@ export const trackEmbeddedMessageSchema = object().shape({
     title: string(),
     body: string(),
     mediaUrl: string(),
-    buttons: array().of(object().shape({
-      id: string(),
-      title: string(),
-      action: object().shape({
+    buttons: array().of(
+      object().shape({
+        id: string(),
+        title: string(),
+        action: object().shape({
+          type: string(),
+          data: string()
+        })
+      })
+    ),
+    text: array().of(
+      object().shape({
+        id: string(),
+        text: string()
+      })
+    ),
+    defaultAction: array().of(
+      object().shape({
         type: string(),
         data: string()
       })
-    })),
-    text: array().of(object().shape({
-      id: string(),
-      text: string()
-    })),
-    defaultAction: array().of(object().shape({
-      type: string(),
-      data: string()
-    })),
+    )
   }),
   payload: array().of(mixed()),
   deviceInfo: object()
@@ -64,7 +70,8 @@ export const trackEmbeddedMessageSchema = object().shape({
       deviceId: string().required(),
       platform: string().required(),
       appPackageName: string().required()
-    }).required(),
+    })
+    .required()
 });
 
 export const trackEmbeddedMessageClickSchema = object().shape({
@@ -76,25 +83,29 @@ export const trackEmbeddedMessageClickSchema = object().shape({
       deviceId: string().required(),
       platform: string().required(),
       appPackageName: string().required()
-    }).required(),
+    })
+    .required()
 });
 
 export const trackEmbeddedSessionSchema = object().shape({
   session: object().shape({
     start: number(),
     end: number(),
-    id: string(),
+    id: string()
   }),
   placementId: string(),
-  impressions: array().of(object().shape({
-    messageId: string(),
-    displayCount: number(),
-    duration: number()
-  })),
+  impressions: array().of(
+    object().shape({
+      messageId: string(),
+      displayCount: number(),
+      duration: number()
+    })
+  ),
   deviceInfo: object()
     .shape({
       deviceId: string().required(),
       platform: string().required(),
       appPackageName: string().required()
-    }).required(),
+    })
+    .required()
 });
