@@ -1,8 +1,21 @@
 import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams, InAppTrackRequestParams, IEmbeddedMessage, IEmbeddedMessageMetadata, IEmbeddedSession } from './types';
+import {
+  InAppEventRequestParams,
+  InAppTrackRequestParams,
+  IEmbeddedMessage,
+  IEmbeddedMessageMetadata,
+  IEmbeddedSession
+} from './types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
-import { eventRequestSchema, trackSchema, trackEmbeddedMessageSchema, trackEmbeddedMessageClickSchema, trackEmbeddedSessionSchema } from './events.schema';
+import {
+  eventRequestSchema,
+  trackSchema,
+  trackEmbeddedMessageSchema,
+  trackEmbeddedMessageClickSchema,
+  trackEmbeddedSessionSchema
+} from './events.schema';
+import { EndPoints } from './consts';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -11,7 +24,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/track',
+    url: EndPoints.event_track,
     data: payload,
     validation: {
       data: trackSchema
@@ -22,7 +35,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/received',
+    url: EndPoints.msg_received_event_track,
     data: payload,
     validation: {
       data: trackEmbeddedMessageSchema
@@ -30,10 +43,15 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   });
 };
 
-export const trackEmbeddedMessageClick = (payload: IEmbeddedMessageMetadata, buttonIdentifier: string, clickedUrl: string, appPackageName: string) => {
+export const trackEmbeddedMessageClick = (
+  payload: IEmbeddedMessageMetadata,
+  buttonIdentifier: string,
+  clickedUrl: string,
+  appPackageName: string
+) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/click',
+    url: EndPoints.msg_click_event_track,
     data: {
       messageId: payload.messageId,
       buttonIdentifier: buttonIdentifier,
@@ -51,7 +69,7 @@ export const trackEmbeddedMessageClick = (payload: IEmbeddedMessageMetadata, but
 export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/impression',
+    url: EndPoints.msg_impression_event_track,
     data: payload,
     validation: {
       data: trackEmbeddedSessionSchema
@@ -66,7 +84,7 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClose',
+    url: EndPoints.track_app_close,
     data: {
       ...payload,
       deviceInfo: {
@@ -93,7 +111,7 @@ export const trackInAppOpen = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppOpen',
+    url: EndPoints.track_app_open,
     data: {
       ...payload,
       deviceInfo: {
@@ -122,7 +140,7 @@ export const trackInAppClick = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClick',
+    url: EndPoints.track_app_click,
     sendBeacon,
     data: {
       ...payload,
@@ -150,7 +168,7 @@ export const trackInAppDelivery = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppDelivery',
+    url: EndPoints.track_app_delivery,
     data: {
       ...payload,
       deviceInfo: {
@@ -181,7 +199,7 @@ export const trackInAppConsume = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/inAppConsume',
+    url: EndPoints.track_app_consume,
     data: {
       ...payload,
       deviceInfo: {

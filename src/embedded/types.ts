@@ -1,16 +1,15 @@
 export interface EmbeddedMessageUpdateHandler {
-    onMessagesUpdated: Function
-    onEmbeddedMessagingDisabled: Function
+  onMessagesUpdated: () => void;
+  onEmbeddedMessagingDisabled: () => void;
 }
 
 export interface EmbeddedMessageActionHandler {
-    onTapAction(url: string): Function
+  onTapAction: (url: string) => void;
 }
 
-export interface IEmbeddedImpressionData
-{
-    messageId: string;
-    displayCount: number;
-    duration: number;
-    start?: Date;
+export interface IEmbeddedImpressionData {
+  messageId: string;
+  displayCount: number;
+  duration: number;
+  start?: Date;
 }
