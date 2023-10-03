@@ -4,7 +4,7 @@ import {
   EmbeddedMessageActionHandler
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessage } from '../events/types';
+import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { trackEmbeddedMessageReceived } from '../events';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';

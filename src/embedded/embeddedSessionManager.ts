@@ -1,7 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IEmbeddedSession, IEmbeddedImpression } from '../events/types';
+import {
+  IEmbeddedSession,
+  IEmbeddedImpression
+} from '../events/embedded/types';
 import { IEmbeddedImpressionData } from './types';
-import { trackEmbeddedSession } from '../events/events';
+import { trackEmbeddedSession } from '../events/embedded/events';
 
 class EmbeddedSession {
   public start?: Date;
