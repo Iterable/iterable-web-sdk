@@ -8,6 +8,7 @@ import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
 import Users from 'src/views/Users';
 import InApp from 'src/views/InApp';
+import EmbeddedMessage from 'src/views/Embedded';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
@@ -82,6 +83,7 @@ const HomeLink = styled(Link)`
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
               <Route path="/inApp" element={<InApp />} />
+              <Route path="/embedded" element={<EmbeddedMessage />} />
             </Routes>
           </RouteWrapper>
         </UserProvider>
