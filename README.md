@@ -38,6 +38,12 @@ or with a CDN:
 <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
 ```
 
+# Iterable's European data center (EUDC)
+
+If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints. 
+
+To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. 
+
 # API
 
 Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) for information on what data to pass and what payload to receive from the HTTP requests.
@@ -198,7 +204,7 @@ request()
 
 :rotating_light: *_PLEASE NOTE_*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
-If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides.
+If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to `filterHiddenInAppMessages` but does not filter out JSON-only messages.
 
 ## initialize
 
@@ -459,6 +465,7 @@ import { updateUserEmail } from '@iterable/web-sdk';
 
 updateUserEmail('user@example.com').then().catch();
 ```
+
 
 # FAQ
 

@@ -120,6 +120,14 @@ export const filterHiddenInAppMessages = (
   });
 };
 
+export const filterOnlyReadAndNeverTriggerMessages = (
+  messages: Partial<InAppMessage>[] = []
+) => {
+  return messages.filter(
+    (eachMessage) => !eachMessage.read && eachMessage.trigger?.type !== 'never'
+  );
+};
+
 export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
   return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 };
