@@ -1,12 +1,18 @@
 import { FC, FormEvent, useEffect, useState } from 'react';
-import { Button, EndpointWrapper, Form, Heading } from './Components.styled';
-
+import {
+  Button,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from '../views/Components.styled';
 import {
   initialize,
   EmbeddedManager,
   trackEmbeddedMessageReceived,
   trackEmbeddedMessageClick,
-  trackEmbeddedSession
+  trackEmbeddedSession,
+  trackEmbeddedMessagingDismiss
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 
@@ -14,6 +20,11 @@ interface Props {}
 
 export const EmbeddedMessage: FC<Props> = () => {
   const [userId, setUserId] = useState<string>();
+  const [trackResponse, setTrackResponse] = useState<string>(
+    'Endpoint JSON goes here'
+  );
+  const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
+  const [inputValue, setInputValue] = useState<string>('');
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -112,26 +123,64 @@ export const EmbeddedMessage: FC<Props> = () => {
       });
   };
 
+  const submitEmbeddedMessagesDismissEvent = async (
+    e: FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    const sessionData = {
+      email: userId,
+      userId: userId,
+      messageId: inputValue,
+      buttonIdentifier: '123',
+      deviceInfo: {
+        deviceId: '123',
+        platform: 'web',
+        appPackageName: 'my-website'
+      },
+      createdAt: 1627060811283
+    };
+
+    trackEmbeddedMessagingDismiss(sessionData)
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
+      });
+  };
+
   const eventsList = [
     {
       heading: 'GET /embedded-messaging/events/received',
       onSubmit: handleFetchEmbeddedMessages,
-      btnText: 'Fetch Embedded Messages'
+      btnText: 'Fetch Embedded Messages',
+      hasInput: false
     },
     {
       heading: 'POST /embedded-messaging/events/received',
       onSubmit: submitEmbeddedMessagesReceivedEvent,
-      btnText: 'Submit'
+      btnText: 'Submit',
+      hasInput: false
     },
     {
       heading: 'POST /embedded-messaging/events/click',
       onSubmit: submitEmbeddedMessagesClickEvent,
-      btnText: 'Submit'
+      btnText: 'Submit',
+      hasInput: false
     },
     {
       heading: 'POST /embedded-messaging/events/impression',
       onSubmit: submitEmbeddedMessagesImpressionEvent,
-      btnText: 'Submit'
+      btnText: 'Submit',
+      hasInput: false
+    },
+    {
+      heading: 'POST /embedded-messaging/events/dismiss',
+      onSubmit: submitEmbeddedMessagesDismissEvent,
+      btnText: 'Submit',
+      hasInput: true
     }
   ];
 
@@ -153,8 +202,19 @@ export const EmbeddedMessage: FC<Props> = () => {
           <Heading>{element.heading}</Heading>
           <EndpointWrapper>
             <Form onSubmit={element.onSubmit} data-qa-cart-submit>
-              <Button type="submit">{element.btnText}</Button>
+              {element.hasInput && (
+                <TextField
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  id="item-1"
+                  placeholder={'e.g. df3fe3'}
+                />
+              )}
+              <Button disabled={isTrackingEvent} type="submit">
+                {element.btnText}
+              </Button>
             </Form>
+            <Response>{trackResponse}</Response>
           </EndpointWrapper>
         </>
       ))}

@@ -55,3 +55,18 @@ export interface IEmbeddedSession {
   impressions?: Array<IEmbeddedImpression>;
   id: string;
 }
+
+export interface DeviceInfo {
+  deviceId: string;
+  platform: string;
+  appPackageName: string;
+}
+
+export interface EnbeddedMessagingDismiss {
+  email: string;
+  userId: string;
+  messageId: string;
+  buttonIdentifier: string;
+  deviceInfo: DeviceInfo;
+  createdAt: number;
+}

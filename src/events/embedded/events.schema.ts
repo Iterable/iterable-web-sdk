@@ -59,3 +59,16 @@ export const trackEmbeddedSessionSchema = object().shape({
   ),
   id: string()
 });
+
+export const embaddedMessagingDismissSchema = object().shape({
+  email: string(),
+  userId: string(),
+  messageId: string().required(),
+  buttonIdentifier: string(),
+  deviceInfo: object().shape({
+    deviceId: string().required(),
+    platform: string().required(),
+    appPackageName: string().required()
+  }),
+  createdAt: number()
+});
