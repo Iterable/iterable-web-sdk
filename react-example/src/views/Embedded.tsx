@@ -20,11 +20,10 @@ interface Props {}
 
 export const EmbeddedMessage: FC<Props> = () => {
   const [userId, setUserId] = useState<string>();
-  const [trackResponse, setTrackResponse] = useState<string>(
-    'Endpoint JSON goes here'
-  );
+  const [trackResponse, setTrackResponse] = useState<string>('');
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
+  const [buttonClickedIndex, setButtonClickedIndex] = useState<number>();
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -32,12 +31,15 @@ export const EmbeddedMessage: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setButtonClickedIndex(0);
+
     try {
       await new EmbeddedManager().syncMessages(userId, () =>
         console.log('Synced message')
       );
     } catch (error: any) {
-      console.log('error', error);
+      setTrackResponse(JSON.stringify(error.response.data));
+      setTrackingEvent(false);
     }
   };
 
@@ -45,6 +47,7 @@ export const EmbeddedMessage: FC<Props> = () => {
     e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setButtonClickedIndex(1);
     const receivedMessage = {
       metadata: {
         messageId: 'abc123',
@@ -58,10 +61,12 @@ export const EmbeddedMessage: FC<Props> = () => {
 
     trackEmbeddedMessageReceived(receivedMessage)
       .then((response) => {
-        console.log('Message reception tracked:', response);
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
       })
       .catch((error) => {
-        console.error('Error tracking message reception:', error);
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
       });
   };
 
@@ -69,6 +74,7 @@ export const EmbeddedMessage: FC<Props> = () => {
     e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setButtonClickedIndex(2);
     const payload = {
       messageId: 'abc123',
       campaignId: 1
@@ -85,10 +91,12 @@ export const EmbeddedMessage: FC<Props> = () => {
       appPackageName
     )
       .then((response) => {
-        console.log('Click tracking successful:', response);
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
       })
       .catch((error) => {
-        console.error('Error tracking click:', error);
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
       });
   };
 
@@ -96,6 +104,7 @@ export const EmbeddedMessage: FC<Props> = () => {
     e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setButtonClickedIndex(3);
     const sessionData = {
       id: '123',
       start: new Date(),
@@ -116,10 +125,12 @@ export const EmbeddedMessage: FC<Props> = () => {
 
     trackEmbeddedSession(sessionData)
       .then((response) => {
-        console.log('Session tracking successful:', response);
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
       })
       .catch((error) => {
-        console.error('Error tracking session:', error);
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
       });
   };
 
@@ -127,6 +138,7 @@ export const EmbeddedMessage: FC<Props> = () => {
     e: FormEvent<HTMLFormElement>
   ) => {
     e.preventDefault();
+    setButtonClickedIndex(4);
     const sessionData = {
       email: userId,
       userId: userId,
@@ -197,11 +209,15 @@ export const EmbeddedMessage: FC<Props> = () => {
         required
       />
       <br />
-      {eventsList.map((element: any) => (
+      {eventsList.map((element: any, index: number) => (
         <>
           <Heading>{element.heading}</Heading>
           <EndpointWrapper>
-            <Form onSubmit={element.onSubmit} data-qa-cart-submit>
+            <Form
+              onSubmit={element.onSubmit}
+              data-qa-cart-submit
+              style={{ marginBottom: 20 }}
+            >
               {element.hasInput && (
                 <TextField
                   value={inputValue}
@@ -214,7 +230,9 @@ export const EmbeddedMessage: FC<Props> = () => {
                 {element.btnText}
               </Button>
             </Form>
-            <Response>{trackResponse}</Response>
+            {index === buttonClickedIndex && (
+              <Response>{trackResponse}</Response>
+            )}
           </EndpointWrapper>
         </>
       ))}
