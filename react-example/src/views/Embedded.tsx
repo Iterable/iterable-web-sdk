@@ -8,12 +8,14 @@ import {
   trackEmbeddedMessageClick,
   trackEmbeddedSession
 } from '@iterable/web-sdk';
+import TextField from 'src/components/TextField';
 
 interface Props {}
 
 export const EmbeddedMessage: FC<Props> = () => {
   const [isFetchingEmbeddedMessages, setFetchingEmbeddedMessages] =
     useState<boolean>(false);
+  const [userId, setUserId] = useState<string>();
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -24,7 +26,7 @@ export const EmbeddedMessage: FC<Props> = () => {
     setFetchingEmbeddedMessages(true);
     try {
       await new EmbeddedManager().syncMessages(
-        'harrymash2006@gmail.com',
+        userId,
         'harrymash2006@gmail.com',
         'Web',
         '1',
@@ -126,44 +128,52 @@ export const EmbeddedMessage: FC<Props> = () => {
       });
   };
 
+  const eventsList = [
+    {
+      heading: 'GET /embedded-messaging/events/received',
+      onSubmit: handleFetchEmbeddedMessages,
+      btnText: 'Fetch Embedded Messages'
+    },
+    {
+      heading: 'POST /embedded-messaging/events/received',
+      onSubmit: submitEmbeddedMessagesReceivedEvent,
+      btnText: 'Submit'
+    },
+    {
+      heading: 'POST /embedded-messaging/events/click',
+      onSubmit: submitEmbeddedMessagesClickEvent,
+      btnText: 'Submit'
+    },
+    {
+      heading: 'POST /embedded-messaging/events/impression',
+      onSubmit: submitEmbeddedMessagesImpressionEvent,
+      btnText: 'Submit'
+    }
+  ];
+
   return (
     <>
       <h1>Embedded Message</h1>
-      <Heading>GET /embedded-messaging/events/received</Heading>
-      <EndpointWrapper>
-        <Form onSubmit={handleFetchEmbeddedMessages} data-qa-cart-submit>
-          <Button disabled={isFetchingEmbeddedMessages} type="submit">
-            Fetch Embedded Messages
-          </Button>
-        </Form>
-      </EndpointWrapper>
-
-      <Heading>POST /embedded-messaging/events/received</Heading>
-      <EndpointWrapper>
-        <Form
-          onSubmit={submitEmbeddedMessagesReceivedEvent}
-          data-qa-cart-submit
-        >
-          <Button type="submit">Submit</Button>
-        </Form>
-      </EndpointWrapper>
-
-      <Heading>POST /embedded-messaging/events/click</Heading>
-      <EndpointWrapper>
-        <Form onSubmit={submitEmbeddedMessagesClickEvent} data-qa-cart-submit>
-          <Button type="submit">Submit</Button>
-        </Form>
-      </EndpointWrapper>
-
-      <Heading>POST /embedded-messaging/events/impression</Heading>
-      <EndpointWrapper>
-        <Form
-          onSubmit={submitEmbeddedMessagesImpressionEvent}
-          data-qa-cart-submit
-        >
-          <Button type="submit">Submit</Button>
-        </Form>
-      </EndpointWrapper>
+      <label htmlFor="item-1">UserId</label>
+      <TextField
+        value={userId}
+        onChange={(e) => setUserId(e.target.value)}
+        id="item-1"
+        placeholder="e.g. phone_number"
+        data-qa-update-user-input
+        required
+      />
+      <br />
+      {eventsList.map((element: any) => (
+        <>
+          <Heading>{element.heading}</Heading>
+          <EndpointWrapper>
+            <Form onSubmit={element.onSubmit} data-qa-cart-submit>
+              <Button type="submit">{element.btnText}</Button>
+            </Form>
+          </EndpointWrapper>
+        </>
+      ))}
     </>
   );
 };

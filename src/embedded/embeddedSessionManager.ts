@@ -1,7 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
-import { IEmbeddedSession, IEmbeddedImpression } from '../events/types';
+import {
+  IEmbeddedSession,
+  IEmbeddedImpression
+} from '../events/embedded/types';
 import { IEmbeddedImpressionData } from './types';
-import { trackEmbeddedSession } from '../events/events';
+import { trackEmbeddedSession } from '../events/embedded/events';
 
 class EmbeddedSession {
   public start?: Date;
@@ -86,16 +89,7 @@ export class EmbeddedSessionManager {
         this.getImpressionList()
       );
 
-      await trackEmbeddedSession({
-        session: {
-          end: sessionToTrack.end?.getTime(),
-          start: sessionToTrack.start?.getTime(),
-          id: sessionToTrack.id
-        },
-        deviceInfo: { appPackageName: 'my-lil-site' },
-        ...sessionToTrack
-      });
-
+      await trackEmbeddedSession(sessionToTrack);
       this.impressions = new Map();
     }
   }

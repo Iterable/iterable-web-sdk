@@ -4,9 +4,10 @@ import {
   EmbeddedMessageActionHandler
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessage } from '../events/types';
+import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
-import { trackEmbeddedMessageReceived } from '../events';
+import { embedded_msg_endpoint, ErrorMessage } from './consts';
+import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -42,21 +43,15 @@ export class EmbeddedManager {
     placementIds: number[]
   ) {
     try {
+      let url = `${embedded_msg_endpoint}?userId=${userId}`;
+      url += `&email=${email}`;
+      url += `&platform=${platform}`;
+      url += `&sdkVersion=${sdkVersion}`;
+      url += `&packageName=${packageName}`;
+      url += `&placementIds=${placementIds.join(',')}`;
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url:
-          '/embedded-messaging/messages?userId=' +
-          userId +
-          '&email=' +
-          email +
-          '&platform=' +
-          platform +
-          '&sdkVersion=' +
-          sdkVersion +
-          '&packageName=' +
-          packageName +
-          '&placementIds=' +
-          placementIds
+        url: url
       });
 
       if (iterableResult?.data?.embeddedMessages?.length) {
@@ -65,7 +60,7 @@ export class EmbeddedManager {
           iterableResult?.data?.embeddedMessages
         );
 
-        this.setMessages(processor);
+        this.setMessageProcesser(processor);
         await this.trackNewlyRetrieved(processor);
         this.messages = [...iterableResult?.data?.embeddedMessages];
       }
@@ -74,8 +69,8 @@ export class EmbeddedManager {
         const { msg } = error.response.data;
 
         if (
-          msg.toLowerCase() === 'Invalid API Key'.toLowerCase() ||
-          msg.toLowerCase() === 'SUBSCRIPTION_INACTIVE'.toLowerCase()
+          msg.toLowerCase() === ErrorMessage.invalid_api_key.toLowerCase() ||
+          msg.toLowerCase() === ErrorMessage.subscription_inactive.toLowerCase()
         ) {
           this.notifyDelegatesOfInvalidApiKeyOrSyncStop();
         }
@@ -83,13 +78,12 @@ export class EmbeddedManager {
     }
   }
 
-  public setMessages(_processor: EmbeddedMessagingProcessor) {
+  private setMessageProcesser(_processor: EmbeddedMessagingProcessor) {
     this.messages = _processor.processedMessagesList();
   }
 
-  public async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
+  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
-
     for (let i = 0; i < msgsList.length; i++) {
       await trackEmbeddedMessageReceived(msgsList[i]);
     }
