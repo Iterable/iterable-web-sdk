@@ -1,13 +1,13 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
+import { track } from './events';
 import {
-  track,
   trackInAppClick,
   trackInAppClose,
   trackInAppConsume,
   trackInAppDelivery,
   trackInAppOpen
-} from './events';
+} from './in-app/events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
 

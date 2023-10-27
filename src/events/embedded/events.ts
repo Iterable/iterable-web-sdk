@@ -1,38 +1,21 @@
-import { baseIterableRequest } from '../request';
+import { baseIterableRequest } from '../../request';
 import {
-  InAppTrackRequestParams,
   IEmbeddedMessage,
   IEmbeddedMessageMetadata,
   IEmbeddedSession
-} from './in-app/types';
-import { IterableResponse } from '../types';
+} from './types';
+import { IterableResponse } from '../../types';
 import {
-  trackSchema,
   trackEmbeddedMessageSchema,
   trackEmbeddedMessageClickSchema,
   trackEmbeddedSessionSchema
 } from './events.schema';
-import { EndPoints } from './consts';
-
-export const track = (payload: InAppTrackRequestParams) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.event_track,
-    data: payload,
-    validation: {
-      data: trackSchema
-    }
-  });
-};
+import { EndPoints } from '../consts';
 
 export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/received',
+    url: EndPoints.msg_received_event_track,
     data: payload,
     validation: {
       data: trackEmbeddedMessageSchema
@@ -48,7 +31,7 @@ export const trackEmbeddedMessageClick = (
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/click',
+    url: EndPoints.msg_click_event_track,
     data: {
       messageId: payload.messageId,
       buttonIdentifier: buttonIdentifier,
@@ -66,7 +49,7 @@ export const trackEmbeddedMessageClick = (
 export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/impression',
+    url: EndPoints.msg_impression_event_track,
     data: payload,
     validation: {
       data: trackEmbeddedSessionSchema

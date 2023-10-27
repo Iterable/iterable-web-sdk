@@ -6,7 +6,7 @@ import {
 } from '../constants';
 import { WebInAppDisplaySettings } from '../inapp';
 import { srSpeak } from '../utils/srSpeak';
-import { trackInAppDelivery } from '../events';
+import { trackInAppDelivery } from 'src/events/in-app/events';
 import {
   BrowserStorageEstimate,
   CLOSE_BUTTON_POSITION,
