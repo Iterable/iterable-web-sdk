@@ -25,14 +25,8 @@ export const EmbeddedMessage: FC<Props> = () => {
     e.preventDefault();
     setFetchingEmbeddedMessages(true);
     try {
-      await new EmbeddedManager().syncMessages(
-        userId,
-        'harrymash2006@gmail.com',
-        'Web',
-        '1',
-        'my-website',
-        [],
-        () => console.log('Synced message')
+      await new EmbeddedManager().syncMessages(userId, () =>
+        console.log('Synced message')
       );
     } catch (error: any) {
       setFetchingEmbeddedMessages(false);

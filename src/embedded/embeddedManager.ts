@@ -14,44 +14,16 @@ export class EmbeddedManager {
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
   private actionListeners: EmbeddedMessageActionHandler[] = [];
 
-  public async syncMessages(
-    userId: string,
-    email: string,
-    platform: string,
-    sdkVersion: string,
-    packageName: string,
-    placementIds: number[],
-    callback: () => void
-  ) {
-    await this.retrieveEmbeddedMessages(
-      userId,
-      email,
-      platform,
-      sdkVersion,
-      packageName,
-      placementIds
-    );
+  public async syncMessages(userId: string, callback: () => void) {
+    await this.retrieveEmbeddedMessages(userId);
     callback();
   }
 
-  private async retrieveEmbeddedMessages(
-    userId: string,
-    email: string,
-    platform: string,
-    sdkVersion: string,
-    packageName: string,
-    placementIds: number[]
-  ) {
+  private async retrieveEmbeddedMessages(userId: string) {
     try {
-      let url = `${embedded_msg_endpoint}?userId=${userId}`;
-      url += `&email=${email}`;
-      url += `&platform=${platform}`;
-      url += `&sdkVersion=${sdkVersion}`;
-      url += `&packageName=${packageName}`;
-      url += `&placementIds=${placementIds.join(',')}`;
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: url
+        url: `${embedded_msg_endpoint}?userId=${userId}`
       });
 
       if (iterableResult?.data?.embeddedMessages?.length) {
