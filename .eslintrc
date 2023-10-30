@@ -16,12 +16,6 @@
     "no-extra-boolean-cast": "off",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "eqeqeq": 2,
-    "prettier/prettier": [
-      "error",
-      {
-        "endOfLine": "auto"
-      }
-    ]
+    "eqeqeq": 2
   }
 }

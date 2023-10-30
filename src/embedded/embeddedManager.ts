@@ -48,7 +48,7 @@ export class EmbeddedManager {
       url += `&platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
-      url += `&placementIds=${placementIds.join(',')}`;
+      url += placementIds.map((id) => `&placementIds=${id}`).join('');
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: url

@@ -31,7 +31,7 @@ export const EmbeddedMessage: FC<Props> = () => {
         'Web',
         '1',
         'my-website',
-        [],
+        [0, 1, 2],
         () => console.log('Synced message')
       );
     } catch (error: any) {
