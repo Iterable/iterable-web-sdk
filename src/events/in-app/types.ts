@@ -64,6 +64,8 @@ export interface IEmbeddedMessageElements {
 }
 
 export interface IEmbeddedMessage {
+  messageId: string;
+  userId: string;
   metadata: IEmbeddedMessageMetadata;
   elements?: IEmbeddedMessageElements;
   payload?: Array<any>;

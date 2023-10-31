@@ -1,0 +1,140 @@
+import React, { CSSProperties } from 'react';
+import '../style.css';
+
+interface IBannerProps {
+  imgSrc?: string;
+  title: string;
+  text: string;
+  primaryBtnLabel?: string;
+  secondaryBtnLabel?: string;
+  disablePrimaryBtn?: boolean;
+  disableSecondaryBtn?: boolean;
+  onClickPrimaryBtn?: () => void;
+  onClickSecondaryBtn?: () => void;
+  imgStyle?: CSSProperties;
+  titleStyle?: CSSProperties;
+  BannerStyle?: CSSProperties;
+  textStyle?: CSSProperties;
+  primaryBtnStyle?: CSSProperties;
+  secondaryBtnStyle?: CSSProperties;
+}
+
+export const Banner = (props: IBannerProps) => {
+  const {
+    text,
+    title,
+    BannerStyle,
+    disablePrimaryBtn,
+    disableSecondaryBtn,
+    imgSrc,
+    imgStyle,
+    onClickPrimaryBtn,
+    onClickSecondaryBtn,
+    primaryBtnLabel,
+    primaryBtnStyle,
+    secondaryBtnLabel,
+    secondaryBtnStyle,
+    textStyle,
+    titleStyle
+  } = props;
+
+  const defaultBannerStyles = {
+    border: '1px solid #ccc',
+    borderRadius: '8px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    maxWidth: 'fit-content',
+    margin: 'auto',
+    marginTop: '10px',
+    marginBottom: '10px',
+    padding: '16px'
+  };
+  const defaultImageStyles = {
+    width: '80px',
+    height: '80px',
+    borderRadius: '8px',
+    marginLeft: 10
+  };
+  const defaultTitleStyles = {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  };
+  const defaultTextStyles = {
+    fontSize: '16px',
+    marginBottom: '16px'
+  };
+  const defaultButtonStyles = {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
+    color: '#433d99',
+    border: 'none',
+    borderRadius: 0,
+    cursor: 'pointer'
+  };
+
+  return (
+    <div
+      className="banner"
+      style={{
+        ...defaultBannerStyles,
+        ...BannerStyle
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row'
+        }}
+      >
+        <div>
+          <div>
+            <h3 style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</h3>
+            <p style={{ ...defaultTextStyles, ...textStyle }}>{text}</p>
+          </div>
+          <div className="banner-buttons">
+            {primaryBtnLabel ? (
+              <button
+                disabled={disablePrimaryBtn}
+                style={
+                  disablePrimaryBtn
+                    ? {
+                        ...defaultButtonStyles,
+                        ...primaryBtnStyle,
+                        color: 'grey'
+                      }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                }
+                onClick={onClickPrimaryBtn}
+              >
+                {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
+              </button>
+            ) : null}
+            {secondaryBtnLabel ? (
+              <button
+                disabled={disableSecondaryBtn}
+                style={
+                  disableSecondaryBtn
+                    ? {
+                        ...defaultButtonStyles,
+                        ...secondaryBtnStyle,
+                        color: 'grey'
+                      }
+                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
+                }
+                onClick={onClickSecondaryBtn}
+              >
+                {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              </button>
+            ) : null}
+          </div>
+        </div>
+        <img
+          style={{ ...defaultImageStyles, ...imgStyle }}
+          src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
+          alt={'logo'}
+        />
+      </div>
+    </div>
+  );
+};

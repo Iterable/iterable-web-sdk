@@ -16,7 +16,7 @@ function getParsedEnv() {
 }
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: './src/index.ts',
   output: {
     filename: './index.js',

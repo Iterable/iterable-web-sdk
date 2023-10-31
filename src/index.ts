@@ -9,3 +9,4 @@ export * from './embedded';
 export * from './embedded';
 export * from './components/notification';
 export { config } from './utils/config';
+export * from './components/banner';

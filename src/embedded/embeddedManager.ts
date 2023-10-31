@@ -25,21 +25,20 @@ export class EmbeddedManager {
         method: 'GET',
         url: `${embedded_msg_endpoint}?userId=${userId}`
       });
-
-      if (iterableResult?.data?.embeddedMessages?.length) {
+      if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          iterableResult?.data?.embeddedMessages
+          iterableResult?.data?.placements[0]?.embeddedMessages
         );
-
         this.setMessageProcesser(processor);
-        await this.trackNewlyRetrieved(processor);
-        this.messages = [...iterableResult?.data?.embeddedMessages];
+        await this.trackNewlyRetrieved(processor, userId);
+        this.messages = [
+          ...iterableResult?.data?.placements[0]?.embeddedMessages
+        ];
       }
     } catch (error: any) {
-      if (error.response.data) {
+      if (error?.response?.data) {
         const { msg } = error.response.data;
-
         if (
           msg.toLowerCase() === ErrorMessage.invalid_api_key.toLowerCase() ||
           msg.toLowerCase() === ErrorMessage.subscription_inactive.toLowerCase()
@@ -54,12 +53,22 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
-    const msgsList = _processor.newlyRetrievedMessages();
+  public getMessages(): Array<IEmbeddedMessage> {
+    return this.messages;
+  }
 
-    for (let i = 0; i < msgsList.length; i++) {
-      await trackEmbeddedMessageReceived(msgsList[i]);
-    }
+  private async trackNewlyRetrieved(
+    _processor: EmbeddedMessagingProcessor,
+    userId: string
+  ) {
+    const msgsList = _processor.newlyRetrievedMessages();
+    msgsList.forEach(async (message) => {
+      await trackEmbeddedMessageReceived({
+        ...message,
+        messageId: message?.metadata?.messageId,
+        userId
+      });
+    });
   }
 
   public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler) {
