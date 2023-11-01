@@ -39,27 +39,28 @@ export const Card = (props: ICardProps) => {
   } = props;
 
   const defaultCardStyles = {
+    width: '30%',
     border: '1px solid #ccc',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    maxWidth: 'fit-content',
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',
-    padding: '16px'
+    paddingBottom: '10px'
   };
   const defaultImageStyles = {
     width: '100%',
     height: 'auto',
-    borderRadius: '8px'
+    borderTopLeftRadius: '8px',
+    borderTopRightRadius: '8px'
   };
   const defaultTitleStyles = {
-    fontSize: '20px',
+    fontSize: '18px',
     fontWeight: 'bold',
-    marginBottom: '8px'
+    marginBottom: '10px'
   };
   const defaultTextStyles = {
-    fontSize: '16px',
+    fontSize: '14px',
     marginBottom: '16px'
   };
   const defaultButtonStyles = {
@@ -71,17 +72,21 @@ export const Card = (props: ICardProps) => {
     borderRadius: 0,
     cursor: 'pointer'
   };
+  const defaultTextParentStyles = {
+    margin: '10px'
+  };
 
   return (
     <div className="card" style={{ ...defaultCardStyles, ...cardStyle }}>
       <img
         style={{ ...defaultImageStyles, ...imgStyle }}
-        src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
+        src={imgSrc ? imgSrc : ''}
         alt={'logo'}
       />
-      <div>
-        <h3 style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</h3>
-        <p style={{ ...defaultTextStyles, ...textStyle }}>{text}</p>
+      <div style={{ ...defaultTextParentStyles }}>
+        <text style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</text>
+        <br></br>
+        <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
       </div>
       <div className="card-buttons">
         {primaryBtnLabel ? (

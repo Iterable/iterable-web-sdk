@@ -30,7 +30,7 @@ export class EmbeddedManager {
           [...this.messages],
           iterableResult?.data?.placements[0]?.embeddedMessages
         );
-        this.setMessageProcesser(processor);
+        this.setMessages(processor);
         await this.trackNewlyRetrieved(processor, userId);
         this.messages = [
           ...iterableResult?.data?.placements[0]?.embeddedMessages
@@ -49,12 +49,18 @@ export class EmbeddedManager {
     }
   }
 
-  private setMessageProcesser(_processor: EmbeddedMessagingProcessor) {
+  private setMessages(_processor: EmbeddedMessagingProcessor) {
     this.messages = _processor.processedMessagesList();
   }
 
   public getMessages(): Array<IEmbeddedMessage> {
     return this.messages;
+  }
+
+  public getMessagesForPlacement(placementId: number): Array<IEmbeddedMessage> {
+    return this.messages.filter((message) => {
+      return message.metadata.placementId === placementId;
+    });
   }
 
   private async trackNewlyRetrieved(

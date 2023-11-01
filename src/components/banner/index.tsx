@@ -1,5 +1,6 @@
 import React, { CSSProperties } from 'react';
 import '../style.css';
+import '../../assets/iterable_logo.png';
 
 interface IBannerProps {
   imgSrc?: string;
@@ -42,15 +43,15 @@ export const Banner = (props: IBannerProps) => {
     border: '1px solid #ccc',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    maxWidth: 'fit-content',
+    width: '60%',
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',
     padding: '16px'
   };
   const defaultImageStyles = {
-    width: '80px',
-    height: '80px',
+    width: '70px',
+    height: '70px',
     borderRadius: '8px',
     marginLeft: 10
   };
@@ -63,6 +64,9 @@ export const Banner = (props: IBannerProps) => {
     fontSize: '16px',
     marginBottom: '16px'
   };
+  const bannerButtons = {
+    marginTop: '20px'
+  };
   const defaultButtonStyles = {
     fontSize: '16px',
     fontWeight: 'bold',
@@ -71,6 +75,9 @@ export const Banner = (props: IBannerProps) => {
     border: 'none',
     borderRadius: 0,
     cursor: 'pointer'
+  };
+  const defaultTextParentStyles = {
+    flex: '1'
   };
 
   return (
@@ -87,12 +94,15 @@ export const Banner = (props: IBannerProps) => {
           flexDirection: 'row'
         }}
       >
-        <div>
+        <div style={defaultTextParentStyles}>
           <div>
-            <h3 style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</h3>
-            <p style={{ ...defaultTextStyles, ...textStyle }}>{text}</p>
+            <text style={{ ...defaultTitleStyles, ...titleStyle }}>
+              {title}
+            </text>
+            <br></br>
+            <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
           </div>
-          <div className="banner-buttons">
+          <div style={bannerButtons}>
             {primaryBtnLabel ? (
               <button
                 disabled={disablePrimaryBtn}

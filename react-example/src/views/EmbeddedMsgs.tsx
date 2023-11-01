@@ -31,6 +31,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
     }
   };
 
+  const handleOpenUrl = (type: string, url: string) => {
+    if (type === 'openUrl') {
+      global.open(url, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
     <>
       <h1>Fetch Embedded Msgs</h1>
@@ -139,6 +145,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   ? message?.elements?.buttons[1]?.title
                   : undefined
               }
+              onClickPrimaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[0]?.action?.type,
+                  message?.elements?.buttons[0]?.action?.data
+                );
+              }}
             />
           ))}
 
@@ -151,6 +163,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
               title={message?.elements?.title}
               text={message?.elements?.body}
               imgSrc={message?.elements?.mediaUrl}
+              primaryBtnStyle={{
+                backgroundColor: '#000fff',
+                borderRadius: '8px',
+                padding: '10px',
+                color: '#ffffff'
+              }}
               primaryBtnLabel={
                 message?.elements?.buttons &&
                 message?.elements?.buttons.length > 0
@@ -163,6 +181,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   ? message?.elements?.buttons[1]?.title
                   : undefined
               }
+              onClickPrimaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[0]?.action?.type,
+                  message?.elements?.buttons[0]?.action?.data
+                );
+              }}
             />
           ))}
 
@@ -185,8 +209,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   ? message?.elements?.buttons[1]?.title
                   : undefined
               }
-              onClickPrimaryBtn={() => console.log('onClickPrimaryBtn')}
-              onClickSecondaryBtn={() => console.log('onClickSecondaryBtn')}
+              onClickPrimaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[0]?.action?.type,
+                  message?.elements?.buttons[0]?.action?.data
+                );
+              }}
             />
           ))}
       </div>

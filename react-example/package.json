@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "tsc && webpack",
-    "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n tsc,webpack -k",
+    "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n 'tsc,webpack' -k",
     "test": "jest --config jest.config.js",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\"",
     "typecheck": "tsc --noEmit true --emitDeclarationOnly false",

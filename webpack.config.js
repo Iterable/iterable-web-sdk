@@ -16,7 +16,7 @@ function getParsedEnv() {
 }
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.ts',
   output: {
     filename: './index.js',
@@ -42,6 +42,18 @@ module.exports = {
       {
         test: /\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader']
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'dist/assets/' // Output directory for images
+            }
+          }
+        ]
       }
     ]
   },
