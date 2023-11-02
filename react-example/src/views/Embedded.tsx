@@ -27,11 +27,11 @@ export const EmbeddedMessage: FC<Props> = () => {
     try {
       await new EmbeddedManager().syncMessages(
         userId,
-        'harrymash2006@gmail.com',
+        userId,
         'Web',
         '1',
         'my-website',
-        [0, 1, 2],
+        [9],
         () => console.log('Synced message')
       );
     } catch (error: any) {
