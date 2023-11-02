@@ -21,17 +21,30 @@ interface Props {}
 export const EmbeddedMessage: FC<Props> = () => {
   const [userId, setUserId] = useState<string>();
   const [trackResponse, setTrackResponse] = useState<string>('');
-  const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
   const [inputValue, setInputValue] = useState<string>('');
   const [buttonClickedIndex, setButtonClickedIndex] = useState<number>();
+
+  const TYPE_GET_RECEIVED = 0;
+  const TYPE_POST_RECEIVED = 1;
+  const TYPE_CLICK = 2;
+  const TYPE_IMPRESSION = 3;
+  const TYPE_DISMISS = 4;
+
+  interface EventsProps {
+    heading: string;
+    onSubmit: (e: FormEvent<HTMLFormElement>) => Promise<void>;
+    btnText: string;
+    hasInput: boolean;
+  }
 
   useEffect(() => {
     initialize(process.env.API_KEY);
   }, []);
 
   const handleFetchEmbeddedMessages = async (e: FormEvent<HTMLFormElement>) => {
+    setTrackResponse('');
     e.preventDefault();
-    setButtonClickedIndex(0);
+    setButtonClickedIndex(TYPE_GET_RECEIVED);
 
     try {
       await new EmbeddedManager().syncMessages(userId, () =>
@@ -39,15 +52,15 @@ export const EmbeddedMessage: FC<Props> = () => {
       );
     } catch (error: any) {
       setTrackResponse(JSON.stringify(error.response.data));
-      setTrackingEvent(false);
     }
   };
 
   const submitEmbeddedMessagesReceivedEvent = async (
     e: FormEvent<HTMLFormElement>
   ) => {
+    setTrackResponse('');
     e.preventDefault();
-    setButtonClickedIndex(1);
+    setButtonClickedIndex(TYPE_POST_RECEIVED);
     const receivedMessage = {
       metadata: {
         messageId: 'abc123',
@@ -62,19 +75,18 @@ export const EmbeddedMessage: FC<Props> = () => {
     trackEmbeddedMessageReceived(receivedMessage)
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
       })
       .catch((error) => {
         setTrackResponse(JSON.stringify(error.response.data));
-        setTrackingEvent(false);
       });
   };
 
   const submitEmbeddedMessagesClickEvent = async (
     e: FormEvent<HTMLFormElement>
   ) => {
+    setTrackResponse('');
     e.preventDefault();
-    setButtonClickedIndex(2);
+    setButtonClickedIndex(TYPE_CLICK);
     const payload = {
       messageId: 'abc123',
       campaignId: 1
@@ -92,19 +104,18 @@ export const EmbeddedMessage: FC<Props> = () => {
     )
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
       })
       .catch((error) => {
         setTrackResponse(JSON.stringify(error.response.data));
-        setTrackingEvent(false);
       });
   };
 
   const submitEmbeddedMessagesImpressionEvent = async (
     e: FormEvent<HTMLFormElement>
   ) => {
+    setTrackResponse('');
     e.preventDefault();
-    setButtonClickedIndex(3);
+    setButtonClickedIndex(TYPE_IMPRESSION);
     const sessionData = {
       id: '123',
       start: new Date(),
@@ -126,19 +137,18 @@ export const EmbeddedMessage: FC<Props> = () => {
     trackEmbeddedSession(sessionData)
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
       })
       .catch((error) => {
         setTrackResponse(JSON.stringify(error.response.data));
-        setTrackingEvent(false);
       });
   };
 
   const submitEmbeddedMessagesDismissEvent = async (
     e: FormEvent<HTMLFormElement>
   ) => {
+    setTrackResponse('');
     e.preventDefault();
-    setButtonClickedIndex(4);
+    setButtonClickedIndex(TYPE_DISMISS);
     const sessionData = {
       email: userId,
       userId: userId,
@@ -155,15 +165,13 @@ export const EmbeddedMessage: FC<Props> = () => {
     trackEmbeddedMessagingDismiss(sessionData)
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
       })
       .catch((error) => {
         setTrackResponse(JSON.stringify(error.response.data));
-        setTrackingEvent(false);
       });
   };
 
-  const eventsList = [
+  const eventsList: Array<EventsProps> = [
     {
       heading: 'GET /embedded-messaging/events/received',
       onSubmit: handleFetchEmbeddedMessages,
@@ -209,7 +217,7 @@ export const EmbeddedMessage: FC<Props> = () => {
         required
       />
       <br />
-      {eventsList.map((element: any, index: number) => (
+      {eventsList.map((element: EventsProps, index: number) => (
         <>
           <Heading>{element.heading}</Heading>
           <EndpointWrapper>
@@ -226,9 +234,7 @@ export const EmbeddedMessage: FC<Props> = () => {
                   placeholder={'e.g. df3fe3'}
                 />
               )}
-              <Button disabled={isTrackingEvent} type="submit">
-                {element.btnText}
-              </Button>
+              <Button type="submit">{element.btnText}</Button>
             </Form>
             {index === buttonClickedIndex && (
               <Response>{trackResponse}</Response>
