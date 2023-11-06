@@ -50,7 +50,7 @@ export class EmbeddedSessionManager {
   );
 
   public isTracking(): boolean {
-    return !!this.session.start;
+    return this.session.start !== null;
   }
 
   public startSession() {
@@ -79,7 +79,7 @@ export class EmbeddedSessionManager {
     }
 
     if (this.impressions.size) {
-      //re-initialising session object
+      //reset session for next session start
       this.session = new EmbeddedSession(undefined, undefined, '0', undefined);
 
       const sessionToTrack = new EmbeddedSession(
@@ -90,7 +90,6 @@ export class EmbeddedSessionManager {
       );
 
       await trackEmbeddedSession(sessionToTrack);
-
       this.impressions = new Map();
     }
   }
@@ -116,7 +115,7 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    if (!impressionData?.start) {
+    if (impressionData?.start === null) {
       console.log('onMessageImpressionEnded: impressionStarted is null');
       return;
     }
