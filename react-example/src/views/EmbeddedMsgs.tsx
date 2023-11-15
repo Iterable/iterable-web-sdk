@@ -106,7 +106,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }}
       >
         {messages.length &&
-          messages.map((message: any, index: number) => (
+          messages.map((message, index: number) => (
             <Card
               key={index.toString()}
               cardStyle={{ margin: 0 }}
