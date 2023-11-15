@@ -157,15 +157,17 @@ The tracking function `trackEmbeddedMessageReceived` enables developers to track
 - Example
 ```ts
 const receivedMessage = {
-  metadata: {
-    messageId: 'abc123',
-    campaignId: 1,
-  },
-  elements: {
-    title: 'Welcome Message',
-    body: 'Thank you for using our app!',
-  },
-};
+      messageId: 'abc123',
+      metadata: {
+        messageId: 'abc123',
+        campaignId: 1,
+      },
+      elements: {
+        title: 'Welcome Message',
+        body: 'Thank you for using our app!',
+      },
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    };
 
 trackEmbeddedMessageReceived(receivedMessage)
   .then(response => {
@@ -230,21 +232,27 @@ The tracking function `trackEmbeddedSession` enables developers to track impress
 - Example
 ```ts
 const sessionData = {
-  start: new Date(),
-  end: new Date(),
-  impressions: [
+  "session": {
+    "id": "123",
+    "start": 18686876876876,
+    "end": 1008083828723
+  },
+  "impressions": [
     {
-      messageId: 'abc123',
-      displayCount: 3,
-      duration: 10,
+      "messageId": "abc123",
+      "displayCount": 3,
+      "duration": 10,
+      "displayDuration": 10
     },
     {
-      messageId: 'def456',
-      displayCount: 2,
-      duration: 8,
-    },
+      "messageId": "def456",
+      "displayCount": 2,
+      "duration": 8,
+      "displayDuration": 8
+    }
   ],
-};
+  deviceInfo: { appPackageName: 'my-lil-site' }
+}
 
 trackEmbeddedSession(sessionData)
   .then(response => {

@@ -3,9 +3,10 @@ import {
   InAppTrackRequestParams,
   IEmbeddedMessage,
   IEmbeddedMessageMetadata,
-  IEmbeddedSession
+  IEventEmbeddedSession
 } from './in-app/types';
 import { IterableResponse } from '../types';
+import { WEB_PLATFORM } from '../constants';
 import {
   trackSchema,
   trackEmbeddedMessageSchema,
@@ -33,7 +34,14 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/received',
-    data: payload,
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    },
     validation: {
       data: trackEmbeddedMessageSchema
     }
@@ -54,6 +62,8 @@ export const trackEmbeddedMessageClick = (
       buttonIdentifier: buttonIdentifier,
       targetUrl: clickedUrl,
       deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
         appPackageName: appPackageName
       }
     },
@@ -63,11 +73,18 @@ export const trackEmbeddedMessageClick = (
   });
 };
 
-export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
+export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/impression',
-    data: payload,
+    data: {
+      ...payload,
+      deviceInfo: {
+        ...payload.deviceInfo,
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || ''
+      }
+    },
     validation: {
       data: trackEmbeddedSessionSchema
     }
