@@ -13,6 +13,8 @@ import TextField from 'src/components/TextField';
 interface Props {}
 
 export const EmbeddedMessage: FC<Props> = () => {
+  const [isFetchingEmbeddedMessages, setFetchingEmbeddedMessages] =
+    useState<boolean>(false);
   const [userId, setUserId] = useState<string>();
 
   useEffect(() => {
@@ -21,12 +23,13 @@ export const EmbeddedMessage: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setFetchingEmbeddedMessages(true);
     try {
       await new EmbeddedManager().syncMessages(userId, () =>
         console.log('Synced message')
       );
     } catch (error: any) {
-      console.log('error', error);
+      setFetchingEmbeddedMessages(false);
     }
   };
 
@@ -35,6 +38,7 @@ export const EmbeddedMessage: FC<Props> = () => {
   ) => {
     e.preventDefault();
     const receivedMessage = {
+      messageId: 'abc123',
       metadata: {
         messageId: 'abc123',
         campaignId: 1
@@ -42,7 +46,8 @@ export const EmbeddedMessage: FC<Props> = () => {
       elements: {
         title: 'Welcome Message',
         body: 'Thank you for using our app!'
-      }
+      },
+      deviceInfo: { appPackageName: 'my-lil-site' }
     };
 
     trackEmbeddedMessageReceived(receivedMessage)
@@ -65,7 +70,7 @@ export const EmbeddedMessage: FC<Props> = () => {
 
     const buttonIdentifier = 'button-123';
     const clickedUrl = 'https://example.com';
-    const appPackageName = 'com.example.app';
+    const appPackageName = 'my-lil-site';
 
     trackEmbeddedMessageClick(
       payload,
@@ -86,21 +91,26 @@ export const EmbeddedMessage: FC<Props> = () => {
   ) => {
     e.preventDefault();
     const sessionData = {
-      id: '123',
-      start: new Date(),
-      end: new Date(),
+      session: {
+        id: '123',
+        start: 18686876876876,
+        end: 1008083828723
+      },
       impressions: [
         {
           messageId: 'abc123',
           displayCount: 3,
-          duration: 10
+          duration: 10,
+          displayDuration: 10
         },
         {
           messageId: 'def456',
           displayCount: 2,
-          duration: 8
+          duration: 8,
+          displayDuration: 8
         }
-      ]
+      ],
+      deviceInfo: { appPackageName: 'my-lil-site' }
     };
 
     trackEmbeddedSession(sessionData)

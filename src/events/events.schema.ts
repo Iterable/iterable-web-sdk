@@ -1,4 +1,4 @@
-import { boolean, number, object, string, array, mixed, date } from 'yup';
+import { boolean, number, object, string, array, mixed } from 'yup';
 
 export const trackSchema = object().shape({
   eventName: string().required(),
@@ -65,21 +65,35 @@ export const trackEmbeddedMessageSchema = object().shape({
       })
     )
   }),
-  payload: array().of(mixed())
+  payload: array().of(mixed()),
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
 });
 
 export const trackEmbeddedMessageClickSchema = object().shape({
   messageId: string(),
   buttonIdentifier: string(),
   targetUrl: string(),
-  deviceInfo: object().shape({
-    appPackageName: string()
-  })
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
 });
 
 export const trackEmbeddedSessionSchema = object().shape({
-  start: date(),
-  end: date(),
+  session: object().shape({
+    start: number(),
+    end: number(),
+    id: string()
+  }),
   placementId: string(),
   impressions: array().of(
     object().shape({
@@ -88,5 +102,11 @@ export const trackEmbeddedSessionSchema = object().shape({
       duration: number()
     })
   ),
-  id: string()
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
 });

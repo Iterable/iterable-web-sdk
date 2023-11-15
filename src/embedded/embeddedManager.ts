@@ -6,8 +6,8 @@ import {
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
-import { trackEmbeddedMessageReceived } from '../events';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
+import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -31,7 +31,7 @@ export class EmbeddedManager {
           iterableResult?.data?.placements[0]?.embeddedMessages
         );
         this.setMessages(processor);
-        await this.trackNewlyRetrieved(processor, userId);
+        await this.trackNewlyRetrieved(processor);
         this.messages = [
           ...iterableResult?.data?.placements[0]?.embeddedMessages
         ];
@@ -63,18 +63,11 @@ export class EmbeddedManager {
     });
   }
 
-  private async trackNewlyRetrieved(
-    _processor: EmbeddedMessagingProcessor,
-    userId: string
-  ) {
+  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
-    msgsList.forEach(async (message) => {
-      await trackEmbeddedMessageReceived({
-        ...message,
-        messageId: message?.metadata?.messageId,
-        userId
-      });
-    });
+    for (let i = 0; i < msgsList.length; i++) {
+      await trackEmbeddedMessageReceived(msgsList[i]);
+    }
   }
 
   public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler) {
@@ -91,7 +84,7 @@ export class EmbeddedManager {
   //     });
   // }
 
-  private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
+  public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
       (updateListener: EmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
