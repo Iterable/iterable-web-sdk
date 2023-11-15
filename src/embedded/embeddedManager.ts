@@ -6,8 +6,8 @@ import {
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
-import { trackEmbeddedMessageReceived } from '../events';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
+import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -56,7 +56,6 @@ export class EmbeddedManager {
 
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
-
     for (let i = 0; i < msgsList.length; i++) {
       await trackEmbeddedMessageReceived(msgsList[i]);
     }
@@ -70,7 +69,7 @@ export class EmbeddedManager {
     this.actionListeners.push(actionHandler);
   }
 
-  private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
+  public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
       (updateListener: EmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
