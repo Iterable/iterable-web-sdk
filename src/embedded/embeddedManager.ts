@@ -20,8 +20,8 @@ export class EmbeddedManager {
     platform: string,
     sdkVersion: string,
     packageName: string,
-    placementIds: number[],
-    callback: () => void
+    callback: () => void,
+    placementIds?: number[]
   ) {
     await this.retrieveEmbeddedMessages(
       userId,
@@ -29,7 +29,7 @@ export class EmbeddedManager {
       platform,
       sdkVersion,
       packageName,
-      placementIds
+      placementIds || []
     );
     callback();
   }
