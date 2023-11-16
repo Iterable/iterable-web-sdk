@@ -23,8 +23,8 @@ describe('EmbeddedManager', () => {
         'Web',
         '1',
         'my-website',
-        [0],
-        callbackMock
+        callbackMock,
+        [0]
       );
 
       expect(syncMessagesMock).toHaveBeenCalled();
@@ -48,8 +48,8 @@ describe('EmbeddedManager', () => {
         'Web',
         '1',
         'my-website',
-        [0],
-        jest.fn()
+        jest.fn(),
+        [0]
       );
 
       expect(() => mockTest()).rejects.toMatch('Invalid API Key');
