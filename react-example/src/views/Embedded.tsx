@@ -50,8 +50,14 @@ export const EmbeddedMessage: FC<Props> = () => {
 
     setFetchingEmbeddedMessages(true);
     try {
-      await new EmbeddedManager().syncMessages(userId, () =>
-        console.log('Synced message')
+      await new EmbeddedManager().syncMessages(
+        userId,
+        userId,
+        'Web',
+        '1',
+        'my-website',
+        () => console.log('Synced message'),
+        [9]
       );
     } catch (error: any) {
       setTrackResponse(JSON.stringify(error.response.data));
