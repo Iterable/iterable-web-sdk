@@ -9,6 +9,7 @@ import { CLOSE_BUTTON_POSITION, CachedMessage, InAppMessage } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
+  filterOnlyReadAndNeverTriggerMessages,
   generateCloseButton,
   generateWidth,
   getCachedMessagesToDelete,
@@ -33,7 +34,7 @@ const mockMarkup = `
 `;
 
 describe('Utils', () => {
-  describe('Filtering', () => {
+  describe('filterHiddenInAppMessages', () => {
     it('should filter out read messages', () => {
       expect(filterHiddenInAppMessages()).toEqual([]);
       expect(filterHiddenInAppMessages(messages).every((e) => !e?.read)).toBe(
@@ -125,6 +126,100 @@ describe('Utils', () => {
           }
         ]).length
       ).toBe(0);
+    });
+  });
+
+  describe('filterOnlyReadAndNeverTriggerMessages', () => {
+    it('should filter out read messages', () => {
+      expect(filterOnlyReadAndNeverTriggerMessages()).toEqual([]);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages(messages).every((e) => !e?.read)
+      ).toBe(true);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            read: true
+          },
+          {
+            ...messages[1],
+            read: true
+          }
+        ]).length
+      ).toBe(0);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: { type: 'good' },
+            read: undefined
+          },
+          {
+            ...messages[1],
+            trigger: { type: 'good' },
+            read: undefined
+          }
+        ]).length
+      ).toBe(2);
+    });
+
+    it('should filter out trigger type "never" messages', () => {
+      expect(
+        filterOnlyReadAndNeverTriggerMessages(messages).every(
+          (e) => !e?.trigger?.type
+        )
+      ).not.toBe('never');
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: { type: 'never' }
+          },
+          {
+            ...messages[1],
+            trigger: { type: 'never' }
+          }
+        ]).length
+      ).toBe(0);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: undefined
+          },
+          {
+            ...messages[1],
+            trigger: undefined
+          }
+        ]).length
+      ).toBe(2);
+    });
+
+    it('should not filter out messages with no HTML body', () => {
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            content: { ...messages[0].content, html: '' }
+          },
+          {
+            ...messages[1],
+            content: { ...messages[0].content, html: '<p>' }
+          }
+        ]).length
+      ).toBe(2);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            content: undefined
+          },
+          {
+            ...messages[1],
+            content: undefined
+          }
+        ]).length
+      ).toBe(2);
     });
   });
 
