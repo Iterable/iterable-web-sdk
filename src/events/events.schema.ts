@@ -1,4 +1,4 @@
-import { boolean, number, object, string } from 'yup';
+import { boolean, number, object, string, array, mixed } from 'yup';
 
 export const trackSchema = object().shape({
   eventName: string().required(),
@@ -27,4 +27,85 @@ export const eventRequestSchema = object().shape({
     .required(),
   inboxSessionId: string(),
   createdAt: number()
+});
+
+export const trackEmbeddedMessageSchema = object().shape({
+  messageId: string(),
+  metadata: object().shape({
+    messageId: string(),
+    campaignId: number(),
+    isProof: boolean(),
+    placementId: number()
+  }),
+  elements: object().shape({
+    title: string(),
+    body: string(),
+    mediaUrl: string(),
+    buttons: array().of(
+      object().shape({
+        id: string(),
+        title: string(),
+        action: object().shape({
+          type: string(),
+          data: string()
+        })
+      })
+    ),
+    text: array().of(
+      object().shape({
+        id: string(),
+        text: string()
+      })
+    ),
+    defaultAction: array().of(
+      object().shape({
+        type: string(),
+        data: string()
+      })
+    )
+  }),
+  payload: array().of(mixed()),
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
+});
+
+export const trackEmbeddedMessageClickSchema = object().shape({
+  messageId: string(),
+  buttonIdentifier: string(),
+  targetUrl: string(),
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
+});
+
+export const trackEmbeddedSessionSchema = object().shape({
+  session: object().shape({
+    start: number(),
+    end: number(),
+    id: string()
+  }),
+  placementId: string(),
+  impressions: array().of(
+    object().shape({
+      messageId: string(),
+      displayCount: number(),
+      duration: number()
+    })
+  ),
+  deviceInfo: object()
+    .shape({
+      deviceId: string().required(),
+      platform: string().required(),
+      appPackageName: string().required()
+    })
+    .required()
 });

@@ -1,8 +1,19 @@
 import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
+import {
+  InAppTrackRequestParams,
+  IEmbeddedMessage,
+  IEmbeddedMessageMetadata,
+  IEventEmbeddedSession
+} from './in-app/types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
-import { eventRequestSchema, trackSchema } from './events.schema';
+import {
+  trackSchema,
+  trackEmbeddedMessageSchema,
+  trackEmbeddedMessageClickSchema,
+  trackEmbeddedSessionSchema
+} from './events.schema';
+import { EndPoints } from './consts';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -11,7 +22,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/track',
+    url: EndPoints.event_track,
     data: payload,
     validation: {
       data: trackSchema
@@ -19,14 +30,10 @@ export const track = (payload: InAppTrackRequestParams) => {
   });
 };
 
-export const trackInAppClose = (payload: InAppEventRequestParams) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
+export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClose',
+    url: '/embedded-messaging/events/received',
     data: {
       ...payload,
       deviceInfo: {
@@ -36,54 +43,40 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
       }
     },
     validation: {
-      data: eventRequestSchema
+      data: trackEmbeddedMessageSchema
     }
   });
 };
 
-export const trackInAppOpen = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'inboxSessionId' | 'closeAction'
-  >
+export const trackEmbeddedMessageClick = (
+  payload: IEmbeddedMessageMetadata,
+  buttonIdentifier: string,
+  clickedUrl: string,
+  appPackageName: string
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppOpen',
+    url: '/embedded-messaging/events/click',
     data: {
-      ...payload,
+      messageId: payload.messageId,
+      buttonIdentifier: buttonIdentifier,
+      targetUrl: clickedUrl,
       deviceInfo: {
-        ...payload.deviceInfo,
         platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: appPackageName
       }
     },
     validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
+      data: trackEmbeddedMessageClickSchema
     }
   });
 };
 
-export const trackInAppClick = (
-  payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>,
-  sendBeacon = false
-) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
+export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClick',
-    sendBeacon,
+    url: '/embedded-messaging/events/impression',
     data: {
       ...payload,
       deviceInfo: {
@@ -93,69 +86,7 @@ export const trackInAppClick = (
       }
     },
     validation: {
-      data: eventRequestSchema.omit(['inboxSessionId', 'closeAction'])
-    }
-  });
-};
-
-export const trackInAppDelivery = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'closeAction' | 'inboxSessionId'
-  >
-) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: '/events/trackInAppDelivery',
-    data: {
-      ...payload,
-      deviceInfo: {
-        ...payload.deviceInfo,
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
-      }
-    },
-    validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
-    }
-  });
-};
-
-export const trackInAppConsume = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'closeAction' | 'inboxSessionId'
-  >
-) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: '/events/inAppConsume',
-    data: {
-      ...payload,
-      deviceInfo: {
-        ...payload.deviceInfo,
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
-      }
-    },
-    validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
+      data: trackEmbeddedSessionSchema
     }
   });
 };
