@@ -83,9 +83,10 @@ export const Card = (props: ICardProps) => {
         src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
         alt={'logo'}
       />
-      <div>
-        <h3 style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</h3>
-        <p style={{ ...defaultTextStyles, ...textStyle }}>{text}</p>
+      <div style={{ ...defaultTextParentStyles }}>
+        <text style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</text>
+        <br></br>
+        <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
       </div>
       <div className="card-buttons">
         {primaryBtnLabel ? (
