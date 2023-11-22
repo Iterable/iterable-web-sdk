@@ -14,16 +14,44 @@ export class EmbeddedManager {
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
   private actionListeners: EmbeddedMessageActionHandler[] = [];
 
-  public async syncMessages(userId: string, callback: () => void) {
-    await this.retrieveEmbeddedMessages(userId);
+  public async syncMessages(
+    userId: string,
+    email: string,
+    platform: string,
+    sdkVersion: string,
+    packageName: string,
+    callback: () => void,
+    placementIds?: number[]
+  ) {
+    await this.retrieveEmbeddedMessages(
+      userId,
+      email,
+      platform,
+      sdkVersion,
+      packageName,
+      placementIds || []
+    );
     callback();
   }
 
-  private async retrieveEmbeddedMessages(userId: string) {
+  private async retrieveEmbeddedMessages(
+    userId: string,
+    email: string,
+    platform: string,
+    sdkVersion: string,
+    packageName: string,
+    placementIds: number[]
+  ) {
     try {
+      let url = `${embedded_msg_endpoint}?userId=${userId}`;
+      url += `&email=${email}`;
+      url += `&platform=${platform}`;
+      url += `&sdkVersion=${sdkVersion}`;
+      url += `&packageName=${packageName}`;
+      url += placementIds.map((id) => `&placementIds=${id}`).join('');
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: `${embedded_msg_endpoint}?userId=${userId}`
+        url: url
       });
 
       if (iterableResult?.data?.embeddedMessages?.length) {
