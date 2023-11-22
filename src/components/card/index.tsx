@@ -67,7 +67,7 @@ export const Card = (props: ICardProps) => {
     fontSize: '16px',
     fontWeight: 'bold',
     backgroundColor: 'transparent',
-    color: '#433d99',
+    color: disablePrimaryBtn ? 'grey' : '#433d99',
     border: 'none',
     borderRadius: 0,
     cursor: 'pointer'
@@ -80,27 +80,18 @@ export const Card = (props: ICardProps) => {
     <div className="card" style={{ ...defaultCardStyles, ...cardStyle }}>
       <img
         style={{ ...defaultImageStyles, ...imgStyle }}
-        src={imgSrc ? imgSrc : ''}
+        src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
         alt={'logo'}
       />
-      <div style={{ ...defaultTextParentStyles }}>
-        <text style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</text>
-        <br></br>
-        <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
+      <div>
+        <h3 style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</h3>
+        <p style={{ ...defaultTextStyles, ...textStyle }}>{text}</p>
       </div>
       <div className="card-buttons">
         {primaryBtnLabel ? (
           <button
             disabled={disablePrimaryBtn}
-            style={
-              disablePrimaryBtn
-                ? {
-                    ...defaultButtonStyles,
-                    ...primaryBtnStyle,
-                    color: 'grey'
-                  }
-                : { ...defaultButtonStyles, ...primaryBtnStyle }
-            }
+            style={{ ...defaultButtonStyles, ...primaryBtnStyle }}
             onClick={onClickPrimaryBtn}
           >
             {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
@@ -109,15 +100,7 @@ export const Card = (props: ICardProps) => {
         {secondaryBtnLabel ? (
           <button
             disabled={disableSecondaryBtn}
-            style={
-              disableSecondaryBtn
-                ? {
-                    ...defaultButtonStyles,
-                    ...secondaryBtnStyle,
-                    color: 'grey'
-                  }
-                : { ...defaultButtonStyles, ...secondaryBtnStyle }
-            }
+            style={{ ...defaultButtonStyles, ...secondaryBtnStyle }}
             onClick={onClickSecondaryBtn}
           >
             {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
