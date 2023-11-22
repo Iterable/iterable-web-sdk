@@ -7,7 +7,7 @@ import {
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
-} from 'src/constants';
+} from '../constants';
 import { throttle } from 'throttle-debounce';
 import {
   trackInAppClick,

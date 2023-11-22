@@ -3,10 +3,10 @@ import { setMany } from 'idb-keyval';
 import {
   ANIMATION_DURATION,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
-} from 'src/constants';
-import { WebInAppDisplaySettings } from 'src/inapp';
-import { srSpeak } from 'src/utils/srSpeak';
-import { trackInAppDelivery } from '../events';
+} from '../constants';
+import { WebInAppDisplaySettings } from '../inapp';
+import { srSpeak } from '../utils/srSpeak';
+import { trackInAppDelivery } from 'src/events/in-app/events';
 import {
   BrowserStorageEstimate,
   CLOSE_BUTTON_POSITION,
