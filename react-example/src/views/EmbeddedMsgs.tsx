@@ -23,9 +23,16 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const embeddedManager = new EmbeddedManager();
-      await embeddedManager.syncMessages(userId, () => {
-        setMessages(embeddedManager.getMessages());
-      });
+      await embeddedManager.syncMessages(
+        userId,
+        userId,
+        'Web',
+        '1',
+        'my-website',
+        () => {
+          setMessages(embeddedManager.getMessages());
+        }
+      );
     } catch (error: any) {
       console.log('error', error);
     }
