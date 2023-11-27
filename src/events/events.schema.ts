@@ -31,6 +31,7 @@ export const eventRequestSchema = object().shape({
 
 export const trackEmbeddedMessageSchema = object().shape({
   messageId: string(),
+  userId: string(),
   metadata: object().shape({
     messageId: string(),
     campaignId: number(),

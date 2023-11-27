@@ -1,88 +1,148 @@
 import React, { CSSProperties } from 'react';
 import '../style.css';
+import '../../assets/iterable_logo.png';
 
 interface IBannerProps {
-  heading: string;
-  body: string;
-  buttonText: string;
-  logo: string;
-  buttonStyles?: CSSProperties;
-  bannerStyles?: CSSProperties;
-  logoStyles?: CSSProperties;
-  headingStyles?: CSSProperties;
-  bodyStyles?: CSSProperties;
-  buttonClickHandler?: (e: any) => void;
+  imgSrc?: string;
+  title: string;
+  text: string;
+  primaryBtnLabel?: string;
+  secondaryBtnLabel?: string;
+  disablePrimaryBtn?: boolean;
+  disableSecondaryBtn?: boolean;
+  onClickPrimaryBtn?: () => void;
+  onClickSecondaryBtn?: () => void;
+  imgStyle?: CSSProperties;
+  titleStyle?: CSSProperties;
+  BannerStyle?: CSSProperties;
+  textStyle?: CSSProperties;
+  primaryBtnStyle?: CSSProperties;
+  secondaryBtnStyle?: CSSProperties;
 }
 
 export const Banner = (props: IBannerProps) => {
   const {
-    heading,
-    body,
-    buttonText,
-    logo,
-    bannerStyles,
-    buttonStyles,
-    logoStyles,
-    headingStyles,
-    bodyStyles,
-    buttonClickHandler
+    text,
+    title,
+    BannerStyle,
+    disablePrimaryBtn,
+    disableSecondaryBtn,
+    imgSrc,
+    imgStyle,
+    onClickPrimaryBtn,
+    onClickSecondaryBtn,
+    primaryBtnLabel,
+    primaryBtnStyle,
+    secondaryBtnLabel,
+    secondaryBtnStyle,
+    textStyle,
+    titleStyle
   } = props;
 
   const defaultBannerStyles = {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    padding: '20px',
-    margin: '20px',
+    border: '1px solid #ccc',
     borderRadius: '8px',
-    boxShadow: '0 2px 6px rgba(0, 0, 0, 0.3)'
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+    width: '60%',
+    margin: 'auto',
+    marginTop: '10px',
+    marginBottom: '10px',
+    padding: '16px'
   };
-  const defaultHeadingStyles = {
-    fontSize: '25px',
-    marginBottom: '20px',
-    marginRight: '20px'
+  const defaultImageStyles = {
+    width: '70px',
+    height: '70px',
+    borderRadius: '8px',
+    marginLeft: 10
   };
-  const defaultBodyStyles = {
+  const defaultTitleStyles = {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  };
+  const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '20px',
-    marginRight: '20px'
+    marginBottom: '16px'
+  };
+  const bannerButtons = {
+    marginTop: '20px'
   };
   const defaultButtonStyles = {
-    backgroundColor: '#6c016cf5',
-    color: '#fff',
-    padding: '10px 20px',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
+    color: '#433d99',
     border: 'none',
-    borderRadius: '40px',
-    cursor: 'pointer',
-    marginBottom: '20px'
+    borderRadius: 0,
+    cursor: 'pointer'
   };
-  const defaultLogoStyles = {
-    width: '100%',
-    height: 'auto'
+  const defaultTextParentStyles = {
+    flex: '1'
   };
 
   return (
     <div
-      className="banner-container"
-      style={{ ...defaultBannerStyles, ...bannerStyles }}
+      className="banner"
+      style={{
+        ...defaultBannerStyles,
+        ...BannerStyle
+      }}
     >
-      <div className="content-container ">
-        <h2 style={{ ...defaultHeadingStyles, ...headingStyles }}>{heading}</h2>
-        <p style={{ ...defaultBodyStyles, ...bodyStyles }}>{body}</p>
-        <button
-          style={{ ...defaultButtonStyles, ...buttonStyles }}
-          onClick={
-            buttonClickHandler as React.MouseEventHandler<HTMLButtonElement>
-          }
-        >
-          {buttonText}
-        </button>
-      </div>
-      <div style={{ marginRight: '20px' }}>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row'
+        }}
+      >
+        <div style={defaultTextParentStyles}>
+          <div>
+            <text style={{ ...defaultTitleStyles, ...titleStyle }}>
+              {title}
+            </text>
+            <br></br>
+            <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
+          </div>
+          <div style={bannerButtons}>
+            {primaryBtnLabel ? (
+              <button
+                disabled={disablePrimaryBtn}
+                style={
+                  disablePrimaryBtn
+                    ? {
+                        ...defaultButtonStyles,
+                        ...primaryBtnStyle,
+                        color: 'grey'
+                      }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                }
+                onClick={onClickPrimaryBtn}
+              >
+                {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
+              </button>
+            ) : null}
+            {secondaryBtnLabel ? (
+              <button
+                disabled={disableSecondaryBtn}
+                style={
+                  disableSecondaryBtn
+                    ? {
+                        ...defaultButtonStyles,
+                        ...secondaryBtnStyle,
+                        color: 'grey'
+                      }
+                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
+                }
+                onClick={onClickSecondaryBtn}
+              >
+                {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              </button>
+            ) : null}
+          </div>
+        </div>
         <img
-          src={logo}
-          alt="Logo"
-          style={{ ...defaultLogoStyles, ...logoStyles }}
+          style={{ ...defaultImageStyles, ...imgStyle }}
+          src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
+          alt={'logo'}
         />
       </div>
     </div>

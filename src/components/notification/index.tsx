@@ -25,7 +25,8 @@ export const Notification: React.FC<NotificationProps> = ({
     background: 'white',
     borderRadius: '10px',
     padding: '20px',
-    border: '3px solid #caccd1'
+    border: '3px solid #caccd1',
+    marginBottom: '10px'
   };
 
   const primaryButtonDefaultStyle: CSSProperties = {

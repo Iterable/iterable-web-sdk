@@ -53,21 +53,20 @@ export class EmbeddedManager {
         method: 'GET',
         url: url
       });
-
-      if (iterableResult?.data?.embeddedMessages?.length) {
+      if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          iterableResult?.data?.embeddedMessages
+          iterableResult?.data?.placements[0]?.embeddedMessages
         );
-
-        this.setMessageProcesser(processor);
+        this.setMessages(processor);
         await this.trackNewlyRetrieved(processor);
-        this.messages = [...iterableResult?.data?.embeddedMessages];
+        this.messages = [
+          ...iterableResult?.data?.placements[0]?.embeddedMessages
+        ];
       }
     } catch (error: any) {
-      if (error.response.data) {
+      if (error?.response?.data) {
         const { msg } = error.response.data;
-
         if (
           msg.toLowerCase() === ErrorMessage.invalid_api_key.toLowerCase() ||
           msg.toLowerCase() === ErrorMessage.subscription_inactive.toLowerCase()
@@ -78,8 +77,18 @@ export class EmbeddedManager {
     }
   }
 
-  private setMessageProcesser(_processor: EmbeddedMessagingProcessor) {
+  private setMessages(_processor: EmbeddedMessagingProcessor) {
     this.messages = _processor.processedMessagesList();
+  }
+
+  public getMessages(): Array<IEmbeddedMessage> {
+    return this.messages;
+  }
+
+  public getMessagesForPlacement(placementId: number): Array<IEmbeddedMessage> {
+    return this.messages.filter((message) => {
+      return message.metadata.placementId === placementId;
+    });
   }
 
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
@@ -96,6 +105,12 @@ export class EmbeddedManager {
   public addActionHandler(actionHandler: EmbeddedMessageActionHandler) {
     this.actionListeners.push(actionHandler);
   }
+
+  // private notifyUpdateDelegates() {
+  //     this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
+  //         updateListener.onMessagesUpdated();
+  //     });
+  // }
 
   public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
