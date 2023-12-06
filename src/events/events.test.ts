@@ -308,7 +308,17 @@ describe('Events Requests', () => {
 
   it('should reject embedded message click on bad params', async () => {
     try {
-      await trackEmbeddedMessageClick('abc123', {} as any, '', '', '', 0);
+      await trackEmbeddedMessageClick(
+        'abc123',
+        {
+          messageId: 'abc123',
+          campaignId: 1
+        } as any,
+        '',
+        '',
+        '',
+        0
+      );
     } catch (e: any) {
       expect(e).toEqual(
         createClientError([
@@ -508,7 +518,7 @@ describe('Events Requests', () => {
     ).toBeUndefined();
 
     expect(JSON.parse(trackEmClickResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBe('abc123');
 
     expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
