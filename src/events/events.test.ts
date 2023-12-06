@@ -308,7 +308,7 @@ describe('Events Requests', () => {
 
   it('should reject embedded message click on bad params', async () => {
     try {
-      await trackEmbeddedMessageClick('', {} as any, '', '', '', 0);
+      await trackEmbeddedMessageClick('abc123', {} as any, '', '', '', 0);
     } catch (e: any) {
       expect(e).toEqual(
         createClientError([
