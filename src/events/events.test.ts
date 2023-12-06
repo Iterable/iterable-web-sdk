@@ -295,10 +295,12 @@ describe('Events Requests', () => {
     const clickedUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
     const response = await trackEmbeddedMessageClick(
+      'abc123',
       payload,
       buttonIdentifier,
       clickedUrl,
-      appPackageName
+      appPackageName,
+      0
     );
 
     expect(JSON.parse(response.config.data).messageId).toBe('abc123');
@@ -306,7 +308,7 @@ describe('Events Requests', () => {
 
   it('should reject embedded message click on bad params', async () => {
     try {
-      await trackEmbeddedMessageClick({} as any, '', '', '');
+      await trackEmbeddedMessageClick('', {} as any, '', '', '', 0);
     } catch (e: any) {
       expect(e).toEqual(
         createClientError([
@@ -412,13 +414,15 @@ describe('Events Requests', () => {
       deviceInfo: { appPackageName: 'my-lil-site' }
     });
     const trackEmClickResponse = await trackEmbeddedMessageClick(
+      'abc123',
       {
         messageId: 'abc123',
         campaignId: 1
       },
       'button-123',
       'https://example.com',
-      'my-lil-site'
+      'my-lil-site',
+      0
     );
     const trackSessionResponse = await trackEmbeddedSession({
       session: {
