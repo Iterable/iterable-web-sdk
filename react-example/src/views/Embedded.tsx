@@ -12,7 +12,8 @@ import {
   trackEmbeddedMessageReceived,
   trackEmbeddedMessageClick,
   trackEmbeddedSession,
-  trackEmbeddedMessagingDismiss
+  trackEmbeddedMessagingDismiss,
+  trackEmbeddedMessagingSession
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 
@@ -31,6 +32,7 @@ export const EmbeddedMessage: FC<Props> = () => {
   const TYPE_CLICK = 2;
   const TYPE_IMPRESSION = 3;
   const TYPE_DISMISS = 4;
+  const TYPE_SESSION = 5;
 
   interface EventsProps {
     heading: string;
@@ -72,16 +74,10 @@ export const EmbeddedMessage: FC<Props> = () => {
     e.preventDefault();
     setButtonClickedIndex(TYPE_POST_RECEIVED);
     const receivedMessage = {
+      userId: 'abc123',
       messageId: 'abc123',
-      metadata: {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      elements: {
-        title: 'Welcome Message',
-        body: 'Thank you for using our app!'
-      },
-      deviceInfo: { appPackageName: 'my-lil-site' }
+      deviceInfo: { appPackageName: 'my-lil-site' },
+      createdAt: 1627060811283
     };
 
     trackEmbeddedMessageReceived(receivedMessage)
@@ -109,10 +105,12 @@ export const EmbeddedMessage: FC<Props> = () => {
     const appPackageName = 'my-lil-site';
 
     trackEmbeddedMessageClick(
+      'abc123',
       payload,
       buttonIdentifier,
       clickedUrl,
-      appPackageName
+      appPackageName,
+      1627060811283
     )
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
@@ -140,12 +138,6 @@ export const EmbeddedMessage: FC<Props> = () => {
           displayCount: 3,
           duration: 10,
           displayDuration: 10
-        },
-        {
-          messageId: 'def456',
-          displayCount: 2,
-          duration: 8,
-          displayDuration: 8
         }
       ],
       deviceInfo: { appPackageName: 'my-lil-site' }
@@ -188,6 +180,42 @@ export const EmbeddedMessage: FC<Props> = () => {
       });
   };
 
+  const submitEmbeddedSessionEvent = async (e: FormEvent<HTMLFormElement>) => {
+    setTrackResponse('');
+    e.preventDefault();
+    setButtonClickedIndex(TYPE_SESSION);
+    const sessionData = {
+      userId: 'abcd123',
+      session: {
+        id: 'abcd123',
+        start: 1701753762,
+        end: 1701754590
+      },
+      impressions: [
+        {
+          messageId: 'abcd123',
+          displayCount: 1,
+          displayDuration: 1000
+        }
+      ],
+      deviceInfo: {
+        deviceId:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        platform: 'Web',
+        appPackageName: 'my-lil-site'
+      },
+      createdAt: 1701754590
+    };
+
+    trackEmbeddedMessagingSession(sessionData)
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+      });
+  };
+
   const eventsList: Array<EventsProps> = [
     {
       heading: 'GET /embedded-messaging/events/received',
@@ -218,6 +246,12 @@ export const EmbeddedMessage: FC<Props> = () => {
       onSubmit: submitEmbeddedMessagesDismissEvent,
       btnText: 'Submit',
       hasInput: true
+    },
+    {
+      heading: 'POST /embedded-messaging/events/session',
+      onSubmit: submitEmbeddedSessionEvent,
+      btnText: 'Submit',
+      hasInput: false
     }
   ];
 

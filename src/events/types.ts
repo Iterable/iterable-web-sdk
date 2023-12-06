@@ -73,15 +73,15 @@ export interface EnbeddedMessagingDismiss {
 
 export interface Session {
   id: string;
-  start: string;
-  end: string;
+  start: number;
+  end: number;
 }
 
 export interface Impression {
   messageId: string;
   displayCount: number;
   displayDuration: number;
-  placementId?: string;
+  placementId?: number;
 }
 
 export interface EnbeddedMessagingSession {

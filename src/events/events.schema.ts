@@ -76,7 +76,8 @@ export const trackEmbeddedMessageSchema = object().shape({
 });
 
 export const trackEmbeddedMessageClickSchema = object().shape({
-  messageId: string(),
+  userId: string().required(),
+  messageId: string().required(),
   buttonIdentifier: string(),
   targetUrl: string(),
   deviceInfo: object()
@@ -85,7 +86,8 @@ export const trackEmbeddedMessageClickSchema = object().shape({
       platform: string().required(),
       appPackageName: string().required()
     })
-    .required()
+    .required(),
+  createdAt: number().required()
 });
 
 export const trackEmbeddedSessionSchema = object().shape({
@@ -109,4 +111,42 @@ export const trackEmbeddedSessionSchema = object().shape({
       appPackageName: string().required()
     })
     .required()
+});
+
+export const embaddedMessagingDismissSchema = object().shape({
+  email: string(),
+  userId: string(),
+  messageId: string().required(),
+  buttonIdentifier: string(),
+  deviceInfo: object().shape({
+    deviceId: string().required(),
+    platform: string().required(),
+    appPackageName: string().required()
+  }),
+  createdAt: number()
+});
+
+export const embaddedMessagingSessionSchema = object().shape({
+  userId: string().required(),
+  session: object()
+    .shape({
+      id: string().required(),
+      start: string().required(),
+      end: string().required()
+    })
+    .required(),
+  impressions: array().of(
+    object().shape({
+      messageId: string().required(),
+      displayCount: number().required(),
+      displayDuration: number().required(),
+      placementId: string()
+    })
+  ),
+  deviceInfo: object().shape({
+    deviceId: string().required(),
+    platform: string().required(),
+    appPackageName: string().required()
+  }),
+  createdAt: number()
 });

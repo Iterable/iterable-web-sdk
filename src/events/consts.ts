@@ -8,5 +8,6 @@ export const EndPoints = {
   track_app_click: '/events/trackInAppClick',
   track_app_delivery: '/events/trackInAppDelivery',
   track_app_consume: '/events/inAppConsume',
-  msg_dismiss: '/embedded-messaging/events/dismiss'
+  msg_dismiss: '/embedded-messaging/events/dismiss',
+  msg_session_event_track: '/embedded-messaging/events/session'
 };
