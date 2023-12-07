@@ -504,7 +504,7 @@ describe('Events Requests', () => {
     ).toBeUndefined();
 
     expect(JSON.parse(trackEmClickResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBe('abc123');
+    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBeUndefined();
 
     expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
