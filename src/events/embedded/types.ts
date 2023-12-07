@@ -70,24 +70,3 @@ export interface EnbeddedMessagingDismiss {
   deviceInfo: DeviceInfo;
   createdAt: number;
 }
-
-export interface Session {
-  id: string;
-  start: string;
-  end: string;
-}
-
-export interface Impression {
-  messageId: string;
-  displayCount: number;
-  displayDuration: number;
-  placementId?: string;
-}
-
-export interface EnbeddedMessagingSession {
-  userId: string;
-  session: Session;
-  impressions: Array<Impression>;
-  deviceInfo: DeviceInfo;
-  createdAt: number;
-}

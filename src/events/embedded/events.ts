@@ -3,16 +3,14 @@ import {
   IEmbeddedMessage,
   IEmbeddedMessageMetadata,
   IEmbeddedSession,
-  EnbeddedMessagingDismiss,
-  EnbeddedMessagingSession
+  EnbeddedMessagingDismiss
 } from './types';
 import { IterableResponse } from '../../types';
 import {
   trackEmbeddedMessageSchema,
   trackEmbeddedMessageClickSchema,
   trackEmbeddedSessionSchema,
-  embaddedMessagingDismissSchema,
-  embaddedMessagingSessionSchema
+  embaddedMessagingDismissSchema
 } from './events.schema';
 import { EndPoints } from '../consts';
 
@@ -70,19 +68,6 @@ export const trackEmbeddedMessagingDismiss = (
     data: payload,
     validation: {
       data: embaddedMessagingDismissSchema
-    }
-  });
-};
-
-export const trackEmbeddedMessagingSession = (
-  payload: EnbeddedMessagingSession
-) => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.msg_session_event_track,
-    data: payload,
-    validation: {
-      data: embaddedMessagingSessionSchema
     }
   });
 };

@@ -11,13 +11,9 @@ import {
   trackSchema,
   trackEmbeddedMessageSchema,
   trackEmbeddedMessageClickSchema,
-  trackEmbeddedSessionSchema,
-  embaddedMessagingDismissSchema,
-  embaddedMessagingSessionSchema
+  trackEmbeddedSessionSchema
 } from './events.schema';
 import { EndPoints } from './consts';
-
-import { EnbeddedMessagingDismiss, EnbeddedMessagingSession } from './types';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -53,18 +49,15 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
 };
 
 export const trackEmbeddedMessageClick = (
-  userId: string,
   payload: IEmbeddedMessageMetadata,
   buttonIdentifier: string,
   clickedUrl: string,
-  appPackageName: string,
-  createdAt: number
+  appPackageName: string
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/click',
     data: {
-      userId: userId,
       messageId: payload.messageId,
       buttonIdentifier: buttonIdentifier,
       targetUrl: clickedUrl,
@@ -72,8 +65,7 @@ export const trackEmbeddedMessageClick = (
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
         appPackageName: appPackageName
-      },
-      createdAt: createdAt
+      }
     },
     validation: {
       data: trackEmbeddedMessageClickSchema
@@ -95,32 +87,6 @@ export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
     },
     validation: {
       data: trackEmbeddedSessionSchema
-    }
-  });
-};
-
-export const trackEmbeddedMessagingDismiss = (
-  payload: EnbeddedMessagingDismiss
-) => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.msg_dismiss,
-    data: payload,
-    validation: {
-      data: embaddedMessagingDismissSchema
-    }
-  });
-};
-
-export const trackEmbeddedMessagingSession = (
-  payload: EnbeddedMessagingSession
-) => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.msg_session_event_track,
-    data: payload,
-    validation: {
-      data: embaddedMessagingSessionSchema
     }
   });
 };
