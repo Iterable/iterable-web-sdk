@@ -78,8 +78,8 @@ export const embaddedMessagingSessionSchema = object().shape({
   session: object()
     .shape({
       id: string().required(),
-      start: string().required(),
-      end: string().required()
+      start: number().required(),
+      end: number().required()
     })
     .required(),
   impressions: array().of(

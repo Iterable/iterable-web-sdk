@@ -1,0 +1,235 @@
+import { FC, FormEvent, useState } from 'react';
+import {
+  Button,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from '../views/Components.styled';
+import {
+  EmbeddedManager,
+  trackEmbeddedMessageReceived,
+  trackEmbeddedMessageClick,
+  trackEmbeddedMessagingDismiss,
+  trackEmbeddedMessagingSession
+} from '@iterable/web-sdk';
+import TextField from 'src/components/TextField';
+
+interface Props {
+  userId: string;
+  endpointName: string;
+  heading: string;
+  needsInputField?: boolean;
+  type: number;
+}
+
+export const TYPE_GET_RECEIVED = 0;
+export const TYPE_POST_RECEIVED = 1;
+export const TYPE_CLICK = 2;
+export const TYPE_DISMISS = 3;
+export const TYPE_SESSION = 4;
+
+export const EmbeddedForm: FC<Props> = ({
+  userId,
+  endpointName,
+  heading,
+  needsInputField,
+  type
+}) => {
+  const [trackResponse, setTrackResponse] = useState<string>(
+    'Endpoint JSON goes here'
+  );
+
+  const [messageId, setMessageId] = useState<string>('');
+
+  const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
+
+  const handleFetchEmbeddedMessages = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      await new EmbeddedManager().syncMessages(
+        userId,
+        userId,
+        'Web',
+        '1',
+        'my-website',
+        () => console.log('Synced message'),
+        [9]
+      );
+    } catch (error: any) {
+      setTrackResponse(JSON.stringify(error.response.data));
+    }
+  };
+
+  const submitEmbeddedMessagesReceivedEvent = async (
+    e: FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setTrackingEvent(true);
+
+    const receivedMessage = {
+      userId: userId,
+      messageId: messageId,
+      deviceInfo: { appPackageName: 'my-lil-site' },
+      createdAt: 1627060811283
+    };
+
+    trackEmbeddedMessageReceived(receivedMessage)
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
+      });
+  };
+
+  const submitEmbeddedMessagesClickEvent = async (
+    e: FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setTrackingEvent(true);
+
+    const payload = {
+      messageId: messageId,
+      campaignId: 1
+    };
+
+    const buttonIdentifier = 'button-123';
+    const clickedUrl = 'https://example.com';
+    const appPackageName = 'my-lil-site';
+
+    trackEmbeddedMessageClick(
+      userId,
+      payload,
+      buttonIdentifier,
+      clickedUrl,
+      appPackageName,
+      1627060811283
+    )
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
+      });
+  };
+
+  const submitEmbeddedMessagesDismissEvent = async (
+    e: FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+    setTrackingEvent(true);
+
+    const sessionData = {
+      email: userId,
+      userId: userId,
+      messageId: messageId,
+      buttonIdentifier: '123',
+      deviceInfo: {
+        deviceId: '123',
+        platform: 'web',
+        appPackageName: 'my-website'
+      },
+      createdAt: 1627060811283
+    };
+
+    trackEmbeddedMessagingDismiss(sessionData)
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
+      });
+  };
+
+  const submitEmbeddedSessionEvent = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setTrackingEvent(true);
+
+    const sessionData = {
+      userId: userId,
+      session: {
+        id: 'abcd123',
+        start: 1701753762,
+        end: 1701754590
+      },
+      impressions: [
+        {
+          messageId: messageId,
+          displayCount: 1,
+          displayDuration: 1000
+        }
+      ],
+      deviceInfo: {
+        deviceId:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+        platform: 'Web',
+        appPackageName: 'my-lil-site'
+      },
+      createdAt: 1701754590
+    };
+
+    trackEmbeddedMessagingSession(sessionData)
+      .then((response) => {
+        setTrackResponse(JSON.stringify(response.data));
+        setTrackingEvent(false);
+      })
+      .catch((error) => {
+        setTrackResponse(JSON.stringify(error.response.data));
+        setTrackingEvent(false);
+      });
+  };
+
+  const handleTrack = (e: FormEvent<HTMLFormElement>, type: number) => {
+    if (type === TYPE_GET_RECEIVED) {
+      handleFetchEmbeddedMessages(e);
+    } else if (type === TYPE_POST_RECEIVED) {
+      submitEmbeddedMessagesReceivedEvent(e);
+    } else if (type === TYPE_CLICK) {
+      submitEmbeddedMessagesClickEvent(e);
+    } else if (type === TYPE_DISMISS) {
+      submitEmbeddedMessagesDismissEvent(e);
+    } else if (type === TYPE_SESSION) {
+      submitEmbeddedSessionEvent(e);
+    }
+  };
+
+  const formAttr = { [`data-qa-${endpointName}-submit`]: true };
+  const inputAttr = { [`data-qa-${endpointName}-input`]: true };
+  const responseAttr = { [`data-qa-${endpointName}-response`]: true };
+
+  return (
+    <>
+      <Heading>{heading}</Heading>
+      <EndpointWrapper>
+        <Form onSubmit={(e) => handleTrack(e, type)} {...formAttr}>
+          {needsInputField && (
+            <>
+              <label htmlFor="item-1">Enter Message ID</label>
+              <TextField
+                value={messageId}
+                onChange={(e) => setMessageId(e.target.value)}
+                id="item-1"
+                placeholder={'e.g. df3fe3'}
+                {...inputAttr}
+              />
+            </>
+          )}
+          <Button disabled={isTrackingEvent} type="submit">
+            Submit
+          </Button>
+        </Form>
+        <Response {...responseAttr}>{trackResponse}</Response>
+      </EndpointWrapper>
+    </>
+  );
+};
+
+export default EmbeddedForm;
