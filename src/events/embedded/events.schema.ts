@@ -72,3 +72,28 @@ export const embaddedMessagingDismissSchema = object().shape({
   }),
   createdAt: number()
 });
+
+export const embaddedMessagingSessionSchema = object().shape({
+  userId: string().required(),
+  session: object()
+    .shape({
+      id: string().required(),
+      start: number().required(),
+      end: number().required()
+    })
+    .required(),
+  impressions: array().of(
+    object().shape({
+      messageId: string().required(),
+      displayCount: number().required(),
+      displayDuration: number().required(),
+      placementId: string()
+    })
+  ),
+  deviceInfo: object().shape({
+    deviceId: string().required(),
+    platform: string().required(),
+    appPackageName: string().required()
+  }),
+  createdAt: number()
+});
