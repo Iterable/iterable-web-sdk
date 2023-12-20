@@ -19,7 +19,12 @@
       { "transform": "typescript-transform-paths", "afterDeclarations": true }
     ]
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "src/iterable_logo.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
   "exclude": [
     "node_modules",
     "**/__tests__/*",

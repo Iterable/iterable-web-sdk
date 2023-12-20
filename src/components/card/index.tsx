@@ -1,5 +1,4 @@
 import React, { CSSProperties } from 'react';
-import '../style.css';
 
 interface ICardProps {
   imgSrc?: string;
@@ -70,14 +69,18 @@ export const Card = (props: ICardProps) => {
     color: disablePrimaryBtn ? 'grey' : '#433d99',
     border: 'none',
     borderRadius: 0,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    marginTop: '40px',
+    marginBottom: '10px',
+    marginRight: '50px',
+    padding: '5px'
   };
   const defaultTextParentStyles = {
     margin: '10px'
   };
 
   return (
-    <div className="card" style={{ ...defaultCardStyles, ...cardStyle }}>
+    <div style={{ ...defaultCardStyles, ...cardStyle }}>
       <img
         style={{ ...defaultImageStyles, ...imgStyle }}
         src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
@@ -88,7 +91,7 @@ export const Card = (props: ICardProps) => {
         <br></br>
         <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
       </div>
-      <div className="card-buttons">
+      <div>
         {primaryBtnLabel ? (
           <button
             disabled={disablePrimaryBtn}

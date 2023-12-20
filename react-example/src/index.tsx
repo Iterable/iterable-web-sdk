@@ -1,6 +1,5 @@
 import { initialize } from '@iterable/web-sdk';
 import axios from 'axios';
-import ReactDOM from 'react-dom';
 import './styles/index.css';
 
 import Home from 'src/views/Home';
@@ -16,6 +15,7 @@ import LoginForm from 'src/components/LoginForm';
 import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
+import { createRoot } from 'react-dom/client';
 
 const Wrapper = styled.div`
   display: flex;
@@ -63,7 +63,9 @@ const HomeLink = styled(Link)`
     }
   );
 
-  ReactDOM.render(
+  const container = document.getElementById('root');
+  const root = createRoot(container);
+  root.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
@@ -90,7 +92,6 @@ const HomeLink = styled(Link)`
           </RouteWrapper>
         </UserProvider>
       </Wrapper>
-    </BrowserRouter>,
-    document.getElementById('root')
+    </BrowserRouter>
   );
 })();

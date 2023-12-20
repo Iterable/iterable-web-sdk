@@ -1,6 +1,4 @@
 import React, { CSSProperties } from 'react';
-import '../style.css';
-import '../../assets/iterable_logo.png';
 
 interface IBannerProps {
   imgSrc?: string;
