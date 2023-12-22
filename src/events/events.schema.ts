@@ -76,7 +76,8 @@ export const trackEmbeddedMessageSchema = object().shape({
 });
 
 export const trackEmbeddedMessageClickSchema = object().shape({
-  userId: string().required(),
+  email: string(),
+  userId: string(),
   messageId: string().required(),
   buttonIdentifier: string(),
   targetUrl: string(),
@@ -127,7 +128,8 @@ export const embaddedMessagingDismissSchema = object().shape({
 });
 
 export const embaddedMessagingSessionSchema = object().shape({
-  userId: string().required(),
+  email: string(),
+  userId: string(),
   session: object()
     .shape({
       id: string().required(),

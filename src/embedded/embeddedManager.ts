@@ -43,12 +43,25 @@ export class EmbeddedManager {
     placementIds: number[]
   ) {
     try {
-      let url = `${embedded_msg_endpoint}?userId=${userId}`;
-      url += `&email=${email}`;
-      url += `&platform=${platform}`;
+      let url = `${embedded_msg_endpoint}?`;
+
+      if (userId.trim() !== '') {
+        url += `userId=${userId}&`;
+      }
+
+      if (email.trim() !== '') {
+        url += `email=${email}&`;
+      }
+
+      url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
-      url += placementIds.map((id) => `&placementIds=${id}`).join('');
+
+      if (placementIds.length > 0) {
+        url += placementIds.map((id) => `&placementIds=${id}`).join('');
+      }
+      url = url.replace(/&$/, '');
+
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: url
@@ -56,12 +69,12 @@ export class EmbeddedManager {
       if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          iterableResult?.data?.placements[0]?.embeddedMessages
+          this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
         await this.trackNewlyRetrieved(processor);
         this.messages = [
-          ...iterableResult?.data?.placements[0]?.embeddedMessages
+          ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];
       }
     } catch (error: any) {
@@ -75,6 +88,14 @@ export class EmbeddedManager {
         }
       }
     }
+  }
+
+  private getEmbeddedMessages(placements: any): IEmbeddedMessage[] {
+    let messages: IEmbeddedMessage[] = [];
+    placements.forEach((placement: any) => {
+      messages = [...messages, ...placement.embeddedMessages];
+    });
+    return messages;
   }
 
   private setMessages(_processor: EmbeddedMessagingProcessor) {
