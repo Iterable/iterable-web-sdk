@@ -53,18 +53,20 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
 };
 
 export const trackEmbeddedMessageClick = (
-  userId: string,
   payload: IEmbeddedMessageMetadata,
   buttonIdentifier: string,
   clickedUrl: string,
   appPackageName: string,
-  createdAt: number
+  createdAt: number,
+  userId?: string,
+  email?: string
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/click',
     data: {
       userId: userId,
+      email: email,
       messageId: payload.messageId,
       buttonIdentifier: buttonIdentifier,
       targetUrl: clickedUrl,
