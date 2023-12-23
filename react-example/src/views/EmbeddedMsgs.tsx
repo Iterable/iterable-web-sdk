@@ -15,6 +15,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -24,8 +25,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
     try {
       const embeddedManager = new EmbeddedManager();
       await embeddedManager.syncMessages(
-        userId,
-        userId,
+        emailRegex.test(userId) ? '' : userId,
+        emailRegex.test(userId) ? userId : '',
         'Web',
         '1',
         'my-website',
