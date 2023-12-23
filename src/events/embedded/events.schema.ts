@@ -74,7 +74,8 @@ export const embaddedMessagingDismissSchema = object().shape({
 });
 
 export const embaddedMessagingSessionSchema = object().shape({
-  userId: string().required(),
+  email: string(),
+  userId: string(),
   session: object()
     .shape({
       id: string().required(),
