@@ -43,19 +43,19 @@ export const EmbeddedForm: FC<Props> = ({
   const [messageId, setMessageId] = useState<string>('');
 
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleFetchEmbeddedMessages = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       await new EmbeddedManager().syncMessages(
-        userId,
-        userId,
+        emailRegex.test(userId) ? '' : userId,
+        emailRegex.test(userId) ? userId : '',
         'Web',
         '1',
         'my-website',
-        () => console.log('Synced message'),
-        [9]
+        () => console.log('Synced message')
       );
     } catch (error: any) {
       setTrackResponse(JSON.stringify(error.response.data));
@@ -69,7 +69,8 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const receivedMessage = {
-      userId: userId,
+      email: emailRegex.test(userId) ? userId : undefined,
+      userId: emailRegex.test(userId) ? undefined : userId,
       messageId: messageId,
       deviceInfo: { appPackageName: 'my-lil-site' },
       createdAt: 1627060811283
@@ -102,12 +103,13 @@ export const EmbeddedForm: FC<Props> = ({
     const appPackageName = 'my-lil-site';
 
     trackEmbeddedMessageClick(
-      userId,
       payload,
       buttonIdentifier,
       clickedUrl,
       appPackageName,
-      1627060811283
+      1627060811283,
+      emailRegex.test(userId) ? undefined : userId,
+      emailRegex.test(userId) ? userId : undefined
     )
       .then((response) => {
         setTrackResponse(JSON.stringify(response.data));
@@ -126,8 +128,8 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      email: userId,
-      userId: userId,
+      email: emailRegex.test(userId) ? userId : undefined,
+      userId: emailRegex.test(userId) ? undefined : userId,
       messageId: messageId,
       buttonIdentifier: '123',
       deviceInfo: {
@@ -154,7 +156,8 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      userId: userId,
+      userId: emailRegex.test(userId) ? undefined : userId,
+      email: emailRegex.test(userId) ? userId : undefined,
       session: {
         id: 'abcd123',
         start: 1701753762,
