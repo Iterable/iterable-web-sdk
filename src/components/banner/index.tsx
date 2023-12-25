@@ -16,6 +16,7 @@ interface IBannerProps {
   textStyle?: CSSProperties;
   primaryBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
+  onClickView?: () => void;
 }
 
 export const Banner = (props: IBannerProps) => {
@@ -34,7 +35,8 @@ export const Banner = (props: IBannerProps) => {
     secondaryBtnLabel,
     secondaryBtnStyle,
     textStyle,
-    titleStyle
+    titleStyle,
+    onClickView
   } = props;
 
   const defaultBannerStyles = {
@@ -85,6 +87,7 @@ export const Banner = (props: IBannerProps) => {
         ...defaultBannerStyles,
         ...BannerStyle
       }}
+      onClick={onClickView}
     >
       <div
         style={{
