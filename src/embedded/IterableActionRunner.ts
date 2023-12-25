@@ -35,8 +35,6 @@ class IterableActionRunnerConfig {
 }
 
 class IterableActionRunnerImpl {
-  private static TAG = 'IterableActionRunner';
-
   executeAction(
     context: any,
     action: IterableAction | null,
