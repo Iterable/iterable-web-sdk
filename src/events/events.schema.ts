@@ -1,36 +1,7 @@
-import { boolean, number, object, string, array, mixed } from 'yup';
-
-export const trackSchema = object().shape({
-  eventName: string().required(),
-  id: string(),
-  createdAt: number(),
-  dataFields: object(),
-  campaignId: number(),
-  templateId: number()
-});
-
-export const eventRequestSchema = object().shape({
-  messageId: string().required(),
-  clickedUrl: string(),
-  messageContext: object().shape({
-    saveToInbox: boolean(),
-    silentInbox: boolean(),
-    location: string()
-  }),
-  closeAction: string(),
-  deviceInfo: object()
-    .shape({
-      deviceId: string().required(),
-      platform: string().required(),
-      appPackageName: string().required()
-    })
-    .required(),
-  inboxSessionId: string(),
-  createdAt: number()
-});
+import { boolean, number, object, string, array, mixed, date } from 'yup';
 
 export const trackEmbeddedMessageSchema = object().shape({
-  messageId: string(),
+  email: string(),
   userId: string(),
   metadata: object().shape({
     messageId: string(),
@@ -65,38 +36,21 @@ export const trackEmbeddedMessageSchema = object().shape({
       })
     )
   }),
-  payload: array().of(mixed()),
-  deviceInfo: object()
-    .shape({
-      deviceId: string().required(),
-      platform: string().required(),
-      appPackageName: string().required()
-    })
-    .required()
+  payload: array().of(mixed())
 });
 
 export const trackEmbeddedMessageClickSchema = object().shape({
-  email: string(),
-  userId: string(),
-  messageId: string().required(),
+  messageId: string(),
   buttonIdentifier: string(),
   targetUrl: string(),
-  deviceInfo: object()
-    .shape({
-      deviceId: string().required(),
-      platform: string().required(),
-      appPackageName: string().required()
-    })
-    .required(),
-  createdAt: number().required()
+  deviceInfo: object().shape({
+    appPackageName: string()
+  })
 });
 
 export const trackEmbeddedSessionSchema = object().shape({
-  session: object().shape({
-    start: number(),
-    end: number(),
-    id: string()
-  }),
+  start: date(),
+  end: date(),
   placementId: string(),
   impressions: array().of(
     object().shape({
@@ -105,13 +59,7 @@ export const trackEmbeddedSessionSchema = object().shape({
       duration: number()
     })
   ),
-  deviceInfo: object()
-    .shape({
-      deviceId: string().required(),
-      platform: string().required(),
-      appPackageName: string().required()
-    })
-    .required()
+  id: string()
 });
 
 export const embaddedMessagingDismissSchema = object().shape({
