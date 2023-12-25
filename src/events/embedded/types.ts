@@ -37,6 +37,8 @@ export interface IEmbeddedMessageElements {
 }
 
 export interface IEmbeddedMessage {
+  email?: string;
+  userId?: string;
   metadata: IEmbeddedMessageMetadata;
   elements?: IEmbeddedMessageElements;
   payload?: Array<any>;
