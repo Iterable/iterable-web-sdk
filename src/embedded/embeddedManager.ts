@@ -66,16 +66,17 @@ export class EmbeddedManager {
         method: 'GET',
         url: url
       });
-      if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
+      const embeddedMessages = this.getEmbeddedMessages(
+        iterableResult?.data?.placements || []
+      );
+      if (embeddedMessages.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          this.getEmbeddedMessages(iterableResult?.data?.placements)
+          embeddedMessages
         );
         this.setMessages(processor);
-        await this.trackNewlyRetrieved(processor);
-        this.messages = [
-          ...this.getEmbeddedMessages(iterableResult?.data?.placements)
-        ];
+        await this.trackNewlyRetrieved(processor, userId, email);
+        this.messages = [...embeddedMessages];
       }
     } catch (error: any) {
       if (error?.response?.data) {
@@ -112,10 +113,23 @@ export class EmbeddedManager {
     });
   }
 
-  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
+  private async trackNewlyRetrieved(
+    _processor: EmbeddedMessagingProcessor,
+    userId: string,
+    email: string
+  ) {
     const msgsList = _processor.newlyRetrievedMessages();
     for (let i = 0; i < msgsList.length; i++) {
-      await trackEmbeddedMessageReceived(msgsList[i]);
+      const messages = {} as IEmbeddedMessage;
+      messages.metadata = msgsList[i].metadata;
+      if (userId !== undefined) {
+        messages.userId = userId;
+      }
+
+      if (email !== undefined) {
+        messages.email = email;
+      }
+      await trackEmbeddedMessageReceived(messages);
     }
   }
 
