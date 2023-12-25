@@ -45,11 +45,11 @@ export class EmbeddedManager {
     try {
       let url = `${embedded_msg_endpoint}?`;
 
-      if (userId.trim() !== '') {
+      if (userId.trim() !== '' && userId !== undefined) {
         url += `userId=${userId}&`;
       }
 
-      if (email.trim() !== '') {
+      if (email.trim() !== '' && email !== undefined) {
         url += `email=${email}&`;
       }
 
@@ -121,12 +121,12 @@ export class EmbeddedManager {
     const msgsList = _processor.newlyRetrievedMessages();
     for (let i = 0; i < msgsList.length; i++) {
       const messages = {} as IEmbeddedMessage;
-      messages.metadata = msgsList[i].metadata;
-      if (userId !== undefined) {
+      messages.messageId = msgsList[i].metadata.messageId;
+      if (userId.trim() !== '' && userId !== undefined) {
         messages.userId = userId;
       }
 
-      if (email !== undefined) {
+      if (email.trim() !== '' && email !== undefined) {
         messages.email = email;
       }
       await trackEmbeddedMessageReceived(messages);
