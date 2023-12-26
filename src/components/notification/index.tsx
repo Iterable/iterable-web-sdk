@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react';
+import { TextParentStyles } from 'src/index';
 
 interface NotificationProps {
   title: string;
@@ -9,6 +10,8 @@ interface NotificationProps {
   secondaryButtonStyle?: CSSProperties;
   onClickPrimaryBtn?: () => void;
   onClickSecondaryBtn?: () => void;
+  titleStyle?: CSSProperties;
+  textStyle?: CSSProperties;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -19,7 +22,9 @@ export const Notification: React.FC<NotificationProps> = ({
   primaryButtonStyle,
   secondaryButtonStyle,
   onClickPrimaryBtn,
-  onClickSecondaryBtn
+  onClickSecondaryBtn,
+  textStyle,
+  titleStyle
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -47,10 +52,34 @@ export const Notification: React.FC<NotificationProps> = ({
     cursor: 'pointer'
   };
 
+  const defaultTitleStyles = {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  };
+
+  const defaultTextStyles = {
+    fontSize: '16px',
+    marginBottom: '16px'
+  };
+
+  const defaultTextParentStyles: TextParentStyles = {
+    overflowWrap: 'break-word',
+    margin: '10px'
+  };
+
   return (
     <div style={cardStyle}>
-      <h2>{title}</h2>
-      <p>{description}</p>
+      <div style={{ ...defaultTextParentStyles }}>
+        <text
+          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
+        >
+          {title}
+        </text>
+        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
+          {description}
+        </text>
+      </div>
       {primaryButtonLabel && (
         <button
           onClick={onClickPrimaryBtn}
