@@ -11,3 +11,9 @@ export * from './components/banner';
 export * from './components/notification';
 export { config } from './utils/config';
 export * from './components/banner';
+
+export interface TextParentStyles {
+  overflowWrap?: 'normal' | 'break-word' | 'initial' | 'inherit' | 'unset';
+  margin?: string;
+  flex?: string;
+}
