@@ -93,7 +93,7 @@ export const Banner = (props: IBannerProps) => {
         }}
       >
         <div style={defaultTextParentStyles}>
-          <div>
+          <div style={{ overflowWrap: 'anywhere' }}>
             <text style={{ ...defaultTitleStyles, ...titleStyle }}>
               {title}
             </text>
