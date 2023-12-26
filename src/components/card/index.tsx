@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react';
+import { TextParentStyles } from 'src/index';
 
 interface ICardProps {
   imgSrc?: string;
@@ -70,13 +71,17 @@ export const Card = (props: ICardProps) => {
     border: 'none',
     borderRadius: 0,
     cursor: 'pointer',
-    marginTop: '40px',
-    marginBottom: '10px',
-    marginRight: '50px',
     padding: '5px'
   };
-  const defaultTextParentStyles = {
+
+  const defaultTextParentStyles: TextParentStyles = {
+    overflowWrap: 'break-word',
     margin: '10px'
+  };
+
+  const cardButtons = {
+    marginTop: '20px',
+    marginLeft: '5px'
   };
 
   return (
@@ -87,15 +92,28 @@ export const Card = (props: ICardProps) => {
         alt={'logo'}
       />
       <div style={{ ...defaultTextParentStyles }}>
-        <text style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</text>
-        <br></br>
-        <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
+        <text
+          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
+        >
+          {title}
+        </text>
+        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
+          {text}
+        </text>
       </div>
-      <div>
+      <div style={cardButtons}>
         {primaryBtnLabel ? (
           <button
             disabled={disablePrimaryBtn}
-            style={{ ...defaultButtonStyles, ...primaryBtnStyle }}
+            style={
+              disablePrimaryBtn
+                ? {
+                    ...defaultButtonStyles,
+                    ...primaryBtnStyle,
+                    color: 'grey'
+                  }
+                : { ...defaultButtonStyles, ...primaryBtnStyle }
+            }
             onClick={onClickPrimaryBtn}
           >
             {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
@@ -104,7 +122,15 @@ export const Card = (props: ICardProps) => {
         {secondaryBtnLabel ? (
           <button
             disabled={disableSecondaryBtn}
-            style={{ ...defaultButtonStyles, ...secondaryBtnStyle }}
+            style={
+              disableSecondaryBtn
+                ? {
+                    ...defaultButtonStyles,
+                    ...secondaryBtnStyle,
+                    color: 'grey'
+                  }
+                : { ...defaultButtonStyles, ...secondaryBtnStyle }
+            }
             onClick={onClickSecondaryBtn}
           >
             {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
