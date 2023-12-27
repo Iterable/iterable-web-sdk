@@ -137,11 +137,9 @@ export const Banner = (props: IBannerProps) => {
             ) : null}
           </div>
         </div>
-        <img
-          style={{ ...defaultImageStyles, ...imgStyle }}
-          src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
-          alt={'logo'}
-        />
+        {imgSrc && (
+          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+        )}
       </div>
     </div>
   );
