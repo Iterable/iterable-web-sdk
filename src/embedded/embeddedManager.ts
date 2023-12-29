@@ -72,11 +72,13 @@ export class EmbeddedManager {
       if (embeddedMessages.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          embeddedMessages
+          this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
         await this.trackNewlyRetrieved(processor, userId, email);
-        this.messages = [...embeddedMessages];
+        this.messages = [
+          ...this.getEmbeddedMessages(iterableResult?.data?.placements)
+        ];
       }
     } catch (error: any) {
       if (error?.response?.data) {
