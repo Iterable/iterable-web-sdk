@@ -13,6 +13,7 @@
 		"@babel/proposal-object-rest-spread",
 		"@babel/plugin-proposal-optional-chaining",
 		"@babel/plugin-transform-modules-umd",
+		"@babel/plugin-transform-nullish-coalescing-operator",
 		[
 			"module-resolver",
 			{
