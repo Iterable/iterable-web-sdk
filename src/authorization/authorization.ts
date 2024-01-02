@@ -20,12 +20,12 @@ import { config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
-interface GenerateJWTPayload {
+export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
 }
 
-interface WithJWT {
+export interface WithJWT {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -33,7 +33,7 @@ interface WithJWT {
   refreshJwtToken: (authTypes: string) => Promise<string>;
 }
 
-interface WithoutJWT {
+export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
   setEmail: (email: string) => void;
