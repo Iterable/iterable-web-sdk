@@ -1,5 +1,5 @@
 import { Buffer } from 'buffer';
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig } from 'axios';
 
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
@@ -55,7 +55,7 @@ export const getEpochDifferenceInMS = (
 };
 
 export const cancelAxiosRequestAndMakeFetch = (
-  config: AxiosRequestConfig,
+  config: InternalAxiosRequestConfig,
   { email, userID }: { email?: string; userID?: string },
   jwtToken: string,
   authToken: string
@@ -87,12 +87,11 @@ export const cancelAxiosRequestAndMakeFetch = (
   }).catch();
 
   /* cancel the axios request */
-  return {
-    ...config,
-    cancelToken: new axios.CancelToken((cancel) => {
-      cancel('Cancel repeated request');
-    })
-  };
+  config.cancelToken = new axios.CancelToken((cancel) => {
+    cancel('Cancel repeated request');
+  });
+
+  return config;
 };
 
 export const validateTokenTime = (expTime: number): boolean => {

@@ -15,5 +15,6 @@ module.exports = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: pathsToModuleNameMapper(config.compilerOptions.paths, {
     prefix: '<rootDir>/'
-  })
+  }),
+  transformIgnorePatterns: ['node_modules/(?!axios)']
 };
