@@ -19,7 +19,6 @@ describe('EmbeddedManager', () => {
 
       await embeddedManager.syncMessages(
         'user123',
-        'email',
         'Web',
         '1',
         'my-website',
@@ -44,7 +43,6 @@ describe('EmbeddedManager', () => {
       jest.spyOn(embeddedManager, 'notifyDelegatesOfInvalidApiKeyOrSyncStop');
       await embeddedManager.syncMessages(
         'user123',
-        'email',
         'Web',
         '1',
         'my-website',
