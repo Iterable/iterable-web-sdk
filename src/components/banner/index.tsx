@@ -15,7 +15,9 @@ interface IBannerProps {
   BannerStyle?: CSSProperties;
   textStyle?: CSSProperties;
   primaryBtnStyle?: CSSProperties;
+  primaryDisableBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
+  secondaryDisableBtnStyle?: CSSProperties;
 }
 
 export const Banner = (props: IBannerProps) => {
@@ -31,8 +33,10 @@ export const Banner = (props: IBannerProps) => {
     onClickSecondaryBtn,
     primaryBtnLabel,
     primaryBtnStyle,
+    primaryDisableBtnStyle,
     secondaryBtnLabel,
     secondaryBtnStyle,
+    secondaryDisableBtnStyle,
     textStyle,
     titleStyle
   } = props;
@@ -108,8 +112,7 @@ export const Banner = (props: IBannerProps) => {
                   disablePrimaryBtn
                     ? {
                         ...defaultButtonStyles,
-                        ...primaryBtnStyle,
-                        color: 'grey'
+                        ...primaryDisableBtnStyle
                       }
                     : { ...defaultButtonStyles, ...primaryBtnStyle }
                 }
@@ -125,8 +128,7 @@ export const Banner = (props: IBannerProps) => {
                   disableSecondaryBtn
                     ? {
                         ...defaultButtonStyles,
-                        ...secondaryBtnStyle,
-                        color: 'grey'
+                        ...secondaryDisableBtnStyle
                       }
                     : { ...defaultButtonStyles, ...secondaryBtnStyle }
                 }
