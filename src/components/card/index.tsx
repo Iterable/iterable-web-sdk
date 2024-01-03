@@ -16,7 +16,9 @@ interface ICardProps {
   cardStyle?: CSSProperties;
   textStyle?: CSSProperties;
   primaryBtnStyle?: CSSProperties;
+  primaryDisableBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
+  secondaryDisableBtnStyle?: CSSProperties;
 }
 
 export const Card = (props: ICardProps) => {
@@ -32,8 +34,10 @@ export const Card = (props: ICardProps) => {
     onClickSecondaryBtn,
     primaryBtnLabel,
     primaryBtnStyle,
+    primaryDisableBtnStyle,
     secondaryBtnLabel,
     secondaryBtnStyle,
+    secondaryDisableBtnStyle,
     textStyle,
     titleStyle
   } = props;
@@ -109,8 +113,7 @@ export const Card = (props: ICardProps) => {
               disablePrimaryBtn
                 ? {
                     ...defaultButtonStyles,
-                    ...primaryBtnStyle,
-                    color: 'grey'
+                    ...primaryDisableBtnStyle
                   }
                 : { ...defaultButtonStyles, ...primaryBtnStyle }
             }
@@ -126,8 +129,7 @@ export const Card = (props: ICardProps) => {
               disableSecondaryBtn
                 ? {
                     ...defaultButtonStyles,
-                    ...secondaryBtnStyle,
-                    color: 'grey'
+                    ...secondaryDisableBtnStyle
                   }
                 : { ...defaultButtonStyles, ...secondaryBtnStyle }
             }
