@@ -63,8 +63,8 @@ export interface DeviceInfo {
 }
 
 export interface EnbeddedMessagingDismiss {
-  email: string;
-  userId: string;
+  userId?: string;
+  email?: string;
   messageId: string;
   buttonIdentifier: string;
   deviceInfo: DeviceInfo;
@@ -85,7 +85,8 @@ export interface Impression {
 }
 
 export interface EnbeddedMessagingSession {
-  userId: string;
+  userId?: string;
+  email?: string;
   session: Session;
   impressions: Array<Impression>;
   deviceInfo: DeviceInfo;

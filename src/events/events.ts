@@ -18,6 +18,7 @@ import {
 import { EndPoints } from './consts';
 
 import { EnbeddedMessagingDismiss, EnbeddedMessagingSession } from './types';
+import { functions } from 'src/utils/functions';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -53,18 +54,19 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
 };
 
 export const trackEmbeddedMessageClick = (
-  userId: string,
   payload: IEmbeddedMessageMetadata,
   buttonIdentifier: string,
   clickedUrl: string,
   appPackageName: string,
-  createdAt: number
+  createdAt: number,
+  userIdOrEmail: string
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/click',
     data: {
-      userId: userId,
+      [functions.checkEmailValidation(userIdOrEmail) ? 'email' : 'userId']:
+        userIdOrEmail,
       messageId: payload.messageId,
       buttonIdentifier: buttonIdentifier,
       targetUrl: clickedUrl,

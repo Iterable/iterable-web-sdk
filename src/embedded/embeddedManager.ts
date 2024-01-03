@@ -8,6 +8,7 @@ import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
+import { functions } from 'src/utils/functions';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -15,8 +16,7 @@ export class EmbeddedManager {
   private actionListeners: EmbeddedMessageActionHandler[] = [];
 
   public async syncMessages(
-    userId: string,
-    email: string,
+    userIdOrEmail: string,
     platform: string,
     sdkVersion: string,
     packageName: string,
@@ -24,8 +24,7 @@ export class EmbeddedManager {
     placementIds?: number[]
   ) {
     await this.retrieveEmbeddedMessages(
-      userId,
-      email,
+      userIdOrEmail,
       platform,
       sdkVersion,
       packageName,
@@ -35,20 +34,28 @@ export class EmbeddedManager {
   }
 
   private async retrieveEmbeddedMessages(
-    userId: string,
-    email: string,
+    userIdOrEmail: string,
     platform: string,
     sdkVersion: string,
     packageName: string,
     placementIds: number[]
   ) {
     try {
-      let url = `${embedded_msg_endpoint}?userId=${userId}`;
-      url += `&email=${email}`;
-      url += `&platform=${platform}`;
+      let url = `${embedded_msg_endpoint}?`;
+
+      url += functions.checkEmailValidation(userIdOrEmail)
+        ? `email=${userIdOrEmail}&`
+        : `userId=${userIdOrEmail}&`;
+
+      url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
-      url += placementIds.map((id) => `&placementIds=${id}`).join('');
+
+      if (placementIds.length > 0) {
+        url += placementIds.map((id) => `&placementIds=${id}`).join('');
+      }
+      url = url.replace(/&$/, '');
+
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: url
@@ -56,12 +63,12 @@ export class EmbeddedManager {
       if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          iterableResult?.data?.placements[0]?.embeddedMessages
+          this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
         await this.trackNewlyRetrieved(processor);
         this.messages = [
-          ...iterableResult?.data?.placements[0]?.embeddedMessages
+          ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];
       }
     } catch (error: any) {
@@ -75,6 +82,14 @@ export class EmbeddedManager {
         }
       }
     }
+  }
+
+  private getEmbeddedMessages(placements: any): IEmbeddedMessage[] {
+    let messages: IEmbeddedMessage[] = [];
+    placements.forEach((placement: any) => {
+      messages = [...messages, ...placement.embeddedMessages];
+    });
+    return messages;
   }
 
   private setMessages(_processor: EmbeddedMessagingProcessor) {
