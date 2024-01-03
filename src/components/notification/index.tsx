@@ -12,6 +12,10 @@ interface NotificationProps {
   onClickSecondaryBtn?: () => void;
   titleStyle?: CSSProperties;
   textStyle?: CSSProperties;
+  primaryDisableBtnStyle?: CSSProperties;
+  secondaryDisableBtnStyle?: CSSProperties;
+  disablePrimaryBtn?: boolean;
+  disableSecondaryBtn?: boolean;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -24,7 +28,11 @@ export const Notification: React.FC<NotificationProps> = ({
   onClickPrimaryBtn,
   onClickSecondaryBtn,
   textStyle,
-  titleStyle
+  titleStyle,
+  primaryDisableBtnStyle,
+  secondaryDisableBtnStyle,
+  disablePrimaryBtn,
+  disableSecondaryBtn
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -83,7 +91,15 @@ export const Notification: React.FC<NotificationProps> = ({
       {primaryButtonLabel && (
         <button
           onClick={onClickPrimaryBtn}
-          style={{ ...primaryButtonDefaultStyle, ...primaryButtonStyle }}
+          disabled={disablePrimaryBtn}
+          style={
+            disablePrimaryBtn
+              ? {
+                  ...primaryButtonDefaultStyle,
+                  ...primaryDisableBtnStyle
+                }
+              : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
+          }
         >
           {primaryButtonLabel}
         </button>
@@ -91,7 +107,15 @@ export const Notification: React.FC<NotificationProps> = ({
       {secondaryButtonLabel && (
         <button
           onClick={onClickSecondaryBtn}
-          style={{ ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }}
+          disabled={disableSecondaryBtn}
+          style={
+            disableSecondaryBtn
+              ? {
+                  ...secondaryButtonDefaultStyle,
+                  ...secondaryDisableBtnStyle
+                }
+              : { ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }
+          }
         >
           {secondaryButtonLabel}
         </button>
