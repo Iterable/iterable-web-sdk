@@ -19,6 +19,7 @@ interface ICardProps {
   primaryDisableBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
   secondaryDisableBtnStyle?: CSSProperties;
+  onClickView?: () => void;
 }
 
 export const Card = (props: ICardProps) => {
@@ -39,7 +40,8 @@ export const Card = (props: ICardProps) => {
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
-    titleStyle
+    titleStyle,
+    onClickView
   } = props;
 
   const defaultCardStyles = {
@@ -89,7 +91,7 @@ export const Card = (props: ICardProps) => {
   };
 
   return (
-    <div style={{ ...defaultCardStyles, ...cardStyle }}>
+    <div style={{ ...defaultCardStyles, ...cardStyle }} onClick={onClickView}>
       <img
         style={{ ...defaultImageStyles, ...imgStyle }}
         src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}

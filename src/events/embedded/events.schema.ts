@@ -1,6 +1,8 @@
 import { boolean, number, object, string, array, mixed, date } from 'yup';
 
 export const trackEmbeddedMessageSchema = object().shape({
+  email: string(),
+  userId: string(),
   metadata: object().shape({
     messageId: string(),
     campaignId: number(),

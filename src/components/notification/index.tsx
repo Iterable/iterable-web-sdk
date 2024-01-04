@@ -16,6 +16,7 @@ interface NotificationProps {
   secondaryDisableBtnStyle?: CSSProperties;
   disablePrimaryBtn?: boolean;
   disableSecondaryBtn?: boolean;
+  onClickView?: () => void;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -32,7 +33,8 @@ export const Notification: React.FC<NotificationProps> = ({
   primaryDisableBtnStyle,
   secondaryDisableBtnStyle,
   disablePrimaryBtn,
-  disableSecondaryBtn
+  disableSecondaryBtn,
+  onClickView
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -77,7 +79,7 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} onClick={onClickView}>
       <div style={{ ...defaultTextParentStyles }}>
         <text
           style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
