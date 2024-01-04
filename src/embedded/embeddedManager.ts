@@ -46,7 +46,6 @@ export class EmbeddedManager {
       url += functions.checkEmailValidation(userIdOrEmail)
         ? `email=${userIdOrEmail}&`
         : `userId=${userIdOrEmail}&`;
-
       url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;

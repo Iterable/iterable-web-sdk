@@ -35,7 +35,6 @@ class IterableActionRunnerConfig {
 }
 
 class IterableActionRunnerImpl {
-
   executeAction(
     context: any,
     action: IterableAction | null,

@@ -14,7 +14,7 @@ import {
   trackEmbeddedMessagingSession
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
-import { Functions } from 'src/utils/functions';
+import { Functions } from 'src/utils/Functions';
 
 interface Props {
   userId: string;

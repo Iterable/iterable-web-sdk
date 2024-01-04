@@ -83,11 +83,9 @@ export const Card = (props: ICardProps) => {
 
   return (
     <div style={{ ...defaultCardStyles, ...cardStyle }} onClick={onClickView}>
-      <img
-        style={{ ...defaultImageStyles, ...imgStyle }}
-        src={imgSrc ? imgSrc : '../../assets/iterable_logo.png'}
-        alt={'logo'}
-      />
+      {imgSrc && (
+        <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+      )}
       <div style={{ ...defaultTextParentStyles }}>
         <text style={{ ...defaultTitleStyles, ...titleStyle }}>{title}</text>
         <br></br>
