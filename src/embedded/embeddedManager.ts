@@ -54,18 +54,20 @@ export class EmbeddedManager {
         url += placementIds.map((id) => `&placementIds=${id}`).join('');
       }
       url = url.replace(/&$/, '');
-
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: url
       });
-      if (iterableResult?.data?.placements[0]?.embeddedMessages?.length) {
+      const embeddedMessages = this.getEmbeddedMessages(
+        iterableResult?.data?.placements || []
+      );
+      if (embeddedMessages.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
           this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
-        await this.trackNewlyRetrieved(processor);
+        await this.trackNewlyRetrieved(processor, userIdOrEmail);
         this.messages = [
           ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];
@@ -105,10 +107,19 @@ export class EmbeddedManager {
     });
   }
 
-  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
+  private async trackNewlyRetrieved(
+    _processor: EmbeddedMessagingProcessor,
+    userIdOrEmail: string
+  ) {
     const msgsList = _processor.newlyRetrievedMessages();
     for (let i = 0; i < msgsList.length; i++) {
-      await trackEmbeddedMessageReceived(msgsList[i]);
+      const messages = {} as IEmbeddedMessage;
+      messages.messageId = msgsList[i].metadata.messageId;
+
+      functions.checkEmailValidation(userIdOrEmail)
+        ? (messages.email = userIdOrEmail)
+        : (messages.userId = userIdOrEmail);
+      await trackEmbeddedMessageReceived(messages);
     }
   }
 

@@ -9,6 +9,7 @@ interface NotificationProps {
   secondaryButtonStyle?: CSSProperties;
   onClickPrimaryBtn?: () => void;
   onClickSecondaryBtn?: () => void;
+  onClickView?: () => void;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -19,7 +20,8 @@ export const Notification: React.FC<NotificationProps> = ({
   primaryButtonStyle,
   secondaryButtonStyle,
   onClickPrimaryBtn,
-  onClickSecondaryBtn
+  onClickSecondaryBtn,
+  onClickView
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -48,7 +50,7 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   return (
-    <div style={cardStyle}>
+    <div style={cardStyle} onClick={onClickView}>
       <h2>{title}</h2>
       <p>{description}</p>
       {primaryButtonLabel && (

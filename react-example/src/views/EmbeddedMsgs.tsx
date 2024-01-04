@@ -8,6 +8,7 @@ import {
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
+import { IterableActionSource, IterableActionRunner } from '@iterable/web-sdk';
 
 interface Props {}
 
@@ -15,6 +16,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
+  const iterableActionRunner = new IterableActionRunner();
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -37,10 +39,17 @@ export const EmbeddedMsgs: FC<Props> = () => {
     }
   };
 
-  const handleOpenUrl = (type: string, url: string) => {
-    if (type === 'openUrl') {
-      global.open(url, '_blank', 'noopener,noreferrer');
-    }
+  const handleOpenUrl = (clickedUrl: string, data: string) => {
+    const iterableAction = {
+      type: clickedUrl,
+      data
+    };
+
+    iterableActionRunner.executeAction(
+      null,
+      iterableAction,
+      IterableActionSource.EMBEDDED
+    );
   };
 
   return (
@@ -157,6 +166,18 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   message?.elements?.buttons[0]?.action?.data
                 );
               }}
+              onClickSecondaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[1]?.action?.type,
+                  message?.elements?.buttons[1]?.action?.data
+                );
+              }}
+              onClickView={() => {
+                handleOpenUrl(
+                  message?.elements?.defaultAction?.type,
+                  message?.elements?.defaultAction?.data
+                );
+              }}
             />
           ))}
 
@@ -193,6 +214,18 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   message?.elements?.buttons[0]?.action?.data
                 );
               }}
+              onClickSecondaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[1]?.action?.type,
+                  message?.elements?.buttons[1]?.action?.data
+                );
+              }}
+              onClickView={() => {
+                handleOpenUrl(
+                  message?.elements?.defaultAction?.type,
+                  message?.elements?.defaultAction?.data
+                );
+              }}
             />
           ))}
 
@@ -219,6 +252,18 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 handleOpenUrl(
                   message?.elements?.buttons[0]?.action?.type,
                   message?.elements?.buttons[0]?.action?.data
+                );
+              }}
+              onClickSecondaryBtn={() => {
+                handleOpenUrl(
+                  message?.elements?.buttons[1]?.action?.type,
+                  message?.elements?.buttons[1]?.action?.data
+                );
+              }}
+              onClickView={() => {
+                handleOpenUrl(
+                  message?.elements?.defaultAction?.type,
+                  message?.elements?.defaultAction?.data
                 );
               }}
             />
