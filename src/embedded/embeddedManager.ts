@@ -65,7 +65,7 @@ export class EmbeddedManager {
       if (embeddedMessages.length) {
         const processor = new EmbeddedMessagingProcessor(
           [...this.messages],
-          embeddedMessages
+          this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
         await this.trackNewlyRetrieved(processor, userIdOrEmail);
