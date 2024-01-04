@@ -15,7 +15,9 @@ interface IBannerProps {
   BannerStyle?: CSSProperties;
   textStyle?: CSSProperties;
   primaryBtnStyle?: CSSProperties;
+  primaryDisableBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
+  secondaryDisableBtnStyle?: CSSProperties;
   onClickView?: () => void;
 }
 
@@ -32,8 +34,10 @@ export const Banner = (props: IBannerProps) => {
     onClickSecondaryBtn,
     primaryBtnLabel,
     primaryBtnStyle,
+    primaryDisableBtnStyle,
     secondaryBtnLabel,
     secondaryBtnStyle,
+    secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
     onClickView
@@ -96,7 +100,7 @@ export const Banner = (props: IBannerProps) => {
         }}
       >
         <div style={defaultTextParentStyles}>
-          <div>
+          <div style={{ overflowWrap: 'anywhere' }}>
             <text style={{ ...defaultTitleStyles, ...titleStyle }}>
               {title}
             </text>
@@ -111,8 +115,7 @@ export const Banner = (props: IBannerProps) => {
                   disablePrimaryBtn
                     ? {
                         ...defaultButtonStyles,
-                        ...primaryBtnStyle,
-                        color: 'grey'
+                        ...primaryDisableBtnStyle
                       }
                     : { ...defaultButtonStyles, ...primaryBtnStyle }
                 }
@@ -128,8 +131,7 @@ export const Banner = (props: IBannerProps) => {
                   disableSecondaryBtn
                     ? {
                         ...defaultButtonStyles,
-                        ...secondaryBtnStyle,
-                        color: 'grey'
+                        ...secondaryDisableBtnStyle
                       }
                     : { ...defaultButtonStyles, ...secondaryBtnStyle }
                 }

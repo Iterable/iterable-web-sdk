@@ -1,4 +1,5 @@
 import React, { CSSProperties } from 'react';
+import { TextParentStyles } from 'src/index';
 
 interface NotificationProps {
   title: string;
@@ -9,6 +10,12 @@ interface NotificationProps {
   secondaryButtonStyle?: CSSProperties;
   onClickPrimaryBtn?: () => void;
   onClickSecondaryBtn?: () => void;
+  titleStyle?: CSSProperties;
+  textStyle?: CSSProperties;
+  primaryDisableBtnStyle?: CSSProperties;
+  secondaryDisableBtnStyle?: CSSProperties;
+  disablePrimaryBtn?: boolean;
+  disableSecondaryBtn?: boolean;
   onClickView?: () => void;
 }
 
@@ -21,6 +28,12 @@ export const Notification: React.FC<NotificationProps> = ({
   secondaryButtonStyle,
   onClickPrimaryBtn,
   onClickSecondaryBtn,
+  textStyle,
+  titleStyle,
+  primaryDisableBtnStyle,
+  secondaryDisableBtnStyle,
+  disablePrimaryBtn,
+  disableSecondaryBtn,
   onClickView
 }) => {
   const cardStyle: CSSProperties = {
@@ -49,14 +62,46 @@ export const Notification: React.FC<NotificationProps> = ({
     cursor: 'pointer'
   };
 
+  const defaultTitleStyles = {
+    fontSize: '20px',
+    fontWeight: 'bold',
+    marginBottom: '8px'
+  };
+
+  const defaultTextStyles = {
+    fontSize: '16px',
+    marginBottom: '16px'
+  };
+
+  const defaultTextParentStyles: TextParentStyles = {
+    overflowWrap: 'break-word',
+    margin: '10px'
+  };
+
   return (
     <div style={cardStyle} onClick={onClickView}>
-      <h2>{title}</h2>
-      <p>{description}</p>
+      <div style={{ ...defaultTextParentStyles }}>
+        <text
+          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
+        >
+          {title}
+        </text>
+        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
+          {description}
+        </text>
+      </div>
       {primaryButtonLabel && (
         <button
           onClick={onClickPrimaryBtn}
-          style={{ ...primaryButtonDefaultStyle, ...primaryButtonStyle }}
+          disabled={disablePrimaryBtn}
+          style={
+            disablePrimaryBtn
+              ? {
+                  ...primaryButtonDefaultStyle,
+                  ...primaryDisableBtnStyle
+                }
+              : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
+          }
         >
           {primaryButtonLabel}
         </button>
@@ -64,7 +109,15 @@ export const Notification: React.FC<NotificationProps> = ({
       {secondaryButtonLabel && (
         <button
           onClick={onClickSecondaryBtn}
-          style={{ ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }}
+          disabled={disableSecondaryBtn}
+          style={
+            disableSecondaryBtn
+              ? {
+                  ...secondaryButtonDefaultStyle,
+                  ...secondaryDisableBtnStyle
+                }
+              : { ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }
+          }
         >
           {secondaryButtonLabel}
         </button>
