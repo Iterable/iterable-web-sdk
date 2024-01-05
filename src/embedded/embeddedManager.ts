@@ -8,6 +8,7 @@ import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
+import { functions } from 'src/utils/functions';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -15,8 +16,7 @@ export class EmbeddedManager {
   private actionListeners: EmbeddedMessageActionHandler[] = [];
 
   public async syncMessages(
-    userId: string,
-    email: string,
+    userIdOrEmail: string,
     platform: string,
     sdkVersion: string,
     packageName: string,
@@ -24,8 +24,7 @@ export class EmbeddedManager {
     placementIds?: number[]
   ) {
     await this.retrieveEmbeddedMessages(
-      userId,
-      email,
+      userIdOrEmail,
       platform,
       sdkVersion,
       packageName,
@@ -35,8 +34,7 @@ export class EmbeddedManager {
   }
 
   private async retrieveEmbeddedMessages(
-    userId: string,
-    email: string,
+    userIdOrEmail: string,
     platform: string,
     sdkVersion: string,
     packageName: string,
@@ -45,14 +43,9 @@ export class EmbeddedManager {
     try {
       let url = `${embedded_msg_endpoint}?`;
 
-      if (userId.trim() !== '') {
-        url += `userId=${userId}&`;
-      }
-
-      if (email.trim() !== '') {
-        url += `email=${email}&`;
-      }
-
+      url += functions.checkEmailValidation(userIdOrEmail)
+        ? `email=${userIdOrEmail}&`
+        : `userId=${userIdOrEmail}&`;
       url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
@@ -61,7 +54,6 @@ export class EmbeddedManager {
         url += placementIds.map((id) => `&placementIds=${id}`).join('');
       }
       url = url.replace(/&$/, '');
-
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: url
@@ -75,7 +67,7 @@ export class EmbeddedManager {
           this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
-        await this.trackNewlyRetrieved(processor, userId, email);
+        await this.trackNewlyRetrieved(processor, userIdOrEmail);
         this.messages = [
           ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];
@@ -117,20 +109,16 @@ export class EmbeddedManager {
 
   private async trackNewlyRetrieved(
     _processor: EmbeddedMessagingProcessor,
-    userId: string,
-    email: string
+    userIdOrEmail: string
   ) {
     const msgsList = _processor.newlyRetrievedMessages();
     for (let i = 0; i < msgsList.length; i++) {
       const messages = {} as IEmbeddedMessage;
-      messages.metadata = msgsList[i].metadata;
-      if (userId !== undefined) {
-        messages.userId = userId;
-      }
+      messages.messageId = msgsList[i].metadata.messageId;
 
-      if (email !== undefined) {
-        messages.email = email;
-      }
+      functions.checkEmailValidation(userIdOrEmail)
+        ? (messages.email = userIdOrEmail)
+        : (messages.userId = userIdOrEmail);
       await trackEmbeddedMessageReceived(messages);
     }
   }
