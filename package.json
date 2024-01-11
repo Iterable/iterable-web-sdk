@@ -1,7 +1,7 @@
 {
   "name": "@iterable/web-sdk",
   "description": "Iterable SDK for JavaScript and Node.",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "homepage": "https://iterable.com/",
   "repository": {
     "type": "git",
@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "@pabra/sortby": "^1.0.1",
-    "axios": "^0.21.4",
+    "axios": "^1.6.2",
     "buffer": "^6.0.3",
     "idb-keyval": "^6.2.0",
     "throttle-debounce": "^3.0.1",
@@ -60,6 +60,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
     "@babel/plugin-proposal-optional-chaining": "^7.14.5",
     "@babel/plugin-transform-modules-umd": "^7.14.5",
+    "@babel/plugin-transform-nullish-coalescing-operator": "^7.23.4",
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-typescript": "^7.6.0",
     "@types/jest": "^27.0.2",
@@ -68,8 +69,8 @@
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "@webpack-cli/serve": "^1.6.0",
-    "axios-mock-adapter": "^1.19.0",
     "babel-plugin-module-resolver": "^5.0.0",
+    "axios-mock-adapter": "^1.22.0",
     "concurrently": "^6.3.0",
     "dotenv": "^10.0.0",
     "eslint": "^7.14.0",

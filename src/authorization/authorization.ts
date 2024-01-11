@@ -20,12 +20,12 @@ import { config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
-interface GenerateJWTPayload {
+export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
 }
 
-interface WithJWT {
+export interface WithJWT {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -33,7 +33,7 @@ interface WithJWT {
   refreshJwtToken: (authTypes: string) => Promise<string>;
 }
 
-interface WithoutJWT {
+export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
   setEmail: (email: string) => void;
@@ -67,13 +67,11 @@ export function initialize(
   */
   let authInterceptor: number | null = generateJWT
     ? null
-    : baseAxiosRequest.interceptors.request.use((config) => ({
-        ...config,
-        headers: {
-          ...config.headers,
-          'Api-Key': authToken
-        }
-      }));
+    : baseAxiosRequest.interceptors.request.use((config) => {
+        config.headers.set('Api-Key', authToken);
+
+        return config;
+      });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
@@ -216,13 +214,10 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
         authInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => ({
-            ...config,
-            headers: {
-              ...config.headers,
-              'Api-Key': newToken
-            }
-          })
+          (config) => {
+            config.headers.set('Api-Key', newToken);
+            return config;
+          }
         );
       },
       clearAuthToken: () => {
@@ -401,22 +396,20 @@ export function initialize(
                 We can't do this with Axios because it's built upon XHR and that doesn't support
                 "keepalive" so we fall back to the fetch API
               */
-              return cancelAxiosRequestAndMakeFetch(
+              const cancelConfig = cancelAxiosRequestAndMakeFetch(
                 config,
                 { email: payload.email, userID: payload.userID },
                 token,
                 authToken
               );
+
+              return cancelConfig;
             }
 
-            return {
-              ...config,
-              headers: {
-                ...config.headers,
-                'Api-Key': authToken,
-                Authorization: `Bearer ${token}`
-              }
-            };
+            config.headers.set('Api-Key', authToken);
+            config.headers.set('Authorization', `Bearer ${token}`);
+
+            return config;
           }
         );
 
@@ -482,14 +475,10 @@ export function initialize(
                         );
                       }
 
-                      return {
-                        ...config,
-                        headers: {
-                          ...config.headers,
-                          Api_Key: authToken,
-                          Authorization: `Bearer ${newToken}`
-                        }
-                      };
+                      config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
+
+                      return config;
                     }
                   );
 
@@ -564,14 +553,10 @@ export function initialize(
                         );
                       }
 
-                      return {
-                        ...config,
-                        headers: {
-                          ...config.headers,
-                          'Api-Key': authToken,
-                          Authorization: `Bearer ${newToken}`
-                        }
-                      };
+                      config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
+
+                      return config;
                     }
                   );
 
