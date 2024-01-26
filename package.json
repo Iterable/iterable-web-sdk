@@ -35,6 +35,7 @@
     "axios": "^1.6.2",
     "buffer": "^6.0.3",
     "idb-keyval": "^6.2.0",
+    "moment": "^2.29.4",
     "throttle-debounce": "^3.0.1",
     "yup": "^0.32.9"
   },

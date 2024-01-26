@@ -1,4 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Button,
   EndpointWrapper,
@@ -6,8 +7,14 @@ import {
   Heading,
   Response
 } from '../views/Components.styled';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
+import {
+  initialize,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
+import { useAnonContext } from '../anonContext';
+import { useUser } from 'src/context/Users';
 
 interface Props {
   endpointName: string;
@@ -22,6 +29,8 @@ export const EventsForm: FC<Props> = ({
   heading,
   needsEventName
 }) => {
+  const { anonymousUserEventManager } = useAnonContext();
+  const { loggedInUser, setLoggedInUser } = useUser();
   const [trackResponse, setTrackResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -30,27 +39,36 @@ export const EventsForm: FC<Props> = ({
 
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
 
-  const handleTrack = (e: FormEvent<HTMLFormElement>) => {
+  const handleTrack = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingEvent(true);
 
     const conditionalParams = needsEventName
       ? { eventName: trackEvent }
       : { messageId: trackEvent };
-    method({
+    const eventDetails = {
       ...conditionalParams,
+      createNewFields: true,
+      createdAt: (Date.now() / 1000) | 0,
+      userId: loggedInUser,
+      dataFields: { website: { domain: 'omni.com' }, eventType: 'track' },
       deviceInfo: {
         appPackageName: 'my-website'
       }
-    })
-      .then((response) => {
-        setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
-      })
-      .catch((e) => {
-        setTrackResponse(JSON.stringify(e.response.data));
-        setTrackingEvent(false);
-      });
+    };
+
+    await anonymousUserEventManager.trackAnonEvent(eventDetails);
+    const isCriteriaCompleted =
+      await anonymousUserEventManager.checkCriteriaCompletion();
+
+    if (isCriteriaCompleted) {
+      const userId = uuidv4();
+      const App = await initialize(process.env.API_KEY);
+      await App.setUserID(userId);
+      await anonymousUserEventManager.createUser(userId, process.env.API_KEY);
+      setLoggedInUser({ type: 'user_update', data: userId });
+      await anonymousUserEventManager.syncEvents();
+    }
   };
 
   const formAttr = { [`data-qa-${endpointName}-submit`]: true };

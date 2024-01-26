@@ -77,8 +77,8 @@ export const trackInAppClick = (
   sendBeacon = false
 ) => {
   /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // delete (payload as any).userId;
+  // delete (payload as any).email;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
