@@ -7,6 +7,9 @@ import { updateCart, trackPurchase } from '../commerce/commerce';
 import { InAppTrackRequestParams } from './types';
 import { track } from './events';
 import { updateUser } from '../users/users';
+import { GET_CRITERIA_PATH } from 'src/constants';
+import { baseIterableRequest } from '../request';
+import { IterableResponse } from '../types';
 
 export class AnonymousUserEventManager {
   private isUserLoggedIn = false;
@@ -14,27 +17,25 @@ export class AnonymousUserEventManager {
 
   constructor() {
     this.updateAnonSession();
+    this.getAnonCriteria();
   }
 
-  public async getAnonCriteria() {
-    return [
-      {
-        criteriaId: 'String',
-        criteriaList: [
-          {
-            criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
-            comparator: 'equal',
-            name: 'browseWebsite'
-          },
-          {
-            criteriaType: 'track', //(track,trackPurchase,cartUpdate,anonSession,tokenRegistration),
-            comparator: 'equal',
-            name: 'viewedLipstick',
-            aggregateCount: 3 // count over 3
-          }
-        ]
-      }
-    ];
+  public getAnonCriteria() {
+    baseIterableRequest<IterableResponse>({
+      method: 'GET',
+      url: GET_CRITERIA_PATH,
+      data: {},
+      validation: {}
+    })
+      .then((response) => {
+        const criteriaData: any = response.data;
+        if (criteriaData) {
+          localStorage.setItem('criteria', criteriaData);
+        }
+      })
+      .catch((e) => {
+        console.log('response', e);
+      });
   }
 
   public storeEventLocally(payload: any) {

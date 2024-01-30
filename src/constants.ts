@@ -19,6 +19,7 @@ const ITERABLE_API_URL = `https://${
 export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
+export const GET_CRITERIA_PATH = '/anonymoususer/list';
 
 /** @todo update once new endpoint is ready */
 export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
