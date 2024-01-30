@@ -288,8 +288,10 @@ describe('Events Requests', () => {
       JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
 
-    expect(JSON.parse(trackClickResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackClickResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackClickResponse.config.data).email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackClickResponse.config.data).userId).toEqual('1234');
     expect(
       JSON.parse(trackClickResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');

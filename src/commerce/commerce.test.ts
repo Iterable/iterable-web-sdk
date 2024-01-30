@@ -106,10 +106,14 @@ describe('Users Requests', () => {
       total: 100
     } as any);
 
-    expect(JSON.parse(updateResponse.config.data).user.email).toBeUndefined();
-    expect(JSON.parse(updateResponse.config.data).user.userId).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).user.email).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).user.userId).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).user.email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(updateResponse.config.data).user.userId).toEqual('1234');
+    expect(JSON.parse(trackResponse.config.data).user.email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackResponse.config.data).user.userId).toEqual('1234');
   });
 
   it('should reject updateCart on bad params', async () => {
