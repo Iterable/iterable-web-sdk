@@ -67,7 +67,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 The SDK does not track `inAppDelete` events.
 
-:rotating_light: Due to a limitation in Safari browsers, web in-app messages displayed in Safari can't automatically fire `trackInAppClick` events when a link has been clicked. This will impact analytics for Safari users.
+:rotating_light:  Due to a limitation in WebKit (which affects iOS web browsers, Safari included) web in-app messages displayed in an iOS web browser browser can't automatically fire trackInAppClick events or handle custom CTAs. This will impact analytics for all Safari and mobile iOS users.
 
 # Usage
 
@@ -900,7 +900,7 @@ Iterable reserves the `iterable://` and `action://` URL schemas to define custom
 
 The SDK may reserve more keywords in the future.
 
-:rotating_light: `iterable://` and `action://` links are not supported in the Safari web browser. In Safari, users can close an in-app message by clicking away from the message.
+:rotating_light: `iterable://` and `action://` links are not supported with WebKit (which affects iOS web browsers, Safari included). In these browsers, users can close an in-app message by clicking away from the message.
 
 ## Routing in single-page apps
 
