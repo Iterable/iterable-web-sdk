@@ -67,7 +67,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 The SDK does not track `inAppDelete` events.
 
-:rotating_light:  Due to a limitation in WebKit (which affects iOS web browsers, Safari included) web in-app messages displayed in an iOS web browser browser can't automatically fire trackInAppClick events or handle custom CTAs. This will impact analytics for all Safari and mobile iOS users.
+:rotating_light: Due to a limitation in WebKit (which affects iOS web browsers, Safari included) web in-app messages displayed in an iOS web browser browser can't automatically fire trackInAppClick events or handle custom CTAs. This will impact analytics for all Safari and mobile iOS users.
 
 # Usage
 
