@@ -46,28 +46,25 @@ export const EventsForm: FC<Props> = ({
     const conditionalParams = needsEventName
       ? { eventName: trackEvent }
       : { messageId: trackEvent };
-    const eventDetails = {
-      ...conditionalParams,
-      createNewFields: true,
-      createdAt: (Date.now() / 1000) | 0,
-      userId: loggedInUser,
-      dataFields: { website: { domain: 'omni.com' }, eventType: 'track' },
-      deviceInfo: {
-        appPackageName: 'my-website'
-      }
-    };
 
-    await anonymousUserEventManager.trackAnonEvent(eventDetails);
-    const isCriteriaCompleted =
-      await anonymousUserEventManager.checkCriteriaCompletion();
-
-    if (isCriteriaCompleted) {
-      const userId = uuidv4();
-      const App = await initialize(process.env.API_KEY);
-      await App.setUserID(userId);
-      await anonymousUserEventManager.createUser(userId, process.env.API_KEY);
-      setLoggedInUser({ type: 'user_update', data: userId });
-      await anonymousUserEventManager.syncEvents();
+    try {
+      method({
+        ...conditionalParams,
+        deviceInfo: {
+          appPackageName: 'my-website'
+        }
+      })
+        .then((response) => {
+          setTrackResponse(JSON.stringify(response.data));
+          setTrackingEvent(false);
+        })
+        .catch((e) => {
+          setTrackResponse(JSON.stringify(e.response.data));
+          setTrackingEvent(false);
+        });
+    } catch (error) {
+      setTrackResponse(JSON.stringify(error.message));
+      setTrackingEvent(false);
     }
   };
 

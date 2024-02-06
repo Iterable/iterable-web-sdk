@@ -3,11 +3,22 @@ import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
 } from '../commerce/types';
-import { updateCart, trackPurchase } from '../commerce/commerce';
+import { updateCart } from '../commerce/commerce';
 import { InAppTrackRequestParams } from './types';
-import { track } from './events';
 import { updateUser } from '../users/users';
-import { GET_CRITERIA_PATH } from 'src/constants';
+import {
+  GET_CRITERIA_PATH,
+  KEY_EVENT_NAME,
+  KEY_CREATED_AT,
+  KEY_DATA_FIELDS,
+  KEY_CREATE_NEW_FIELDS,
+  SHARED_PREFS_EVENT_TYPE,
+  TRACK_EVENT,
+  SHARED_PREFS_EVENT_LIST_KEY,
+  KEY_ITEMS,
+  KEY_TOTAL,
+  TRACK_PURCHASE
+} from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 
@@ -39,32 +50,53 @@ export class AnonymousUserEventManager {
   }
 
   public storeEventLocally(payload: any) {
-    const strTrackEventList = localStorage.getItem('track_event_list');
+    const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     let trackEventList = [];
 
     if (strTrackEventList) {
       trackEventList = JSON.parse(strTrackEventList);
     }
     trackEventList.push(payload);
-    localStorage.setItem('track_event_list', JSON.stringify(trackEventList));
+    localStorage.setItem(
+      SHARED_PREFS_EVENT_LIST_KEY,
+      JSON.stringify(trackEventList)
+    );
+
+    console.log(
+      'store data',
+      localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY)
+    );
+    // const isCriteriaCompleted = this.checkCriteriaCompletion();
+
+    // if (await isCriteriaCompleted) {
+    //   const userId = uuidv4();
+    //   await App.setUserID(userId);
+    //   await createUser(userId, process.env.API_KEY);
+    //   setLoggedInUser({ type: 'user_update', data: userId });
+    //   await syncEvents();
+    // }
   }
 
   public async trackAnonEvent(payload: InAppTrackRequestParams) {
-    if (this.isUserLoggedIn) {
-      return track(payload);
-    } else {
-      // localstorage
-      this.storeEventLocally(payload);
-    }
+    const newDataObject = {
+      [KEY_EVENT_NAME]: payload.eventName,
+      [KEY_CREATED_AT]: this.getCurrentTime(),
+      [KEY_DATA_FIELDS]: payload.dataFields,
+      [KEY_CREATE_NEW_FIELDS]: true,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
+    };
+    this.storeEventLocally(newDataObject);
   }
 
   public async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
-    if (this.isUserLoggedIn) {
-      return trackPurchase(payload);
-    } else {
-      // localstorage
-      this.storeEventLocally(payload);
-    }
+    const newDataObject = {
+      [KEY_ITEMS]: payload.items,
+      [KEY_CREATED_AT]: this.getCurrentTime(),
+      [KEY_DATA_FIELDS]: payload.dataFields,
+      [KEY_TOTAL]: payload.total,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
+    };
+    this.storeEventLocally(newDataObject);
   }
 
   public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
@@ -189,4 +221,8 @@ export class AnonymousUserEventManager {
 
     return isCompleted;
   }
+
+  private getCurrentTime = () => {
+    return new Date().getTime();
+  };
 }

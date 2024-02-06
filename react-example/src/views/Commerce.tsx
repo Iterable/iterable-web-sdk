@@ -45,18 +45,23 @@ export const Commerce: FC<Props> = () => {
   const handleTrackPurchase = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingPurchase(true);
-    trackPurchase({
-      items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
-      total: 200
-    })
-      .then((response) => {
-        setTrackingPurchase(false);
-        setTrackPurchaseResponse(JSON.stringify(response.data));
+    try {
+      trackPurchase({
+        items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
+        total: 200
       })
-      .catch((e) => {
-        setTrackingPurchase(false);
-        setTrackPurchaseResponse(JSON.stringify(e.response.data));
-      });
+        .then((response) => {
+          setTrackingPurchase(false);
+          setTrackPurchaseResponse(JSON.stringify(response.data));
+        })
+        .catch((e) => {
+          setTrackingPurchase(false);
+          setTrackPurchaseResponse(JSON.stringify(e.response.data));
+        });
+    } catch (error) {
+      setTrackingPurchase(false);
+      setTrackPurchaseResponse(JSON.stringify(error.message));
+    }
   };
 
   return (
