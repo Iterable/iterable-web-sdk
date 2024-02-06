@@ -40,17 +40,22 @@ export const Users: FC<Props> = () => {
   const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdatingUser(true);
-    updateUser({
-      dataFields: { [userDataField]: 'test-data' }
-    })
-      .then((response) => {
-        setUpdateUserResponse(JSON.stringify(response.data));
-        setUpdatingUser(false);
+    try {
+      updateUser({
+        dataFields: { [userDataField]: 'test-data' }
       })
-      .catch((e) => {
-        setUpdateUserResponse(JSON.stringify(e.response.data));
-        setUpdatingUser(false);
-      });
+        .then((response) => {
+          setUpdateUserResponse(JSON.stringify(response.data));
+          setUpdatingUser(false);
+        })
+        .catch((e) => {
+          setUpdateUserResponse(JSON.stringify(e.response.data));
+          setUpdatingUser(false);
+        });
+    } catch (error) {
+      setUpdateUserResponse(JSON.stringify(error.message));
+      setUpdatingUser(false);
+    }
   };
 
   const handleUpdateUserEmail = (e: FormEvent<HTMLFormElement>) => {

@@ -159,6 +159,9 @@ export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const KEY_ITEMS = 'items';
 export const KEY_TOTAL = 'total';
+export const DATA_REPLACE = 'dataReplace';
 
 export const TRACK_EVENT = 'customEvent';
 export const TRACK_PURCHASE = 'purchase';
+export const UPDATE_USER = 'updateUser';
+export const TRACK_UPDATE_CART = 'cartUpdate';

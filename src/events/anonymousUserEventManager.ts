@@ -3,7 +3,6 @@ import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
 } from '../commerce/types';
-import { updateCart } from '../commerce/commerce';
 import { InAppTrackRequestParams } from './types';
 import { updateUser } from '../users/users';
 import {
@@ -17,16 +16,21 @@ import {
   SHARED_PREFS_EVENT_LIST_KEY,
   KEY_ITEMS,
   KEY_TOTAL,
-  TRACK_PURCHASE
+  TRACK_PURCHASE,
+  DATA_REPLACE,
+  UPDATE_USER,
+  TRACK_UPDATE_CART
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
+import { UpdateUserParams } from '..';
 
 export class AnonymousUserEventManager {
   private isUserLoggedIn = false;
   private userId = '';
 
   constructor() {
+    console.log('isUserLoggedIn', this.isUserLoggedIn);
     this.updateAnonSession();
     this.getAnonCriteria();
   }
@@ -100,12 +104,20 @@ export class AnonymousUserEventManager {
   }
 
   public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
-    if (this.isUserLoggedIn) {
-      return updateCart(payload);
-    } else {
-      // localstorage
-      this.storeEventLocally(payload);
-    }
+    const newDataObject = {
+      [KEY_ITEMS]: payload.items,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
+      [KEY_CREATED_AT]: this.getCurrentTime()
+    };
+    this.storeEventLocally(newDataObject);
+  }
+
+  public async trackAnonUpdateUser(payload: UpdateUserParams) {
+    const newDataObject = {
+      [DATA_REPLACE]: payload.dataFields,
+      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
+    };
+    this.storeEventLocally(newDataObject);
   }
 
   public async updateAnonSession() {

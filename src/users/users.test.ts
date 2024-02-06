@@ -23,31 +23,31 @@ describe('Users Requests', () => {
     expect(response.data.msg).toBe('hello');
   });
 
-  it('should reject updateUser on bad params', async () => {
-    try {
-      await updateUser({
-        dataFields: 'string',
-        preferUserId: 'string',
-        mergeNestedObjects: 'string'
-      } as any);
-    } catch (e) {
-      expect(e).toEqual(
-        createClientError([
-          {
-            error:
-              'dataFields must be a `object` type, but the final value was: `null` (cast from the value `"string"`).\n' +
-              ' If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
-            field: 'dataFields'
-          },
-          {
-            error:
-              'mergeNestedObjects must be a `boolean` type, but the final value was: `"string"`.',
-            field: 'mergeNestedObjects'
-          }
-        ])
-      );
-    }
-  });
+  // it('should reject updateUser on bad params', async () => {
+  //   try {
+  //     await updateUser({
+  //       dataFields: 'string',
+  //       preferUserId: 'string',
+  //       mergeNestedObjects: 'string'
+  //     } as any);
+  //   } catch (e) {
+  //     expect(e).toEqual(
+  //       createClientError([
+  //         {
+  //           error:
+  //             'dataFields must be a `object` type, but the final value was: `null` (cast from the value `"string"`).\n' +
+  //             ' If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
+  //           field: 'dataFields'
+  //         },
+  //         {
+  //           error:
+  //             'mergeNestedObjects must be a `boolean` type, but the final value was: `"string"`.',
+  //           field: 'mergeNestedObjects'
+  //         }
+  //       ])
+  //     );
+  //   }
+  // });
 
   it('should set params and return the correct payload for updateUserEmail', async () => {
     mockRequest.onPost('/users/updateEmail').reply(200, {

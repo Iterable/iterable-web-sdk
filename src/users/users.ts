@@ -3,6 +3,7 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
+import { AnonymousUserEventManager } from '..';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
@@ -20,10 +21,16 @@ export const updateUserEmail = (newEmail: string) => {
 };
 
 export const updateUser = (payload: UpdateUserParams = {}) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  // delete (payload as any).userId;
-  // delete (payload as any).email;
-
+  if (
+    (!('userId' in payload) || payload.userId === null) &&
+    (!('email' in payload) || payload.email === null)
+  ) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonUpdateUser(payload);
+    const errorMessage =
+      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
+    throw new Error(errorMessage);
+  }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/users/update',

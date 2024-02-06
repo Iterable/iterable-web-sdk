@@ -29,17 +29,22 @@ export const Commerce: FC<Props> = () => {
   const handleUpdateCart = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdatingCart(true);
-    updateCart({
-      items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
-    })
-      .then((response) => {
-        setUpdateCartResponse(JSON.stringify(response.data));
-        setUpdatingCart(false);
+    try {
+      updateCart({
+        items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
       })
-      .catch((e) => {
-        setUpdateCartResponse(JSON.stringify(e.response.data));
-        setUpdatingCart(false);
-      });
+        .then((response) => {
+          setUpdateCartResponse(JSON.stringify(response.data));
+          setUpdatingCart(false);
+        })
+        .catch((e) => {
+          setUpdateCartResponse(JSON.stringify(e.response.data));
+          setUpdatingCart(false);
+        });
+    } catch (error) {
+      setUpdateCartResponse(JSON.stringify(error.message));
+      setUpdatingCart(false);
+    }
   };
 
   const handleTrackPurchase = (e: FormEvent<HTMLFormElement>) => {
