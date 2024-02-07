@@ -12,6 +12,8 @@ interface CommerceItem {
 }
 
 interface CommerceUser {
+  userId?: string;
+  email?: string;
   dataFields?: Record<string, any>;
   preferUserId?: boolean;
   mergeNestedObjects?: boolean;

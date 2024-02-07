@@ -7,8 +7,12 @@ import { AnonymousUserEventManager } from './anonymousUserEventManager';
 
 export const track = (payload: InAppTrackRequestParams) => {
   if (
-    (!('userId' in payload) || payload.userId === null) &&
-    (!('email' in payload) || payload.email === null)
+    (!('userId' in payload) ||
+      payload.userId === null ||
+      typeof payload.userId === 'undefined') &&
+    (!('email' in payload) ||
+      payload.email === null ||
+      typeof payload.email === 'undefined')
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);

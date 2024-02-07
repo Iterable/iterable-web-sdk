@@ -6,8 +6,42 @@ import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+jest.mock('../events/anonymousUserEventManager', () => {
+  return {
+    AnonymousUserEventManager: jest.fn().mockImplementation(() => ({
+      trackAnonUpdateCart: jest.fn(),
+      trackAnonPurchaseEvent: jest.fn()
+    }))
+  };
+});
+
 describe('Users Requests', () => {
-  it('should set params and return the correct payload for updateCart', async () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should throw an error if updateCart payload is empty', () => {
+    expect(() => {
+      updateCart({} as any);
+    }).toThrow();
+  });
+
+  it('should throw an error if updateCart userId is empty', () => {
+    expect(() => {
+      updateCart({
+        items: [
+          {
+            id: 'fdsafds',
+            name: 'banana',
+            quantity: 2,
+            price: 12
+          }
+        ]
+      });
+    }).toThrow();
+  });
+
+  it('return the correct payload for updateCart with userId', async () => {
     mockRequest.onPost('/commerce/updateCart').reply(200, {
       msg: 'hello'
     });
@@ -20,9 +54,33 @@ describe('Users Requests', () => {
           quantity: 2,
           price: 12
         }
-      ]
+      ],
+      user: {
+        userId: 'user'
+      }
+    });
+    expect(response.data.msg).toBe('hello');
+  });
+
+  it('return the correct payload for updateCart with email', async () => {
+    mockRequest.onPost('/commerce/updateCart').reply(200, {
+      msg: 'hello'
     });
 
+    const response = await updateCart({
+      items: [
+        {
+          id: 'fdsafds',
+          name: 'banana',
+          quantity: 2,
+          price: 12
+        }
+      ],
+      user: {
+        email: 'user@example.com'
+      }
+    });
+    expect(response.data.msg).toBe('hello');
     expect(JSON.parse(response.config.data).items).toEqual([
       {
         id: 'fdsafds',
@@ -32,15 +90,15 @@ describe('Users Requests', () => {
       }
     ]);
     expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
-    expect(response.data.msg).toBe('hello');
   });
 
   it('should reject updateCart on bad params', async () => {
     try {
       await updateCart({
-        items: [{} as any]
+        items: [{} as any],
+        user: {
+          userId: 'user'
+        }
       });
     } catch (e) {
       expect(e).toEqual(
@@ -66,60 +124,92 @@ describe('Users Requests', () => {
     }
   });
 
-  it('should set params and return the correct payload for trackPurchase', async () => {
+  it('should throw an error if trackPurchase payload is empty', () => {
+    expect(() => {
+      trackPurchase({} as any);
+    }).toThrow();
+  });
+
+  it('should throw an error if trackPurchase userId is empty', () => {
+    expect(() => {
+      trackPurchase({
+        items: [],
+        total: 100
+      });
+    }).toThrow();
+  });
+
+  it('return the correct payload for trackPurchase with userId', async () => {
     mockRequest.onPost('/commerce/trackPurchase').reply(200, {
       msg: 'hello'
     });
 
     const response = await trackPurchase({
-      items: [],
-      total: 100
+      items: [
+        {
+          id: 'fdsafds',
+          name: 'banana',
+          quantity: 2,
+          price: 12
+        }
+      ],
+      user: {
+        userId: 'user'
+      },
+      total: 24
     });
-
-    expect(JSON.parse(response.config.data).total).toBe(100);
-    expect(JSON.parse(response.config.data).items).toEqual([]);
-    expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
     expect(response.data.msg).toBe('hello');
+    expect(JSON.parse(response.config.data).total).toBe(24);
+    expect(JSON.parse(response.config.data).items).toEqual([
+      {
+        id: 'fdsafds',
+        name: 'banana',
+        quantity: 2,
+        price: 12
+      }
+    ]);
+    expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
   });
 
-  it('should not allow a passed userId or email for API methods', async () => {
+  it('return the correct payload for trackPurchase with email', async () => {
     mockRequest.onPost('/commerce/trackPurchase').reply(200, {
       msg: 'hello'
     });
-    mockRequest.onPost('/commerce/updateCart').reply(200, {
-      msg: 'hello'
+
+    const response = await trackPurchase({
+      items: [
+        {
+          id: 'fdsafds',
+          name: 'banana',
+          quantity: 2,
+          price: 12
+        }
+      ],
+      user: {
+        email: 'user@example.com'
+      },
+      total: 24
     });
-
-    const updateResponse = await updateCart({
-      user: {
-        email: 'hello@gmail.com',
-        userId: '1234'
-      },
-      items: []
-    } as any);
-    const trackResponse = await trackPurchase({
-      user: {
-        email: 'hello@gmail.com',
-        userId: '1234'
-      },
-      items: [],
-      total: 100
-    } as any);
-
-    expect(JSON.parse(updateResponse.config.data).user.email).toEqual(
-      'hello@gmail.com'
-    );
-    expect(JSON.parse(updateResponse.config.data).user.userId).toEqual('1234');
-    expect(JSON.parse(trackResponse.config.data).user.email).toEqual(
-      'hello@gmail.com'
-    );
-    expect(JSON.parse(trackResponse.config.data).user.userId).toEqual('1234');
+    expect(response.data.msg).toBe('hello');
+    expect(JSON.parse(response.config.data).total).toBe(24);
+    expect(JSON.parse(response.config.data).items).toEqual([
+      {
+        id: 'fdsafds',
+        name: 'banana',
+        quantity: 2,
+        price: 12
+      }
+    ]);
+    expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
   });
 
-  it('should reject updateCart on bad params', async () => {
+  it('should reject trackPurchase on bad params', async () => {
     try {
       await trackPurchase({
-        items: [{} as any]
+        items: [{} as any],
+        user: {
+          userId: 'user'
+        }
       } as any);
     } catch (e) {
       expect(e).toEqual(

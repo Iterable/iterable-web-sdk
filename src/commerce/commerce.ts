@@ -6,8 +6,14 @@ import { AnonymousUserEventManager } from '..';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   if (
-    (!('userId' in payload) || payload.userId === null) &&
-    (!('email' in payload) || payload.email === null)
+    (!payload.user ||
+      !('userId' in payload.user) ||
+      payload.user.userId === null ||
+      typeof payload.user.userId === undefined) &&
+    (!payload.user ||
+      !('email' in payload.user) ||
+      payload.user.email === null ||
+      typeof payload.user.email === undefined)
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
@@ -33,8 +39,14 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (
-    (!('userId' in payload) || payload.userId === null) &&
-    (!('email' in payload) || payload.email === null)
+    (!payload.user ||
+      !('userId' in payload.user) ||
+      payload.user.userId === null ||
+      typeof payload.user.userId === undefined) &&
+    (!payload.user ||
+      !('email' in payload.user) ||
+      payload.user.email === null ||
+      typeof payload.user.email === undefined)
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
