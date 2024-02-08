@@ -713,7 +713,7 @@ describe('User Identification', () => {
           mockRequest.history.post.filter(
             (e: any) => !!e.url?.match(/users\/update/gim)
           ).length
-        ).toBe(0);
+        ).toBe(1);
       });
     });
   });
@@ -1111,7 +1111,7 @@ describe('User Identification', () => {
             mockRequest.history.post.filter(
               (e: any) => !!e.url?.match(/users\/update/gim)
             ).length
-          ).toBe(0);
+          ).toBe(1);
         }
       });
     });

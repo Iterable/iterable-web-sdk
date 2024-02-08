@@ -318,12 +318,12 @@ export function initialize(
           }
         );
 
-        const tryUser = () => {
+        const tryUser = (userId: any) => {
           let createUserAttempts = 0;
 
           return async function tryUserNTimes(): Promise<any> {
             try {
-              return await updateUser({});
+              return await updateUser({ userId: userId });
             } catch (e) {
               if (createUserAttempts < RETRY_USER_ATTEMPTS) {
                 createUserAttempts += 1;
@@ -338,7 +338,7 @@ export function initialize(
         };
 
         try {
-          return await tryUser()();
+          return await tryUser(userId)();
         } catch (e) {
           /* failed to create a new user. Just silently resolve */
           return Promise.resolve();
@@ -708,12 +708,12 @@ export function initialize(
         return config;
       });
 
-      const tryUser = () => {
+      const tryUser = (userID: any) => {
         let createUserAttempts = 0;
 
         return async function tryUserNTimes(): Promise<any> {
           try {
-            return await updateUser({});
+            return await updateUser({ userId: userID });
           } catch (e) {
             if (createUserAttempts < RETRY_USER_ATTEMPTS) {
               createUserAttempts += 1;
@@ -729,7 +729,7 @@ export function initialize(
 
       return doRequest({ userID: userId })
         .then(async (token) => {
-          await tryUser()();
+          await tryUser(userId)();
           return token;
         })
         .catch((e) => {
