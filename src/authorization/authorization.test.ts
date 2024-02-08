@@ -10,7 +10,7 @@ import { GETMESSAGES_PATH } from '../constants';
 
 let mockRequest: any = null;
 
-jest.mock('../events/anonymousUserEventManager', () => {
+jest.mock('../utils/anonymousUserEventManager', () => {
   return {
     AnonymousUserEventManager: jest.fn().mockImplementation(() => ({
       trackAnonUpdateCart: jest.fn(),

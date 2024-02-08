@@ -13,7 +13,7 @@ import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
-jest.mock('../events/anonymousUserEventManager', () => {
+jest.mock('../utils/anonymousUserEventManager', () => {
   return jest.fn().mockImplementation(() => ({
     trackAnonEvent: jest.fn()
   }));
