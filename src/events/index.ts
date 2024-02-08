@@ -1,3 +1,3 @@
 export * from './types';
 export * from './events';
-export * from './anonymousUserEventManager';
+export * from '../utils/anonymousUserEventManager';

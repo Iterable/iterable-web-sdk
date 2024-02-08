@@ -3,7 +3,7 @@ import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import { eventRequestSchema, trackSchema } from './events.schema';
-import { AnonymousUserEventManager } from './anonymousUserEventManager';
+import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 
 export const track = (payload: InAppTrackRequestParams) => {
   if (

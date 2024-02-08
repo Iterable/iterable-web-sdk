@@ -151,12 +151,17 @@ export const ANIMATION_STYLESHEET = (
   }
 `;
 
+export const SHARED_PREFS_EVENT_TYPE = 'eventType';
+export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
+export const SHARED_PREFS_CRITERIA = 'criteria';
+export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
+export const SHARED_PREF_AUTH_TYPE = 'typeOfAuth';
+export const SHARED_PREF_AUTH_IDENTIFIER = 'authIdentifier';
+
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';
 export const KEY_DATA_FIELDS = 'dataFields';
 export const KEY_CREATE_NEW_FIELDS = 'createNewFields';
-export const SHARED_PREFS_EVENT_TYPE = 'eventType';
-export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const KEY_ITEMS = 'items';
 export const KEY_TOTAL = 'total';
 export const DATA_REPLACE = 'dataReplace';
