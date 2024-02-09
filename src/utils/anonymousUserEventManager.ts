@@ -24,12 +24,18 @@ import {
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
-import { UpdateUserParams } from '..';
-import { CriteriaCompletionChecker } from './criteriaCompletionChecker';
+import {
+  UpdateUserParams,
+  track,
+  trackPurchase,
+  updateCart,
+  updateUser
+} from '..';
+import CriteriaCompletionChecker from './criteriaCompletionChecker';
 // import { v4 as uuidv4 } from 'uuid';
 
 export class AnonymousUserEventManager {
-  private userId = '';
+  // private userId = '';
 
   constructor() {
     this.updateAnonSession();
@@ -85,7 +91,7 @@ export class AnonymousUserEventManager {
       [KEY_CREATE_NEW_FIELDS]: true,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
     };
-    this.storeEventLocally(newDataObject);
+    this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   public async trackAnonUpdateUser(payload: UpdateUserParams) {
@@ -93,7 +99,7 @@ export class AnonymousUserEventManager {
       [DATA_REPLACE]: payload.dataFields,
       [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
     };
-    this.storeEventLocally(newDataObject);
+    this.storeEventListToLocalStorage(newDataObject, true);
   }
 
   public async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
@@ -104,7 +110,7 @@ export class AnonymousUserEventManager {
       [KEY_TOTAL]: payload.total,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
     };
-    this.storeEventLocally(newDataObject);
+    this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
@@ -113,7 +119,7 @@ export class AnonymousUserEventManager {
       [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
       [KEY_CREATED_AT]: this.getCurrentTime()
     };
-    this.storeEventLocally(newDataObject);
+    this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   public getAnonCriteria() {
@@ -126,7 +132,10 @@ export class AnonymousUserEventManager {
       .then((response) => {
         const criteriaData: any = response.data;
         if (criteriaData) {
-          localStorage.setItem(SHARED_PREFS_CRITERIA, criteriaData);
+          localStorage.setItem(
+            SHARED_PREFS_CRITERIA,
+            JSON.stringify(criteriaData)
+          );
         }
       })
       .catch((e) => {
@@ -142,8 +151,8 @@ export class AnonymousUserEventManager {
 
     try {
       if (criteriaData && localStoredEventList) {
-        const checker = new CriteriaCompletionChecker();
-        return checker.getMatchedCriteria(criteriaData, localStoredEventList);
+        const checker = new CriteriaCompletionChecker(localStoredEventList);
+        return checker.getMatchedCriteria(criteriaData);
       }
     } catch (error) {
       console.error('checkCriteriaCompletion', error);
@@ -152,7 +161,7 @@ export class AnonymousUserEventManager {
     return null;
   }
 
-  public async createKnownUser(criteriaId: number) {
+  public async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     // updateUser({ userId: uuidv4(), preferUserId: true });
 
@@ -161,6 +170,8 @@ export class AnonymousUserEventManager {
       const userDataJson = userSessionInfo.get(SHARED_PREFS_ANON_SESSIONS);
       console.log('data', userDataJson);
     }
+
+    console.log('criteriaId', criteriaId);
 
     // await updateUser({
     //   dataFields: {
@@ -174,62 +185,77 @@ export class AnonymousUserEventManager {
   }
 
   public async syncEvents() {
-    const strTrackEventList = localStorage.getItem('track_event_list');
+    const strTrackEventList = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
       : [];
-    localStorage.removeItem('track_event_list');
 
     if (trackEventList.length) {
       for (let i = 0; i < trackEventList.length; i++) {
-        if (trackEventList[i].dataFields['eventType'] === 'track') {
-          trackEventList[i].userId = this.userId;
-          await this.trackAnonEvent(trackEventList[i]);
-        } else if (
-          trackEventList[i].dataFields['eventType'] === 'trackPurchase'
-        ) {
-          trackEventList[i].user = {
-            userId: this.userId,
-            createNewFields: true
-          };
-          await this.trackAnonPurchaseEvent(trackEventList[i]);
-        } else if (trackEventList[i].dataFields['eventType'] === 'cartUpdate') {
-          trackEventList[i].user = {
-            userId: this.userId,
-            createNewFields: true
-          };
-          await this.trackAnonUpdateCart(trackEventList[i]);
+        const event = trackEventList[i];
+        const eventType = event.get(SHARED_PREFS_EVENT_TYPE);
+
+        switch (eventType) {
+          case TRACK_EVENT: {
+            await track(trackEventList[i]);
+            break;
+          }
+          case TRACK_PURCHASE: {
+            await trackPurchase(trackEventList[i]);
+            break;
+          }
+          case TRACK_UPDATE_CART: {
+            await updateCart(trackEventList[i]);
+            break;
+          }
+          case UPDATE_USER: {
+            await updateUser(trackEventList[i]);
+            break;
+          }
+          default: {
+            break;
+          }
         }
+
+        localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
+        localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
       }
     }
   }
 
-  public storeEventLocally(payload: any) {
+  async storeEventListToLocalStorage(
+    newDataObject: any,
+    shouldOverWrite: boolean
+  ) {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
-    let trackEventList = [];
+    let previousDataArray = [];
 
     if (strTrackEventList) {
-      trackEventList = JSON.parse(strTrackEventList);
+      previousDataArray = JSON.parse(strTrackEventList);
     }
-    trackEventList.push(payload);
+
+    if (shouldOverWrite) {
+      const trackingType = newDataObject.getString(SHARED_PREFS_EVENT_TYPE);
+      const indexToUpdate = previousDataArray.findIndex(
+        (obj: any) => obj[SHARED_PREFS_EVENT_TYPE] === trackingType
+      );
+      if (indexToUpdate !== -1) {
+        previousDataArray[indexToUpdate] = newDataObject;
+      }
+    } else {
+      previousDataArray.push(newDataObject);
+    }
+
     localStorage.setItem(
       SHARED_PREFS_EVENT_LIST_KEY,
-      JSON.stringify(trackEventList)
+      JSON.stringify(previousDataArray)
     );
 
-    console.log(
-      'store data',
-      localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY)
-    );
-    // const isCriteriaCompleted = this.checkCriteriaCompletion();
-
-    // if (await isCriteriaCompleted) {
-    //   const userId = uuidv4();
-    //   await App.setUserID(userId);
-    //   await createUser(userId, process.env.API_KEY);
-    //   setLoggedInUser({ type: 'user_update', data: userId });
-    //   await syncEvents();
-    // }
+    const criteriaId = await this.checkCriteriaCompletion();
+    console.log('criteriaId', criteriaId);
+    if (criteriaId !== null) {
+      this.createKnownUser(criteriaId);
+    }
   }
 
   private getCurrentTime = () => {
