@@ -20,7 +20,9 @@ import {
   UPDATE_USER,
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
-  SHARED_PREFS_ANON_SESSIONS
+  SHARED_PREFS_ANON_SESSIONS,
+  SHARED_PREFS_CRITERIA_ID,
+  SHARED_PREFS_PUSH_OPT_IN
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
@@ -32,17 +34,11 @@ import {
   updateUser
 } from '..';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
-// import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
+import { setUserID } from '..';
 
 export class AnonymousUserEventManager {
-  // private userId = '';
-
-  constructor() {
-    this.updateAnonSession();
-    this.getAnonCriteria();
-  }
-
-  public async updateAnonSession() {
+  updateAnonSession() {
     try {
       const strAnonSessionInfo = localStorage.getItem(
         SHARED_PREFS_ANON_SESSIONS
@@ -83,46 +79,7 @@ export class AnonymousUserEventManager {
     }
   }
 
-  public async trackAnonEvent(payload: InAppTrackRequestParams) {
-    const newDataObject = {
-      [KEY_EVENT_NAME]: payload.eventName,
-      [KEY_CREATED_AT]: this.getCurrentTime(),
-      [KEY_DATA_FIELDS]: payload.dataFields,
-      [KEY_CREATE_NEW_FIELDS]: true,
-      [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
-    };
-    this.storeEventListToLocalStorage(newDataObject, false);
-  }
-
-  public async trackAnonUpdateUser(payload: UpdateUserParams) {
-    const newDataObject = {
-      [DATA_REPLACE]: payload.dataFields,
-      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
-    };
-    this.storeEventListToLocalStorage(newDataObject, true);
-  }
-
-  public async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
-    const newDataObject = {
-      [KEY_ITEMS]: payload.items,
-      [KEY_CREATED_AT]: this.getCurrentTime(),
-      [KEY_DATA_FIELDS]: payload.dataFields,
-      [KEY_TOTAL]: payload.total,
-      [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
-    };
-    this.storeEventListToLocalStorage(newDataObject, false);
-  }
-
-  public async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
-    const newDataObject = {
-      [KEY_ITEMS]: payload.items,
-      [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
-      [KEY_CREATED_AT]: this.getCurrentTime()
-    };
-    this.storeEventListToLocalStorage(newDataObject, false);
-  }
-
-  public getAnonCriteria() {
+  getAnonCriteria() {
     baseIterableRequest<IterableResponse>({
       method: 'GET',
       url: GET_CRITERIA_PATH,
@@ -143,7 +100,46 @@ export class AnonymousUserEventManager {
       });
   }
 
-  public async checkCriteriaCompletion() {
+  async trackAnonEvent(payload: InAppTrackRequestParams) {
+    const newDataObject = {
+      [KEY_EVENT_NAME]: payload.eventName,
+      [KEY_CREATED_AT]: this.getCurrentTime(),
+      [KEY_DATA_FIELDS]: payload.dataFields,
+      [KEY_CREATE_NEW_FIELDS]: true,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
+    };
+    this.storeEventListToLocalStorage(newDataObject, false);
+  }
+
+  async trackAnonUpdateUser(payload: UpdateUserParams) {
+    const newDataObject = {
+      [DATA_REPLACE]: payload.dataFields,
+      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
+    };
+    this.storeEventListToLocalStorage(newDataObject, true);
+  }
+
+  async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
+    const newDataObject = {
+      [KEY_ITEMS]: payload.items,
+      [KEY_CREATED_AT]: this.getCurrentTime(),
+      [KEY_DATA_FIELDS]: payload.dataFields,
+      [KEY_TOTAL]: payload.total,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
+    };
+    this.storeEventListToLocalStorage(newDataObject, false);
+  }
+
+  async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
+    const newDataObject = {
+      [KEY_ITEMS]: payload.items,
+      [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
+      [KEY_CREATED_AT]: this.getCurrentTime()
+    };
+    this.storeEventListToLocalStorage(newDataObject, false);
+  }
+
+  private async checkCriteriaCompletion() {
     const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
@@ -161,30 +157,23 @@ export class AnonymousUserEventManager {
     return null;
   }
 
-  public async createKnownUser(criteriaId: string) {
+  private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
-    // updateUser({ userId: uuidv4(), preferUserId: true });
+    setUserID(uuidv4());
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
       const userDataJson = userSessionInfo.get(SHARED_PREFS_ANON_SESSIONS);
-      console.log('data', userDataJson);
+      userDataJson.put(SHARED_PREFS_CRITERIA_ID, criteriaId);
+      userDataJson.put(SHARED_PREFS_PUSH_OPT_IN, this.getPushStatus());
+      userDataJson.put(SHARED_PREFS_EVENT_TYPE, TRACK_EVENT);
+      userDataJson.put('event_name', SHARED_PREFS_ANON_SESSIONS);
+      track(userDataJson);
     }
-
-    console.log('criteriaId', criteriaId);
-
-    // await updateUser({
-    //   dataFields: {
-    //     userId: userId,
-    //     ...{ SHARED_PREFS_ANON_SESSIONS: { ...userSessionInfo } }
-    //   },
-    //   userId: userId
-    // });
-    // this.userId = userId;
     this.syncEvents();
   }
 
-  public async syncEvents() {
+  async syncEvents() {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
@@ -223,7 +212,7 @@ export class AnonymousUserEventManager {
     }
   }
 
-  async storeEventListToLocalStorage(
+  private async storeEventListToLocalStorage(
     newDataObject: any,
     shouldOverWrite: boolean
   ) {
@@ -252,7 +241,6 @@ export class AnonymousUserEventManager {
     );
 
     const criteriaId = await this.checkCriteriaCompletion();
-    console.log('criteriaId', criteriaId);
     if (criteriaId !== null) {
       this.createKnownUser(criteriaId);
     }
@@ -261,4 +249,13 @@ export class AnonymousUserEventManager {
   private getCurrentTime = () => {
     return new Date().getTime();
   };
+
+  private getPushStatus(): boolean {
+    const notificationManager = window.Notification;
+    if (notificationManager && notificationManager.permission === 'granted') {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

@@ -21,6 +21,15 @@ jest.mock('../utils/anonymousUserEventManager', () => {
   };
 });
 
+jest.mock('../utils/anonymousUserMerge', () => {
+  return {
+    AnonymousUserMerge: jest.fn().mockImplementation(() => ({
+      mergeUserUsingUserId: jest.fn(),
+      mergeUserUsingEmail: jest.fn()
+    }))
+  };
+});
+
 /*
   decoded payload is:
 

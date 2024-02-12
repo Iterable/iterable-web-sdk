@@ -20,6 +20,9 @@ export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 export const GET_CRITERIA_PATH = '/anonymoususer/list';
+export const ENDPOINT_GET_USER_BY_USERID = 'users/byUserId';
+export const ENDPOINT_GET_USER_BY_EMAIL = 'users/getByEmail';
+export const ENDPOINT_MERGE_USER = 'users/merge';
 
 /** @todo update once new endpoint is ready */
 export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
@@ -155,8 +158,10 @@ export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
-export const SHARED_PREF_AUTH_TYPE = 'typeOfAuth';
-export const SHARED_PREF_AUTH_IDENTIFIER = 'authIdentifier';
+export const SHARED_PREF_USER_ID = '_userId';
+export const SHARED_PREF_EMAIL = '_email';
+export const SHARED_PREFS_CRITERIA_ID = 'anon_criteria_id';
+export const SHARED_PREFS_PUSH_OPT_IN = 'pushOptIn';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';

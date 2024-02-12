@@ -5,7 +5,9 @@ import { clearMessages } from 'src/inapp';
 import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
-  STATIC_HEADERS
+  STATIC_HEADERS,
+  SHARED_PREF_USER_ID,
+  SHARED_PREF_EMAIL
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -17,8 +19,26 @@ import {
   isEmail
 } from './utils';
 import { config } from '../utils/config';
+import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
+import { AnonymousUserEventManager } from '..';
 
 const MAX_TIMEOUT = ONE_DAY;
+/* 
+    AKA did the user auth with their email (setEmail) or user ID (setUserID) 
+
+    we're going to use this variable for one circumstance - when calling _updateUserEmail_.
+    Essentially, when we call the Iterable API to update a user's email address and we get a
+    successful 200 request, we're going to request a new JWT token, since it might need to
+    be re-signed with the new email address; however, if the customer code never authorized the
+    user with an email and instead a user ID, we'll just continue to sign the JWT with the user ID.
+
+    This is mainly just a quality-of-life feature, so that the customer's JWT generation code
+    doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
+    tokens by user ID.
+  */
+let typeOfAuth: null | 'email' | 'userID' = null;
+/* this will be the literal user ID or email they choose to auth with */
+let authIdentifier: null | string = null;
 
 export interface GenerateJWTPayload {
   email?: string;
@@ -39,6 +59,34 @@ export interface WithoutJWT {
   setEmail: (email: string) => void;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
+}
+
+export function setUserID(userId: string) {
+  if (userId !== null && userId !== '') {
+    const anonymousUserMerge = new AnonymousUserMerge();
+    anonymousUserMerge.mergeUserUsingUserId(userId);
+  }
+  typeOfAuth = 'userID';
+  authIdentifier = userId;
+  localStorage.setItem(SHARED_PREF_USER_ID, userId);
+}
+
+export function setEmail(email: string) {
+  if (email !== null && email !== '') {
+    const anonymousUserMerge = new AnonymousUserMerge();
+    anonymousUserMerge.mergeUserUsingEmail(email);
+  }
+  typeOfAuth = 'email';
+  authIdentifier = email;
+  localStorage.setItem(SHARED_PREF_EMAIL, email);
+}
+
+export function getUserID(): string | null {
+  return localStorage.getItem(SHARED_PREF_USER_ID);
+}
+
+export function getEmail(): string | null {
+  return localStorage.getItem(SHARED_PREF_EMAIL);
 }
 
 export function initialize(
@@ -74,22 +122,6 @@ export function initialize(
       });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
-  /* 
-    AKA did the user auth with their email (setEmail) or user ID (setUserID) 
-
-    we're going to use this variable for one circumstance - when calling _updateUserEmail_.
-    Essentially, when we call the Iterable API to update a user's email address and we get a
-    successful 200 request, we're going to request a new JWT token, since it might need to
-    be re-signed with the new email address; however, if the customer code never authorized the
-    user with an email and instead a user ID, we'll just continue to sign the JWT with the user ID.
-
-    This is mainly just a quality-of-life feature, so that the customer's JWT generation code
-    doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
-    tokens by user ID.
-  */
-  let typeOfAuth: null | 'email' | 'userID' = null;
-  /* this will be the literal user ID or email they choose to auth with */
-  let authIdentifier: null | string = null;
 
   /**
     method that sets a timer one minute before JWT expiration
@@ -607,6 +639,15 @@ export function initialize(
         return Promise.reject(error);
       });
   };
+
+  try {
+    const anonUserManager = new AnonymousUserEventManager();
+    anonUserManager.getAnonCriteria();
+    anonUserManager.updateAnonSession();
+  } catch (error) {
+    console.warn(error);
+  }
+
   return {
     clearRefresh: () => {
       /* this will just clear the existing timeout */
