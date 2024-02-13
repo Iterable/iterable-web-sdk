@@ -3,6 +3,7 @@ import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '..';
+import config from '../utils/config';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   if (
@@ -13,7 +14,8 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
     (!payload.user ||
       !('email' in payload.user) ||
       payload.user.email === null ||
-      typeof payload.user.email === undefined)
+      typeof payload.user.email === undefined) &&
+    config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
@@ -46,7 +48,8 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
     (!payload.user ||
       !('email' in payload.user) ||
       payload.user.email === null ||
-      typeof payload.user.email === undefined)
+      typeof payload.user.email === undefined) &&
+    config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);

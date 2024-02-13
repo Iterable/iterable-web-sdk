@@ -62,7 +62,11 @@ export interface WithoutJWT {
 }
 
 export function setUserID(userId: string) {
-  if (userId !== null && userId !== '') {
+  if (
+    userId !== null &&
+    userId !== '' &&
+    config.getConfig('enableAnonTracking')
+  ) {
     const anonymousUserMerge = new AnonymousUserMerge();
     anonymousUserMerge.mergeUserUsingUserId(userId);
   }
@@ -72,7 +76,11 @@ export function setUserID(userId: string) {
 }
 
 export function setEmail(email: string) {
-  if (email !== null && email !== '') {
+  if (
+    email !== null &&
+    email !== '' &&
+    config.getConfig('enableAnonTracking')
+  ) {
     const anonymousUserMerge = new AnonymousUserMerge();
     anonymousUserMerge.mergeUserUsingEmail(email);
   }
@@ -236,6 +244,18 @@ export function initialize(
       return config;
     });
   };
+
+  console.log('enabled hani', config.getConfig('enableAnonTracking'));
+
+  try {
+    if (config.getConfig('enableAnonTracking')) {
+      const anonUserManager = new AnonymousUserEventManager();
+      anonUserManager.getAnonCriteria();
+      anonUserManager.updateAnonSession();
+    }
+  } catch (error) {
+    console.warn(error);
+  }
 
   if (!generateJWT) {
     /* we want to set a normal non-JWT enabled API key */
@@ -639,14 +659,6 @@ export function initialize(
         return Promise.reject(error);
       });
   };
-
-  try {
-    const anonUserManager = new AnonymousUserEventManager();
-    anonUserManager.getAnonCriteria();
-    anonUserManager.updateAnonSession();
-  } catch (error) {
-    console.warn(error);
-  }
 
   return {
     clearRefresh: () => {

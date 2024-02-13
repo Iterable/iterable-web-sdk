@@ -4,6 +4,7 @@ import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 import { AnonymousUserEventManager } from '..';
+import config from '../utils/config';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
@@ -27,7 +28,8 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
       typeof payload.userId === 'undefined') &&
     (!('email' in payload) ||
       payload.email === null ||
-      typeof payload.email === 'undefined')
+      typeof payload.email === 'undefined') &&
+    config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateUser(payload);

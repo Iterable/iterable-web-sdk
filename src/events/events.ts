@@ -4,6 +4,7 @@ import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import { eventRequestSchema, trackSchema } from './events.schema';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { config } from '../utils/config';
 
 export const track = (payload: InAppTrackRequestParams) => {
   if (
@@ -12,7 +13,8 @@ export const track = (payload: InAppTrackRequestParams) => {
       typeof payload.userId === 'undefined') &&
     (!('email' in payload) ||
       payload.email === null ||
-      typeof payload.email === 'undefined')
+      typeof payload.email === 'undefined') &&
+    config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
