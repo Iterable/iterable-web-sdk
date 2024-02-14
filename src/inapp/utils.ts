@@ -487,8 +487,24 @@ export const paintIFrame = (
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
     */
-    const images =
+    const imageUrls: string[] =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
+
+    const imageTags = Array.from(
+      new DOMParser()
+        .parseFromString(html, 'text/html')
+        .getElementsByTagName('img')
+    );
+    const imageTagUrls = imageTags
+      .map((i) => i.src)
+      .filter((src) => {
+        if (!imageUrls.length) return true;
+        const imageUrlSet = new Set(imageUrls);
+        return imageUrlSet.has(src);
+      });
+
+    const images = [...imageUrls, ...imageTagUrls];
+
     return preloadImages(images, () => {
       /* 
         set the scroll height to the content inside, but since images
