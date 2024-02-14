@@ -446,6 +446,16 @@ export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
 };
 
 /**
+ * Default Chrome user agent stylesheet adds 8px margin to body element.
+ * This unsets it so that it does not interfere with iframe sizing.
+ */
+const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
+  const { contentDocument } = iframe;
+  const margin = contentDocument?.body.style.margin;
+  if (contentDocument && !margin) contentDocument.body.style.margin = 'unset';
+};
+
+/**
  *
  * @param html html you want to paint to the DOM inside the iframe
  * @param position screen position the message should appear in
@@ -486,9 +496,11 @@ export const paintIFrame = (
         set the inner HTML of the iframe
       */
       document.body.appendChild(iframe);
-      iframe.contentWindow?.document?.open();
-      iframe.contentWindow?.document?.write(html);
-      iframe.contentWindow?.document?.close();
+      iframe.contentDocument?.open();
+      iframe.contentDocument?.write(html);
+      iframe.contentDocument?.close();
+
+      unsetIframeBodyMargin(iframe);
 
       const timeout = setTimeout(() => {
         /**
@@ -591,21 +603,13 @@ export const paintIFrame = (
         };
 
         if (position !== 'Full') {
-          const iframeHeight =
-            iframe.contentWindow?.document?.body?.scrollHeight;
-          /*
-            For web in-app messages created with WYSIWYG editor,
-            there is 8px margin all around the iframe document body.
-            Add 16px to the iframe height to eliminate scrollbar.
-            Add 10px to eliminate discrepancy between the height
-            of the document html and that of the iframe itself.
-          */
-          iframe.style.height =
-            ((iframeHeight && iframeHeight + 26) || 0) + 'px';
+          const iframeHeight = iframe.contentDocument?.body?.scrollHeight;
+          if (iframeHeight) iframe.style.height = iframeHeight + 'px';
         }
 
         clearTimeout(timeout);
       }, 100);
+
       resolve(iframe);
     });
   }).then((iframe: HTMLIFrameElement) => {
