@@ -454,7 +454,7 @@ export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
 const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
   const { contentDocument } = iframe;
   const margin = contentDocument?.body.style.margin;
-  if (contentDocument && !margin) contentDocument.body.style.margin = 'unset';
+  if (contentDocument && !margin) contentDocument.body.style.margin = '0px';
 };
 
 /**
@@ -502,7 +502,7 @@ export const paintIFrame = (
       .filter((src) => {
         if (!imageUrls.length) return true;
         const imageUrlSet = new Set(imageUrls);
-        return imageUrlSet.has(src);
+        return !imageUrlSet.has(src);
       });
 
     const imageLinks = [...imageUrls, ...imageTagUrls];
@@ -546,7 +546,7 @@ export const paintIFrame = (
               transform: translateX(150%);
               -webkit-transform: translateX(150%);
               width: ${width};
-              // height: ${iframe.style.height};
+              height: ${iframe.style.height};
             `
               : `
               position: fixed;
@@ -555,7 +555,7 @@ export const paintIFrame = (
               max-width: 100%;
               z-index: 9999;
               width: ${width};
-              // height: ${iframe.style.height};
+              height: ${iframe.style.height};
             `,
             position,
             mediaQuerySm.matches,
