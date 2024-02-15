@@ -2,8 +2,8 @@ import { setMany } from 'idb-keyval';
 import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
 
 /**
- * detect amount of local storage remaining (quota) and used (usage).
- * if usageDetails exist (not supported in Safari), use this instead of usage.
+ * Detect amount of local storage remaining (quota) and used (usage).
+ * If usageDetails exist (not supported in Safari), use this instead of usage.
  */
 export const determineRemainingStorageQuota = async () => {
   try {
@@ -14,39 +14,37 @@ export const determineRemainingStorageQuota = async () => {
         ? await navigator.storage.estimate()
         : undefined;
 
-    /** 50 MB is the lower common denominator on modern mobile browser caches */
+    /** 50 MB is the lower common denominator on modern mobile browser caches. */
     const mobileBrowserQuota = 52428800;
-    /** max quota of browser storage that in-apps will potentially fill */
+    /** Max quota of browser storage that in-apps will potentially fill */
     const estimatedBrowserQuota = storage?.quota;
     /**
-     * determine lower max quota that can be used for message cache,
-     * set to 60% of quota to leave space for other caching needs
-     * on that domain
+     * Determine lower max quota that can be used for message cache, set to
+     * 60% of quota to leave space for other caching needs on that domain.
      */
     const messageQuota =
       ((estimatedBrowserQuota &&
         Math.min(estimatedBrowserQuota, mobileBrowserQuota)) ??
         mobileBrowserQuota) * 0.6;
 
-    /** how much local storage is being used */
+    /** How much local storage is being used. */
     const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
     const remainingQuota = usage && messageQuota - usage;
 
     return remainingQuota ? remainingQuota : 0;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (err: any) {
+  } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     // eslint-disable-next-line no-console
     console.warn(
       'Error determining remaining storage quota',
       err?.response?.data?.clientErrors ?? err
     );
   }
-  /** do not try to add to cache if we cannot determine storage space */
+  /** Do not try to add to cache if we cannot determine storage space. */
   return 0;
 };
 
 /**
- * deletes cached messages not present in latest getMessages fetch
+ * Deletes cached messages not present in latest getMessages fetch.
  * @param cachedMessages
  * @param fetchedMessages
  */
@@ -68,9 +66,9 @@ export const getCachedMessagesToDelete = (
   }, []);
 
 /**
- * adds messages to cache only if they fit within the quota, starting with
+ * Adds messages to cache only if they fit within the quota, starting with
  * oldest messages since newer messages can still be easily retrieved via
- * new requests while passing in latestCachedMessageId param
+ * new requests while passing in latestCachedMessageId param.
  * @param messages
  * @param quota
  */
@@ -80,8 +78,8 @@ export const addNewMessagesToCache = async (
   const quota = await determineRemainingStorageQuota();
   if (quota > 0) {
     /**
-     * determine total size (in bytes) of new messages to be added to cache
-     * sorted oldest to newest (ascending createdAt property)
+     * Determine total size (in bytes) of new messages to be added to cache
+     * sorted oldest to newest (ascending createdAt property).
      */
     const messagesWithSizes: {
       messageId: string;
@@ -102,7 +100,7 @@ export const addNewMessagesToCache = async (
       })
       .sort((a, b) => a.createdAt - b.createdAt);
 
-    /** only add messages that fit in cache, starting from oldest messages */
+    /** Only add messages that fit in cache, starting from oldest messages. */
     let remainingQuota = quota;
     const messagesToAddToCache: [string, InAppMessage][] = [];
     messagesWithSizes.every(({ messageId, message, size }) => {
@@ -114,8 +112,7 @@ export const addNewMessagesToCache = async (
 
     try {
       await setMany(messagesToAddToCache);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
       // eslint-disable-next-line no-console
       console.warn(
         'Error adding new messages to the browser cache',
