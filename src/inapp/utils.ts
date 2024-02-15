@@ -75,7 +75,7 @@ export const addStyleSheet = (doc: Document, style: string) => {
 
 export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
-    return callback();
+    callback();
   }
 
   const images: HTMLImageElement[] = [];
