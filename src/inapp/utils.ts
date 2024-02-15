@@ -78,13 +78,15 @@ export const addStyleSheet = (doc: Document, style: string) => {
 
 export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
-    callback();
+    return callback();
   }
-  const images = [];
+
+  const images: HTMLImageElement[] = [];
   let loadedImages = 0;
   for (let i = 0; i < imageLinks.length; i++) {
     images[i] = new Image();
     images[i].src = imageLinks[i];
+    images[i].loading = 'eager';
     images[i].onload = () => {
       /* 
         track the amount of images we preloaded. If this is the last image
@@ -503,9 +505,9 @@ export const paintIFrame = (
         return imageUrlSet.has(src);
       });
 
-    const images = [...imageUrls, ...imageTagUrls];
+    const imageLinks = [...imageUrls, ...imageTagUrls];
 
-    return preloadImages(images, () => {
+    return preloadImages(imageLinks, () => {
       /* 
         set the scroll height to the content inside, but since images
         are going to take some time to load, we opt to preload them, THEN
@@ -544,7 +546,7 @@ export const paintIFrame = (
               transform: translateX(150%);
               -webkit-transform: translateX(150%);
               width: ${width};
-              height: ${iframe.style.height};
+              // height: ${iframe.style.height};
             `
               : `
               position: fixed;
@@ -553,7 +555,7 @@ export const paintIFrame = (
               max-width: 100%;
               z-index: 9999;
               width: ${width};
-              height: ${iframe.style.height};
+              // height: ${iframe.style.height};
             `,
             position,
             mediaQuerySm.matches,
@@ -632,6 +634,14 @@ export const paintIFrame = (
     if (srMessage) {
       srSpeak(srMessage, 'assertive');
     }
+
+    iframe.onload = () => {
+      if (position !== 'Full') {
+        const scrollHeight = iframe.contentDocument?.body.scrollHeight ?? 0;
+        if (scrollHeight) iframe.style.height = scrollHeight + 'px';
+      }
+    };
+
     return iframe;
   });
 
