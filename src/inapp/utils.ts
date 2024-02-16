@@ -6,11 +6,7 @@ import {
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
-import {
-  CLOSE_BUTTON_POSITION,
-  CloseButtonPosition,
-  InAppMessage
-} from './types';
+import { CloseButtonPosition, InAppMessage } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -164,7 +160,7 @@ export const generateCloseButton = (
   `;
   const button = doc.createElement('button');
   button.style.cssText =
-    position === CLOSE_BUTTON_POSITION.TopLeft
+    position === CloseButtonPosition.TopLeft
       ? `
     ${sharedStyles}
     left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
@@ -622,7 +618,7 @@ export const setCloseButtonPosition = (
     ? `calc(${iframeRect.top}px + ${topOffset})`
     : `${iframeRect.top + defaultTop}px`;
 
-  if (position === CLOSE_BUTTON_POSITION.TopLeft)
+  if (position === CloseButtonPosition.TopLeft)
     closeButton.style.left = sideOffset
       ? `calc(${iframeRect.left}px + ${sideOffset})`
       : `${iframeRect.left + defaultSide}px`;

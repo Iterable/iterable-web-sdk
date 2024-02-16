@@ -18,10 +18,9 @@ import {
 import { IterablePromise } from '../types';
 import { requestMessages } from './request';
 import {
-  DISPLAY_OPTIONS,
   DisplayOptions,
   GetInAppMessagesResponse,
-  HANDLE_LINKS,
+  HandleLinks,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -426,9 +425,8 @@ export function getInAppMessages(
             ) => {
               if (typeof handleLinks === 'string') {
                 if (
-                  handleLinks === HANDLE_LINKS.OpenAllSameTab ||
-                  (isInternalLink &&
-                    handleLinks === HANDLE_LINKS.ExternalNewTab)
+                  handleLinks === HandleLinks.OpenAllSameTab ||
+                  (isInternalLink && handleLinks === HandleLinks.ExternalNewTab)
                 ) {
                   sameTabAction();
                 } else {
@@ -481,9 +479,9 @@ export function getInAppMessages(
                 if (clickedUrl) {
                   const isOpeningLinkInSameTab =
                     (!handleLinks && !openInNewTab) ||
-                    handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                    handleLinks === HandleLinks.OpenAllSameTab ||
                     (isInternalLink &&
-                      handleLinks === HANDLE_LINKS.ExternalNewTab);
+                      handleLinks === HandleLinks.ExternalNewTab);
 
                   trackInAppClick(
                     {
@@ -574,7 +572,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred = options.display === DISPLAY_OPTIONS.deferred;
+    const isDeferred = options.display === DisplayOptions.Deferred;
 
     const triggerDisplayFn = isDeferred
       ? {
