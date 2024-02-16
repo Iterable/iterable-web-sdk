@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { messages } from '../../__data__/inAppMessages';
 import { baseAxiosRequest } from '../../request';
 import { srSpeak } from '../../utils/srSpeak';
-import { CLOSE_BUTTON_POSITION } from '../types';
+import { CloseButtonPosition, DisplayPosition } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
@@ -505,7 +505,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('100%');
       expect(
@@ -516,7 +516,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('100%');
       expect(
@@ -527,7 +527,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('100%');
       expect(
@@ -538,7 +538,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('100%');
     });
@@ -552,7 +552,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -563,7 +563,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('45%');
       expect(
@@ -574,7 +574,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('45%');
       expect(
@@ -585,7 +585,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -599,7 +599,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -610,7 +610,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('33%');
       expect(
@@ -621,7 +621,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('33%');
       expect(
@@ -632,7 +632,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -646,7 +646,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -657,7 +657,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('25%');
       expect(
@@ -668,7 +668,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('25%');
       expect(
@@ -679,7 +679,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -718,7 +718,12 @@ describe('Utils', () => {
 
     describe('painting the iframe', () => {
       it('should paint the iframe in the center of the screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.Center,
+          false,
+          'hi'
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -734,7 +739,12 @@ describe('Utils', () => {
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'TopRight', false, 'hi');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.TopRight,
+          false,
+          'hi'
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -752,7 +762,7 @@ describe('Utils', () => {
       it('should paint the iframe in the bottom-right of the screen', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'BottomRight',
+          DisplayPosition.BottomRight,
           false,
           'hi'
         );
@@ -771,7 +781,12 @@ describe('Utils', () => {
       });
 
       it('should paint the iframe full-screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'Full', false, '');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.Full,
+          false,
+          ''
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -790,7 +805,7 @@ describe('Utils', () => {
       it('should paint TopRight iframes with custom offsets', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'TopRight',
+          DisplayPosition.TopRight,
           false,
           '',
           '10px',
@@ -814,7 +829,7 @@ describe('Utils', () => {
       it('should paint BottomRight iframes with custom offsets', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'BottomRight',
+          DisplayPosition.BottomRight,
           false,
           '',
           '10px',
@@ -836,13 +851,13 @@ describe('Utils', () => {
       });
 
       it('should call srSpeak if screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, 'Center', false, 'hi');
+        await paintIFrame(mockMarkup, DisplayPosition.Center, false, 'hi');
 
         expect((srSpeak as any).mock.calls.length).toBe(1);
       });
 
       it('should not call srSpeak if no screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, 'Center', false);
+        await paintIFrame(mockMarkup, DisplayPosition.Center, false);
 
         expect((srSpeak as any).mock.calls.length).toBe(0);
       });
@@ -993,7 +1008,7 @@ describe('Utils', () => {
       const button = generateCloseButton(
         buttonId,
         document,
-        CLOSE_BUTTON_POSITION.TopLeft,
+        CloseButtonPosition.TopLeft,
         'blue',
         20,
         undefined,
@@ -1015,7 +1030,7 @@ describe('Utils', () => {
       const rightButton = generateCloseButton(
         buttonId,
         document,
-        CLOSE_BUTTON_POSITION.TopRight,
+        CloseButtonPosition.TopRight,
         'blue',
         20,
         './assets/something.svg',
