@@ -449,19 +449,6 @@ export const paintIFrame = (
               : 'slide-in';
         }
 
-        const initialWidth = generateWidth(
-          {
-            smMatches: mediaQuerySm.matches,
-            mdMatches: mediaQueryMd.matches,
-            lgMatches: mediaQueryLg.matches,
-            xlMatches: mediaQueryXl.matches
-          },
-          position
-        );
-
-        /* set the initial width based at the breakpoint we loaded the message at. */
-        setCSS(position === 'Full' ? '100%' : initialWidth);
-
         const setNewWidth = () => {
           setCSS(
             generateWidth(
@@ -476,28 +463,24 @@ export const paintIFrame = (
           );
         };
 
-        mediaQuerySm.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryMd.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryLg.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryXl.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
+        if (position === 'Full') {
+          setCSS('100%');
+        } else {
+          setNewWidth();
 
-        if (position !== 'Full') {
+          mediaQuerySm.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryMd.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryLg.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryXl.onchange = () => {
+            setNewWidth();
+          };
+
           const iframeHeight = iframe.contentDocument?.body?.scrollHeight;
           if (iframeHeight) iframe.style.height = iframeHeight + 'px';
         }
