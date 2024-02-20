@@ -43,7 +43,7 @@ const HomeLink = styled(Link)`
     ({ email }) => {
       return axios
         .post(
-          process.env.JWT_GENERATOR || '',
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
           {
             exp_minutes: 2,
             email,
