@@ -195,7 +195,11 @@ export class AnonymousUserEventManager {
         console.log('response', e);
       });
     }
-    this.syncEvents();
+    try {
+      this.syncEvents();
+    } catch (error) {
+      console.error('error', error);
+    }
   }
 
   async syncEvents() {

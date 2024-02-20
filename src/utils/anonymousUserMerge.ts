@@ -96,8 +96,12 @@ export class AnonymousUserMerge {
       }
     })
       .then((response) => {
-        if (response.statusText === 'success') {
-          this.anonymousUserManager.syncEvents();
+        if (response.status === 200) {
+          try {
+            this.anonymousUserManager.syncEvents();
+          } catch (error) {
+            console.error('error', error);
+          }
         }
       })
       .catch((e) => {
