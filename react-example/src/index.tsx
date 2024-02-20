@@ -14,7 +14,7 @@ import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
 
 import { UserProvider } from 'src/context/Users';
-import { AnonProvider } from './anonContext';
+import { setAnonTracking } from '@iterable/web-sdk';
 
 const Wrapper = styled.div`
   display: flex;
@@ -61,32 +61,31 @@ const HomeLink = styled(Link)`
         });
     }
   );
+  setAnonTracking(true);
 
   ReactDOM.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
-          <AnonProvider>
-            <HeaderWrapper>
-              <HomeLink renderAsButton to="/">
-                Home
-              </HomeLink>
-              <LoginForm
-                setEmail={setEmail}
-                logout={logout}
-                refreshJwt={refreshJwtToken}
-              />
-            </HeaderWrapper>
-            <RouteWrapper>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/commerce" element={<Commerce />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/users" element={<Users />} />
-                <Route path="/inApp" element={<InApp />} />
-              </Routes>
-            </RouteWrapper>
-          </AnonProvider>
+          <HeaderWrapper>
+            <HomeLink renderAsButton to="/">
+              Home
+            </HomeLink>
+            <LoginForm
+              setEmail={setEmail}
+              logout={logout}
+              refreshJwt={refreshJwtToken}
+            />
+          </HeaderWrapper>
+          <RouteWrapper>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/commerce" element={<Commerce />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/inApp" element={<InApp />} />
+            </Routes>
+          </RouteWrapper>
         </UserProvider>
       </Wrapper>
     </BrowserRouter>,

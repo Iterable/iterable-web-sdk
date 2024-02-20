@@ -23,6 +23,7 @@ export const GET_CRITERIA_PATH = '/anonymoususer/list';
 export const ENDPOINT_GET_USER_BY_USERID = 'users/byUserId';
 export const ENDPOINT_GET_USER_BY_EMAIL = 'users/getByEmail';
 export const ENDPOINT_MERGE_USER = 'users/merge';
+export const ENDPOINT_TRACK_ANON_SESSION = 'anonymoususer/events/session';
 
 /** @todo update once new endpoint is ready */
 export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
@@ -158,10 +159,8 @@ export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
-export const SHARED_PREF_USER_ID = '_userId';
-export const SHARED_PREF_EMAIL = '_email';
-export const SHARED_PREFS_CRITERIA_ID = 'anon_criteria_id';
-export const SHARED_PREFS_PUSH_OPT_IN = 'pushOptIn';
+export const SHARED_PREF_USER_ID = 'userId';
+export const SHARED_PREF_EMAIL = 'email';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';

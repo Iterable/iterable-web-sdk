@@ -1,8 +1,8 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { trackPurchase, updateCart } from './commerce';
-// import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -18,6 +18,7 @@ jest.mock('../utils/anonymousUserEventManager', () => {
 describe('Users Requests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    config.setConfig({ enableAnonTracking: true });
   });
 
   it('should throw an error if updateCart payload is empty', () => {

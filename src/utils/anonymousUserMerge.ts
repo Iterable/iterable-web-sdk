@@ -19,20 +19,17 @@ export class AnonymousUserMerge {
       sourceUserId === '' ||
       sourceUserId === destinationUserId
     ) {
-      console.log('sourceUserId is null or same as destinationUserId');
       return;
     }
     baseIterableRequest<IterableResponse>({
       method: 'GET',
       url: ENDPOINT_GET_USER_BY_USERID,
-      data: { userId: destinationUserId },
-      validation: {}
+      params: { userId: destinationUserId }
     })
       .then((response) => {
         const userData: any = response.data;
         if (userData) {
-          const dataObj = JSON.parse(userData);
-          if (dataObj.user) {
+          if (userData.user) {
             this.callMergeApi(
               '',
               sourceUserId,
@@ -54,20 +51,18 @@ export class AnonymousUserMerge {
       sourceEmail === '' ||
       sourceEmail === destinationEmail
     ) {
-      console.log('sourceEmail is null or same as destinationEmail');
       return;
     }
     baseIterableRequest<IterableResponse>({
       method: 'GET',
       url: ENDPOINT_GET_USER_BY_EMAIL,
-      data: { email: destinationEmail },
+      params: { email: destinationEmail },
       validation: {}
     })
       .then((response) => {
         const userData: any = response.data;
         if (userData) {
-          const dataObj = JSON.parse(userData);
-          if (dataObj.user) {
+          if (userData.user) {
             this.callMergeApi(
               destinationEmail,
               '',
@@ -92,12 +87,13 @@ export class AnonymousUserMerge {
       method: 'POST',
       url: ENDPOINT_MERGE_USER,
       data: {
-        sourceEmail: sourceEmail,
-        sourceUserId: sourceUserId,
-        destinationEmail: destinationEmail,
-        destinationUserId: destinationUserId
-      },
-      validation: {}
+        sourceEmail: sourceEmail !== '' ? sourceEmail : undefined,
+        sourceUserId: sourceUserId !== '' ? sourceUserId : undefined,
+        destinationEmail:
+          destinationEmail !== '' ? destinationEmail : undefined,
+        destinationUserId:
+          destinationUserId !== '' ? destinationUserId : undefined
+      }
     })
       .then((response) => {
         if (response.statusText === 'success') {

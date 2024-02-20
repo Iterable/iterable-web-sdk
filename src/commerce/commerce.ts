@@ -4,19 +4,25 @@ import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '..';
 import config from '../utils/config';
+import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from 'src/constants';
 
-export const updateCart = (payload: UpdateCartRequestParams) => {
+const canTrackAnonUser = (payload: any): boolean => {
   if (
-    (!payload.user ||
-      !('userId' in payload.user) ||
-      payload.user.userId === null ||
-      typeof payload.user.userId === undefined) &&
-    (!payload.user ||
-      !('email' in payload.user) ||
-      payload.user.email === null ||
-      typeof payload.user.email === undefined) &&
+    (!(SHARED_PREF_USER_ID in (payload.user ?? {})) ||
+      payload.user?.userId === null ||
+      typeof payload.user?.userId === 'undefined') &&
+    (!(SHARED_PREF_EMAIL in payload.user) ||
+      payload.user?.email === null ||
+      typeof payload.user?.email === 'undefined') &&
     config.getConfig('enableAnonTracking')
   ) {
+    return true;
+  }
+  return false;
+};
+
+export const updateCart = (payload: UpdateCartRequestParams) => {
+  if (canTrackAnonUser(payload)) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
     const errorMessage =
@@ -40,17 +46,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 };
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
-  if (
-    (!payload.user ||
-      !('userId' in payload.user) ||
-      payload.user.userId === null ||
-      typeof payload.user.userId === undefined) &&
-    (!payload.user ||
-      !('email' in payload.user) ||
-      payload.user.email === null ||
-      typeof payload.user.email === undefined) &&
-    config.getConfig('enableAnonTracking')
-  ) {
+  if (canTrackAnonUser(payload)) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     const errorMessage =

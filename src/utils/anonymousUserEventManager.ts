@@ -1,4 +1,3 @@
-import moment from 'moment';
 import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
@@ -21,13 +20,16 @@ import {
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
   SHARED_PREFS_ANON_SESSIONS,
-  SHARED_PREFS_CRITERIA_ID,
-  SHARED_PREFS_PUSH_OPT_IN
+  SHARED_PREF_USER_ID,
+  SHARED_PREF_EMAIL,
+  ENDPOINT_TRACK_ANON_SESSION
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 import {
   UpdateUserParams,
+  getEmail,
+  getUserID,
   track,
   trackPurchase,
   updateCart,
@@ -36,6 +38,7 @@ import {
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { setUserID } from '..';
+import { TrackAnonSessionParams } from './types';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
@@ -46,8 +49,8 @@ export class AnonymousUserEventManager {
       let anonSessionInfo: {
         itbl_anon_sessions?: {
           number_of_sessions?: number;
-          first_session?: string;
-          last_session?: string;
+          first_session?: number;
+          last_session?: number;
         };
       } = {};
 
@@ -62,8 +65,9 @@ export class AnonymousUserEventManager {
         (anonSessionInfo.itbl_anon_sessions.number_of_sessions || 0) + 1;
       anonSessionInfo.itbl_anon_sessions.first_session =
         anonSessionInfo.itbl_anon_sessions.first_session ||
-        moment().toISOString();
-      anonSessionInfo.itbl_anon_sessions.last_session = moment().toISOString();
+        Math.round(new Date().getTime() / 1000) | 0;
+      anonSessionInfo.itbl_anon_sessions.last_session =
+        Math.round(new Date().getTime() / 1000) | 0;
 
       // Update the structure to the desired format
       const outputObject = {
@@ -163,18 +167,39 @@ export class AnonymousUserEventManager {
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
-      const userDataJson = userSessionInfo.get(SHARED_PREFS_ANON_SESSIONS);
-      userDataJson.put(SHARED_PREFS_CRITERIA_ID, criteriaId);
-      userDataJson.put(SHARED_PREFS_PUSH_OPT_IN, this.getPushStatus());
-      userDataJson.put(SHARED_PREFS_EVENT_TYPE, TRACK_EVENT);
-      userDataJson.put('event_name', SHARED_PREFS_ANON_SESSIONS);
-      track(userDataJson);
+      const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
+      const payload: TrackAnonSessionParams = {
+        email: getEmail() || undefined,
+        userId: getEmail() ? null : getUserID() || undefined,
+        createdAt: Math.round(new Date().getTime() / 1000) | 0,
+        deviceInfo: {
+          appPackageName: '',
+          deviceId: '',
+          platform: 'web'
+        },
+        anonSessionContext: {
+          totalAnonSessionCount: userDataJson.number_of_sessions,
+          lastAnonSession: userDataJson.last_session,
+          firstAnonSession: userDataJson.first_session,
+          matchedCriteriaId: parseInt(criteriaId),
+          webPushOptIn:
+            this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
+        }
+      };
+
+      baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINT_TRACK_ANON_SESSION,
+        data: payload
+      }).catch((e) => {
+        console.log('response', e);
+      });
     }
     this.syncEvents();
   }
 
   async syncEvents() {
-    const strTrackEventList = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
+    const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
       : [];
@@ -182,23 +207,34 @@ export class AnonymousUserEventManager {
     if (trackEventList.length) {
       for (let i = 0; i < trackEventList.length; i++) {
         const event = trackEventList[i];
-        const eventType = event.get(SHARED_PREFS_EVENT_TYPE);
+        const eventType = event[SHARED_PREFS_EVENT_TYPE];
 
         switch (eventType) {
           case TRACK_EVENT: {
-            await track(trackEventList[i]);
+            await track(event);
             break;
           }
           case TRACK_PURCHASE: {
-            await trackPurchase(trackEventList[i]);
+            let userDataJson = {};
+            if (getEmail() !== null) {
+              userDataJson = {
+                [SHARED_PREF_EMAIL]: getEmail()
+              };
+            } else {
+              userDataJson = {
+                [SHARED_PREF_USER_ID]: getUserID()
+              };
+            }
+            event.user = userDataJson;
+            await trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            await updateCart(trackEventList[i]);
+            await updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            await updateUser(trackEventList[i]);
+            await updateUser(event);
             break;
           }
           default: {
@@ -250,12 +286,12 @@ export class AnonymousUserEventManager {
     return new Date().getTime();
   };
 
-  private getPushStatus(): boolean {
+  private getWebPushOptnIn(): string {
     const notificationManager = window.Notification;
     if (notificationManager && notificationManager.permission === 'granted') {
-      return true;
+      return window.location.hostname;
     } else {
-      return false;
+      return '';
     }
   }
 }

@@ -4,18 +4,10 @@ import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import { eventRequestSchema, trackSchema } from './events.schema';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
-import { config } from '../utils/config';
+import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {
-  if (
-    (!('userId' in payload) ||
-      payload.userId === null ||
-      typeof payload.userId === 'undefined') &&
-    (!('email' in payload) ||
-      payload.email === null ||
-      typeof payload.email === 'undefined') &&
-    config.getConfig('enableAnonTracking')
-  ) {
+  if (canTrackAnonUser(payload)) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
     const errorMessage =
@@ -90,8 +82,8 @@ export const trackInAppClick = (
   sendBeacon = false
 ) => {
   /* a customer could potentially send these up if they're not using TypeScript */
-  // delete (payload as any).userId;
-  // delete (payload as any).email;
+  delete (payload as any).userId;
+  delete (payload as any).email;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

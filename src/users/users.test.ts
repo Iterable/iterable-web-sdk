@@ -2,6 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { updateSubscriptions, updateUser, updateUserEmail } from './users';
 import { createClientError } from '../utils/testUtils';
+import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -14,6 +15,7 @@ jest.mock('../utils/anonymousUserEventManager', () => {
 describe('Users Requests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    config.setConfig({ enableAnonTracking: true });
   });
 
   it('should throw an error if payload is empty', () => {
@@ -25,7 +27,7 @@ describe('Users Requests', () => {
   it('should reject updateUser on bad params', async () => {
     try {
       await updateUser({
-        userId: 'hani1',
+        userId: 'test',
         dataFields: 'string',
         preferUserId: 'string',
         mergeNestedObjects: 'string'

@@ -10,6 +10,7 @@ import {
 } from './events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
@@ -22,6 +23,7 @@ jest.mock('../utils/anonymousUserEventManager', () => {
 describe('Events Requests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    config.setConfig({ enableAnonTracking: true });
   });
 
   beforeAll(() => {
@@ -100,8 +102,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppClick on bad params', async () => {
@@ -137,8 +137,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppClose on bad params', async () => {
@@ -174,8 +172,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppConsume on bad params', async () => {
@@ -211,8 +207,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppDelivery on bad params', async () => {
@@ -248,8 +242,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppOpen on bad params', async () => {
@@ -271,97 +263,97 @@ describe('Events Requests', () => {
     }
   });
 
-  // it('should not send up passed email or userId params', async () => {
-  //   const trackResponse = await track({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     eventName: 'my-event',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
-  //   const trackClickResponse = await trackInAppClick({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     messageId: 'fdsafd',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
-  //   const trackCloseResponse = await trackInAppClose({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     messageId: 'fdsafd',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
-  //   const trackConsumeResponse = await trackInAppConsume({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     messageId: 'fdsafd',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
-  //   const trackDeliveryResponse = await trackInAppDelivery({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     messageId: 'fdsafd',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
-  //   const trackOpenResponse = await trackInAppOpen({
-  //     email: 'hello@gmail.com',
-  //     userId: '1234',
-  //     messageId: 'fdsafd',
-  //     deviceInfo: { appPackageName: 'my-lil-site' }
-  //   } as any);
+  it('should not send up passed email or userId params', async () => {
+    const trackResponse = await track({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      eventName: 'my-event',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackClickResponse = await trackInAppClick({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackCloseResponse = await trackInAppClose({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackConsumeResponse = await trackInAppConsume({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackDeliveryResponse = await trackInAppDelivery({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
+    const trackOpenResponse = await trackInAppOpen({
+      email: 'hello@gmail.com',
+      userId: '1234',
+      messageId: 'fdsafd',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    } as any);
 
-  //   expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
-  //   expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
+    expect(JSON.parse(trackResponse.config.data).email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackResponse.config.data).userId).toEqual('1234');
+    expect(
+      JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
 
-  //   expect(JSON.parse(trackClickResponse.config.data).email).toEqual(
-  //     'hello@gmail.com'
-  //   );
-  //   expect(JSON.parse(trackClickResponse.config.data).userId).toEqual('1234');
-  //   expect(
-  //     JSON.parse(trackClickResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
-  //   expect(JSON.parse(trackClickResponse.config.data).deviceInfo.platform).toBe(
-  //     WEB_PLATFORM
-  //   );
+    expect(JSON.parse(trackClickResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackClickResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackClickResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackClickResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
 
-  //   expect(JSON.parse(trackCloseResponse.config.data).email).toBeUndefined();
-  //   expect(JSON.parse(trackCloseResponse.config.data).userId).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackCloseResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
-  //   expect(JSON.parse(trackCloseResponse.config.data).deviceInfo.platform).toBe(
-  //     WEB_PLATFORM
-  //   );
+    expect(JSON.parse(trackCloseResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackCloseResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackCloseResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackCloseResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
 
-  //   expect(JSON.parse(trackConsumeResponse.config.data).email).toBeUndefined();
-  //   expect(JSON.parse(trackConsumeResponse.config.data).userId).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackConsumeResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
-  //   expect(
-  //     JSON.parse(trackConsumeResponse.config.data).deviceInfo.platform
-  //   ).toBe(WEB_PLATFORM);
+    expect(JSON.parse(trackConsumeResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackConsumeResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackConsumeResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(
+      JSON.parse(trackConsumeResponse.config.data).deviceInfo.platform
+    ).toBe(WEB_PLATFORM);
 
-  //   expect(JSON.parse(trackDeliveryResponse.config.data).email).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackDeliveryResponse.config.data).userId
-  //   ).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackDeliveryResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
-  //   expect(
-  //     JSON.parse(trackDeliveryResponse.config.data).deviceInfo.platform
-  //   ).toBe(WEB_PLATFORM);
+    expect(JSON.parse(trackDeliveryResponse.config.data).email).toBeUndefined();
+    expect(
+      JSON.parse(trackDeliveryResponse.config.data).userId
+    ).toBeUndefined();
+    expect(
+      JSON.parse(trackDeliveryResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(
+      JSON.parse(trackDeliveryResponse.config.data).deviceInfo.platform
+    ).toBe(WEB_PLATFORM);
 
-  //   expect(JSON.parse(trackOpenResponse.config.data).email).toBeUndefined();
-  //   expect(JSON.parse(trackOpenResponse.config.data).userId).toBeUndefined();
-  //   expect(
-  //     JSON.parse(trackOpenResponse.config.data).deviceInfo.appPackageName
-  //   ).toBe('my-lil-site');
-  //   expect(JSON.parse(trackOpenResponse.config.data).deviceInfo.platform).toBe(
-  //     WEB_PLATFORM
-  //   );
-  // });
+    expect(JSON.parse(trackOpenResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackOpenResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(trackOpenResponse.config.data).deviceInfo.appPackageName
+    ).toBe('my-lil-site');
+    expect(JSON.parse(trackOpenResponse.config.data).deviceInfo.platform).toBe(
+      WEB_PLATFORM
+    );
+  });
 });

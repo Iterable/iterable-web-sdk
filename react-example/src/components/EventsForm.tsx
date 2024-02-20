@@ -13,7 +13,6 @@ import {
   IterableResponse
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
-import { useAnonContext } from '../anonContext';
 import { useUser } from 'src/context/Users';
 
 interface Props {
@@ -29,7 +28,6 @@ export const EventsForm: FC<Props> = ({
   heading,
   needsEventName
 }) => {
-  const { anonymousUserEventManager } = useAnonContext();
   const { loggedInUser, setLoggedInUser } = useUser();
   const [trackResponse, setTrackResponse] = useState<string>(
     'Endpoint JSON goes here'

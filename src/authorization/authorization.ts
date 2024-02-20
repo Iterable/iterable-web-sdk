@@ -70,9 +70,9 @@ export function setUserID(userId: string) {
     const anonymousUserMerge = new AnonymousUserMerge();
     anonymousUserMerge.mergeUserUsingUserId(userId);
   }
+  localStorage.setItem(SHARED_PREF_USER_ID, userId);
   typeOfAuth = 'userID';
   authIdentifier = userId;
-  localStorage.setItem(SHARED_PREF_USER_ID, userId);
 }
 
 export function setEmail(email: string) {
@@ -84,18 +84,32 @@ export function setEmail(email: string) {
     const anonymousUserMerge = new AnonymousUserMerge();
     anonymousUserMerge.mergeUserUsingEmail(email);
   }
+  localStorage.setItem(SHARED_PREF_EMAIL, email);
   typeOfAuth = 'email';
   authIdentifier = email;
-  localStorage.setItem(SHARED_PREF_EMAIL, email);
 }
 
-export function getUserID(): string | null {
+export const getUserID = (): string | null => {
   return localStorage.getItem(SHARED_PREF_USER_ID);
-}
+};
 
-export function getEmail(): string | null {
+export const getEmail = (): string | null => {
   return localStorage.getItem(SHARED_PREF_EMAIL);
-}
+};
+
+export const setAnonTracking = (enableAnonTracking: boolean) => {
+  config.setConfig({ enableAnonTracking: enableAnonTracking });
+
+  try {
+    if (config.getConfig('enableAnonTracking')) {
+      const anonUserManager = new AnonymousUserEventManager();
+      anonUserManager.getAnonCriteria();
+      anonUserManager.updateAnonSession();
+    }
+  } catch (error) {
+    console.warn(error);
+  }
+};
 
 export function initialize(
   authToken: string,
@@ -244,18 +258,6 @@ export function initialize(
       return config;
     });
   };
-
-  console.log('enabled hani', config.getConfig('enableAnonTracking'));
-
-  try {
-    if (config.getConfig('enableAnonTracking')) {
-      const anonUserManager = new AnonymousUserEventManager();
-      anonUserManager.getAnonCriteria();
-      anonUserManager.updateAnonSession();
-    }
-  } catch (error) {
-    console.warn(error);
-  }
 
   if (!generateJWT) {
     /* we want to set a normal non-JWT enabled API key */
