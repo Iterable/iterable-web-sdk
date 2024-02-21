@@ -14,7 +14,7 @@ const localStorageMock = {
   removeItem: jest.fn()
 };
 
-jest.mock('./CriteriaCompletionChecker', () => {
+jest.mock('./criteriaCompletionChecker', () => {
   return jest.fn().mockImplementation(() => ({
     getMatchedCriteria: jest.fn()
   }));
