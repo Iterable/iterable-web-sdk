@@ -41,11 +41,7 @@ export class AnonymousUserMerge {
     })
       .then((response) => {
         const userData: any = response.data;
-        if (userData) {
-          if (userData.user) {
-            this.callMergeApi(mergeApiParams);
-          }
-        }
+        if (userData?.user) this.callMergeApi(mergeApiParams);
       })
       .catch((e) => {
         console.log('response', e);
