@@ -4,7 +4,7 @@ import {
   ENDPOINT_MERGE_USER
 } from '../constants';
 import { baseIterableRequest } from '../request';
-import { AnonymousUserMerge } from './AnonymousUserMerge';
+import { AnonymousUserMerge } from './anonymousUserMerge';
 
 const localStorageMock = {
   getItem: jest.fn()

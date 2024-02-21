@@ -1,4 +1,4 @@
-import { AnonymousUserEventManager } from './AnonymousUserEventManager';
+import { AnonymousUserEventManager } from './anonymousUserEventManager';
 import { baseIterableRequest } from '../request';
 import {
   SHARED_PREFS_ANON_SESSIONS,
