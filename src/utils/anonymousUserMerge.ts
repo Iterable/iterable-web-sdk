@@ -8,34 +8,42 @@ import {
 import { AnonymousUserEventManager } from './anonymousUserEventManager';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
+import { isEmail } from 'src/authorization/utils';
+
+type MergeApiParams = {
+  sourceEmail: string | null;
+  sourceUserId: string | null;
+  destinationEmail: string | null;
+  destinationUserId: string | null;
+}
 
 export class AnonymousUserMerge {
   private anonymousUserManager = new AnonymousUserEventManager();
 
-  mergeUserUsingUserId(destinationUserId: string): void {
-    const sourceUserId = localStorage.getItem(SHARED_PREF_USER_ID);
-    if (
-      !sourceUserId ||
-      sourceUserId === '' ||
-      sourceUserId === destinationUserId
-    ) {
+  mergeUser(user: string): void {
+    const userContainsEmail = isEmail(user)
+    const sourceUser = localStorage.getItem(userContainsEmail ? SHARED_PREF_EMAIL : SHARED_PREF_USER_ID)
+
+    const mergeApiParams: MergeApiParams = {
+      sourceUserId: !userContainsEmail ? localStorage.getItem(SHARED_PREF_USER_ID) : null,
+      sourceEmail: userContainsEmail ? localStorage.getItem(SHARED_PREF_EMAIL) : null,
+      destinationUserId: !userContainsEmail ? user : null,
+      destinationEmail: userContainsEmail ? user : null,
+    }
+    
+    if (!user || user === sourceUser) {
       return;
     }
     baseIterableRequest<IterableResponse>({
       method: 'GET',
       url: ENDPOINT_GET_USER_BY_USERID,
-      params: { userId: destinationUserId }
+      params: { email: mergeApiParams.destinationEmail, userId: mergeApiParams.destinationUserId},
     })
       .then((response) => {
         const userData: any = response.data;
         if (userData) {
           if (userData.user) {
-            this.callMergeApi(
-              '',
-              sourceUserId,
-              localStorage.getItem(SHARED_PREF_EMAIL) || '',
-              destinationUserId
-            );
+            this.callMergeApi(mergeApiParams);
           }
         }
       })
@@ -44,56 +52,11 @@ export class AnonymousUserMerge {
       });
   }
 
-  mergeUserUsingEmail(destinationEmail: string): void {
-    const sourceEmail = localStorage.getItem(SHARED_PREF_EMAIL);
-    if (
-      !sourceEmail ||
-      sourceEmail === '' ||
-      sourceEmail === destinationEmail
-    ) {
-      return;
-    }
-    baseIterableRequest<IterableResponse>({
-      method: 'GET',
-      url: ENDPOINT_GET_USER_BY_EMAIL,
-      params: { email: destinationEmail },
-      validation: {}
-    })
-      .then((response) => {
-        const userData: any = response.data;
-        if (userData) {
-          if (userData.user) {
-            this.callMergeApi(
-              destinationEmail,
-              '',
-              destinationEmail,
-              localStorage.getItem(SHARED_PREF_USER_ID) || ''
-            );
-          }
-        }
-      })
-      .catch((e) => {
-        console.log('response', e);
-      });
-  }
-
-  private callMergeApi(
-    sourceEmail: string,
-    sourceUserId: string,
-    destinationEmail: string,
-    destinationUserId: string
-  ): void {
+  private callMergeApi(data: MergeApiParams): void {
     baseIterableRequest<IterableResponse>({
       method: 'POST',
       url: ENDPOINT_MERGE_USER,
-      data: {
-        sourceEmail: sourceEmail !== '' ? sourceEmail : undefined,
-        sourceUserId: sourceUserId !== '' ? sourceUserId : undefined,
-        destinationEmail:
-          destinationEmail !== '' ? destinationEmail : undefined,
-        destinationUserId:
-          destinationUserId !== '' ? destinationUserId : undefined
-      }
+      data,
     })
       .then((response) => {
         if (response.status === 200) {
