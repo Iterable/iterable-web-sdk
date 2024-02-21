@@ -36,7 +36,7 @@ export class AnonymousUserMerge {
     }
     baseIterableRequest<IterableResponse>({
       method: 'GET',
-      url: ENDPOINT_GET_USER_BY_USERID,
+      url: userContainsEmail ? ENDPOINT_GET_USER_BY_EMAIL : ENDPOINT_GET_USER_BY_USERID,
       params: { email: mergeApiParams.destinationEmail, userId: mergeApiParams.destinationUserId},
     })
       .then((response) => {
