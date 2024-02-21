@@ -16,6 +16,7 @@ import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
+import { Fiterable } from './views/fiterable';
 
 const Wrapper = styled.div`
   display: flex;
@@ -83,11 +84,12 @@ const HomeLink = styled(Link)`
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/commerce" element={<Commerce />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/users" element={<Users />} />
-              <Route path="/inApp" element={<InApp />} />
               <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
               <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/fiterable" element={<Fiterable />} />
+              <Route path="/inApp" element={<InApp />} />
+              <Route path="/users" element={<Users />} />
             </Routes>
           </RouteWrapper>
         </UserProvider>
