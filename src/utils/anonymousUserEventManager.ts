@@ -264,7 +264,7 @@ export class AnonymousUserEventManager {
     }
 
     if (shouldOverWrite) {
-      const trackingType = newDataObject.getString(SHARED_PREFS_EVENT_TYPE);
+      const trackingType = newDataObject[SHARED_PREFS_EVENT_TYPE];
       const indexToUpdate = previousDataArray.findIndex(
         (obj: any) => obj[SHARED_PREFS_EVENT_TYPE] === trackingType
       );
