@@ -68,7 +68,7 @@ export function setUserID(userId: string) {
     config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserMerge = new AnonymousUserMerge();
-    anonymousUserMerge.mergeUserUsingUserId(userId);
+    anonymousUserMerge.mergeUser(userId);
   }
   localStorage.setItem(SHARED_PREF_USER_ID, userId);
   typeOfAuth = 'userID';
@@ -82,7 +82,7 @@ export function setEmail(email: string) {
     config.getConfig('enableAnonTracking')
   ) {
     const anonymousUserMerge = new AnonymousUserMerge();
-    anonymousUserMerge.mergeUserUsingEmail(email);
+    anonymousUserMerge.mergeUser(email);
   }
   localStorage.setItem(SHARED_PREF_EMAIL, email);
   typeOfAuth = 'email';

@@ -4,7 +4,7 @@ import {
   ENDPOINT_MERGE_USER
 } from '../constants';
 import { baseIterableRequest } from '../request';
-import { AnonymousUserMerge } from './anonymousUserMerge';
+import { AnonymousUserMerge, MergeApiParams } from './anonymousUserMerge';
 
 const localStorageMock = {
   getItem: jest.fn()
@@ -35,31 +35,30 @@ describe('AnonymousUserMerge', () => {
     };
     (baseIterableRequest as jest.Mock).mockResolvedValueOnce(response);
 
-    anonymousUserMerge.mergeUserUsingUserId(destinationUserId);
+    anonymousUserMerge.mergeUser(destinationUserId);
 
     expect(baseIterableRequest).toHaveBeenCalledWith({
       method: 'GET',
       url: ENDPOINT_GET_USER_BY_USERID,
-      params: { userId: destinationUserId }
+      params: { userId: destinationUserId, email: null }
     });
   });
 
   it('should merge users using email', async () => {
     localStorageMock.getItem.mockReturnValueOnce('sourceEmail');
-    const destinationEmail = 'destinationEmail';
+    const destinationEmail = 'destinationEmail@example.com';
     const response = {
       status: 200,
       data: { user: {} }
     };
     (baseIterableRequest as jest.Mock).mockResolvedValueOnce(response);
 
-    anonymousUserMerge.mergeUserUsingEmail(destinationEmail);
+    anonymousUserMerge.mergeUser(destinationEmail);
 
     expect(baseIterableRequest).toHaveBeenCalledWith({
       method: 'GET',
       url: ENDPOINT_GET_USER_BY_EMAIL,
-      params: { email: destinationEmail },
-      validation: {}
+      params: { email: destinationEmail, userId: null }
     });
   });
 
@@ -74,12 +73,14 @@ describe('AnonymousUserMerge', () => {
     };
     (baseIterableRequest as jest.Mock).mockResolvedValueOnce(response);
 
-    anonymousUserMerge['callMergeApi'](
-      sourceEmail,
-      sourceUserId,
-      destinationEmail,
-      destinationUserId
-    );
+    const mergeApiParams: MergeApiParams = {
+      sourceUserId: sourceUserId,
+      sourceEmail: sourceEmail,
+      destinationUserId: destinationUserId,
+      destinationEmail: destinationEmail
+    };
+
+    anonymousUserMerge['callMergeApi'](mergeApiParams);
 
     expect(baseIterableRequest).toHaveBeenCalledWith({
       method: 'POST',
