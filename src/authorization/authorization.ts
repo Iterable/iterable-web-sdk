@@ -20,7 +20,7 @@ import {
 } from './utils';
 import { config } from '../utils/config';
 import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
-import { AnonymousUserEventManager } from '..';
+import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 

@@ -26,19 +26,16 @@ import {
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
-import {
-  UpdateUserParams,
-  getEmail,
-  getUserID,
-  track,
-  trackPurchase,
-  updateCart,
-  updateUser
-} from '..';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
-import { setUserID } from '..';
 import { TrackAnonSessionParams } from './types';
+import {
+  trackPurchaseSchema,
+  updateCartSchema
+} from 'src/commerce/commerce.schema';
+import { trackSchema } from 'src/events/events.schema';
+import { UpdateUserParams } from 'src/users';
+import { updateUserSchema } from 'src/users/users.schema';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
@@ -163,14 +160,14 @@ export class AnonymousUserEventManager {
 
   private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
-    setUserID(uuidv4());
+    this.setUserID(uuidv4());
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
       const payload: TrackAnonSessionParams = {
-        email: getEmail() || undefined,
-        userId: getEmail() ? null : getUserID() || undefined,
+        email: this.getEmail() || undefined,
+        userId: this.getEmail() ? null : this.getUserID() || undefined,
         createdAt: Math.round(new Date().getTime() / 1000) | 0,
         deviceInfo: {
           appPackageName: '',
@@ -187,18 +184,18 @@ export class AnonymousUserEventManager {
         }
       };
 
-      baseIterableRequest<IterableResponse>({
-        method: 'POST',
-        url: ENDPOINT_TRACK_ANON_SESSION,
-        data: payload
-      }).catch((e) => {
-        console.log('response', e);
-      });
-    }
-    try {
+      setTimeout(() => {
+        baseIterableRequest<IterableResponse>({
+          method: 'POST',
+          url: ENDPOINT_TRACK_ANON_SESSION,
+          data: payload
+        }).catch((e) => {
+          console.log('response', e);
+        });
+        this.syncEvents();
+      }, 500);
+    } else {
       this.syncEvents();
-    } catch (error) {
-      console.error('error', error);
     }
   }
 
@@ -215,30 +212,30 @@ export class AnonymousUserEventManager {
 
         switch (eventType) {
           case TRACK_EVENT: {
-            await track(event);
+            await this.track(event);
             break;
           }
           case TRACK_PURCHASE: {
             let userDataJson = {};
-            if (getEmail() !== null) {
+            if (this.getEmail() !== null) {
               userDataJson = {
-                [SHARED_PREF_EMAIL]: getEmail()
+                [SHARED_PREF_EMAIL]: this.getEmail()
               };
             } else {
               userDataJson = {
-                [SHARED_PREF_USER_ID]: getUserID()
+                [SHARED_PREF_USER_ID]: this.getUserID()
               };
             }
             event.user = userDataJson;
-            await trackPurchase(event);
+            await this.trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            await updateCart(event);
+            await this.updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            await updateUser(event);
+            await this.updateUser(event);
             break;
           }
           default: {
@@ -298,4 +295,74 @@ export class AnonymousUserEventManager {
       return '';
     }
   }
+
+  track = (payload: InAppTrackRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: '/events/track',
+      data: payload,
+      validation: {
+        data: trackSchema
+      }
+    });
+  };
+
+  updateCart = (payload: UpdateCartRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: '/commerce/updateCart',
+      data: {
+        ...payload,
+        user: {
+          ...payload.user,
+          preferUserId: true
+        }
+      },
+      validation: {
+        data: updateCartSchema
+      }
+    });
+  };
+
+  trackPurchase = (payload: TrackPurchaseRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: '/commerce/trackPurchase',
+      data: {
+        ...payload,
+        user: {
+          ...payload.user,
+          preferUserId: true
+        }
+      },
+      validation: {
+        data: trackPurchaseSchema
+      }
+    });
+  };
+
+  updateUser = (payload: UpdateUserParams = {}) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: '/users/update',
+      data: {
+        ...payload,
+        preferUserId: true
+      },
+      validation: {
+        data: updateUserSchema
+      }
+    });
+  };
+  setUserID = (userId: string) => {
+    localStorage.setItem(SHARED_PREF_USER_ID, userId);
+  };
+
+  getUserID = (): string | null => {
+    return localStorage.getItem(SHARED_PREF_USER_ID);
+  };
+
+  getEmail = (): string | null => {
+    return localStorage.getItem(SHARED_PREF_EMAIL);
+  };
 }

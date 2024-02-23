@@ -3,7 +3,7 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
-import { AnonymousUserEventManager } from '..';
+import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const updateUserEmail = (newEmail: string) => {

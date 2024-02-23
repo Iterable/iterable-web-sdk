@@ -2,7 +2,7 @@ import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
-import { AnonymousUserEventManager } from '..';
+import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import config from '../utils/config';
 import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from 'src/constants';
 
@@ -11,7 +11,7 @@ const canTrackAnonUser = (payload: any): boolean => {
     (!(SHARED_PREF_USER_ID in (payload.user ?? {})) ||
       payload.user?.userId === null ||
       typeof payload.user?.userId === 'undefined') &&
-    (!(SHARED_PREF_EMAIL in payload.user) ||
+    (!(SHARED_PREF_EMAIL in (payload.user ?? {})) ||
       payload.user?.email === null ||
       typeof payload.user?.email === 'undefined') &&
     config.getConfig('enableAnonTracking')
