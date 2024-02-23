@@ -139,8 +139,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           justifyContent: 'flex-start'
         }}
       >
-        {selectedButtonIndex === 0 &&
-          messages.length &&
+        {selectedButtonIndex === 0 && messages.length ? (
           messages.map((message: any, index: number) => (
             <Card
               key={index.toString()}
@@ -179,10 +178,14 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 );
               }}
             />
-          ))}
+          ))
+        ) : selectedButtonIndex === 0 ? (
+          <div>No message</div>
+        ) : (
+          <div></div>
+        )}
 
-        {selectedButtonIndex === 1 &&
-          messages.length &&
+        {selectedButtonIndex === 1 && messages.length ? (
           messages.map((message: any, index: number) => (
             <Banner
               key={index.toString()}
@@ -227,10 +230,14 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 );
               }}
             />
-          ))}
+          ))
+        ) : selectedButtonIndex === 1 ? (
+          <div>No message</div>
+        ) : (
+          <div></div>
+        )}
 
-        {selectedButtonIndex === 2 &&
-          messages.length &&
+        {selectedButtonIndex === 2 && messages.length ? (
           messages.map((message: any, index: number) => (
             <Notification
               key={index.toString()}
@@ -267,7 +274,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 );
               }}
             />
-          ))}
+          ))
+        ) : selectedButtonIndex === 2 ? (
+          <div>No message</div>
+        ) : (
+          <div></div>
+        )}
       </div>
     </>
   );
