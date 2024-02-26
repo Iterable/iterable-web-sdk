@@ -71,7 +71,8 @@ export const Banner = (props: IBannerProps) => {
   const bannerButtons = {
     marginTop: '20px'
   };
-  const defaultButtonStyles = {
+  const defaultButtonStyles: CSSProperties = {
+    textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
     backgroundColor: 'transparent',

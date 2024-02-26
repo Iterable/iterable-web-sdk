@@ -69,7 +69,8 @@ export const Card = (props: ICardProps) => {
     fontSize: '14px',
     marginBottom: '16px'
   };
-  const defaultButtonStyles = {
+  const defaultButtonStyles: CSSProperties = {
+    textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
     backgroundColor: 'transparent',
