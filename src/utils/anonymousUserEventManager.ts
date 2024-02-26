@@ -22,7 +22,8 @@ import {
   SHARED_PREFS_ANON_SESSIONS,
   SHARED_PREF_USER_ID,
   SHARED_PREF_EMAIL,
-  ENDPOINT_TRACK_ANON_SESSION
+  ENDPOINT_TRACK_ANON_SESSION,
+  WEB_PLATFORM
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
@@ -62,9 +63,8 @@ export class AnonymousUserEventManager {
         (anonSessionInfo.itbl_anon_sessions.number_of_sessions || 0) + 1;
       anonSessionInfo.itbl_anon_sessions.first_session =
         anonSessionInfo.itbl_anon_sessions.first_session ||
-        Math.round(new Date().getTime() / 1000) | 0;
-      anonSessionInfo.itbl_anon_sessions.last_session =
-        Math.round(new Date().getTime() / 1000) | 0;
+        this.getCurrentTime();
+      anonSessionInfo.itbl_anon_sessions.last_session = this.getCurrentTime();
 
       // Update the structure to the desired format
       const outputObject = {
@@ -168,11 +168,11 @@ export class AnonymousUserEventManager {
       const payload: TrackAnonSessionParams = {
         email: this.getEmail() || undefined,
         userId: this.getEmail() ? null : this.getUserID() || undefined,
-        createdAt: Math.round(new Date().getTime() / 1000) | 0,
+        createdAt: this.getCurrentTime(),
         deviceInfo: {
-          appPackageName: '',
-          deviceId: '',
-          platform: 'web'
+          appPackageName: window.location.hostname,
+          deviceId: global.navigator.userAgent || '',
+          platform: WEB_PLATFORM
         },
         anonSessionContext: {
           totalAnonSessionCount: userDataJson.number_of_sessions,
