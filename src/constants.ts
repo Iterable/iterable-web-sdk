@@ -56,6 +56,8 @@ export const DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE = 4;
 export const CLOSE_X_BUTTON_ID = 'close-x-button';
 export const ABSOLUTE_DISMISS_BUTTON_ID = 'absolute-dismiss-button';
 
+export const LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS = 'itbl_current_embedded_msgs';
+
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION
 ) => `

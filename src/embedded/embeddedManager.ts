@@ -9,6 +9,7 @@ import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { functions } from 'src/utils/functions';
+import { LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS } from 'src/constants';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -53,6 +54,21 @@ export class EmbeddedManager {
       if (placementIds.length > 0) {
         url += placementIds.map((id) => `&placementIds=${id}`).join('');
       }
+
+      const storedMessageIds = localStorage.getItem(
+        LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS
+      );
+
+      let currentMessageIds: string[] = [];
+      if (storedMessageIds) {
+        currentMessageIds = JSON.parse(storedMessageIds);
+
+        if (currentMessageIds.length > 0) {
+          const messageIdsQueryParam =
+            currentMessageIds.join('&currentMessageId=');
+          url += `&currentMessageId=${messageIdsQueryParam}`;
+        }
+      }
       url = url.replace(/&$/, '');
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
@@ -68,6 +84,21 @@ export class EmbeddedManager {
         );
         this.setMessages(processor);
         await this.trackNewlyRetrieved(processor, userIdOrEmail);
+
+        const messageIds = embeddedMessages.map(
+          (message) => message.metadata.messageId
+        );
+        messageIds
+          .filter((messageId): messageId is string => messageId !== undefined)
+          .forEach((validMessageId) => {
+            currentMessageIds.push(validMessageId);
+          });
+
+        localStorage.setItem(
+          LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS,
+          JSON.stringify(currentMessageIds)
+        );
+
         this.messages = [
           ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];

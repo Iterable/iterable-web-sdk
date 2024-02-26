@@ -4,6 +4,7 @@ import { updateUser } from '../users';
 import { clearMessages } from '../inapp';
 import {
   IS_PRODUCTION,
+  LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS
 } from '../constants';
@@ -352,6 +353,8 @@ export function initialize(
       logout: () => {
         typeOfAuth = null;
         authIdentifier = null;
+        /* clear fetched embedded messages ids */
+        localStorage.removeItem(LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS);
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -759,6 +762,8 @@ export function initialize(
     logout: () => {
       typeOfAuth = null;
       authIdentifier = null;
+      /* clear fetched embedded messages ids */
+      localStorage.removeItem(LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS);
       /* clear fetched in-app messages */
       clearMessages();
 
