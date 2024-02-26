@@ -45,7 +45,6 @@ export const Card = (props: ICardProps) => {
   } = props;
 
   const defaultCardStyles = {
-    width: '30%',
     border: '1px solid #ccc',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
