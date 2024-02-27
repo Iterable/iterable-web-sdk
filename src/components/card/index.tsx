@@ -51,7 +51,8 @@ export const Card = (props: ICardProps) => {
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',
-    paddingBottom: '10px'
+    paddingBottom: '10px',
+    cursor: 'pointer'
   };
   const defaultImageStyles = {
     width: '100%',
