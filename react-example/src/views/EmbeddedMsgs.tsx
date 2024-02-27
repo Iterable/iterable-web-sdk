@@ -139,146 +139,108 @@ export const EmbeddedMsgs: FC<Props> = () => {
           justifyContent: 'flex-start'
         }}
       >
-        {selectedButtonIndex === 0 && messages.length ? (
-          messages.map((message: any, index: number) => (
-            <Card
-              key={index.toString()}
-              cardStyle={{ margin: 0 }}
-              title={message?.elements?.title}
-              text={message?.elements?.body}
-              imgSrc={message?.elements?.mediaUrl}
-              primaryBtnLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 0
-                  ? message?.elements?.buttons[0]?.title
-                  : undefined
-              }
-              secondaryBtnLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 1
-                  ? message?.elements?.buttons[1]?.title
-                  : undefined
-              }
-              onClickPrimaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[0]?.action?.type,
-                  message?.elements?.buttons[0]?.action?.data
-                );
-              }}
-              onClickSecondaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[1]?.action?.type,
-                  message?.elements?.buttons[1]?.action?.data
-                );
-              }}
-              onClickView={() => {
-                handleOpenUrl(
-                  message?.elements?.defaultAction?.type,
-                  message?.elements?.defaultAction?.data
-                );
-              }}
-            />
-          ))
-        ) : selectedButtonIndex === 0 ? (
-          <div>No message</div>
-        ) : (
-          <div></div>
-        )}
+        {messages.length > 0 ? (
+          messages.map((message: any, index: number) => {
+            const data = message?.elements;
+            const primaryButton = data?.buttons?.[0];
+            const secondaryButton = data?.buttons?.[1];
+            const defaultAction = data?.defaultAction;
 
-        {selectedButtonIndex === 1 && messages.length ? (
-          messages.map((message: any, index: number) => (
-            <Banner
-              key={index.toString()}
-              BannerStyle={{ margin: 0 }}
-              title={message?.elements?.title}
-              text={message?.elements?.body}
-              imgSrc={message?.elements?.mediaUrl}
-              primaryBtnStyle={{
-                backgroundColor: '#000fff',
-                borderRadius: '8px',
-                padding: '10px',
-                color: '#ffffff'
-              }}
-              primaryBtnLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 0
-                  ? message?.elements?.buttons[0]?.title
-                  : undefined
-              }
-              secondaryBtnLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 1
-                  ? message?.elements?.buttons[1]?.title
-                  : undefined
-              }
-              onClickPrimaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[0]?.action?.type,
-                  message?.elements?.buttons[0]?.action?.data
+            switch (selectedButtonIndex) {
+              case 0:
+                return (
+                  <Card
+                    key={index.toString()}
+                    cardStyle={{ margin: 0 }}
+                    title={data?.title}
+                    text={data?.body}
+                    imgSrc={data?.mediaUrl}
+                    primaryBtnLabel={primaryButton?.title}
+                    secondaryBtnLabel={secondaryButton?.title}
+                    onClickPrimaryBtn={() =>
+                      handleOpenUrl(
+                        primaryButton?.action?.type,
+                        primaryButton?.action?.data
+                      )
+                    }
+                    onClickSecondaryBtn={() =>
+                      handleOpenUrl(
+                        secondaryButton?.action?.type,
+                        secondaryButton?.action?.data
+                      )
+                    }
+                    onClickView={() =>
+                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
+                    }
+                  />
                 );
-              }}
-              onClickSecondaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[1]?.action?.type,
-                  message?.elements?.buttons[1]?.action?.data
-                );
-              }}
-              onClickView={() => {
-                handleOpenUrl(
-                  message?.elements?.defaultAction?.type,
-                  message?.elements?.defaultAction?.data
-                );
-              }}
-            />
-          ))
-        ) : selectedButtonIndex === 1 ? (
-          <div>No message</div>
-        ) : (
-          <div></div>
-        )}
 
-        {selectedButtonIndex === 2 && messages.length ? (
-          messages.map((message: any, index: number) => (
-            <Notification
-              key={index.toString()}
-              title={message?.elements?.title}
-              description={message?.elements?.body}
-              primaryButtonLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 0
-                  ? message?.elements?.buttons[0]?.title
-                  : undefined
-              }
-              secondaryButtonLabel={
-                message?.elements?.buttons &&
-                message?.elements?.buttons.length > 1
-                  ? message?.elements?.buttons[1]?.title
-                  : undefined
-              }
-              onClickPrimaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[0]?.action?.type,
-                  message?.elements?.buttons[0]?.action?.data
+              case 1:
+                return (
+                  <Banner
+                    key={index.toString()}
+                    BannerStyle={{ margin: 0 }}
+                    title={data?.title}
+                    text={data?.body}
+                    imgSrc={data?.mediaUrl}
+                    primaryBtnStyle={{
+                      backgroundColor: '#000fff',
+                      borderRadius: '8px',
+                      padding: '10px',
+                      color: '#ffffff'
+                    }}
+                    primaryBtnLabel={primaryButton?.title}
+                    secondaryBtnLabel={secondaryButton?.title}
+                    onClickPrimaryBtn={() =>
+                      handleOpenUrl(
+                        primaryButton?.action?.type,
+                        primaryButton?.action?.data
+                      )
+                    }
+                    onClickSecondaryBtn={() =>
+                      handleOpenUrl(
+                        secondaryButton?.action?.type,
+                        secondaryButton?.action?.data
+                      )
+                    }
+                    onClickView={() =>
+                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
+                    }
+                  />
                 );
-              }}
-              onClickSecondaryBtn={() => {
-                handleOpenUrl(
-                  message?.elements?.buttons[1]?.action?.type,
-                  message?.elements?.buttons[1]?.action?.data
+
+              case 2:
+                return (
+                  <Notification
+                    key={index.toString()}
+                    title={data?.title}
+                    description={data?.body}
+                    primaryButtonLabel={primaryButton?.title}
+                    secondaryButtonLabel={secondaryButton?.title}
+                    onClickPrimaryBtn={() =>
+                      handleOpenUrl(
+                        primaryButton?.action?.type,
+                        primaryButton?.action?.data
+                      )
+                    }
+                    onClickSecondaryBtn={() =>
+                      handleOpenUrl(
+                        secondaryButton?.action?.type,
+                        secondaryButton?.action?.data
+                      )
+                    }
+                    onClickView={() =>
+                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
+                    }
+                  />
                 );
-              }}
-              onClickView={() => {
-                handleOpenUrl(
-                  message?.elements?.defaultAction?.type,
-                  message?.elements?.defaultAction?.data
-                );
-              }}
-            />
-          ))
-        ) : selectedButtonIndex === 2 ? (
-          <div>No message</div>
+
+              default:
+                return null;
+            }
+          })
         ) : (
-          <div></div>
+          <div>No message</div>
         )}
       </div>
     </>
