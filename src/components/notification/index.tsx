@@ -45,6 +45,7 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   const primaryButtonDefaultStyle: CSSProperties = {
+    textAlign: 'left',
     background: '#2196f3',
     color: 'white',
     borderRadius: '4px',
@@ -56,6 +57,7 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   const secondaryButtonDefaultStyle: CSSProperties = {
+    textAlign: 'left',
     background: 'none',
     border: 'none',
     color: '#2196f3',
