@@ -47,7 +47,6 @@ export const Banner = (props: IBannerProps) => {
     border: '1px solid #ccc',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    width: '60%',
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',

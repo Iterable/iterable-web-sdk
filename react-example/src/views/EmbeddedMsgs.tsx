@@ -65,7 +65,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
         required
       />
       <Button
-        style={{ marginLeft: 20, width: '10%' }}
+        style={{ marginLeft: 20, width: '100px' }}
         onClick={() => handleFetchEmbeddedMessages()}
       >
         Submit
