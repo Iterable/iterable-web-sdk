@@ -51,7 +51,8 @@ export const Banner = (props: IBannerProps) => {
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',
-    padding: '16px'
+    padding: '16px',
+    cursor: 'pointer'
   };
   const defaultImageStyles = {
     width: '70px',
