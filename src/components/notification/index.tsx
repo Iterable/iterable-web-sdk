@@ -74,8 +74,7 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   const defaultTextParentStyles: TextParentStyles = {
-    overflowWrap: 'break-word',
-    margin: '10px'
+    overflowWrap: 'break-word'
   };
 
   return (
