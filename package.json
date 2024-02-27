@@ -1,7 +1,7 @@
 {
   "name": "@iterable/web-sdk",
   "description": "Iterable SDK for JavaScript and Node.",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "homepage": "https://iterable.com/",
   "repository": {
     "type": "git",
