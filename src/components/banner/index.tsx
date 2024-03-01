@@ -68,10 +68,14 @@ export const Banner = (props: IBannerProps) => {
     fontSize: '16px',
     marginBottom: '16px'
   };
-  const bannerButtons = {
-    marginTop: '20px'
+  const bannerButtons: CSSProperties = {
+    marginTop: '20px',
+    flex: '1',
+    flexDirection: 'row',
+    display: 'flex'
   };
   const defaultButtonStyles: CSSProperties = {
+    maxWidth: 'calc(50% - 32px)',
     textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
@@ -79,7 +83,9 @@ export const Banner = (props: IBannerProps) => {
     color: '#433d99',
     border: 'none',
     borderRadius: 0,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    padding: '5px',
+    overflowWrap: 'break-word'
   };
   const defaultTextParentStyles = {
     flex: '1'

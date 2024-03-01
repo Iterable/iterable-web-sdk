@@ -70,6 +70,7 @@ export const Card = (props: ICardProps) => {
     marginBottom: '16px'
   };
   const defaultButtonStyles: CSSProperties = {
+    maxWidth: 'calc(50% - 32px)',
     textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
@@ -78,7 +79,8 @@ export const Card = (props: ICardProps) => {
     border: 'none',
     borderRadius: 0,
     cursor: 'pointer',
-    padding: '5px'
+    padding: '5px',
+    overflowWrap: 'break-word'
   };
 
   const defaultTextParentStyles: TextParentStyles = {
@@ -86,9 +88,12 @@ export const Card = (props: ICardProps) => {
     margin: '10px'
   };
 
-  const cardButtons = {
+  const cardButtons: CSSProperties = {
     marginTop: '20px',
-    marginLeft: '5px'
+    marginLeft: '5px',
+    flex: '1',
+    flexDirection: 'row',
+    display: 'flex'
   };
 
   return (
