@@ -3,12 +3,17 @@ import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import { eventRequestSchema, trackSchema } from './events.schema';
+import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
+  if (canTrackAnonUser(payload)) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonEvent(payload);
+    const errorMessage =
+      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
+    throw new Error(errorMessage);
+  }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/events/track',

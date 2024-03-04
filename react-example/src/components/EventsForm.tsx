@@ -1,4 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import {
   Button,
   EndpointWrapper,
@@ -6,8 +7,13 @@ import {
   Heading,
   Response
 } from '../views/Components.styled';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
+import {
+  initialize,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
+import { useUser } from 'src/context/Users';
 
 interface Props {
   endpointName: string;
@@ -22,6 +28,7 @@ export const EventsForm: FC<Props> = ({
   heading,
   needsEventName
 }) => {
+  const { loggedInUser, setLoggedInUser } = useUser();
   const [trackResponse, setTrackResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -30,27 +37,33 @@ export const EventsForm: FC<Props> = ({
 
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
 
-  const handleTrack = (e: FormEvent<HTMLFormElement>) => {
+  const handleTrack = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingEvent(true);
 
     const conditionalParams = needsEventName
       ? { eventName: trackEvent }
       : { messageId: trackEvent };
-    method({
-      ...conditionalParams,
-      deviceInfo: {
-        appPackageName: 'my-website'
-      }
-    })
-      .then((response) => {
-        setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
+
+    try {
+      method({
+        ...conditionalParams,
+        deviceInfo: {
+          appPackageName: 'my-website'
+        }
       })
-      .catch((e) => {
-        setTrackResponse(JSON.stringify(e.response.data));
-        setTrackingEvent(false);
-      });
+        .then((response) => {
+          setTrackResponse(JSON.stringify(response.data));
+          setTrackingEvent(false);
+        })
+        .catch((e) => {
+          setTrackResponse(JSON.stringify(e.response.data));
+          setTrackingEvent(false);
+        });
+    } catch (error) {
+      setTrackResponse(JSON.stringify(error.message));
+      setTrackingEvent(false);
+    }
   };
 
   const formAttr = { [`data-qa-${endpointName}-submit`]: true };

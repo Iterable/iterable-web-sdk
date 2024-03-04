@@ -14,6 +14,7 @@ import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
 
 import { UserProvider } from 'src/context/Users';
+import { setAnonTracking } from '@iterable/web-sdk';
 
 const Wrapper = styled.div`
   display: flex;
@@ -60,6 +61,7 @@ const HomeLink = styled(Link)`
         });
     }
   );
+  setAnonTracking(true);
 
   ReactDOM.render(
     <BrowserRouter>

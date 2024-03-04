@@ -2,30 +2,32 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { updateSubscriptions, updateUser, updateUserEmail } from './users';
 import { createClientError } from '../utils/testUtils';
-// import { SDK_VERSION, WEB_PLATFORM } from '../constants';
+import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+jest.mock('../utils/anonymousUserEventManager', () => {
+  return jest.fn().mockImplementation(() => ({
+    trackAnonUpdateUser: jest.fn()
+  }));
+});
+
 describe('Users Requests', () => {
-  it('should set params and return the correct payload for updateUser', async () => {
-    mockRequest.onPost('/users/update').reply(200, {
-      msg: 'hello'
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    config.setConfig({ enableAnonTracking: true });
+  });
 
-    const response = await updateUser({
-      dataFields: {}
-    });
-
-    expect(JSON.parse(response.config.data).dataFields).toEqual({});
-    expect(JSON.parse(response.config.data).preferUserId).toBe(true);
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
-    expect(response.data.msg).toBe('hello');
+  it('should throw an error if payload is empty', () => {
+    expect(() => {
+      updateUser();
+    }).toThrow();
   });
 
   it('should reject updateUser on bad params', async () => {
     try {
       await updateUser({
+        userId: 'test',
         dataFields: 'string',
         preferUserId: 'string',
         mergeNestedObjects: 'string'
@@ -179,8 +181,10 @@ describe('Users Requests', () => {
       userId: '1234'
     } as any);
 
-    expect(JSON.parse(updateResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(updateResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(updateResponse.config.data).userId).toEqual('1234');
     expect(JSON.parse(subsResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(subsResponse.config.data).userId).toBeUndefined();
   });

@@ -10,12 +10,25 @@ import {
 } from './events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+jest.mock('../utils/anonymousUserEventManager', () => {
+  return jest.fn().mockImplementation(() => ({
+    trackAnonEvent: jest.fn()
+  }));
+});
+
 describe('Events Requests', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    config.setConfig({ enableAnonTracking: true });
+  });
+
   beforeAll(() => {
     mockRequest.onPost('/events/track').reply(200, {
+      userId: 'user',
       msg: 'hello'
     });
     mockRequest.onPost('/events/trackInAppClick').reply(200, {
@@ -35,19 +48,35 @@ describe('Events Requests', () => {
     });
   });
 
-  it('return the correct payload for track', async () => {
-    const response = await track({ eventName: 'test' });
+  it('should throw an error if payload is empty', () => {
+    expect(() => {
+      track({} as any);
+    }).toThrow();
+  });
 
+  it('should throw an error if payload is empty', () => {
+    expect(() => {
+      track({ eventName: 'test' });
+    }).toThrow();
+  });
+
+  it('return the correct payload for track with userId', async () => {
+    const response = await track({ userId: 'user', eventName: 'test' });
     expect(JSON.parse(response.config.data).eventName).toBe('test');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
-    expect(response.data.msg).toBe('hello');
+  });
+
+  it('return the correct payload for track with email', async () => {
+    const response = await track({
+      email: 'user@email.com',
+      eventName: 'test'
+    });
+    expect(JSON.parse(response.config.data).eventName).toBe('test');
   });
 
   it('should reject track on bad params', async () => {
     try {
-      await track({} as any);
-    } catch (e) {
+      await track({ userId: 'user' } as any);
+    } catch (e: any) {
       expect(e).toEqual(
         createClientError([
           {
@@ -73,8 +102,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppClick on bad params', async () => {
@@ -110,8 +137,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppClose on bad params', async () => {
@@ -147,8 +172,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppConsume on bad params', async () => {
@@ -184,8 +207,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppDelivery on bad params', async () => {
@@ -221,8 +242,6 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
-    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
-    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppOpen on bad params', async () => {
@@ -282,8 +301,10 @@ describe('Events Requests', () => {
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
 
-    expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackResponse.config.data).email).toEqual(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackResponse.config.data).userId).toEqual('1234');
     expect(
       JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');

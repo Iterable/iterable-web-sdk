@@ -1,4 +1,6 @@
 export interface InAppTrackRequestParams {
+  userId?: string;
+  email?: string;
   eventName: string;
   id?: string;
   createdAt?: number;
