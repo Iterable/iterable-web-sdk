@@ -64,9 +64,10 @@ export class EmbeddedManager {
         currentMessageIds = JSON.parse(storedMessageIds);
 
         if (currentMessageIds.length > 0) {
-          const messageIdsQueryParam =
-            currentMessageIds.join('&currentMessageId=');
-          url += `&currentMessageId=${messageIdsQueryParam}`;
+          const messageIdsQueryParam = currentMessageIds.join(
+            '&currentMessageIds='
+          );
+          url += `&currentMessageIds=${messageIdsQueryParam}`;
         }
       }
       url = url.replace(/&$/, '');
