@@ -63,11 +63,13 @@ export const Card = (props: ICardProps) => {
   const defaultTitleStyles = {
     fontSize: '18px',
     fontWeight: 'bold',
-    marginBottom: '4px'
+    marginBottom: '4px',
+    display: 'block'
   };
   const defaultTextStyles = {
     fontSize: '14px',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    display: 'block'
   };
   const defaultButtonStyles: CSSProperties = {
     textAlign: 'left',
@@ -91,25 +93,25 @@ export const Card = (props: ICardProps) => {
     marginLeft: '5px'
   };
 
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .card {
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
   return (
     <>
-      <style>
-        {`
-        @media screen and (max-width: 800px) {
-            .titleText {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-height: 2.6em;
-              line-height: 1.3em;
-            }
-            .card {
-              height: 450px;
-              display: flex;
-              flex-direction: column;
-            }
-          }
-        `}
-      </style>
+      <style>{mediaStyle}</style>
       <div
         className="card"
         style={{ ...defaultCardStyles, ...cardStyle }}
@@ -121,13 +123,13 @@ export const Card = (props: ICardProps) => {
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
-            style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
+            style={{ ...defaultTitleStyles, ...titleStyle }}
           >
             {title}
           </text>
           <text
             className="titleText"
-            style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}
+            style={{ ...defaultTextStyles, ...textStyle }}
           >
             {text}
           </text>

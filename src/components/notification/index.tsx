@@ -68,12 +68,14 @@ export const Notification: React.FC<NotificationProps> = ({
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '4px'
+    marginBottom: '4px',
+    display: 'block'
   };
 
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    display: 'block'
   };
 
   const defaultTextParentStyles: TextParentStyles = {
@@ -84,36 +86,36 @@ export const Notification: React.FC<NotificationProps> = ({
     marginTop: 'auto'
   };
 
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .notification {
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
   return (
     <>
-      <style>
-        {`
-        @media screen and (max-width: 800px) {
-            .titleText {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-height: 2.6em;
-              line-height: 1.3em;
-            }
-            .notification {
-              height: 200px;
-              display: flex;
-              flex-direction: column;
-            }
-          }
-        `}
-      </style>
+      <style>{mediaStyle}</style>
       <div className="notification" style={cardStyle} onClick={onClickView}>
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
-            style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
+            style={{ ...defaultTitleStyles, ...titleStyle }}
           >
             {title}
           </text>
           <text
             className="titleText"
-            style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}
+            style={{ ...defaultTextStyles, ...textStyle }}
           >
             {description}
           </text>

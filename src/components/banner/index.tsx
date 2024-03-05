@@ -62,11 +62,13 @@ export const Banner = (props: IBannerProps) => {
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '4px'
+    marginBottom: '4px',
+    display: 'block'
   };
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '10px'
+    marginBottom: '10px',
+    display: 'block'
   };
   const bannerButtons = {
     marginTop: 'auto'
@@ -85,26 +87,25 @@ export const Banner = (props: IBannerProps) => {
     flex: '1',
     maxWidth: 'calc(100% - 80px)'
   };
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .banner {
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
 
   return (
     <>
-      <style>
-        {`
-        @media screen and (max-width: 800px) {
-            .titleText {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              max-height: 2.6em;
-              line-height: 1.3em;
-            }
-            .banner {
-              height: 250px;
-              display: flex;
-              flex-direction: column;
-            }
-          }
-        `}
-      </style>
+      <style>{mediaStyle}</style>
       <div
         className="banner"
         style={{
@@ -124,15 +125,14 @@ export const Banner = (props: IBannerProps) => {
               className="titleText"
               style={{
                 ...defaultTitleStyles,
-                ...titleStyle,
-                display: 'block'
+                ...titleStyle
               }}
             >
               {title}
             </text>
             <text
               className="titleText"
-              style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}
+              style={{ ...defaultTextStyles, ...textStyle }}
             >
               {text}
             </text>
