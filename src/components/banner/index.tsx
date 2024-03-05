@@ -62,14 +62,16 @@ export const Banner = (props: IBannerProps) => {
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '8px'
+    marginBottom: '4px',
+    display: 'block'
   };
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '16px'
+    marginBottom: '10px',
+    display: 'block'
   };
   const bannerButtons = {
-    marginTop: '20px'
+    marginTop: 'auto'
   };
   const defaultButtonStyles: CSSProperties = {
     textAlign: 'left',
@@ -82,71 +84,98 @@ export const Banner = (props: IBannerProps) => {
     cursor: 'pointer'
   };
   const defaultTextParentStyles = {
-    flex: '1'
+    flex: '1',
+    maxWidth: 'calc(100% - 80px)'
   };
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .banner {
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
 
   return (
-    <div
-      className="banner"
-      style={{
-        ...defaultBannerStyles,
-        ...BannerStyle
-      }}
-      onClick={onClickView}
-    >
+    <>
+      <style>{mediaStyle}</style>
       <div
+        className="banner"
         style={{
-          display: 'flex',
-          flexDirection: 'row'
+          ...defaultBannerStyles,
+          ...BannerStyle
         }}
+        onClick={onClickView}
       >
-        <div style={defaultTextParentStyles}>
-          <div style={{ overflowWrap: 'anywhere' }}>
-            <text style={{ ...defaultTitleStyles, ...titleStyle }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}
+        >
+          <div style={defaultTextParentStyles}>
+            <text
+              className="titleText"
+              style={{
+                ...defaultTitleStyles,
+                ...titleStyle
+              }}
+            >
               {title}
             </text>
-            <br></br>
-            <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
+            <text
+              className="titleText"
+              style={{ ...defaultTextStyles, ...textStyle }}
+            >
+              {text}
+            </text>
           </div>
-          <div style={bannerButtons}>
-            {primaryBtnLabel ? (
-              <button
-                disabled={disablePrimaryBtn}
-                style={
-                  disablePrimaryBtn
-                    ? {
-                        ...defaultButtonStyles,
-                        ...primaryDisableBtnStyle
-                      }
-                    : { ...defaultButtonStyles, ...primaryBtnStyle }
-                }
-                onClick={onClickPrimaryBtn}
-              >
-                {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-              </button>
-            ) : null}
-            {secondaryBtnLabel ? (
-              <button
-                disabled={disableSecondaryBtn}
-                style={
-                  disableSecondaryBtn
-                    ? {
-                        ...defaultButtonStyles,
-                        ...secondaryDisableBtnStyle
-                      }
-                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
-                }
-                onClick={onClickSecondaryBtn}
-              >
-                {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
-              </button>
-            ) : null}
-          </div>
+          {imgSrc && (
+            <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+          )}
         </div>
-        {imgSrc && (
-          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
-        )}
+        <div style={bannerButtons}>
+          {primaryBtnLabel ? (
+            <button
+              disabled={disablePrimaryBtn}
+              style={
+                disablePrimaryBtn
+                  ? {
+                      ...defaultButtonStyles,
+                      ...primaryDisableBtnStyle
+                    }
+                  : { ...defaultButtonStyles, ...primaryBtnStyle }
+              }
+              onClick={onClickPrimaryBtn}
+            >
+              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
+            </button>
+          ) : null}
+          {secondaryBtnLabel ? (
+            <button
+              disabled={disableSecondaryBtn}
+              style={
+                disableSecondaryBtn
+                  ? {
+                      ...defaultButtonStyles,
+                      ...secondaryDisableBtnStyle
+                    }
+                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
+              }
+              onClick={onClickSecondaryBtn}
+            >
+              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+            </button>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 };

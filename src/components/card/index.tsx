@@ -63,11 +63,13 @@ export const Card = (props: ICardProps) => {
   const defaultTitleStyles = {
     fontSize: '18px',
     fontWeight: 'bold',
-    marginBottom: '10px'
+    marginBottom: '4px',
+    display: 'block'
   };
   const defaultTextStyles = {
     fontSize: '14px',
-    marginBottom: '16px'
+    marginBottom: '10px',
+    display: 'block'
   };
   const defaultButtonStyles: CSSProperties = {
     textAlign: 'left',
@@ -87,59 +89,86 @@ export const Card = (props: ICardProps) => {
   };
 
   const cardButtons = {
-    marginTop: '20px',
+    marginTop: 'auto',
     marginLeft: '5px'
   };
 
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .card {
+        height: 450px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
   return (
-    <div style={{ ...defaultCardStyles, ...cardStyle }} onClick={onClickView}>
-      {imgSrc && (
-        <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
-      )}
-      <div style={{ ...defaultTextParentStyles }}>
-        <text
-          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
-        >
-          {title}
-        </text>
-        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
-          {text}
-        </text>
-      </div>
-      <div style={cardButtons}>
-        {primaryBtnLabel ? (
-          <button
-            disabled={disablePrimaryBtn}
-            style={
-              disablePrimaryBtn
-                ? {
-                    ...defaultButtonStyles,
-                    ...primaryDisableBtnStyle
-                  }
-                : { ...defaultButtonStyles, ...primaryBtnStyle }
-            }
-            onClick={onClickPrimaryBtn}
+    <>
+      <style>{mediaStyle}</style>
+      <div
+        className="card"
+        style={{ ...defaultCardStyles, ...cardStyle }}
+        onClick={onClickView}
+      >
+        {imgSrc && (
+          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+        )}
+        <div style={{ ...defaultTextParentStyles }}>
+          <text
+            className="titleText"
+            style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-          </button>
-        ) : null}
-        {secondaryBtnLabel ? (
-          <button
-            disabled={disableSecondaryBtn}
-            style={
-              disableSecondaryBtn
-                ? {
-                    ...defaultButtonStyles,
-                    ...secondaryDisableBtnStyle
-                  }
-                : { ...defaultButtonStyles, ...secondaryBtnStyle }
-            }
-            onClick={onClickSecondaryBtn}
+            {title}
+          </text>
+          <text
+            className="titleText"
+            style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
-          </button>
-        ) : null}
+            {text}
+          </text>
+        </div>
+        <div style={cardButtons}>
+          {primaryBtnLabel ? (
+            <button
+              disabled={disablePrimaryBtn}
+              style={
+                disablePrimaryBtn
+                  ? {
+                      ...defaultButtonStyles,
+                      ...primaryDisableBtnStyle
+                    }
+                  : { ...defaultButtonStyles, ...primaryBtnStyle }
+              }
+              onClick={onClickPrimaryBtn}
+            >
+              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
+            </button>
+          ) : null}
+          {secondaryBtnLabel ? (
+            <button
+              disabled={disableSecondaryBtn}
+              style={
+                disableSecondaryBtn
+                  ? {
+                      ...defaultButtonStyles,
+                      ...secondaryDisableBtnStyle
+                    }
+                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
+              }
+              onClick={onClickSecondaryBtn}
+            >
+              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+            </button>
+          ) : null}
+        </div>
       </div>
-    </div>
+    </>
   );
 };

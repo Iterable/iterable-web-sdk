@@ -68,62 +68,93 @@ export const Notification: React.FC<NotificationProps> = ({
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '8px'
+    marginBottom: '4px',
+    display: 'block'
   };
 
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '16px'
+    marginBottom: '10px',
+    display: 'block'
   };
 
   const defaultTextParentStyles: TextParentStyles = {
     overflowWrap: 'break-word'
   };
 
+  const notificationButtons = {
+    marginTop: 'auto'
+  };
+
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .notification {
+        height: 200px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
   return (
-    <div style={cardStyle} onClick={onClickView}>
-      <div style={{ ...defaultTextParentStyles }}>
-        <text
-          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
-        >
-          {title}
-        </text>
-        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
-          {description}
-        </text>
+    <>
+      <style>{mediaStyle}</style>
+      <div className="notification" style={cardStyle} onClick={onClickView}>
+        <div style={{ ...defaultTextParentStyles }}>
+          <text
+            className="titleText"
+            style={{ ...defaultTitleStyles, ...titleStyle }}
+          >
+            {title}
+          </text>
+          <text
+            className="titleText"
+            style={{ ...defaultTextStyles, ...textStyle }}
+          >
+            {description}
+          </text>
+        </div>
+        <div style={notificationButtons}>
+          {primaryButtonLabel && (
+            <button
+              onClick={onClickPrimaryBtn}
+              disabled={disablePrimaryBtn}
+              style={
+                disablePrimaryBtn
+                  ? {
+                      ...primaryButtonDefaultStyle,
+                      ...primaryDisableBtnStyle
+                    }
+                  : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
+              }
+            >
+              {primaryButtonLabel}
+            </button>
+          )}
+          {secondaryButtonLabel && (
+            <button
+              onClick={onClickSecondaryBtn}
+              disabled={disableSecondaryBtn}
+              style={
+                disableSecondaryBtn
+                  ? {
+                      ...secondaryButtonDefaultStyle,
+                      ...secondaryDisableBtnStyle
+                    }
+                  : { ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }
+              }
+            >
+              {secondaryButtonLabel}
+            </button>
+          )}
+        </div>
       </div>
-      {primaryButtonLabel && (
-        <button
-          onClick={onClickPrimaryBtn}
-          disabled={disablePrimaryBtn}
-          style={
-            disablePrimaryBtn
-              ? {
-                  ...primaryButtonDefaultStyle,
-                  ...primaryDisableBtnStyle
-                }
-              : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
-          }
-        >
-          {primaryButtonLabel}
-        </button>
-      )}
-      {secondaryButtonLabel && (
-        <button
-          onClick={onClickSecondaryBtn}
-          disabled={disableSecondaryBtn}
-          style={
-            disableSecondaryBtn
-              ? {
-                  ...secondaryButtonDefaultStyle,
-                  ...secondaryDisableBtnStyle
-                }
-              : { ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }
-          }
-        >
-          {secondaryButtonLabel}
-        </button>
-      )}
-    </div>
+    </>
   );
 };
