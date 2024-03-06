@@ -73,12 +73,14 @@ export const Notification: React.FC<NotificationProps> = ({
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '8px'
+    marginBottom: '4px',
+    display: 'block'
   };
 
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '16px'
+    marginBottom: '10px',
+    display: 'block'
   };
 
   const defaultTextParentStyles: TextParentStyles = {
@@ -86,58 +88,83 @@ export const Notification: React.FC<NotificationProps> = ({
   };
 
   const notificationButtons: CSSProperties = {
-    marginTop: 'auto',
-    flex: '1',
-    flexDirection: 'row',
-    display: 'flex'
+    marginTop: 'auto'
   };
 
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .notification {
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
   return (
-    <div style={cardStyle} onClick={onClickView}>
-      <div style={{ ...defaultTextParentStyles }}>
-        <text
-          style={{ ...defaultTitleStyles, ...titleStyle, display: 'block' }}
-        >
-          {title}
-        </text>
-        <text style={{ ...defaultTextStyles, ...textStyle, display: 'block' }}>
-          {description}
-        </text>
-      </div>
-      <div style={notificationButtons}>
-        {primaryButtonLabel && (
-          <button
-            onClick={onClickPrimaryBtn}
-            disabled={disablePrimaryBtn}
-            style={
-              disablePrimaryBtn
-                ? {
-                    ...primaryButtonDefaultStyle,
-                    ...primaryDisableBtnStyle
-                  }
-                : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
-            }
+    <>
+      <style>{mediaStyle}</style>
+      <div className="notification" style={cardStyle} onClick={onClickView}>
+        <div style={{ ...defaultTextParentStyles }}>
+          <text
+            className="titleText"
+            style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {primaryButtonLabel}
-          </button>
-        )}
-        {secondaryButtonLabel && (
-          <button
-            onClick={onClickSecondaryBtn}
-            disabled={disableSecondaryBtn}
-            style={
-              disableSecondaryBtn
-                ? {
-                    ...secondaryButtonDefaultStyle,
-                    ...secondaryDisableBtnStyle
-                  }
-                : { ...secondaryButtonDefaultStyle, ...secondaryButtonStyle }
-            }
+            {title}
+          </text>
+          <text
+            className="titleText"
+            style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {secondaryButtonLabel}
-          </button>
-        )}
+            {description}
+          </text>
+        </div>
+        <div style={notificationButtons}>
+          <div style={notificationButtons}>
+            {primaryButtonLabel && (
+              <button
+                onClick={onClickPrimaryBtn}
+                disabled={disablePrimaryBtn}
+                style={
+                  disablePrimaryBtn
+                    ? {
+                        ...primaryButtonDefaultStyle,
+                        ...primaryDisableBtnStyle
+                      }
+                    : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
+                }
+              >
+                {primaryButtonLabel}
+              </button>
+            )}
+            {secondaryButtonLabel && (
+              <button
+                onClick={onClickSecondaryBtn}
+                disabled={disableSecondaryBtn}
+                style={
+                  disableSecondaryBtn
+                    ? {
+                        ...secondaryButtonDefaultStyle,
+                        ...secondaryDisableBtnStyle
+                      }
+                    : {
+                        ...secondaryButtonDefaultStyle,
+                        ...secondaryButtonStyle
+                      }
+                }
+              >
+                {secondaryButtonLabel}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
