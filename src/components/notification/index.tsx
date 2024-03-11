@@ -1,10 +1,7 @@
 import React, { CSSProperties } from 'react';
-import {
-  IterableActionRunner,
-  IterableActionSource,
-  TextParentStyles
-} from 'src/index';
+import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
+import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 export const Notification: React.FC<EmbeddedMessageData> = ({
   primaryBtnStyle,
@@ -89,17 +86,10 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
     }
   `;
 
-  const iterableActionRunner = new IterableActionRunner();
-
-  const handleEmbeddedUrl = (clickedUrl: string, data: string) => {
-    const iterableAction = {
-      type: clickedUrl,
-      data
-    };
-
-    iterableActionRunner.executeAction(
+  const handleEmbeddedUrl = (type: string, data: string) => {
+    new IterableActionRunner().executeAction(
       null,
-      iterableAction,
+      { type, data },
       IterableActionSource.EMBEDDED
     );
   };

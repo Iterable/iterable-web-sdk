@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
 import { EmbeddedMessageData } from '../types';
-import { IterableActionRunner, IterableActionSource } from 'src/index';
+import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 export const Banner = (props: EmbeddedMessageData) => {
   const {
@@ -81,17 +81,10 @@ export const Banner = (props: EmbeddedMessageData) => {
     }
   `;
 
-  const iterableActionRunner = new IterableActionRunner();
-
-  const handleEmbeddedUrl = (clickedUrl: string, data: string) => {
-    const iterableAction = {
-      type: clickedUrl,
-      data
-    };
-
-    iterableActionRunner.executeAction(
+  const handleEmbeddedUrl = (type: string, data: string) => {
+    new IterableActionRunner().executeAction(
       null,
-      iterableAction,
+      { type, data },
       IterableActionSource.EMBEDDED
     );
   };
