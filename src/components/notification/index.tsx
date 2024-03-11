@@ -1,40 +1,22 @@
 import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
+import {
+  IterableActionRunner,
+  IterableActionSource,
+  TextParentStyles
+} from 'src/index';
+import { EmbeddedMessageData } from '../types';
 
-interface NotificationProps {
-  title: string;
-  description: string;
-  primaryButtonLabel?: string;
-  secondaryButtonLabel?: string;
-  primaryButtonStyle?: CSSProperties;
-  secondaryButtonStyle?: CSSProperties;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  titleStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickView?: () => void;
-}
-
-export const Notification: React.FC<NotificationProps> = ({
-  title,
-  description,
-  primaryButtonLabel,
-  secondaryButtonLabel,
-  primaryButtonStyle,
-  secondaryButtonStyle,
-  onClickPrimaryBtn,
-  onClickSecondaryBtn,
+export const Notification: React.FC<EmbeddedMessageData> = ({
+  primaryBtnStyle,
+  secondaryBtnStyle,
   textStyle,
   titleStyle,
   primaryDisableBtnStyle,
   secondaryDisableBtnStyle,
   disablePrimaryBtn,
   disableSecondaryBtn,
-  onClickView
+  handleEmbeddedClick,
+  messageData
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -107,29 +89,61 @@ export const Notification: React.FC<NotificationProps> = ({
     }
   `;
 
+  const iterableActionRunner = new IterableActionRunner();
+
+  const handleEmbeddedUrl = (clickedUrl: string, data: string) => {
+    const iterableAction = {
+      type: clickedUrl,
+      data
+    };
+
+    iterableActionRunner.executeAction(
+      null,
+      iterableAction,
+      IterableActionSource.EMBEDDED
+    );
+  };
+
   return (
     <>
       <style>{mediaStyle}</style>
-      <div className="notification" style={cardStyle} onClick={onClickView}>
+      <div
+        className="notification"
+        style={cardStyle}
+        onClick={
+          handleEmbeddedClick
+            ? handleEmbeddedClick
+            : () =>
+                handleEmbeddedUrl(
+                  messageData?.defaultAction?.type,
+                  messageData?.defaultAction?.data
+                )
+        }
+      >
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {title}
+            {messageData?.title}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {description}
+            {messageData?.body}
           </text>
         </div>
         <div style={notificationButtons}>
           <div style={notificationButtons}>
-            {primaryButtonLabel && (
+            {messageData?.buttons?.[0].title && (
               <button
-                onClick={onClickPrimaryBtn}
+                onClick={() =>
+                  handleEmbeddedUrl(
+                    messageData?.buttons?.[0]?.action?.type,
+                    messageData?.buttons?.[0]?.action?.data
+                  )
+                }
                 disabled={disablePrimaryBtn}
                 style={
                   disablePrimaryBtn
@@ -137,15 +151,20 @@ export const Notification: React.FC<NotificationProps> = ({
                         ...primaryButtonDefaultStyle,
                         ...primaryDisableBtnStyle
                       }
-                    : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
+                    : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
                 }
               >
-                {primaryButtonLabel}
+                {messageData?.buttons?.[0].title}
               </button>
             )}
-            {secondaryButtonLabel && (
+            {messageData?.buttons?.[1]?.title && (
               <button
-                onClick={onClickSecondaryBtn}
+                onClick={() =>
+                  handleEmbeddedUrl(
+                    messageData?.buttons?.[1]?.action?.type,
+                    messageData?.buttons?.[1]?.action?.data
+                  )
+                }
                 disabled={disableSecondaryBtn}
                 style={
                   disableSecondaryBtn
@@ -155,11 +174,11 @@ export const Notification: React.FC<NotificationProps> = ({
                       }
                     : {
                         ...secondaryButtonDefaultStyle,
-                        ...secondaryButtonStyle
+                        ...secondaryBtnStyle
                       }
                 }
               >
-                {secondaryButtonLabel}
+                {messageData?.buttons?.[1]?.title}
               </button>
             )}
           </div>

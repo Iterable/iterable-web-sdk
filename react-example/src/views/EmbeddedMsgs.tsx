@@ -8,7 +8,6 @@ import {
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
-import { IterableActionSource, IterableActionRunner } from '@iterable/web-sdk';
 
 interface Props {}
 
@@ -16,7 +15,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
-  const iterableActionRunner = new IterableActionRunner();
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -39,17 +37,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
     }
   };
 
-  const handleOpenUrl = (clickedUrl: string, data: string) => {
-    const iterableAction = {
-      type: clickedUrl,
-      data
-    };
-
-    iterableActionRunner.executeAction(
-      null,
-      iterableAction,
-      IterableActionSource.EMBEDDED
-    );
+  const performCustomClick = (url: string) => {
+    window.open(url, '_blank');
   };
 
   return (
@@ -142,36 +131,16 @@ export const EmbeddedMsgs: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: any, index: number) => {
             const data = message?.elements;
-            const primaryButton = data?.buttons?.[0];
-            const secondaryButton = data?.buttons?.[1];
-            const defaultAction = data?.defaultAction;
-
             switch (selectedButtonIndex) {
               case 0:
                 return (
                   <Card
                     key={index.toString()}
-                    cardStyle={{ margin: 0 }}
-                    title={data?.title}
-                    text={data?.body}
-                    imgSrc={data?.mediaUrl}
-                    primaryBtnLabel={primaryButton?.title}
-                    secondaryBtnLabel={secondaryButton?.title}
-                    onClickPrimaryBtn={() =>
-                      handleOpenUrl(
-                        primaryButton?.action?.type,
-                        primaryButton?.action?.data
-                      )
-                    }
-                    onClickSecondaryBtn={() =>
-                      handleOpenUrl(
-                        secondaryButton?.action?.type,
-                        secondaryButton?.action?.data
-                      )
-                    }
-                    onClickView={() =>
-                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
-                    }
+                    parentStyle={{ margin: 0 }}
+                    messageData={data}
+                    handleEmbeddedClick={() => {
+                      performCustomClick(data?.defaultAction?.data);
+                    }}
                   />
                 );
 
@@ -179,60 +148,20 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 return (
                   <Banner
                     key={index.toString()}
-                    BannerStyle={{ margin: 0 }}
-                    title={data?.title}
-                    text={data?.body}
-                    imgSrc={data?.mediaUrl}
+                    parentStyle={{ margin: 0 }}
+                    messageData={data}
                     primaryBtnStyle={{
                       backgroundColor: '#000fff',
                       borderRadius: '8px',
                       padding: '10px',
                       color: '#ffffff'
                     }}
-                    primaryBtnLabel={primaryButton?.title}
-                    secondaryBtnLabel={secondaryButton?.title}
-                    onClickPrimaryBtn={() =>
-                      handleOpenUrl(
-                        primaryButton?.action?.type,
-                        primaryButton?.action?.data
-                      )
-                    }
-                    onClickSecondaryBtn={() =>
-                      handleOpenUrl(
-                        secondaryButton?.action?.type,
-                        secondaryButton?.action?.data
-                      )
-                    }
-                    onClickView={() =>
-                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
-                    }
                   />
                 );
 
               case 2:
                 return (
-                  <Notification
-                    key={index.toString()}
-                    title={data?.title}
-                    description={data?.body}
-                    primaryButtonLabel={primaryButton?.title}
-                    secondaryButtonLabel={secondaryButton?.title}
-                    onClickPrimaryBtn={() =>
-                      handleOpenUrl(
-                        primaryButton?.action?.type,
-                        primaryButton?.action?.data
-                      )
-                    }
-                    onClickSecondaryBtn={() =>
-                      handleOpenUrl(
-                        secondaryButton?.action?.type,
-                        secondaryButton?.action?.data
-                      )
-                    }
-                    onClickView={() =>
-                      handleOpenUrl(defaultAction?.type, defaultAction?.data)
-                    }
-                  />
+                  <Notification key={index.toString()} messageData={data} />
                 );
 
               default:

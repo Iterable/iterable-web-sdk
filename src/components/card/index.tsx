@@ -1,47 +1,25 @@
 import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
+import {
+  IterableActionRunner,
+  IterableActionSource,
+  TextParentStyles
+} from 'src/index';
+import { EmbeddedMessageData } from '../types';
 
-interface ICardProps {
-  imgSrc?: string;
-  title: string;
-  text: string;
-  primaryBtnLabel?: string;
-  secondaryBtnLabel?: string;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  imgStyle?: CSSProperties;
-  titleStyle?: CSSProperties;
-  cardStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryBtnStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  onClickView?: () => void;
-}
-
-export const Card = (props: ICardProps) => {
+export const Card = (props: EmbeddedMessageData) => {
   const {
-    text,
-    title,
-    cardStyle,
+    parentStyle,
     disablePrimaryBtn,
     disableSecondaryBtn,
-    imgSrc,
     imgStyle,
-    onClickPrimaryBtn,
-    onClickSecondaryBtn,
-    primaryBtnLabel,
     primaryBtnStyle,
     primaryDisableBtnStyle,
-    secondaryBtnLabel,
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    onClickView
+    handleEmbeddedClick,
+    messageData
   } = props;
 
   const defaultCardStyles = {
@@ -111,33 +89,59 @@ export const Card = (props: ICardProps) => {
     }
   `;
 
+  const iterableActionRunner = new IterableActionRunner();
+
+  const handleEmbeddedUrl = (clickedUrl: string, data: string) => {
+    const iterableAction = {
+      type: clickedUrl,
+      data
+    };
+
+    iterableActionRunner.executeAction(
+      null,
+      iterableAction,
+      IterableActionSource.EMBEDDED
+    );
+  };
+
   return (
     <>
       <style>{mediaStyle}</style>
       <div
         className="card"
-        style={{ ...defaultCardStyles, ...cardStyle }}
-        onClick={onClickView}
+        style={{ ...defaultCardStyles, ...parentStyle }}
+        onClick={
+          handleEmbeddedClick
+            ? handleEmbeddedClick
+            : () =>
+                handleEmbeddedUrl(
+                  messageData?.defaultAction?.type,
+                  messageData?.defaultAction?.data
+                )
+        }
       >
-        {imgSrc && (
-          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+        {messageData?.mediaUrl && (
+          <img
+            style={{ ...defaultImageStyles, ...imgStyle }}
+            src={messageData?.mediaUrl}
+          />
         )}
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {title}
+            {messageData?.title}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {text}
+            {messageData?.body}
           </text>
         </div>
         <div style={cardButtons}>
-          {primaryBtnLabel ? (
+          {messageData?.buttons?.[0].title ? (
             <button
               disabled={disablePrimaryBtn}
               style={
@@ -148,12 +152,19 @@ export const Card = (props: ICardProps) => {
                     }
                   : { ...defaultButtonStyles, ...primaryBtnStyle }
               }
-              onClick={onClickPrimaryBtn}
+              onClick={() =>
+                handleEmbeddedUrl(
+                  messageData?.buttons?.[0]?.action?.type,
+                  messageData?.buttons?.[0]?.action?.data
+                )
+              }
             >
-              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
+              {messageData?.buttons?.[0]?.title
+                ? messageData?.buttons?.[0]?.title
+                : 'Button 1'}
             </button>
           ) : null}
-          {secondaryBtnLabel ? (
+          {messageData?.buttons?.[1]?.title ? (
             <button
               disabled={disableSecondaryBtn}
               style={
@@ -164,9 +175,16 @@ export const Card = (props: ICardProps) => {
                     }
                   : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
-              onClick={onClickSecondaryBtn}
+              onClick={() =>
+                handleEmbeddedUrl(
+                  messageData?.buttons?.[1]?.action?.type,
+                  messageData?.buttons?.[1]?.action?.data
+                )
+              }
             >
-              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              {messageData?.buttons?.[1]?.title
+                ? messageData?.buttons?.[1]?.title
+                : 'Button 2'}
             </button>
           ) : null}
         </div>
