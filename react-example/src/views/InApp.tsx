@@ -57,7 +57,10 @@ export const InApp: FC<{}> = () => {
 
     return getInAppMessages(
       { count: 20, packageName: 'my-website' },
-      { display: 'deferred' }
+      { display: 'deferred' },
+      () => {
+        console.log('Can handle custom handler');
+      }
     )
       .request()
       .then((response) => {
