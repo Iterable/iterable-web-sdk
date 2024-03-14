@@ -40,7 +40,6 @@ describe('EmbeddedManager', () => {
       }
 
       jest.spyOn(embeddedManager, 'syncMessages');
-      jest.spyOn(embeddedManager, 'notifyDelegatesOfInvalidApiKeyOrSyncStop');
       await embeddedManager.syncMessages(
         'user123',
         'Web',
