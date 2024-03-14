@@ -142,7 +142,7 @@ export class EmbeddedManager {
     );
   }
 
-  public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
+  private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
       (updateListener: EmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
