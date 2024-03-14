@@ -112,6 +112,9 @@ export class EmbeddedManager {
     userIdOrEmail: string
   ) {
     const msgsList = _processor.newlyRetrievedMessages();
+    if (msgsList.length > 0) {
+      this.notifyUpdateDelegates();
+    }
     for (let i = 0; i < msgsList.length; i++) {
       const messages = {} as IEmbeddedMessage;
       messages.messageId = msgsList[i].metadata.messageId;
@@ -131,11 +134,13 @@ export class EmbeddedManager {
     this.actionListeners.push(actionHandler);
   }
 
-  // private notifyUpdateDelegates() {
-  //     this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
-  //         updateListener.onMessagesUpdated();
-  //     });
-  // }
+  private notifyUpdateDelegates() {
+    this.updateListeners.forEach(
+      (updateListener: EmbeddedMessageUpdateHandler) => {
+        updateListener.onMessagesUpdated();
+      }
+    );
+  }
 
   public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
