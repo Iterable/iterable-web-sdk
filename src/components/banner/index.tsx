@@ -14,7 +14,6 @@ export const Banner = (props: EmbeddedMessageData) => {
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    handleEmbeddedClick,
     messageData
   } = props;
 
@@ -81,8 +80,8 @@ export const Banner = (props: EmbeddedMessageData) => {
     }
   `;
 
-  const handleEmbeddedUrl = (type: string, data: string) => {
-    new IterableActionRunner().executeAction(
+  const handleEmbeddedUrl = (type: string, data: string): boolean => {
+    return new IterableActionRunner().executeAction(
       null,
       { type, data },
       IterableActionSource.EMBEDDED
@@ -98,14 +97,11 @@ export const Banner = (props: EmbeddedMessageData) => {
           ...defaultBannerStyles,
           ...parentStyle
         }}
-        onClick={
-          handleEmbeddedClick
-            ? handleEmbeddedClick
-            : () =>
-                handleEmbeddedUrl(
-                  messageData?.defaultAction?.type,
-                  messageData?.defaultAction?.data
-                )
+        onClick={() =>
+          handleEmbeddedUrl(
+            messageData?.defaultAction?.type,
+            messageData?.defaultAction?.data
+          )
         }
       >
         <div
@@ -122,7 +118,7 @@ export const Banner = (props: EmbeddedMessageData) => {
                 ...titleStyle
               }}
             >
-              {messageData?.title}
+              {messageData?.title || 'Title Here'}
             </text>
             <text
               className="titleText"
@@ -139,52 +135,26 @@ export const Banner = (props: EmbeddedMessageData) => {
           )}
         </div>
         <div style={bannerButtons}>
-          {messageData?.buttons?.[0].title ? (
+          {messageData?.buttons?.map((button: any, index: number) => (
             <button
-              disabled={disablePrimaryBtn}
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
               style={
-                disablePrimaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...primaryDisableBtnStyle
-                    }
-                  : { ...defaultButtonStyles, ...primaryBtnStyle }
-              }
-              onClick={() =>
-                handleEmbeddedUrl(
-                  messageData?.buttons?.[0]?.action?.type,
-                  messageData?.buttons?.[0]?.action?.data
-                )
-              }
-            >
-              {messageData?.buttons?.[0].title
-                ? messageData?.buttons?.[0].title
-                : 'Button 1'}
-            </button>
-          ) : null}
-          {messageData?.buttons?.[1]?.title ? (
-            <button
-              disabled={disableSecondaryBtn}
-              style={
-                disableSecondaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...secondaryDisableBtnStyle
-                    }
+                index === 0
+                  ? disablePrimaryBtn
+                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
                   : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
               onClick={() =>
-                handleEmbeddedUrl(
-                  messageData?.buttons?.[1]?.action?.type,
-                  messageData?.buttons?.[1]?.action?.data
-                )
+                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
               }
             >
-              {messageData?.buttons?.[1]?.title
-                ? messageData?.buttons?.[1]?.title
-                : 'Button 2'}
+              {button.title ? button.title : `Button ${index + 1}`}
             </button>
-          ) : null}
+          ))}
         </div>
       </div>
     </>

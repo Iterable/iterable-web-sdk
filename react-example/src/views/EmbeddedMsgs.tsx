@@ -4,7 +4,9 @@ import {
   Notification,
   Banner,
   initialize,
-  EmbeddedManager
+  EmbeddedManager,
+  IterableActionRunner,
+  IterableActionSource
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
@@ -15,6 +17,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
+  const iterableActionRunner = new IterableActionRunner();
 
   useEffect(() => {
     initialize(process.env.API_KEY);
@@ -35,10 +38,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
     } catch (error: any) {
       console.log('error', error);
     }
-  };
-
-  const performCustomClick = (url: string) => {
-    window.open(url, '_blank');
   };
 
   return (
@@ -139,7 +138,14 @@ export const EmbeddedMsgs: FC<Props> = () => {
                     parentStyle={{ margin: 0 }}
                     messageData={data}
                     handleEmbeddedClick={() => {
-                      performCustomClick(data?.defaultAction?.data);
+                      return iterableActionRunner.executeAction(
+                        null,
+                        {
+                          type: data?.defaultAction?.type,
+                          data: data?.defaultAction?.data
+                        },
+                        IterableActionSource.EMBEDDED
+                      );
                     }}
                   />
                 );

@@ -12,7 +12,6 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
   secondaryDisableBtnStyle,
   disablePrimaryBtn,
   disableSecondaryBtn,
-  handleEmbeddedClick,
   messageData
 }) => {
   const cardStyle: CSSProperties = {
@@ -86,8 +85,8 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
     }
   `;
 
-  const handleEmbeddedUrl = (type: string, data: string) => {
-    new IterableActionRunner().executeAction(
+  const handleEmbeddedUrl = (type: string, data: string): boolean => {
+    return new IterableActionRunner().executeAction(
       null,
       { type, data },
       IterableActionSource.EMBEDDED
@@ -100,14 +99,11 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
       <div
         className="notification"
         style={cardStyle}
-        onClick={
-          handleEmbeddedClick
-            ? handleEmbeddedClick
-            : () =>
-                handleEmbeddedUrl(
-                  messageData?.defaultAction?.type,
-                  messageData?.defaultAction?.data
-                )
+        onClick={() =>
+          handleEmbeddedUrl(
+            messageData?.defaultAction?.type,
+            messageData?.defaultAction?.data
+          )
         }
       >
         <div style={{ ...defaultTextParentStyles }}>
@@ -115,7 +111,7 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {messageData?.title}
+            {messageData?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
@@ -125,53 +121,32 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
           </text>
         </div>
         <div style={notificationButtons}>
-          <div style={notificationButtons}>
-            {messageData?.buttons?.[0].title && (
-              <button
-                onClick={() =>
-                  handleEmbeddedUrl(
-                    messageData?.buttons?.[0]?.action?.type,
-                    messageData?.buttons?.[0]?.action?.data
-                  )
-                }
-                disabled={disablePrimaryBtn}
-                style={
-                  disablePrimaryBtn
+          {messageData?.buttons?.map((button: any, index: number) => (
+            <button
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
+              style={
+                index === 0
+                  ? disablePrimaryBtn
                     ? {
                         ...primaryButtonDefaultStyle,
                         ...primaryDisableBtnStyle
                       }
                     : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
-                }
-              >
-                {messageData?.buttons?.[0].title}
-              </button>
-            )}
-            {messageData?.buttons?.[1]?.title && (
-              <button
-                onClick={() =>
-                  handleEmbeddedUrl(
-                    messageData?.buttons?.[1]?.action?.type,
-                    messageData?.buttons?.[1]?.action?.data
-                  )
-                }
-                disabled={disableSecondaryBtn}
-                style={
-                  disableSecondaryBtn
-                    ? {
-                        ...secondaryButtonDefaultStyle,
-                        ...secondaryDisableBtnStyle
-                      }
-                    : {
-                        ...secondaryButtonDefaultStyle,
-                        ...secondaryBtnStyle
-                      }
-                }
-              >
-                {messageData?.buttons?.[1]?.title}
-              </button>
-            )}
-          </div>
+                  : disableSecondaryBtn
+                  ? {
+                      ...secondaryButtonDefaultStyle,
+                      ...secondaryDisableBtnStyle
+                    }
+                  : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
+              }
+              onClick={() =>
+                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
+              }
+            >
+              {button.title ? button.title : `Button ${index + 1}`}
+            </button>
+          ))}
         </div>
       </div>
     </>

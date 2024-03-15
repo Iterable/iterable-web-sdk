@@ -12,5 +12,4 @@ export interface EmbeddedMessageData {
   primaryDisableBtnStyle?: CSSProperties;
   secondaryBtnStyle?: CSSProperties;
   secondaryDisableBtnStyle?: CSSProperties;
-  handleEmbeddedClick?: () => void;
 }
