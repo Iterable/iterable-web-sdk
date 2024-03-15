@@ -2,7 +2,8 @@ import React, { CSSProperties } from 'react';
 import { EmbeddedMessageData } from '../types';
 import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
-export const Banner = (props: EmbeddedMessageData) => {
+/* Note: Add export to this const when support Embedded Message View Types in a later release. */
+const Banner = (props: EmbeddedMessageData) => {
   const {
     parentStyle,
     disablePrimaryBtn,
@@ -160,3 +161,6 @@ export const Banner = (props: EmbeddedMessageData) => {
     </>
   );
 };
+
+/* Note: Remove this line when support Embedded Message View Types in a later release. */
+console.log(Banner);

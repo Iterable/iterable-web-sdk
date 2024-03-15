@@ -3,7 +3,8 @@ import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
 import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
-export const Notification: React.FC<EmbeddedMessageData> = ({
+/* Note: Add export to this const when support Embedded Message View Types in a later release. */
+const Notification: React.FC<EmbeddedMessageData> = ({
   primaryBtnStyle,
   secondaryBtnStyle,
   textStyle,
@@ -152,3 +153,6 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
     </>
   );
 };
+
+/* Note: Remove this line when support Embedded Message View Types in a later release. */
+console.log(Notification);
