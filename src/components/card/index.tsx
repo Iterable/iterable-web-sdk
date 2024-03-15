@@ -22,8 +22,7 @@ interface ICardProps {
   onClickView?: () => void;
 }
 
-/* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Card = (props: ICardProps) => {
+export const Card = (props: ICardProps) => {
   const {
     text,
     title,
@@ -175,6 +174,3 @@ const Card = (props: ICardProps) => {
     </>
   );
 };
-
-/* Note: Remove this line when support Embedded Message View Types in a later release. */
-console.log(Card);

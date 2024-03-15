@@ -21,8 +21,7 @@ interface IBannerProps {
   onClickView?: () => void;
 }
 
-/* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Banner = (props: IBannerProps) => {
+export const Banner = (props: IBannerProps) => {
   const {
     text,
     title,
@@ -183,6 +182,3 @@ const Banner = (props: IBannerProps) => {
     </>
   );
 };
-
-/* Note: Remove this line when support Embedded Message View Types in a later release. */
-console.log(Banner);
