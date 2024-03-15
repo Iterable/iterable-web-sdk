@@ -7,7 +7,7 @@ Key Features and Functionalities:
 
 - Message Synchronization: Developers can utilize the syncMessages method to synchronize messages for a specific user. Upon synchronization, a provided callback function is invoked, allowing developers to take actions based on the synchronized messages.
 - Listeners: The class allows developers to register listeners using the addUpdateListener and addActionHandler methods. These listeners enable the application to respond to updates and actions related to embedded messages.
-- Handlers Retrieval: The class offers methods to retrieve arrays of registered update and action handlers using getUpdateHandlers and getActionHandlers, respectively. This enables developers to manage and interact with these handlers as needed.
+- Handlers Retrieval: The class offers methods to retrieve arrays of registered update handler using getUpdateHandlers. This enables developers to manage and interact with these handlers as needed.
 
 Properties
 - messages: IEmbeddedMessage[]: An array that holds the embedded messages received.
@@ -15,47 +15,50 @@ Properties
 ### Table of Contents
 - [Syncing Messages](#syncing-messages)
 - [Adding Listeners](#adding-listeners)
-- [Retrieving Action Handlers](#retrieving-action-handlers)
 - [Retrieving Update Handlers](#retrieving-update-handlers)
 
 # Usage
 
 1. `Syncing Messages`
 The EmbeddedManager class provides a method to sync messages for a specific user and invoke a callback upon synchronization.
-public async syncMessages(userId: string, callback: () => void): Promise<void>
+public async syncMessages(userIdOrEmail: string, platform: string, sdkVersion: string, packageName: string, callback: () => void, placementIds?: number[]): Promise<void>;
 
 Params
-- userId: The identifier of the user for whom to sync messages.
+- userIdOrEmail: The identifier of the user for whom to sync messages.
+- platform: On which platform you are working.
+- sdkVersion: Used sdkVersion.
+- packageName: packageName of your website.
 - callback: A function to be called after message synchronization is complete.
+- placementIds: Array of placementIds for which you want messages.
 
 ```ts
 import { EmbeddedManager } from '@iterable/web-sdk';
 
-await new EmbeddedManager().syncMessages('harrymash2006', () => console.log('Synced message'));
+await new EmbeddedManager().syncMessages('harrymash2006', 'Web', '1', 'my-website'() => console.log('Synced message'));
 ```
 
 2. `Adding Listeners`
-Developers can register listeners to handle updates and actions related to embedded messages.
+Developers can register listeners to handle updates related to embedded messages.
 public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler): void
-public addActionHandler(actionHandler: EmbeddedMessageActionHandler): void
 
 - updateListener: A listener that implements the EmbeddedMessageUpdateHandler interface to handle message update events.
-- actionHandler: A listener that implements the EmbeddedMessageActionHandler interface to handle message action events.
 
-3. `Retrieving Action Handlers`
-This method retrieves an array of registered action handlers.
-public getActionHandlers(): Array<EmbeddedMessageActionHandler>
-
-4. `Retrieving Update Handlers`
+3. `Retrieving Update Handlers`
 This method retrieves an array of registered update handlers.
 public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler>
+
+Public Methods
+- getMessagesForPlacement(placementId: number): returns the embedded messages for the specific placement.
+- addUpdateListener(updateListener: EmbeddedMessageUpdateHandler): registered listener to array to manage all the listeners.
 
 Private Methods
 - The following are private methods used internally by the class:
 
-- retrieveEmbeddedMessages(userId: string): Retrieves embedded messages for the specified user.
+- retrieveEmbeddedMessages(userIdOrEmail: string, platform: string, sdkVersion: string, packageName: string, placementIds?: number[]): Retrieves embedded messages for the specified user and placement.
+- getEmbeddedMessages(placements: any): returns the embedded messages for the multiple placement.
 - setMessages(_processor: EmbeddedMessagingProcessor): Sets the internal messages array based on the provided processor.
-- trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor): Tracks newly retrieved messages and invokes tracking methods.
+- getMessages(): returns all the embedded messages.
+- trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor, userIdOrEmail: string): Tracks newly retrieved messages and invokes tracking methods.
 - notifyUpdateDelegates(): Notifies registered update listeners of message updates.
 - notifyDelegatesOfInvalidApiKeyOrSyncStop(): Notifies listeners when the API key is invalid or synchronization stops.
 
@@ -79,7 +82,7 @@ Properties
 The EmbeddedSessionManager class provides a method to check if session tracking is active.
 
 ```ts
-public isTracking(): boolean
+private isTracking(): boolean
 ```
 Returns true if tracking is active, otherwise false.
 
@@ -121,15 +124,6 @@ The pauseImpression function temporarily halts the tracking of an ongoing impres
         - The calculated duration is added to the impression's duration value, indicating the total time users have spent engaging with the message.
         - The impression's start time is reset to undefined, effectively pausing the tracking of the current engagement.
 
-- endAllImpressions(): Ends tracking for all impressions.
-The endAllImpressions function concludes the tracking of all ongoing impressions. It ensures that all impressions are accurately measured and finalized before ending an embedded session.
-
-    When all impressions are ended:
-
-    - The function iterates through all impressions stored in the impressions map.
-    - For each impression, the same calculation and updates performed in the pauseImpression function are applied, effectively finalizing the impression's engagement duration and display count.
-    - After iterating through all impressions, the impressions map is cleared, removing all impression data.
-
 - getImpressionList(): Retrieves a list of tracked impressions.
 The getImpressionList function retrieves a list of tracked impressions, including their associated metadata. This function is essential for reporting and analyzing user engagement with embedded messages.
 
@@ -139,6 +133,8 @@ The getImpressionList function retrieves a list of tracked impressions, includin
     - It iterates through all impressions stored in the impressions map.
     - For each impression, an EmbeddedImpressionData object is created, containing the messageId, displayCount, and duration of the impression. This object is added to the array.
     - Once all impressions have been processed, the array of impression data is returned.
+
+- updateDisplayCountAndDuration(impressionData: IEmbeddedImpressionData): updates the count of message display and update the duration.
 
 # Tracking Function
 
@@ -261,4 +257,85 @@ trackEmbeddedSession(sessionData)
   .catch(error => {
     console.error('Error tracking session:', error);
   });
+```
+
+4. `trackEmbeddedMessagingDismiss(payload: EnbeddedMessagingDismiss)`
+The tracking function `trackEmbeddedMessagingDismiss` enables developers to track dismiss event associated with embedded messages. The function facilitates data collection for analysis and insights into user engagement patterns.
+
+- Parameters
+  - payload: EnbeddedMessagingDismiss: The payload representing the message to be tracked.
+- Return Value
+  - The function returns a promise containing the result of the tracking request, which is a part of the baseIterableRequest function.
+- Behavior
+  - The function constructs a POST request to the server endpoint /embedded-messaging/events/dismiss.
+  - It packages the session data in the request payload.
+  - The function performs validation of the request payload using the embaddedMessagingDismissSchema schema.
+  - The request is sent to the server for analysis.
+- Example
+```ts
+const sessionData = {
+      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
+      messageId: messageId,
+      buttonIdentifier: '123',
+      deviceInfo: {
+        deviceId: '123',
+        platform: 'web',
+        appPackageName: 'my-website'
+      },
+      createdAt: Date.now()
+    };
+
+    trackEmbeddedMessagingDismiss(sessionData)
+      .then((response) => {
+         console.log('Message dismiss tracking successful:', response);
+      })
+      .catch((error) => {
+         console.error('Error tracking message dismiss session:', error);
+      });
+```
+
+5. `trackEmbeddedMessagingSession(payload: EnbeddedMessagingSession)`
+The tracking function `trackEmbeddedMessagingSession` enables developers to track session event associated with embedded messages. The function facilitates data collection for analysis and insights into user engagement patterns.
+
+- Parameters
+  - payload: EnbeddedMessagingSession: The payload representing the message session to be tracked.
+- Return Value
+  - The function returns a promise containing the result of the tracking request, which is a part of the baseIterableRequest function.
+- Behavior
+  - The function constructs a POST request to the server endpoint /embedded-messaging/events/session.
+  - It packages the session data in the request payload.
+  - The function performs validation of the request payload using the embaddedMessagingSessionSchema schema.
+  - The request is sent to the server for analysis.
+- Example
+```ts
+const sessionData = {
+      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
+      session: {
+        id: 'abcd123',
+        start: startTime.getTime(),
+        end: Date.now()
+      },
+      impressions: [
+        {
+          messageId: messageId,
+          displayCount: 1,
+          displayDuration: 1000
+        }
+      ],
+      deviceInfo: {
+        deviceId:
+          'Chrome/119.0.0.0 Safari/537.36',
+        platform: 'Web',
+        appPackageName: 'my-lil-site'
+      },
+      createdAt: Date.now()
+    };
+
+    trackEmbeddedMessagingSession(sessionData)
+      .then((response) => {
+         console.log('Message session tracking successful:', response);
+      })
+      .catch((error) => {
+        console.error('Error tracking message session:', error);
+      });
 ```
