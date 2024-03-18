@@ -49,7 +49,7 @@ export class EmbeddedSessionManager {
     undefined
   );
 
-  public isTracking(): boolean {
+  private isTracking(): boolean {
     return this.session.start !== null;
   }
 
