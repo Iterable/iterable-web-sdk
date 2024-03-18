@@ -11,7 +11,8 @@ import {
   trackEmbeddedMessageReceived,
   trackEmbeddedMessageClick,
   trackEmbeddedMessagingDismiss,
-  trackEmbeddedMessagingSession
+  trackEmbeddedMessagingSession,
+  EmbeddedMessageUpdateHandler
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 import { Functions } from 'src/utils/Functions';
@@ -51,12 +52,18 @@ export const EmbeddedForm: FC<Props> = ({
     e.preventDefault();
 
     try {
-      await new EmbeddedManager().syncMessages(
-        userId,
-        'Web',
-        '1',
-        'my-website',
-        () => console.log('Synced message')
+      const updateListener: EmbeddedMessageUpdateHandler = {
+        onMessagesUpdated() {
+          console.log('onMessagesUpdated called');
+        },
+        onEmbeddedMessagingDisabled() {
+          console.log('onEmbeddedMessagingDisabled called');
+        }
+      };
+      const embeddedManager = new EmbeddedManager();
+      embeddedManager.addUpdateListener(updateListener);
+      await embeddedManager.syncMessages(userId, 'Web', '1', 'my-website', () =>
+        console.log('Synced message')
       );
     } catch (error: any) {
       setTrackResponse(JSON.stringify(error.response.data));
