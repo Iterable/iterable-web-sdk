@@ -1,48 +1,21 @@
 import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
-
-interface ICardProps {
-  imgSrc?: string;
-  title: string;
-  text: string;
-  primaryBtnLabel?: string;
-  secondaryBtnLabel?: string;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  imgStyle?: CSSProperties;
-  titleStyle?: CSSProperties;
-  cardStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryBtnStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  onClickView?: () => void;
-}
+import { EmbeddedManager, TextParentStyles } from 'src/index';
+import { EmbeddedMessageData } from '../types';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Card = (props: ICardProps) => {
+export const Card = (props: EmbeddedMessageData) => {
   const {
-    text,
-    title,
-    cardStyle,
+    parentStyle,
     disablePrimaryBtn,
     disableSecondaryBtn,
-    imgSrc,
     imgStyle,
-    onClickPrimaryBtn,
-    onClickSecondaryBtn,
-    primaryBtnLabel,
     primaryBtnStyle,
     primaryDisableBtnStyle,
-    secondaryBtnLabel,
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    onClickView
+    messageData
   } = props;
 
   const defaultCardStyles = {
@@ -112,64 +85,75 @@ const Card = (props: ICardProps) => {
     }
   `;
 
+  const embeddedManager = new EmbeddedManager();
+
   return (
     <>
       <style>{mediaStyle}</style>
       <div
         className="card"
-        style={{ ...defaultCardStyles, ...cardStyle }}
-        onClick={onClickView}
+        style={{ ...defaultCardStyles, ...parentStyle }}
+        onClick={() => {
+          const clickedUrl =
+            messageData?.elements?.defaultAction?.data?.trim() ||
+            messageData?.elements?.defaultAction?.type ||
+            null;
+          embeddedManager.handleEmbeddedClick(messageData, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(messageData, '', clickedUrl);
+        }}
       >
-        {imgSrc && (
-          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+        {messageData?.elements?.mediaUrl && (
+          <img
+            style={{ ...defaultImageStyles, ...imgStyle }}
+            src={messageData?.elements?.mediaUrl}
+          />
         )}
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {title}
+            {messageData?.elements?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {text}
+            {messageData?.elements?.body}
           </text>
         </div>
         <div style={cardButtons}>
-          {primaryBtnLabel ? (
+          {messageData?.elements?.buttons?.map((button: any, index: number) => (
             <button
-              disabled={disablePrimaryBtn}
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
               style={
-                disablePrimaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...primaryDisableBtnStyle
-                    }
-                  : { ...defaultButtonStyles, ...primaryBtnStyle }
-              }
-              onClick={onClickPrimaryBtn}
-            >
-              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-            </button>
-          ) : null}
-          {secondaryBtnLabel ? (
-            <button
-              disabled={disableSecondaryBtn}
-              style={
-                disableSecondaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...secondaryDisableBtnStyle
-                    }
+                index === 0
+                  ? disablePrimaryBtn
+                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
                   : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
-              onClick={onClickSecondaryBtn}
+              onClick={() => {
+                const clickedUrl =
+                  button?.action?.data?.trim() || button?.action?.type || null;
+                embeddedManager.handleEmbeddedClick(
+                  messageData,
+                  button?.id,
+                  clickedUrl
+                );
+                embeddedManager.trackEmbeddedClick(
+                  messageData,
+                  button?.id,
+                  clickedUrl
+                );
+              }}
             >
-              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              {button.title ? button.title : `Button ${index + 1}`}
             </button>
-          ) : null}
+          ))}
         </div>
       </div>
     </>

@@ -5,7 +5,9 @@ import { clearMessages } from '../inapp';
 import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
-  STATIC_HEADERS
+  STATIC_HEADERS,
+  SHARED_PREF_USER_ID,
+  SHARED_PREF_EMAIL
 } from '../constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -235,6 +237,7 @@ export function initialize(
       setEmail: (email: string) => {
         typeOfAuth = 'email';
         authIdentifier = email;
+        localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -248,6 +251,7 @@ export function initialize(
       setUserID: async (userId: string) => {
         typeOfAuth = 'userID';
         authIdentifier = userId;
+        localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
 
         if (typeof userInterceptor === 'number') {
@@ -630,6 +634,7 @@ export function initialize(
     setEmail: (email: string) => {
       typeOfAuth = 'email';
       authIdentifier = email;
+      localStorage.setItem(SHARED_PREF_EMAIL, email);
       /* clear previous user */
       clearMessages();
       if (typeof userInterceptor === 'number') {
@@ -650,6 +655,7 @@ export function initialize(
     setUserID: async (userId: string) => {
       typeOfAuth = 'userID';
       authIdentifier = userId;
+      localStorage.setItem(SHARED_PREF_USER_ID, userId);
       clearMessages();
 
       if (typeof userInterceptor === 'number') {

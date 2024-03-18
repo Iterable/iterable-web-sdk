@@ -1,11 +1,24 @@
 import { baseIterableRequest } from '../request';
-import { EmbeddedMessageUpdateHandler } from './types';
+import {
+  EmbeddedMessageUpdateHandler,
+  IterableActionSource,
+  IterableAction
+} from './types';
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { functions } from 'src/utils/functions';
+import { IterableActionRunner } from '.';
+import {
+  URL_SCHEME_ITBL,
+  URL_SCHEME_ACTION,
+  URL_SCHEME_OPEN,
+  SHARED_PREF_EMAIL,
+  SHARED_PREF_USER_ID
+} from '../constants';
+import { trackEmbeddedMessageClick } from '..';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -140,5 +153,63 @@ export class EmbeddedManager {
   //Get the list of updateHandlers
   public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
     return this.updateListeners;
+  }
+
+  handleEmbeddedClick(
+    message: any,
+    buttonIdentifier: string | null,
+    clickedUrl: string | null
+  ) {
+    if (clickedUrl && clickedUrl.trim() !== '') {
+      let actionType: string;
+      let actionName: string;
+
+      if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
+        actionType = URL_SCHEME_ACTION;
+        actionName = clickedUrl.replace(URL_SCHEME_ACTION, '');
+      } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
+        actionType = URL_SCHEME_ITBL;
+        actionName = clickedUrl.replace(URL_SCHEME_ITBL, '');
+      } else {
+        actionType = URL_SCHEME_OPEN;
+        actionName = clickedUrl.replace(URL_SCHEME_OPEN, '');
+      }
+
+      const iterableAction: IterableAction = {
+        type: actionType,
+        data: actionName
+      };
+
+      IterableActionRunner.executeAction(
+        null,
+        iterableAction,
+        IterableActionSource.EMBEDDED
+      );
+    }
+  }
+
+  trackEmbeddedClick(
+    message: any,
+    buttonIdentifier: string | '',
+    clickedUrl: string | ''
+  ) {
+    const payload = {
+      messageId: message?.metadata?.messageId,
+      campaignId: message?.metadata?.campaignId
+    };
+
+    const emailOrUserId =
+      (localStorage.getItem(SHARED_PREF_EMAIL) as string) ??
+      (localStorage.getItem(SHARED_PREF_USER_ID) as string);
+
+    console.log('email', emailOrUserId);
+    trackEmbeddedMessageClick(
+      payload,
+      buttonIdentifier,
+      clickedUrl,
+      window.location.hostname,
+      Date.now(),
+      emailOrUserId
+    );
   }
 }
