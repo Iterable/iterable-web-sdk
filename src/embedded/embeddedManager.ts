@@ -126,10 +126,6 @@ export class EmbeddedManager {
     this.updateListeners.push(updateListener);
   }
 
-  public addActionHandler(actionHandler: EmbeddedMessageActionHandler) {
-    this.actionListeners.push(actionHandler);
-  }
-
   private notifyUpdateDelegates() {
     this.updateListeners.forEach(
       (updateListener: EmbeddedMessageUpdateHandler) => {
