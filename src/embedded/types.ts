@@ -3,10 +3,6 @@ export interface EmbeddedMessageUpdateHandler {
   onEmbeddedMessagingDisabled: () => void;
 }
 
-export interface EmbeddedMessageActionHandler {
-  onTapAction: (url: string) => void;
-}
-
 export interface IEmbeddedImpressionData {
   messageId: string;
   displayCount: number;
