@@ -74,19 +74,5 @@ describe('EmbeddedManager', () => {
         }
       });
     });
-
-    describe('addActionHandler', () => {
-      it('should add an action handler to the list', () => {
-        if (embeddedManager instanceof EmbeddedManager) {
-          const actionHandler = {
-            onTapAction: jest.fn()
-          };
-
-          embeddedManager.addActionHandler(actionHandler);
-
-          expect(embeddedManager.getActionHandlers()).toContain(actionHandler);
-        }
-      });
-    });
   });
 });

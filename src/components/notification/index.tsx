@@ -19,7 +19,8 @@ interface NotificationProps {
   onClickView?: () => void;
 }
 
-export const Notification: React.FC<NotificationProps> = ({
+/* Note: Add export to this const when support Embedded Message View Types in a later release. */
+const Notification: React.FC<NotificationProps> = ({
   title,
   description,
   primaryButtonLabel,
@@ -168,3 +169,6 @@ export const Notification: React.FC<NotificationProps> = ({
     </>
   );
 };
+
+/* Note: Remove this line when support Embedded Message View Types in a later release. */
+console.log(Notification);

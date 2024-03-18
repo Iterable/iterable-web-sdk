@@ -1,8 +1,5 @@
 import { baseIterableRequest } from '../request';
-import {
-  EmbeddedMessageUpdateHandler,
-  EmbeddedMessageActionHandler
-} from './types';
+import { EmbeddedMessageUpdateHandler } from './types';
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
@@ -13,7 +10,6 @@ import { functions } from 'src/utils/functions';
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
-  private actionListeners: EmbeddedMessageActionHandler[] = [];
 
   public async syncMessages(
     userIdOrEmail: string,
@@ -148,10 +144,6 @@ export class EmbeddedManager {
         updateListener.onEmbeddedMessagingDisabled();
       }
     );
-  }
-
-  public getActionHandlers(): Array<EmbeddedMessageActionHandler> {
-    return this.actionListeners;
   }
 
   //Get the list of updateHandlers
