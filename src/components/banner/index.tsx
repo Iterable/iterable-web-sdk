@@ -1,5 +1,5 @@
 import React, { CSSProperties } from 'react';
-import { EmbeddedManager } from 'src/index';
+import { EmbeddedManager } from '../../embedded';
 import { EmbeddedMessageData } from '../types';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */

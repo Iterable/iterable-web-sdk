@@ -1,6 +1,7 @@
 import React, { CSSProperties } from 'react';
-import { EmbeddedManager, TextParentStyles } from 'src/index';
+import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
+import { EmbeddedManager } from '../../embedded';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
 const Card = (props: EmbeddedMessageData) => {
