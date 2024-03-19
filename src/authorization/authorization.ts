@@ -160,7 +160,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/impression)|(events\/dismiss)|(events\/received)/gim
+          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
@@ -177,7 +177,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)|(events\/click)|(events\/impression)|(events\/dismiss)|(events\/received)/gim
+          /(commerce\/updateCart)|(commerce\/trackPurchase)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
