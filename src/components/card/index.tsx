@@ -3,8 +3,8 @@ import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
 import { EmbeddedManager } from '../../embedded';
 
-/* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Card = (props: EmbeddedMessageData) => {
+/* WARNING: OOTB Views not officially supported for Beta */
+export const Card = (props: EmbeddedMessageData) => {
   const {
     parentStyle,
     disablePrimaryBtn,
@@ -138,8 +138,8 @@ const Card = (props: EmbeddedMessageData) => {
                     ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
                     : { ...defaultButtonStyles, ...primaryBtnStyle }
                   : disableSecondaryBtn
-                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
-                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
+                    ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
               onClick={() => {
                 const clickedUrl =
@@ -164,6 +164,3 @@ const Card = (props: EmbeddedMessageData) => {
     </>
   );
 };
-
-/* Note: Remove this line when support Embedded Message View Types in a later release. */
-console.log(Card);

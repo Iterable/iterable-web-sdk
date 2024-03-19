@@ -2,8 +2,8 @@ import React, { CSSProperties } from 'react';
 import { EmbeddedManager } from '../../embedded';
 import { EmbeddedMessageData } from '../types';
 
-/* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Banner = (props: EmbeddedMessageData) => {
+/* WARNING: OOTB Views not officially supported for Beta */
+export const Banner = (props: EmbeddedMessageData) => {
   const {
     parentStyle,
     disablePrimaryBtn,
@@ -146,8 +146,8 @@ const Banner = (props: EmbeddedMessageData) => {
                     ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
                     : { ...defaultButtonStyles, ...primaryBtnStyle }
                   : disableSecondaryBtn
-                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
-                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
+                    ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
               onClick={() => {
                 const clickedUrl =
@@ -172,6 +172,3 @@ const Banner = (props: EmbeddedMessageData) => {
     </>
   );
 };
-
-/* Note: Remove this line when support Embedded Message View Types in a later release. */
-console.log(Banner);
