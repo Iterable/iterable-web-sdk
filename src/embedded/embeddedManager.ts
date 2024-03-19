@@ -52,10 +52,6 @@ export class EmbeddedManager {
   ) {
     try {
       let url = `${embedded_msg_endpoint}?`;
-
-      url += functions.checkEmailValidation(userIdOrEmail)
-        ? `email=${userIdOrEmail}&`
-        : `userId=${userIdOrEmail}&`;
       url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;

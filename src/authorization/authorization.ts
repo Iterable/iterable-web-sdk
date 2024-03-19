@@ -70,12 +70,12 @@ export function initialize(
   let authInterceptor: number | null = generateJWT
     ? null
     : baseAxiosRequest.interceptors.request.use((config) => ({
-        ...config,
-        headers: {
-          ...config.headers,
-          'Api-Key': authToken
-        }
-      }));
+      ...config,
+      headers: {
+        ...config.headers,
+        'Api-Key': authToken
+      }
+    }));
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
@@ -160,7 +160,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
+          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/impression)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
@@ -177,7 +177,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+          /(commerce\/updateCart)|(commerce\/trackPurchase)|(events\/click)|(events\/impression)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
@@ -195,7 +195,7 @@ export function initialize(
       /*
         endpoints that use _email_ query param in GET requests
       */
-      if (!!(config?.url || '').match(/getMessages/gim)) {
+      if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
         return {
           ...config,
           params: {
