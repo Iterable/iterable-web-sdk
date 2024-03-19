@@ -3,7 +3,7 @@ import { EmbeddedManager, TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-export const Card = (props: EmbeddedMessageData) => {
+const Card = (props: EmbeddedMessageData) => {
   const {
     parentStyle,
     disablePrimaryBtn,

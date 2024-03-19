@@ -15,11 +15,11 @@ import {
   URL_SCHEME_ITBL,
   URL_SCHEME_ACTION,
   URL_SCHEME_OPEN,
-  SHARED_PREF_EMAIL,
-  SHARED_PREF_USER_ID
+  WEB_PLATFORM
 } from '../constants';
-import { trackEmbeddedMessageClick } from '..';
 import { IterableEmbeddedMessage } from './embeddedMessage';
+import { EndPoints } from 'src/events/consts';
+import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -201,22 +201,23 @@ export class EmbeddedManager {
   ) {
     const payload = {
       messageId: message?.metadata?.messageId,
-      campaignId: message?.metadata?.campaignId
+      buttonIdentifier: buttonIdentifier,
+      targetUrl: clickedUrl,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: window.location.hostname
+      },
+      createdAt: Date.now()
     };
 
-    const emailOrUserId =
-      (localStorage.getItem(SHARED_PREF_EMAIL) as string) ??
-      (localStorage.getItem(SHARED_PREF_USER_ID) as string);
-
-    if (emailOrUserId) {
-      trackEmbeddedMessageClick(
-        payload,
-        buttonIdentifier,
-        clickedUrl,
-        window.location.hostname,
-        Date.now(),
-        emailOrUserId
-      );
-    }
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: EndPoints.msg_click_event_track,
+      data: payload,
+      validation: {
+        data: trackEmbeddedMessageClickSchema
+      }
+    });
   }
 }

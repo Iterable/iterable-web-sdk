@@ -3,7 +3,7 @@ import { EmbeddedManager } from 'src/index';
 import { EmbeddedMessageData } from '../types';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-export const Banner = (props: EmbeddedMessageData) => {
+const Banner = (props: EmbeddedMessageData) => {
   const {
     parentStyle,
     disablePrimaryBtn,
