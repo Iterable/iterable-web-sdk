@@ -1,20 +1,21 @@
 import React, { CSSProperties } from 'react';
 import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
-import { IterableActionRunner, IterableActionSource } from '../../embedded';
+import { EmbeddedManager } from '../../embedded';
 
 /* WARNING: OOTB Views not officially supported for Beta */
-export const Notification: React.FC<EmbeddedMessageData> = ({
-  primaryBtnStyle,
-  secondaryBtnStyle,
-  textStyle,
-  titleStyle,
-  primaryDisableBtnStyle,
-  secondaryDisableBtnStyle,
-  disablePrimaryBtn,
-  disableSecondaryBtn,
-  messageData
-}) => {
+export const Notification = (props: EmbeddedMessageData) => {
+  const {
+    disablePrimaryBtn,
+    disableSecondaryBtn,
+    primaryBtnStyle,
+    primaryDisableBtnStyle,
+    secondaryBtnStyle,
+    secondaryDisableBtnStyle,
+    textStyle,
+    titleStyle,
+    message
+  } = props;
   const cardStyle: CSSProperties = {
     background: 'white',
     borderRadius: '10px',
@@ -86,13 +87,7 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
     }
   `;
 
-  const handleEmbeddedUrl = (type: string, data: string): boolean => {
-    return new IterableActionRunner().executeAction(
-      null,
-      { type, data },
-      IterableActionSource.EMBEDDED
-    );
-  };
+  const embeddedManager = new EmbeddedManager();
 
   return (
     <>
@@ -100,29 +95,35 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
       <div
         className="notification"
         style={cardStyle}
-        onClick={() =>
-          handleEmbeddedUrl(
-            messageData?.defaultAction?.type,
-            messageData?.defaultAction?.data
-          )
-        }
+        onClick={() => {
+          const clickedUrl =
+            message?.elements?.defaultAction?.data?.trim() ||
+            message?.elements?.defaultAction?.type ||
+            null;
+          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(
+            message,
+            '',
+            clickedUrl ? clickedUrl : ''
+          );
+        }}
       >
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {messageData?.title || 'Title Here'}
+            {message?.elements?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {messageData?.body}
+            {message?.elements?.body}
           </text>
         </div>
         <div style={notificationButtons}>
-          {messageData?.buttons?.map((button: any, index: number) => (
+          {message?.elements?.buttons?.map((button: any, index: number) => (
             <button
               key={index}
               disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
@@ -141,9 +142,20 @@ export const Notification: React.FC<EmbeddedMessageData> = ({
                     }
                     : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
               }
-              onClick={() =>
-                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
-              }
+              onClick={() => {
+                const clickedUrl =
+                  button?.action?.data?.trim() || button?.action?.type || '';
+                embeddedManager.handleEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+                embeddedManager.trackEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+              }}
             >
               {button.title ? button.title : `Button ${index + 1}`}
             </button>

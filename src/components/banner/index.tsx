@@ -1,6 +1,6 @@
 import React, { CSSProperties } from 'react';
+import { EmbeddedManager } from '../../embedded';
 import { EmbeddedMessageData } from '../types';
-import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 /* WARNING: OOTB Views not officially supported for Beta */
 export const Banner = (props: EmbeddedMessageData) => {
@@ -15,7 +15,7 @@ export const Banner = (props: EmbeddedMessageData) => {
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    messageData
+    message
   } = props;
 
   const defaultBannerStyles = {
@@ -81,13 +81,7 @@ export const Banner = (props: EmbeddedMessageData) => {
     }
   `;
 
-  const handleEmbeddedUrl = (type: string, data: string): boolean => {
-    return new IterableActionRunner().executeAction(
-      null,
-      { type, data },
-      IterableActionSource.EMBEDDED
-    );
-  };
+  const embeddedManager = new EmbeddedManager();
 
   return (
     <>
@@ -98,12 +92,18 @@ export const Banner = (props: EmbeddedMessageData) => {
           ...defaultBannerStyles,
           ...parentStyle
         }}
-        onClick={() =>
-          handleEmbeddedUrl(
-            messageData?.defaultAction?.type,
-            messageData?.defaultAction?.data
-          )
-        }
+        onClick={() => {
+          const clickedUrl =
+            message?.elements?.defaultAction?.data?.trim() ||
+            message?.elements?.defaultAction?.type ||
+            null;
+          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(
+            message,
+            '',
+            clickedUrl ? clickedUrl : ''
+          );
+        }}
       >
         <div
           style={{
@@ -119,24 +119,24 @@ export const Banner = (props: EmbeddedMessageData) => {
                 ...titleStyle
               }}
             >
-              {messageData?.title || 'Title Here'}
+              {message?.elements?.title || 'Title Here'}
             </text>
             <text
               className="titleText"
               style={{ ...defaultTextStyles, ...textStyle }}
             >
-              {messageData?.body}
+              {message?.elements?.body}
             </text>
           </div>
-          {messageData?.mediaUrl && (
+          {message?.elements?.mediaUrl && (
             <img
               style={{ ...defaultImageStyles, ...imgStyle }}
-              src={messageData?.mediaUrl}
+              src={message?.elements?.mediaUrl}
             />
           )}
         </div>
         <div style={bannerButtons}>
-          {messageData?.buttons?.map((button: any, index: number) => (
+          {message?.elements?.buttons?.map((button: any, index: number) => (
             <button
               key={index}
               disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
@@ -149,9 +149,20 @@ export const Banner = (props: EmbeddedMessageData) => {
                     ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
                     : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
-              onClick={() =>
-                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
-              }
+              onClick={() => {
+                const clickedUrl =
+                  button?.action?.data?.trim() || button?.action?.type || '';
+                embeddedManager.handleEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+                embeddedManager.trackEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+              }}
             >
               {button.title ? button.title : `Button ${index + 1}`}
             </button>

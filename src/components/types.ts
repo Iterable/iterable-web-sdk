@@ -1,7 +1,8 @@
 import { CSSProperties } from 'react';
+import { IterableEmbeddedMessage } from '..';
 
 export interface EmbeddedMessageData {
-  messageData: Record<string, any>;
+  message: IterableEmbeddedMessage;
   disablePrimaryBtn?: boolean;
   disableSecondaryBtn?: boolean;
   imgStyle?: CSSProperties;

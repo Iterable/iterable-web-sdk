@@ -1,11 +1,25 @@
 import { baseIterableRequest } from '../request';
-import { EmbeddedMessageUpdateHandler } from './types';
+import {
+  EmbeddedMessageUpdateHandler,
+  IterableActionSource,
+  IterableAction
+} from './types';
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { functions } from 'src/utils/functions';
+import { IterableActionRunner } from 'src/utils/IterableActionRunner';
+import {
+  URL_SCHEME_ITBL,
+  URL_SCHEME_ACTION,
+  URL_SCHEME_OPEN,
+  WEB_PLATFORM
+} from '../constants';
+import { IterableEmbeddedMessage } from './embeddedMessage';
+import { EndPoints } from 'src/events/consts';
+import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -145,5 +159,65 @@ export class EmbeddedManager {
   //Get the list of updateHandlers
   public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
     return this.updateListeners;
+  }
+
+  handleEmbeddedClick(
+    message: any,
+    buttonIdentifier: string | null,
+    clickedUrl: string | null
+  ) {
+    if (clickedUrl && clickedUrl.trim() !== '') {
+      let actionType: string;
+      let actionName: string;
+
+      if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
+        actionType = URL_SCHEME_ACTION;
+        actionName = clickedUrl.replace(URL_SCHEME_ACTION, '');
+      } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
+        actionType = URL_SCHEME_ITBL;
+        actionName = clickedUrl.replace(URL_SCHEME_ITBL, '');
+      } else {
+        actionType = URL_SCHEME_OPEN;
+        actionName = clickedUrl.replace(URL_SCHEME_OPEN, '');
+      }
+
+      const iterableAction: IterableAction = {
+        type: actionType,
+        data: actionName
+      };
+
+      IterableActionRunner.executeAction(
+        null,
+        iterableAction,
+        IterableActionSource.EMBEDDED
+      );
+    }
+  }
+
+  trackEmbeddedClick(
+    message: IterableEmbeddedMessage,
+    buttonIdentifier: string,
+    clickedUrl: string
+  ) {
+    const payload = {
+      messageId: message?.metadata?.messageId,
+      buttonIdentifier: buttonIdentifier,
+      targetUrl: clickedUrl,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: window.location.hostname
+      },
+      createdAt: Date.now()
+    };
+
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: EndPoints.msg_click_event_track,
+      data: payload,
+      validation: {
+        data: trackEmbeddedMessageClickSchema
+      }
+    });
   }
 }

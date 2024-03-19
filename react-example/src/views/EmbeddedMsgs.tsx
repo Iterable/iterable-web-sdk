@@ -4,9 +4,7 @@ import {
   Notification,
   Banner,
   initialize,
-  EmbeddedManager,
-  IterableActionRunner,
-  IterableActionSource
+  EmbeddedManager
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
@@ -17,14 +15,11 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
-  const iterableActionRunner = new IterableActionRunner();
-
-  useEffect(() => {
-    initialize(process.env.API_KEY);
-  }, []);
+  const iterableApi = initialize(process.env.API_KEY);
 
   const handleFetchEmbeddedMessages = async () => {
     try {
+      iterableApi.setUserID(userId);
       const embeddedManager = new EmbeddedManager();
       await embeddedManager.syncMessages(
         userId,
@@ -129,24 +124,15 @@ export const EmbeddedMsgs: FC<Props> = () => {
       >
         {messages.length > 0 ? (
           messages.map((message: any, index: number) => {
-            const data = message?.elements;
+            const data = message;
+
             switch (selectedButtonIndex) {
               case 0:
                 return (
                   <Card
                     key={index.toString()}
                     parentStyle={{ margin: 0 }}
-                    messageData={data}
-                    handleEmbeddedClick={() => {
-                      return iterableActionRunner.executeAction(
-                        null,
-                        {
-                          type: data?.defaultAction?.type,
-                          data: data?.defaultAction?.data
-                        },
-                        IterableActionSource.EMBEDDED
-                      );
-                    }}
+                    message={data}
                   />
                 );
 
@@ -155,7 +141,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   <Banner
                     key={index.toString()}
                     parentStyle={{ margin: 0 }}
-                    messageData={data}
+                    message={data}
                     primaryBtnStyle={{
                       backgroundColor: '#000fff',
                       borderRadius: '8px',
@@ -166,9 +152,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 );
 
               case 2:
-                return (
-                  <Notification key={index.toString()} messageData={data} />
-                );
+                return <Notification key={index.toString()} message={data} />;
 
               default:
                 return null;
