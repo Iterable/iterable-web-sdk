@@ -40,6 +40,7 @@ import {
   trackMessagesDelivered,
   wrapWithIFrame
 } from './utils';
+import { IterableActionRunner, IterableActionSource } from '../embedded';
 
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
@@ -55,24 +56,36 @@ export const clearMessages = () => {
   }
 };
 
+const handleInAppUrl = (data: string) => {
+  new IterableActionRunner().executeAction(
+    null,
+    { type: 'openUrl', data },
+    IterableActionSource.IN_APP
+  );
+};
+
 export function getInAppMessages(
   payload: InAppMessagesRequestParams
 ): IterablePromise<InAppMessageResponse>;
+
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
   options: {
     display: DisplayOptions;
     /** @note parameter will be enabled once new endpoint is ready */
     // useLocalCache?: boolean;
-  }
+  },
+  handleInAppClick?: () => void
 ): GetInAppMessagesResponse;
+
 export function getInAppMessages(
   payload: InAppMessagesRequestParams,
   options?: {
     display: DisplayOptions;
     /** @note parameter will be enabled once new endpoint is ready */
     // useLocalCache?: boolean;
-  }
+  },
+  handleInAppClick?: () => void
 ) {
   clearMessages();
   const dupedPayload = { ...payload };
@@ -539,27 +552,27 @@ export function getInAppMessages(
                     manageHandleLinks(
                       () => global.location.assign(clickedUrl),
                       () => {
-                        global.open(
-                          clickedUrl,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
+                        if (handleInAppClick) {
+                          handleInAppClick();
+                        } else {
+                          handleInAppUrl(clickedUrl);
+                        }
                       }
                     );
                     if (!handleLinks) {
-                      if (openInNewTab)
+                      if (openInNewTab) {
                         /**
                           Using target="_blank" without rel="noreferrer" and rel="noopener"
                           makes the website vulnerable to window.opener API exploitation attacks
   
                           @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                         */
-                        global.open(
-                          clickedUrl,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
-                      else global.location.assign(clickedUrl);
+                        if (handleInAppClick) {
+                          handleInAppClick();
+                        } else {
+                          handleInAppUrl(clickedUrl);
+                        }
+                      } else global.location.assign(clickedUrl);
                     }
                   }
                 }
