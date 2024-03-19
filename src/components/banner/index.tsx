@@ -1,47 +1,21 @@
 import React, { CSSProperties } from 'react';
-
-interface IBannerProps {
-  imgSrc?: string;
-  title: string;
-  text: string;
-  primaryBtnLabel?: string;
-  secondaryBtnLabel?: string;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  imgStyle?: CSSProperties;
-  titleStyle?: CSSProperties;
-  BannerStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryBtnStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  onClickView?: () => void;
-}
+import { EmbeddedMessageData } from '../types';
+import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Banner = (props: IBannerProps) => {
+const Banner = (props: EmbeddedMessageData) => {
   const {
-    text,
-    title,
-    BannerStyle,
+    parentStyle,
     disablePrimaryBtn,
     disableSecondaryBtn,
-    imgSrc,
     imgStyle,
-    onClickPrimaryBtn,
-    onClickSecondaryBtn,
-    primaryBtnLabel,
     primaryBtnStyle,
     primaryDisableBtnStyle,
-    secondaryBtnLabel,
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    onClickView
+    messageData
   } = props;
 
   const defaultBannerStyles = {
@@ -107,6 +81,14 @@ const Banner = (props: IBannerProps) => {
     }
   `;
 
+  const handleEmbeddedUrl = (type: string, data: string): boolean => {
+    return new IterableActionRunner().executeAction(
+      null,
+      { type, data },
+      IterableActionSource.EMBEDDED
+    );
+  };
+
   return (
     <>
       <style>{mediaStyle}</style>
@@ -114,9 +96,14 @@ const Banner = (props: IBannerProps) => {
         className="banner"
         style={{
           ...defaultBannerStyles,
-          ...BannerStyle
+          ...parentStyle
         }}
-        onClick={onClickView}
+        onClick={() =>
+          handleEmbeddedUrl(
+            messageData?.defaultAction?.type,
+            messageData?.defaultAction?.data
+          )
+        }
       >
         <div
           style={{
@@ -132,52 +119,43 @@ const Banner = (props: IBannerProps) => {
                 ...titleStyle
               }}
             >
-              {title}
+              {messageData?.title || 'Title Here'}
             </text>
             <text
               className="titleText"
               style={{ ...defaultTextStyles, ...textStyle }}
             >
-              {text}
+              {messageData?.body}
             </text>
           </div>
-          {imgSrc && (
-            <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+          {messageData?.mediaUrl && (
+            <img
+              style={{ ...defaultImageStyles, ...imgStyle }}
+              src={messageData?.mediaUrl}
+            />
           )}
         </div>
         <div style={bannerButtons}>
-          {primaryBtnLabel ? (
+          {messageData?.buttons?.map((button: any, index: number) => (
             <button
-              disabled={disablePrimaryBtn}
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
               style={
-                disablePrimaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...primaryDisableBtnStyle
-                    }
-                  : { ...defaultButtonStyles, ...primaryBtnStyle }
-              }
-              onClick={onClickPrimaryBtn}
-            >
-              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-            </button>
-          ) : null}
-          {secondaryBtnLabel ? (
-            <button
-              disabled={disableSecondaryBtn}
-              style={
-                disableSecondaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...secondaryDisableBtnStyle
-                    }
+                index === 0
+                  ? disablePrimaryBtn
+                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
                   : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
-              onClick={onClickSecondaryBtn}
+              onClick={() =>
+                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
+              }
             >
-              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              {button.title ? button.title : `Button ${index + 1}`}
             </button>
-          ) : null}
+          ))}
         </div>
       </div>
     </>

@@ -1,41 +1,19 @@
 import React, { CSSProperties } from 'react';
 import { TextParentStyles } from 'src/index';
-
-interface NotificationProps {
-  title: string;
-  description: string;
-  primaryButtonLabel?: string;
-  secondaryButtonLabel?: string;
-  primaryButtonStyle?: CSSProperties;
-  secondaryButtonStyle?: CSSProperties;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  titleStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickView?: () => void;
-}
+import { EmbeddedMessageData } from '../types';
+import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Notification: React.FC<NotificationProps> = ({
-  title,
-  description,
-  primaryButtonLabel,
-  secondaryButtonLabel,
-  primaryButtonStyle,
-  secondaryButtonStyle,
-  onClickPrimaryBtn,
-  onClickSecondaryBtn,
+const Notification: React.FC<EmbeddedMessageData> = ({
+  primaryBtnStyle,
+  secondaryBtnStyle,
   textStyle,
   titleStyle,
   primaryDisableBtnStyle,
   secondaryDisableBtnStyle,
   disablePrimaryBtn,
   disableSecondaryBtn,
-  onClickView
+  messageData
 }) => {
   const cardStyle: CSSProperties = {
     background: 'white',
@@ -108,62 +86,68 @@ const Notification: React.FC<NotificationProps> = ({
     }
   `;
 
+  const handleEmbeddedUrl = (type: string, data: string): boolean => {
+    return new IterableActionRunner().executeAction(
+      null,
+      { type, data },
+      IterableActionSource.EMBEDDED
+    );
+  };
+
   return (
     <>
       <style>{mediaStyle}</style>
-      <div className="notification" style={cardStyle} onClick={onClickView}>
+      <div
+        className="notification"
+        style={cardStyle}
+        onClick={() =>
+          handleEmbeddedUrl(
+            messageData?.defaultAction?.type,
+            messageData?.defaultAction?.data
+          )
+        }
+      >
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {title}
+            {messageData?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {description}
+            {messageData?.body}
           </text>
         </div>
         <div style={notificationButtons}>
-          <div style={notificationButtons}>
-            {primaryButtonLabel && (
-              <button
-                onClick={onClickPrimaryBtn}
-                disabled={disablePrimaryBtn}
-                style={
-                  disablePrimaryBtn
+          {messageData?.buttons?.map((button: any, index: number) => (
+            <button
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
+              style={
+                index === 0
+                  ? disablePrimaryBtn
                     ? {
                         ...primaryButtonDefaultStyle,
                         ...primaryDisableBtnStyle
                       }
-                    : { ...primaryButtonDefaultStyle, ...primaryButtonStyle }
-                }
-              >
-                {primaryButtonLabel}
-              </button>
-            )}
-            {secondaryButtonLabel && (
-              <button
-                onClick={onClickSecondaryBtn}
-                disabled={disableSecondaryBtn}
-                style={
-                  disableSecondaryBtn
-                    ? {
-                        ...secondaryButtonDefaultStyle,
-                        ...secondaryDisableBtnStyle
-                      }
-                    : {
-                        ...secondaryButtonDefaultStyle,
-                        ...secondaryButtonStyle
-                      }
-                }
-              >
-                {secondaryButtonLabel}
-              </button>
-            )}
-          </div>
+                    : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? {
+                      ...secondaryButtonDefaultStyle,
+                      ...secondaryDisableBtnStyle
+                    }
+                  : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
+              }
+              onClick={() =>
+                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
+              }
+            >
+              {button.title ? button.title : `Button ${index + 1}`}
+            </button>
+          ))}
         </div>
       </div>
     </>

@@ -1,48 +1,22 @@
 import React, { CSSProperties } from 'react';
 import { TextParentStyles } from 'src/index';
-
-interface ICardProps {
-  imgSrc?: string;
-  title: string;
-  text: string;
-  primaryBtnLabel?: string;
-  secondaryBtnLabel?: string;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  imgStyle?: CSSProperties;
-  titleStyle?: CSSProperties;
-  cardStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryBtnStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  onClickView?: () => void;
-}
+import { EmbeddedMessageData } from '../types';
+import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Card = (props: ICardProps) => {
+const Card = (props: EmbeddedMessageData) => {
   const {
-    text,
-    title,
-    cardStyle,
+    parentStyle,
     disablePrimaryBtn,
     disableSecondaryBtn,
-    imgSrc,
     imgStyle,
-    onClickPrimaryBtn,
-    onClickSecondaryBtn,
-    primaryBtnLabel,
     primaryBtnStyle,
     primaryDisableBtnStyle,
-    secondaryBtnLabel,
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    onClickView
+    messageData
   } = props;
 
   const defaultCardStyles = {
@@ -112,64 +86,68 @@ const Card = (props: ICardProps) => {
     }
   `;
 
+  const handleEmbeddedUrl = (type: string, data: string): boolean => {
+    return new IterableActionRunner().executeAction(
+      null,
+      { type, data },
+      IterableActionSource.EMBEDDED
+    );
+  };
+
   return (
     <>
       <style>{mediaStyle}</style>
       <div
         className="card"
-        style={{ ...defaultCardStyles, ...cardStyle }}
-        onClick={onClickView}
+        style={{ ...defaultCardStyles, ...parentStyle }}
+        onClick={() =>
+          handleEmbeddedUrl(
+            messageData?.defaultAction?.type,
+            messageData?.defaultAction?.data
+          )
+        }
       >
-        {imgSrc && (
-          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
+        {messageData?.mediaUrl && (
+          <img
+            style={{ ...defaultImageStyles, ...imgStyle }}
+            src={messageData?.mediaUrl}
+          />
         )}
         <div style={{ ...defaultTextParentStyles }}>
           <text
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {title}
+            {messageData?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {text}
+            {messageData?.body}
           </text>
         </div>
         <div style={cardButtons}>
-          {primaryBtnLabel ? (
+          {messageData?.buttons?.map((button: any, index: number) => (
             <button
-              disabled={disablePrimaryBtn}
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
               style={
-                disablePrimaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...primaryDisableBtnStyle
-                    }
-                  : { ...defaultButtonStyles, ...primaryBtnStyle }
-              }
-              onClick={onClickPrimaryBtn}
-            >
-              {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-            </button>
-          ) : null}
-          {secondaryBtnLabel ? (
-            <button
-              disabled={disableSecondaryBtn}
-              style={
-                disableSecondaryBtn
-                  ? {
-                      ...defaultButtonStyles,
-                      ...secondaryDisableBtnStyle
-                    }
+                index === 0
+                  ? disablePrimaryBtn
+                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
                   : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
-              onClick={onClickSecondaryBtn}
+              onClick={() =>
+                handleEmbeddedUrl(button?.action?.type, button?.action?.data)
+              }
             >
-              {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
+              {button.title ? button.title : `Button ${index + 1}`}
             </button>
-          ) : null}
+          ))}
         </div>
       </div>
     </>
