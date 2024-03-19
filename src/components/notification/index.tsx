@@ -1,7 +1,6 @@
 import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
+import { EmbeddedManager, TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded/embeddedManager';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
 export const Notification = (props: EmbeddedMessageData) => {
