@@ -132,7 +132,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   <Card
                     key={index.toString()}
                     parentStyle={{ margin: 0 }}
-                    messageData={data}
+                    message={data}
                   />
                 );
 
@@ -141,7 +141,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   <Banner
                     key={index.toString()}
                     parentStyle={{ margin: 0 }}
-                    messageData={data}
+                    message={data}
                     primaryBtnStyle={{
                       backgroundColor: '#000fff',
                       borderRadius: '8px',
@@ -152,9 +152,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 );
 
               case 2:
-                return (
-                  <Notification key={index.toString()} messageData={data} />
-                );
+                return <Notification key={index.toString()} message={data} />;
 
               default:
                 return null;

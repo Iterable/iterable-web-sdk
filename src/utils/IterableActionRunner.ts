@@ -57,6 +57,4 @@ class IterableActionRunnerImpl {
   }
 }
 
-export class IterableActionRunner extends IterableActionRunnerImpl {
-  static config = IterableConfig;
-}
+export class IterableActionRunner extends IterableActionRunnerImpl {}

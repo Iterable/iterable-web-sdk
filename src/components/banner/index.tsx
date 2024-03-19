@@ -15,7 +15,7 @@ export const Banner = (props: EmbeddedMessageData) => {
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    messageData
+    message
   } = props;
 
   const defaultBannerStyles = {
@@ -94,11 +94,15 @@ export const Banner = (props: EmbeddedMessageData) => {
         }}
         onClick={() => {
           const clickedUrl =
-            messageData?.elements?.defaultAction?.data?.trim() ||
-            messageData?.elements?.defaultAction?.type ||
+            message?.elements?.defaultAction?.data?.trim() ||
+            message?.elements?.defaultAction?.type ||
             null;
-          embeddedManager.handleEmbeddedClick(messageData, null, clickedUrl);
-          embeddedManager.trackEmbeddedClick(messageData, '', clickedUrl);
+          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(
+            message,
+            '',
+            clickedUrl ? clickedUrl : ''
+          );
         }}
       >
         <div
@@ -115,24 +119,24 @@ export const Banner = (props: EmbeddedMessageData) => {
                 ...titleStyle
               }}
             >
-              {messageData?.elements?.title || 'Title Here'}
+              {message?.elements?.title || 'Title Here'}
             </text>
             <text
               className="titleText"
               style={{ ...defaultTextStyles, ...textStyle }}
             >
-              {messageData?.elements?.body}
+              {message?.elements?.body}
             </text>
           </div>
-          {messageData?.elements?.mediaUrl && (
+          {message?.elements?.mediaUrl && (
             <img
               style={{ ...defaultImageStyles, ...imgStyle }}
-              src={messageData?.elements?.mediaUrl}
+              src={message?.elements?.mediaUrl}
             />
           )}
         </div>
         <div style={bannerButtons}>
-          {messageData?.elements?.buttons?.map((button: any, index: number) => (
+          {message?.elements?.buttons?.map((button: any, index: number) => (
             <button
               key={index}
               disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
@@ -147,14 +151,14 @@ export const Banner = (props: EmbeddedMessageData) => {
               }
               onClick={() => {
                 const clickedUrl =
-                  button?.action?.data?.trim() || button?.action?.type || null;
+                  button?.action?.data?.trim() || button?.action?.type || '';
                 embeddedManager.handleEmbeddedClick(
-                  messageData,
+                  message,
                   button?.id,
                   clickedUrl
                 );
                 embeddedManager.trackEmbeddedClick(
-                  messageData,
+                  message,
                   button?.id,
                   clickedUrl
                 );

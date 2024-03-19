@@ -19,6 +19,7 @@ import {
   SHARED_PREF_USER_ID
 } from '../constants';
 import { trackEmbeddedMessageClick } from '..';
+import { IterableEmbeddedMessage } from './embeddedMessage';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
@@ -194,9 +195,9 @@ export class EmbeddedManager {
   }
 
   trackEmbeddedClick(
-    message: any,
-    buttonIdentifier: string | '',
-    clickedUrl: string | ''
+    message: IterableEmbeddedMessage,
+    buttonIdentifier: string,
+    clickedUrl: string
   ) {
     const payload = {
       messageId: message?.metadata?.messageId,
@@ -207,14 +208,15 @@ export class EmbeddedManager {
       (localStorage.getItem(SHARED_PREF_EMAIL) as string) ??
       (localStorage.getItem(SHARED_PREF_USER_ID) as string);
 
-    console.log('email', emailOrUserId);
-    trackEmbeddedMessageClick(
-      payload,
-      buttonIdentifier,
-      clickedUrl,
-      window.location.hostname,
-      Date.now(),
-      emailOrUserId
-    );
+    if (emailOrUserId) {
+      trackEmbeddedMessageClick(
+        payload,
+        buttonIdentifier,
+        clickedUrl,
+        window.location.hostname,
+        Date.now(),
+        emailOrUserId
+      );
+    }
   }
 }

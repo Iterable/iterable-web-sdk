@@ -1,6 +1,7 @@
 import React, { CSSProperties } from 'react';
-import { EmbeddedManager, TextParentStyles } from 'src/index';
+import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
+import { EmbeddedManager } from '../../embedded/embeddedManager';
 
 /* Note: Add export to this const when support Embedded Message View Types in a later release. */
 export const Card = (props: EmbeddedMessageData) => {
@@ -15,7 +16,7 @@ export const Card = (props: EmbeddedMessageData) => {
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    messageData
+    message
   } = props;
 
   const defaultCardStyles = {
@@ -95,17 +96,21 @@ export const Card = (props: EmbeddedMessageData) => {
         style={{ ...defaultCardStyles, ...parentStyle }}
         onClick={() => {
           const clickedUrl =
-            messageData?.elements?.defaultAction?.data?.trim() ||
-            messageData?.elements?.defaultAction?.type ||
+            message?.elements?.defaultAction?.data?.trim() ||
+            message?.elements?.defaultAction?.type ||
             null;
-          embeddedManager.handleEmbeddedClick(messageData, null, clickedUrl);
-          embeddedManager.trackEmbeddedClick(messageData, '', clickedUrl);
+          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(
+            message,
+            '',
+            clickedUrl ? clickedUrl : ''
+          );
         }}
       >
-        {messageData?.elements?.mediaUrl && (
+        {message?.elements?.mediaUrl && (
           <img
             style={{ ...defaultImageStyles, ...imgStyle }}
-            src={messageData?.elements?.mediaUrl}
+            src={message?.elements?.mediaUrl}
           />
         )}
         <div style={{ ...defaultTextParentStyles }}>
@@ -113,17 +118,17 @@ export const Card = (props: EmbeddedMessageData) => {
             className="titleText"
             style={{ ...defaultTitleStyles, ...titleStyle }}
           >
-            {messageData?.elements?.title || 'Title Here'}
+            {message?.elements?.title || 'Title Here'}
           </text>
           <text
             className="titleText"
             style={{ ...defaultTextStyles, ...textStyle }}
           >
-            {messageData?.elements?.body}
+            {message?.elements?.body}
           </text>
         </div>
         <div style={cardButtons}>
-          {messageData?.elements?.buttons?.map((button: any, index: number) => (
+          {message?.elements?.buttons?.map((button: any, index: number) => (
             <button
               key={index}
               disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
@@ -138,14 +143,14 @@ export const Card = (props: EmbeddedMessageData) => {
               }
               onClick={() => {
                 const clickedUrl =
-                  button?.action?.data?.trim() || button?.action?.type || null;
+                  button?.action?.data?.trim() || button?.action?.type || '';
                 embeddedManager.handleEmbeddedClick(
-                  messageData,
+                  message,
                   button?.id,
                   clickedUrl
                 );
                 embeddedManager.trackEmbeddedClick(
-                  messageData,
+                  message,
                   button?.id,
                   clickedUrl
                 );
