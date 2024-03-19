@@ -3,8 +3,8 @@ import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
 import { IterableActionRunner, IterableActionSource } from '../../embedded';
 
-/* Note: Add export to this const when support Embedded Message View Types in a later release. */
-const Notification: React.FC<EmbeddedMessageData> = ({
+/* WARNING: OOTB Views not officially supported for Beta */
+export const Notification: React.FC<EmbeddedMessageData> = ({
   primaryBtnStyle,
   secondaryBtnStyle,
   textStyle,
@@ -130,16 +130,16 @@ const Notification: React.FC<EmbeddedMessageData> = ({
                 index === 0
                   ? disablePrimaryBtn
                     ? {
-                        ...primaryButtonDefaultStyle,
-                        ...primaryDisableBtnStyle
-                      }
+                      ...primaryButtonDefaultStyle,
+                      ...primaryDisableBtnStyle
+                    }
                     : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
                   : disableSecondaryBtn
-                  ? {
+                    ? {
                       ...secondaryButtonDefaultStyle,
                       ...secondaryDisableBtnStyle
                     }
-                  : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
+                    : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
               }
               onClick={() =>
                 handleEmbeddedUrl(button?.action?.type, button?.action?.data)
@@ -153,6 +153,3 @@ const Notification: React.FC<EmbeddedMessageData> = ({
     </>
   );
 };
-
-/* Note: Remove this line when support Embedded Message View Types in a later release. */
-console.log(Notification);

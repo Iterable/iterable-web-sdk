@@ -12,7 +12,7 @@ const Link = styled(_Link)`
   margin-top: 1em;
 `;
 
-interface Props {}
+interface Props { }
 
 export const Home: FC<Props> = () => {
   return (
@@ -32,9 +32,9 @@ export const Home: FC<Props> = () => {
           inApp
         </Link>
         {/* Note: The following components (specifically Embedded Message View Types) will not be supported until a later release. */}
-        {/* <Link to="/embedded-msgs" renderAsButton>
+        <Link to="/embedded-msgs" renderAsButton>
           Embedded Msgs
-        </Link> */}
+        </Link>
         <Link to="/embedded" renderAsButton>
           embedded
         </Link>
