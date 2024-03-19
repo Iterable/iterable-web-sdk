@@ -138,8 +138,8 @@ export const Card = (props: EmbeddedMessageData) => {
                     ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
                     : { ...defaultButtonStyles, ...primaryBtnStyle }
                   : disableSecondaryBtn
-                    ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
-                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
+                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
               }
               onClick={() => {
                 const clickedUrl =

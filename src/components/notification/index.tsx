@@ -131,16 +131,16 @@ export const Notification = (props: EmbeddedMessageData) => {
                 index === 0
                   ? disablePrimaryBtn
                     ? {
-                      ...primaryButtonDefaultStyle,
-                      ...primaryDisableBtnStyle
-                    }
+                        ...primaryButtonDefaultStyle,
+                        ...primaryDisableBtnStyle
+                      }
                     : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
                   : disableSecondaryBtn
-                    ? {
+                  ? {
                       ...secondaryButtonDefaultStyle,
                       ...secondaryDisableBtnStyle
                     }
-                    : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
+                  : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
               }
               onClick={() => {
                 const clickedUrl =
