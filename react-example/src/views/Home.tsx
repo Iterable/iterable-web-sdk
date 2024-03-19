@@ -12,7 +12,7 @@ const Link = styled(_Link)`
   margin-top: 1em;
 `;
 
-interface Props { }
+interface Props {}
 
 export const Home: FC<Props> = () => {
   return (
