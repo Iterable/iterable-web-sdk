@@ -16,6 +16,7 @@ import {
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 import { Functions } from 'src/utils/Functions';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
   userId: string;
@@ -163,7 +164,7 @@ export const EmbeddedForm: FC<Props> = ({
     const sessionData = {
       [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       session: {
-        id: 'abcd123',
+        id: uuidv4(),
         start: startTime.getTime(),
         end: Date.now()
       },
