@@ -13,7 +13,8 @@
     "paths": {
       "src/*": ["src/*"],
       "@iterable/web-sdk": ["../dist"]
-    }
+    },
+    "skipLibCheck": true
   },
   "include": [
     "./src/**/*"

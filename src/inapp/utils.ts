@@ -639,7 +639,7 @@ export const trackMessagesDelivered = (
         */
       });
     })
-  ).catch((e) => e);
+  ).catch((e: any) => e);
 };
 
 export const paintOverlay = (

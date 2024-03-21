@@ -32,11 +32,11 @@ export const Commerce: FC<Props> = () => {
     updateCart({
       items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
     })
-      .then((response) => {
+      .then((response: any) => {
         setUpdateCartResponse(JSON.stringify(response.data));
         setUpdatingCart(false);
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdateCartResponse(JSON.stringify(e.response.data));
         setUpdatingCart(false);
       });
@@ -49,11 +49,11 @@ export const Commerce: FC<Props> = () => {
       items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
       total: 200
     })
-      .then((response) => {
+      .then((response: any) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(response.data));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(e.response.data));
       });

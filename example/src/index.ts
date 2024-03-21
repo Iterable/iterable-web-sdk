@@ -25,7 +25,7 @@ import {
             }
           }
         )
-        .then((response) => {
+        .then((response: any) => {
           return response.data?.token;
         });
     }
@@ -72,7 +72,7 @@ import {
       startBtn.setAttribute('aria-disabled', 'true');
       startBtn.className = 'disabled';
       request()
-        .then((response) => {
+        .then((response: any) => {
           triggerDisplayMessages(response.data.inAppMessages);
           startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
         })

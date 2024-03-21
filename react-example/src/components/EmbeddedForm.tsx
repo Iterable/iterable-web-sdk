@@ -85,11 +85,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedMessageReceived(receivedMessage)
-      .then((response) => {
+      .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -118,11 +118,11 @@ export const EmbeddedForm: FC<Props> = ({
       Date.now(),
       userId
     )
-      .then((response) => {
+      .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -147,11 +147,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedMessagingDismiss(sessionData)
-      .then((response) => {
+      .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -185,11 +185,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedMessagingSession(sessionData)
-      .then((response) => {
+      .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
