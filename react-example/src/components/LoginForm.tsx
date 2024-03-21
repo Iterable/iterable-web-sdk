@@ -33,7 +33,7 @@ interface Props {
 }
 
 export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
-  const [email, updateEmail] = useState<string>('');
+  const [email, updateEmail] = useState<string>(process.env.LOGIN_EMAIL || '');
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 

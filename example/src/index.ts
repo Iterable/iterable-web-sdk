@@ -3,14 +3,15 @@ import axios from 'axios';
 import {
   initialize,
   getInAppMessages,
-  updateUserEmail
+  updateUserEmail,
+  GenerateJWTPayload
 } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    ({ email }) => {
+    ({ email }: GenerateJWTPayload) => {
       return axios
         .post(
           'http://localhost:5000/generate',

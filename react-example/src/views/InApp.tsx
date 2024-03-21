@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import _Button from 'src/components/Button';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
 import { useUser } from 'src/context/Users';
-import { getInAppMessages } from '@iterable/web-sdk';
+import { DisplayOptions, getInAppMessages } from '@iterable/web-sdk';
 
 const Button = styled(_Button)`
   width: 100%;
@@ -35,7 +35,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     closeButton: {},
     displayInterval: 1000
   },
-  { display: 'immediate' }
+  { display: DisplayOptions.Immediate }
 );
 
 export const InApp: FC<{}> = () => {
@@ -57,7 +57,7 @@ export const InApp: FC<{}> = () => {
 
     return getInAppMessages(
       { count: 20, packageName: 'my-website' },
-      { display: 'deferred' }
+      { display: DisplayOptions.Deferred }
     )
       .request()
       .then((response: any) => {

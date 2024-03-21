@@ -18,6 +18,7 @@
 			"regenerator": true
 		}],
 		"@babel/plugin-transform-modules-umd",
+		"@babel/plugin-transform-nullish-coalescing-operator",
 		[
 			"module-resolver",
 			{
