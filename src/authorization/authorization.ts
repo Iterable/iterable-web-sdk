@@ -70,12 +70,12 @@ export function initialize(
   let authInterceptor: number | null = generateJWT
     ? null
     : baseAxiosRequest.interceptors.request.use((config) => ({
-      ...config,
-      headers: {
-        ...config.headers,
-        'Api-Key': authToken
-      }
-    }));
+        ...config,
+        headers: {
+          ...config.headers,
+          'Api-Key': authToken
+        }
+      }));
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
@@ -125,7 +125,7 @@ export function initialize(
         if (millisecondsToExpired < MAX_TIMEOUT) {
           timer = setTimeout(() => {
             /* get new token */
-            return callback().catch((e) => {
+            return callback().catch((e: any) => {
               console.warn(e);
               console.warn(
                 'Could not refresh JWT. Try identifying the user again.'
@@ -513,7 +513,7 @@ export function initialize(
                   */
                   handleTokenExpiration(newToken, () => {
                     /* re-run the JWT generation */
-                    return doRequest(payloadToPass).catch((e) => {
+                    return doRequest(payloadToPass).catch((e: any) => {
                       console.warn(e);
                       console.warn(
                         'Could not refresh JWT. Try identifying the user again.'
@@ -593,7 +593,7 @@ export function initialize(
                     }
                   });
                 })
-                .catch((e) => {
+                .catch((e: any) => {
                   /*
                     if the JWT generation failed, 
                     just abort with a Promise rejection.
@@ -607,7 +607,7 @@ export function initialize(
         );
         handleTokenExpiration(token, () => {
           /* re-run the JWT generation */
-          return doRequest(payload).catch((e) => {
+          return doRequest(payload).catch((e: any) => {
             if (logLevel === 'verbose') {
               console.warn(e);
               console.warn(
@@ -618,7 +618,7 @@ export function initialize(
         });
         return token;
       })
-      .catch((error) => {
+      .catch((error: any) => {
         /* clear interceptor */
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -643,7 +643,7 @@ export function initialize(
 
       addEmailToRequest(email);
 
-      return doRequest({ email }).catch((e) => {
+      return doRequest({ email }).catch((e: any) => {
         if (logLevel === 'verbose') {
           console.warn(
             'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
@@ -753,7 +753,7 @@ export function initialize(
           await tryUser()();
           return token;
         })
-        .catch((e) => {
+        .catch((e: any) => {
           if (logLevel === 'verbose') {
             console.warn(
               'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
@@ -785,7 +785,7 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
       const payloadToPass = { [isEmail(user) ? 'email' : 'userID']: user };
-      return doRequest(payloadToPass).catch((e) => {
+      return doRequest(payloadToPass).catch((e: any) => {
         if (logLevel === 'verbose') {
           console.warn(e);
           console.warn('Could not refresh JWT. Try Refresh the JWT again.');

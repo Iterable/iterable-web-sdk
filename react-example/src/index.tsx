@@ -57,7 +57,7 @@ const HomeLink = styled(Link)`
             }
           }
         )
-        .then((response) => {
+        .then((response: any) => {
           return response.data?.token;
         });
     }
