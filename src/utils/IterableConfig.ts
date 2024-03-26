@@ -1,8 +1,11 @@
 import { IterableCustomActionHandler, IterableUrlHandler } from '..';
 
-class IterableConfig {
-  public static urlHandler: IterableUrlHandler | null = null;
-  public static customActionHandler: IterableCustomActionHandler | null = null;
-}
+export class IterableConfig {
+  public urlHandler: IterableUrlHandler;
+  public customActionHandler: IterableCustomActionHandler;
 
-export default IterableConfig;
+  constructor(urlHandler: IterableUrlHandler, customActionHandler: IterableCustomActionHandler) {
+    this.urlHandler = urlHandler;
+    this.customActionHandler = customActionHandler;
+  }
+}
