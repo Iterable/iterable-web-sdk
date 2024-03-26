@@ -1,11 +1,6 @@
 import { IterableCustomActionHandler, IterableUrlHandler } from '..';
 
 export class IterableConfig {
-  public urlHandler: IterableUrlHandler;
-  public customActionHandler: IterableCustomActionHandler;
-
-  constructor(urlHandler: IterableUrlHandler, customActionHandler: IterableCustomActionHandler) {
-    this.urlHandler = urlHandler;
-    this.customActionHandler = customActionHandler;
-  }
+  public static urlHandler: IterableUrlHandler;
+  public static customActionHandler: IterableCustomActionHandler;
 }
