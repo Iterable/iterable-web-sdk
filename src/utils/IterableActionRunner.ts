@@ -6,10 +6,15 @@ import {
 } from '../embedded/types';
 
 class IterableActionRunnerImpl {
-  static executeAction(
-    context: any,
+  iterableConfig: IterableConfig;
+
+  constructor(config: IterableConfig) {
+    this.iterableConfig = config;
+  }
+
+  executeAction(
     action: IterableAction | null,
-    source: IterableActionSource
+    source: IterableActionSource,
   ): boolean {
     if (action === null) {
       return false;
@@ -17,21 +22,21 @@ class IterableActionRunnerImpl {
 
     const actionContext: IterableActionContext = { action, source };
     if (action.type === 'openUrl') {
-      return IterableActionRunnerImpl.openUri(action.data, actionContext);
+      return this.openUri(action.data, actionContext);
     } else {
-      return IterableActionRunnerImpl.callCustomActionIfSpecified(
+      return this.callCustomActionIfSpecified(
         action,
         actionContext
       );
     }
   }
 
-  private static openUri(
+  private openUri(
     uri: string,
     actionContext: IterableActionContext
   ): boolean {
-    if (IterableConfig.urlHandler) {
-      if (IterableConfig.urlHandler.handleIterableURL(uri, actionContext)) {
+    if (this.iterableConfig.urlHandler) {
+      if (this.iterableConfig.urlHandler.handleIterableURL(uri, actionContext)) {
         return true;
       }
     }
@@ -41,13 +46,13 @@ class IterableActionRunnerImpl {
     return true;
   }
 
-  private static callCustomActionIfSpecified(
+  private callCustomActionIfSpecified(
     action: IterableAction,
     actionContext: IterableActionContext
   ): boolean {
     if (action.type && action.type !== '') {
-      if (IterableConfig.customActionHandler) {
-        return IterableConfig.customActionHandler.handleIterableCustomAction(
+      if (this.iterableConfig.customActionHandler) {
+        return this.iterableConfig.customActionHandler.handleIterableCustomAction(
           action,
           actionContext
         );
