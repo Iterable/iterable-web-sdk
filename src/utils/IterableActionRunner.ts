@@ -1,4 +1,4 @@
-import IterableConfig from 'src/utils/IterableConfig';
+import { IterableConfig } from 'src/utils/IterableConfig';
 import {
   IterableAction,
   IterableActionContext,

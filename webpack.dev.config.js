@@ -22,7 +22,9 @@ module.exports = {
     filename: './index.js',
     path: path.resolve(__dirname),
     library: '@iterable/web-sdk',
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    hotUpdateChunkFilename: 'hot/hot-update.js',
+    hotUpdateMainFilename: 'hot/hot-update.json'
   },
   devServer: {
     port: 8000,
