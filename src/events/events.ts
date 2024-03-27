@@ -1,8 +1,24 @@
 import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
+import {
+  InAppTrackRequestParams,
+  IEmbeddedMessage,
+  IEmbeddedMessageMetadata,
+  IEventEmbeddedSession
+} from './in-app/types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
-import { eventRequestSchema, trackSchema } from './events.schema';
+import {
+  trackSchema,
+  trackEmbeddedMessageSchema,
+  trackEmbeddedMessageClickSchema,
+  trackEmbeddedSessionSchema,
+  embaddedMessagingDismissSchema,
+  embaddedMessagingSessionSchema
+} from './events.schema';
+import { EndPoints } from './consts';
+
+import { EnbeddedMessagingDismiss, EnbeddedMessagingSession } from './types';
+import { functions } from 'src/utils/functions';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -11,7 +27,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/track',
+    url: EndPoints.event_track,
     data: payload,
     validation: {
       data: trackSchema
@@ -19,14 +35,10 @@ export const track = (payload: InAppTrackRequestParams) => {
   });
 };
 
-export const trackInAppClose = (payload: InAppEventRequestParams) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
+export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClose',
+    url: '/embedded-messaging/events/received',
     data: {
       ...payload,
       deviceInfo: {
@@ -36,54 +48,45 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
       }
     },
     validation: {
-      data: eventRequestSchema
+      data: trackEmbeddedMessageSchema
     }
   });
 };
 
-export const trackInAppOpen = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'inboxSessionId' | 'closeAction'
-  >
+export const trackEmbeddedMessageClick = (
+  payload: IEmbeddedMessageMetadata,
+  buttonIdentifier: string,
+  clickedUrl: string,
+  appPackageName: string,
+  createdAt: number,
+  userIdOrEmail: string
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppOpen',
+    url: '/embedded-messaging/events/click',
     data: {
-      ...payload,
+      [functions.checkEmailValidation(userIdOrEmail) ? 'email' : 'userId']:
+        userIdOrEmail,
+      messageId: payload.messageId,
+      buttonIdentifier: buttonIdentifier,
+      targetUrl: clickedUrl,
       deviceInfo: {
-        ...payload.deviceInfo,
         platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
-      }
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: appPackageName
+      },
+      createdAt: createdAt
     },
     validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
+      data: trackEmbeddedMessageClickSchema
     }
   });
 };
 
-export const trackInAppClick = (
-  payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>,
-  sendBeacon = false
-) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
+export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppClick',
-    sendBeacon,
+    url: '/embedded-messaging/events/impression',
     data: {
       ...payload,
       deviceInfo: {
@@ -93,69 +96,33 @@ export const trackInAppClick = (
       }
     },
     validation: {
-      data: eventRequestSchema.omit(['inboxSessionId', 'closeAction'])
+      data: trackEmbeddedSessionSchema
     }
   });
 };
 
-export const trackInAppDelivery = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'closeAction' | 'inboxSessionId'
-  >
+export const trackEmbeddedMessagingDismiss = (
+  payload: EnbeddedMessagingDismiss
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/trackInAppDelivery',
-    data: {
-      ...payload,
-      deviceInfo: {
-        ...payload.deviceInfo,
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
-      }
-    },
+    url: EndPoints.msg_dismiss,
+    data: payload,
     validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
+      data: embaddedMessagingDismissSchema
     }
   });
 };
 
-export const trackInAppConsume = (
-  payload: Omit<
-    InAppEventRequestParams,
-    'clickedUrl' | 'closeAction' | 'inboxSessionId'
-  >
+export const trackEmbeddedMessagingSession = (
+  payload: EnbeddedMessagingSession
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
-
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/events/inAppConsume',
-    data: {
-      ...payload,
-      deviceInfo: {
-        ...payload.deviceInfo,
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || ''
-      }
-    },
+    url: EndPoints.msg_session_event_track,
+    data: payload,
     validation: {
-      data: eventRequestSchema.omit([
-        'clickedUrl',
-        'inboxSessionId',
-        'closeAction'
-      ])
+      data: embaddedMessagingSessionSchema
     }
   });
 };

@@ -60,12 +60,12 @@ export const InApp: FC<{}> = () => {
       { display: DisplayOptions.Deferred }
     )
       .request()
-      .then((response) => {
+      .then((response: any) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(response.data, null, 2));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(e.response.data, null, 2));
       });
@@ -77,7 +77,7 @@ export const InApp: FC<{}> = () => {
     setIsGettingMessagesAuto(true);
 
     return request()
-      .then((response) => {
+      .then((response: any) => {
         setAutoMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesAuto(false);
       })
