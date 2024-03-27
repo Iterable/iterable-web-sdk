@@ -6,10 +6,7 @@ import {
 import { WebInAppDisplaySettings } from '../inapp';
 import { srSpeak } from '../utils/srSpeak';
 import { trackInAppDelivery } from 'src/events/in-app/events';
-import {
-  CloseButtonPosition,
-  InAppMessage
-} from './types';
+import { CloseButtonPosition, InAppMessage } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
