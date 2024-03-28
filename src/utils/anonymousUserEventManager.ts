@@ -160,14 +160,18 @@ export class AnonymousUserEventManager {
 
   private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
-    this.setUserID(uuidv4());
+    const userId = uuidv4();
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
       const payload: TrackAnonSessionParams = {
-        email: this.getEmail() || undefined,
-        userId: this.getEmail() ? null : this.getUserID() || undefined,
+        user: {
+          userId,
+          preferUserId: true,
+          mergeNestedObjects: true,
+          createNewFields: true
+        },
         createdAt: this.getCurrentTime(),
         deviceInfo: {
           appPackageName: window.location.hostname,
@@ -184,15 +188,20 @@ export class AnonymousUserEventManager {
         }
       };
 
-      setTimeout(() => {
-        baseIterableRequest<IterableResponse>({
+      setTimeout(async () => {
+        const response = await baseIterableRequest<IterableResponse>({
           method: 'POST',
           url: ENDPOINT_TRACK_ANON_SESSION,
           data: payload
         }).catch((e) => {
-          console.log('response', e);
+          if (e?.response?.status === 409) {
+            this.getAnonCriteria();
+          }
         });
-        this.syncEvents();
+        if (response && response.status === 200) {
+          this.setUserID(userId);
+          this.syncEvents();
+        }
       }, 500);
     } else {
       this.syncEvents();

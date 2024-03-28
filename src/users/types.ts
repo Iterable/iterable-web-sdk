@@ -18,6 +18,10 @@ export interface UpdateUserParams {
   mergeNestedObjects?: boolean;
 }
 
+export interface UpdateAnonymousUserParams extends UpdateUserParams {
+  createNewFields?: boolean;
+}
+
 export interface UpdateSubscriptionParams {
   emailListIds: number[];
   unsubscribedChannelIds: number[];
