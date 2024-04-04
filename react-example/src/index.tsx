@@ -1,5 +1,5 @@
 import { WithJWT, initialize, setAnonTracking } from '@iterable/web-sdk';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import styled from 'styled-components';
 import './styles/index.css';
 
@@ -57,7 +57,10 @@ const HomeLink = styled(Link)`
       });
   setAnonTracking(true);
 
-  ReactDOM.render(
+  const container = document.getElementById('app');
+  const root = createRoot(container);
+
+  root.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
