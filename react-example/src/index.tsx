@@ -1,4 +1,5 @@
 import { WithJWT, initialize, setAnonTracking } from '@iterable/web-sdk';
+import axios from 'axios';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import './styles/index.css';
@@ -6,14 +7,12 @@ import './styles/index.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import Link from 'src/components/Link';
 import LoginForm from 'src/components/LoginForm';
+import { UserProvider } from 'src/context/Users';
 import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
 import Home from 'src/views/Home';
 import InApp from 'src/views/InApp';
 import Users from 'src/views/Users';
-
-import axios from 'axios';
-import { UserProvider } from 'src/context/Users';
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,23 +37,18 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
+  const authToken = process.env.API_KEY || '';
   const { setEmail, logout, ...rest } = process.env.NO_JWT
-    ? initialize(process.env.API_KEY || '')
-    : initialize(process.env.API_KEY || '', ({ email }) => {
-        return axios
+    ? initialize(authToken)
+    : initialize(authToken, ({ email }) =>
+        axios
           .post(
             'http://localhost:5000/generate',
-            {
-              exp_minutes: 2,
-              email,
-              jwt_secret: process.env.JWT_SECRET
-            },
+            { exp_minutes: 2, email, jwt_secret: process.env.JWT_SECRET },
             { headers: { 'Content-Type': 'application/json' } }
           )
-          .then((response) => {
-            return response.data?.token;
-          });
-      });
+          .then((response) => response.data?.token)
+      );
   setAnonTracking(true);
 
   ReactDOM.render(
