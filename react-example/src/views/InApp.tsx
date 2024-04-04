@@ -4,6 +4,7 @@ import _Button from 'src/components/Button';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
 import { useUser } from 'src/context/Users';
 import { getInAppMessages } from '@iterable/web-sdk';
+import { AxiosError } from 'axios';
 
 const Button = styled(_Button)`
   width: 100%;
@@ -81,7 +82,16 @@ export const InApp: FC<{}> = () => {
         setAutoMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesAuto(false);
       })
-      .catch(() => {
+      .catch((reason: AxiosError<{ code: string; msg: string }>) => {
+        const { code, msg } = reason.response.data;
+        if (
+          code === 'BadAuthorizationHeader' &&
+          msg === 'JWT Authorization header is not set'
+        )
+          alert(
+            'Temporary Warning (only for branch MOB-8047-nojwt): You are likely using an API key that is configured to require JWT authentication. Please use a Web API key without JWT authentication and set it in your /react-example/.env file. Then restart your sample app.'
+          );
+
         setIsGettingMessagesAuto(false);
       });
   };
