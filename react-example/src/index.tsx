@@ -38,9 +38,10 @@ const HomeLink = styled(Link)`
 
 ((): void => {
   const authToken = process.env.API_KEY || '';
-  const { setEmail, logout, ...rest } = process.env.NO_JWT
-    ? initialize(authToken)
-    : initialize(authToken, ({ email }) =>
+  const requiresJwt = process.env.USE_JWT !== 'false';
+
+  const { setEmail, logout, ...rest } = requiresJwt
+    ? initialize(authToken, ({ email }) =>
         axios
           .post(
             'http://localhost:5000/generate',
@@ -48,7 +49,8 @@ const HomeLink = styled(Link)`
             { headers: { 'Content-Type': 'application/json' } }
           )
           .then((response) => response.data?.token)
-      );
+      )
+    : initialize(authToken);
   setAnonTracking(true);
 
   ReactDOM.render(
