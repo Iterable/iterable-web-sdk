@@ -1,20 +1,19 @@
-import { initialize } from '@iterable/web-sdk';
-import axios from 'axios';
+import { WithJWT, initialize, setAnonTracking } from '@iterable/web-sdk';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
 import './styles/index.css';
 
-import Home from 'src/views/Home';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Link from 'src/components/Link';
+import LoginForm from 'src/components/LoginForm';
 import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
-import Users from 'src/views/Users';
+import Home from 'src/views/Home';
 import InApp from 'src/views/InApp';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
-import styled from 'styled-components';
-import LoginForm from 'src/components/LoginForm';
+import Users from 'src/views/Users';
 
+import axios from 'axios';
 import { UserProvider } from 'src/context/Users';
-import { setAnonTracking } from '@iterable/web-sdk';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,28 +38,23 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    ({ email }) => {
-      return axios
-        .post(
-          'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response) => {
-          return response.data?.token;
-        });
-    }
-  );
+  const { setEmail, logout, ...rest } = process.env.NO_JWT
+    ? initialize(process.env.API_KEY || '')
+    : initialize(process.env.API_KEY || '', ({ email }) => {
+        return axios
+          .post(
+            'http://localhost:5000/generate',
+            {
+              exp_minutes: 2,
+              email,
+              jwt_secret: process.env.JWT_SECRET
+            },
+            { headers: { 'Content-Type': 'application/json' } }
+          )
+          .then((response) => {
+            return response.data?.token;
+          });
+      });
   setAnonTracking(true);
 
   ReactDOM.render(
@@ -74,7 +68,7 @@ const HomeLink = styled(Link)`
             <LoginForm
               setEmail={setEmail}
               logout={logout}
-              refreshJwt={refreshJwtToken}
+              refreshJwt={(rest as WithJWT).refreshJwtToken}
             />
           </HeaderWrapper>
           <RouteWrapper>

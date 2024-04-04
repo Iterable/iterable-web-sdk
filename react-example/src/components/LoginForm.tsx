@@ -27,9 +27,9 @@ const Form = styled.form`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string>;
+  setEmail: (email?: string) => Promise<string | void>;
   logout: () => void;
-  refreshJwt: (authTypes: string) => Promise<string>;
+  refreshJwt?: (authTypes: string) => Promise<string>;
 }
 
 export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
@@ -39,15 +39,16 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
 
   const { loggedInUser, setLoggedInUser } = useUser();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setEmail(email)
-      .then(() => {
-        setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: email });
-      })
-      .catch(() => updateEmail('Something went wrong!'));
+    try {
+      await setEmail(email);
+      setEditingUser(false);
+      setLoggedInUser({ type: 'user_update', data: email });
+    } catch {
+      updateEmail('Something went wrong!');
+    }
   };
 
   const handleLogout = () => {
