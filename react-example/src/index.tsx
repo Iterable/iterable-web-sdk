@@ -38,7 +38,7 @@ const HomeLink = styled(Link)`
 
 ((): void => {
   const authToken = process.env.API_KEY || '';
-  const requiresJwt = process.env.USE_JWT !== 'false';
+  const requiresJwt = process.env.USE_JWT === 'true'; // Need to do a string equality check bc afaik boolean cannot be saved to env variable
 
   const { setEmail, logout, ...rest } = requiresJwt
     ? initialize(authToken, ({ email }) =>
