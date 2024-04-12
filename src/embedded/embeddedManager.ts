@@ -53,6 +53,7 @@ export class EmbeddedManager {
     try {
       let url = `${embedded_msg_endpoint}?`;
       url += `platform=${platform}`;
+      url += `&userId=${userIdOrEmail}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
 

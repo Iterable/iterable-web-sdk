@@ -41,7 +41,7 @@ export const Users: FC<Props> = () => {
     e.preventDefault();
     setUpdatingUser(true);
     updateUser({
-      dataFields: { [userDataField]: 'test-data' }
+      dataFields: { [userDataField]: 'test' }
     })
       .then((response: any) => {
         setUpdateUserResponse(JSON.stringify(response.data));

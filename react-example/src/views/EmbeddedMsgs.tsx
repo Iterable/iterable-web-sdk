@@ -19,10 +19,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      iterableApi.setUserID(userId);
+      //iterableApi.setUserID(userId);
       const embeddedManager = new EmbeddedManager();
       await embeddedManager.syncMessages(
-        userId,
+        'hani',
         'Web',
         '1',
         'my-website',

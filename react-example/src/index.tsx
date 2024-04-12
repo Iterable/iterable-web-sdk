@@ -40,15 +40,15 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
+  const { setEmail, logout, refreshJwtToken, setUserID } = initialize(
     process.env.API_KEY || '',
-    ({ email }) => {
+    ({ email, userID }) => {
       return axios
         .post(
-          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
+          process.env.JWT_GENERATOR || 'http://localhost:3000/generate',
           {
             exp_minutes: 2,
-            email,
+            userId: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
@@ -74,7 +74,7 @@ const HomeLink = styled(Link)`
               Home
             </HomeLink>
             <LoginForm
-              setEmail={setEmail}
+              setEmail={setUserID}
               logout={logout}
               refreshJwt={refreshJwtToken}
             />
