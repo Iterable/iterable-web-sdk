@@ -125,34 +125,44 @@ export const EmbeddedMsgs: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: any, index: number) => {
             const data = message;
-
+            const customComponentHTML2 = Notification({
+              message: data
+            });
+            const customComponentHTML1 = Banner({
+              message: data,
+              parentStyle: ` margin: 0; `,
+              primaryBtnStyle: `
+                background-color: #000fff;
+                border-radius: 8px;
+                padding: 10px;
+                color: #ffffff;
+                `
+            });
+            const customComponentHTML0 = Card({
+              message: data,
+              parentStyle: ` margin: 0; `
+            });
             switch (selectedButtonIndex) {
               case 0:
                 return (
-                  <Card
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: customComponentHTML0 }}
                   />
                 );
 
               case 1:
                 return (
-                  <Banner
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
-                    primaryBtnStyle={{
-                      backgroundColor: '#000fff',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      color: '#ffffff'
-                    }}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: customComponentHTML1 }}
                   />
                 );
 
               case 2:
-                return <Notification key={index.toString()} message={data} />;
+                return (
+                  <div
+                    dangerouslySetInnerHTML={{ __html: customComponentHTML2 }}
+                  />
+                );
 
               default:
                 return null;
