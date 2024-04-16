@@ -150,13 +150,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
                     dangerouslySetInnerHTML={{ __html: customComponentHTML0 }}
                   />
                 );
-              /*  return (
-                  <Card
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
-                  />
-                );  */
 
               case 1:
                 return (
@@ -165,28 +158,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   />
                 );
 
-              /* return (
-                  <Banner
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
-                    primaryBtnStyle={{
-                      backgroundColor: '#000fff',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      color: '#ffffff'
-                    }}
-                  />
-                );  */
-
               case 2:
                 return (
                   <div
                     dangerouslySetInnerHTML={{ __html: customComponentHTML2 }}
                   />
                 );
-
-              //  return <Notification key={index.toString()} message={data} />;
 
               default:
                 return null;
