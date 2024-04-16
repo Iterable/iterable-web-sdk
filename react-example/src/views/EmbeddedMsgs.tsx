@@ -131,7 +131,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             });
             const customComponentHTML1 = Banner({
               message: data,
-              parentStyle: { margin: 0 },
+              parentStyle: ` margin: 0; `,
               primaryBtnStyle: `
                 background-color: #000fff;
                 border-radius: 8px;
@@ -141,7 +141,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             });
             const customComponentHTML0 = Card({
               message: data,
-              parentStyle: { margin: 0 }
+              parentStyle: ` margin: 0; `
             });
             switch (selectedButtonIndex) {
               case 0:

@@ -1,171 +1,3 @@
-// import React, { CSSProperties } from 'react';
-// import { TextParentStyles } from 'src/index';
-// import { EmbeddedMessageData } from '../types';
-// import { EmbeddedManager } from '../../embedded';
-
-// /* WARNING: OOTB Views not officially supported for Beta */
-// export const Notification = (props: EmbeddedMessageData) => {
-//   const {
-//     disablePrimaryBtn,
-//     disableSecondaryBtn,
-//     primaryBtnStyle,
-//     primaryDisableBtnStyle,
-//     secondaryBtnStyle,
-//     secondaryDisableBtnStyle,
-//     textStyle,
-//     titleStyle,
-//     message
-//   } = props;
-//   const cardStyle: CSSProperties = {
-//     background: 'white',
-//     borderRadius: '10px',
-//     padding: '20px',
-//     border: '3px solid #caccd1',
-//     marginBottom: '10px',
-//     cursor: 'pointer'
-//   };
-
-//   const primaryButtonDefaultStyle: CSSProperties = {
-//     maxWidth: 'calc(50% - 32px)',
-//     textAlign: 'left',
-//     background: '#2196f3',
-//     color: 'white',
-//     borderRadius: '4px',
-//     padding: '8px',
-//     marginRight: '8px',
-//     cursor: 'pointer',
-//     border: 'none',
-//     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06)',
-//     overflowWrap: 'break-word'
-//   };
-
-//   const secondaryButtonDefaultStyle: CSSProperties = {
-//     maxWidth: 'calc(50% - 32px)',
-//     textAlign: 'left',
-//     background: 'none',
-//     border: 'none',
-//     color: '#2196f3',
-//     cursor: 'pointer',
-//     padding: '5px',
-//     overflowWrap: 'break-word'
-//   };
-
-//   const defaultTitleStyles = {
-//     fontSize: '20px',
-//     fontWeight: 'bold',
-//     marginBottom: '4px',
-//     display: 'block'
-//   };
-
-//   const defaultTextStyles = {
-//     fontSize: '16px',
-//     marginBottom: '10px',
-//     display: 'block'
-//   };
-
-//   const defaultTextParentStyles: TextParentStyles = {
-//     overflowWrap: 'break-word'
-//   };
-
-//   const notificationButtons: CSSProperties = {
-//     marginTop: 'auto'
-//   };
-
-//   const mediaStyle = `
-//   @media screen and (max-width: 800px) {
-//       .titleText {
-//         overflow: hidden;
-//         text-overflow: ellipsis;
-//         max-height: 2.6em;
-//         line-height: 1.3em;
-//       }
-//       .notification {
-//         min-height: 100px;
-//         display: flex;
-//         flex-direction: column;
-//       }
-//     }
-//   `;
-
-//   const embeddedManager = new EmbeddedManager();
-
-//   return (
-//     <>
-//       <style>{mediaStyle}</style>
-//       <div
-//         className="notification"
-//         style={cardStyle}
-//         onClick={() => {
-//           const clickedUrl =
-//             message?.elements?.defaultAction?.data?.trim() ||
-//             message?.elements?.defaultAction?.type ||
-//             null;
-//           embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-//           embeddedManager.trackEmbeddedClick(
-//             message,
-//             '',
-//             clickedUrl ? clickedUrl : ''
-//           );
-//         }}
-//       >
-//         <div style={{ ...defaultTextParentStyles }}>
-//           <text
-//             className="titleText"
-//             style={{ ...defaultTitleStyles, ...titleStyle }}
-//           >
-//             {message?.elements?.title || 'Title Here'}
-//           </text>
-//           <text
-//             className="titleText"
-//             style={{ ...defaultTextStyles, ...textStyle }}
-//           >
-//             {message?.elements?.body}
-//           </text>
-//         </div>
-//         <div style={notificationButtons}>
-//           {message?.elements?.buttons?.map((button: any, index: number) => (
-//             <button
-//               key={index}
-//               disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
-//               style={
-//                 index === 0
-//                   ? disablePrimaryBtn
-//                     ? {
-//                         ...primaryButtonDefaultStyle,
-//                         ...primaryDisableBtnStyle
-//                       }
-//                     : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
-//                   : disableSecondaryBtn
-//                   ? {
-//                       ...secondaryButtonDefaultStyle,
-//                       ...secondaryDisableBtnStyle
-//                     }
-//                   : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
-//               }
-//               onClick={() => {
-//                 const clickedUrl =
-//                   button?.action?.data?.trim() || button?.action?.type || '';
-//                 embeddedManager.handleEmbeddedClick(
-//                   message,
-//                   button?.id,
-//                   clickedUrl
-//                 );
-//                 embeddedManager.trackEmbeddedClick(
-//                   message,
-//                   button?.id,
-//                   clickedUrl
-//                 );
-//               }}
-//             >
-//               {button.title ? button.title : `Button ${index + 1}`}
-//             </button>
-//           ))}
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-
 import { EmbeddedMessageData } from '../types';
 import { EmbeddedManager } from '../../embedded';
 
@@ -210,10 +42,7 @@ export function Notification({
     }
   `;
   const embeddedManager = new EmbeddedManager();
-  const handleBannerClick = () => {
-    console.log('vvvvvv0', message);
-    console.log('vvvvvv1', message?.elements?.defaultAction?.data);
-    console.log('vvvvvv2', message?.elements?.defaultAction?.type);
+  const handleNotificationClick = () => {
     const clickedUrl =
       message?.elements?.defaultAction?.data?.trim() ||
       message?.elements?.defaultAction?.type ||
@@ -234,11 +63,12 @@ export function Notification({
   };
 
   document.addEventListener('click', (event) => {
-    console.log('vvvvvvv44444', event.target);
     const target = event.target as HTMLElement;
     if (target.classList.contains('notification')) {
-      handleBannerClick();
-    } else if (target.classList.contains('button-primary-secondary')) {
+      handleNotificationClick();
+    } else if (
+      target.classList.contains('notification-button-primary-secondary')
+    ) {
       const index = parseInt(target.getAttribute('data-index') || '0', 10);
       if (!message || !message.elements || !message.elements.buttons) {
         return '';
@@ -253,15 +83,20 @@ export function Notification({
       class="notification" 
       style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: pointer;" 
     >
-      <div style="${defaultTextParentStyles}">
-        <p class="titleText" style="${defaultTitleStyles}; ${titleStyle || ''}">
+      <div class="notification" 
+       style="${defaultTextParentStyles}">
+        <p class="titleText notification" style="${defaultTitleStyles}; ${
+    titleStyle || ''
+  }">
           ${message?.elements?.title || 'Title Here'}
         </p>
-        <p class="titleText" style="${defaultTextStyles}; ${textStyle || ''}">
+        <p class="titleText notification" style="${defaultTextStyles}; ${
+    textStyle || ''
+  }">
           ${message?.elements?.body}
         </p>
       </div>
-      <div style="margin-top: auto;">
+      <div class="notification" style="margin-top: auto;">
         ${message?.elements?.buttons
           ?.map((button: any, index: number) => {
             const buttonStyle =
@@ -280,7 +115,7 @@ export function Notification({
                     : 'enabled'
                 } 
                 data-index="${index}"
-                class="button-primary-secondary" 
+                class="notification-button-primary-secondary" 
                 style="
                   max-width: calc(50% - 32px); 
                   text-align: left; 
