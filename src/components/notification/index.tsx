@@ -55,7 +55,7 @@ export function Notification({
     );
   };
 
-  const handleButtonClick = (button: any, index: number) => {
+  const handleButtonClick = (button: any) => {
     const clickedUrl =
       button?.action?.data?.trim() || button?.action?.type || '';
     embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
@@ -73,7 +73,7 @@ export function Notification({
       if (!message || !message.elements || !message.elements.buttons) {
         return '';
       }
-      handleButtonClick(message?.elements?.buttons[index], index);
+      handleButtonClick(message?.elements?.buttons[index]);
     }
   });
 
