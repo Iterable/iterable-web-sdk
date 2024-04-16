@@ -125,10 +125,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: any, index: number) => {
             const data = message;
-            const customComponentHTML2 = Notification({
+            const notification = Notification({
               message: data
             });
-            const customComponentHTML1 = Banner({
+            const banner = Banner({
               message: data,
               parentStyle: ` margin: 0; `,
               primaryBtnStyle: `
@@ -138,30 +138,20 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 color: #ffffff;
                 `
             });
-            const customComponentHTML0 = Card({
+            const card = Card({
               message: data,
               parentStyle: ` margin: 0; `
             });
             switch (selectedButtonIndex) {
               case 0:
-                return (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: customComponentHTML0 }}
-                  />
-                );
+                return <div dangerouslySetInnerHTML={{ __html: card }} />;
 
               case 1:
-                return (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: customComponentHTML1 }}
-                  />
-                );
+                return <div dangerouslySetInnerHTML={{ __html: banner }} />;
 
               case 2:
                 return (
-                  <div
-                    dangerouslySetInnerHTML={{ __html: customComponentHTML2 }}
-                  />
+                  <div dangerouslySetInnerHTML={{ __html: notification }} />
                 );
 
               default:
