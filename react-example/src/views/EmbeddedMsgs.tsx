@@ -4,7 +4,8 @@ import {
   Notification,
   Banner,
   initialize,
-  EmbeddedManager
+  EmbeddedManager,
+  IterableEmbeddedMessage
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
@@ -15,11 +16,31 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
-  const iterableApi = initialize(process.env.API_KEY);
+
+  const changeCustomElement = () => {
+    const titleElement = document.getElementById('notification-title-custom');
+    const imageElement = document.getElementById('banner-image-custom');
+
+    if (titleElement) {
+      titleElement.innerText = 'Custom title';
+    }
+    if (imageElement) {
+      imageElement.style.height = '100px';
+      imageElement.style.width = '100px';
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      changeCustomElement();
+    }, 3000);
+
+    // Clear the timeout to prevent memory leaks
+    return () => clearTimeout(timeoutId);
+  }, [selectedButtonIndex]);
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      iterableApi.setUserID(userId);
       const embeddedManager = new EmbeddedManager();
       await embeddedManager.syncMessages(
         userId,
@@ -123,10 +144,14 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }}
       >
         {messages.length > 0 ? (
-          messages.map((message: any, index: number) => {
+          messages.map((message: IterableEmbeddedMessage) => {
             const data = message;
             const notification = Notification({
-              message: data
+              message: data,
+              titleId: 'notification-title-custom',
+              textStyle: `
+                font-size: 20px;
+              `
             });
             const banner = Banner({
               message: data,
@@ -136,7 +161,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 border-radius: 8px;
                 padding: 10px;
                 color: #ffffff;
-                `
+                `,
+              imageId: 'banner-image-custom'
             });
             const card = Card({
               message: data,
