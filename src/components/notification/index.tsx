@@ -10,7 +10,12 @@ export function Notification({
   secondaryBtnStyle,
   secondaryDisableBtnStyle,
   textStyle,
-  titleStyle
+  titleStyle,
+  titleId = 'notification-title',
+  textId = 'notification-text',
+  primaryButtonId = 'notification-primary-button',
+  secondaryButtonId = 'notification-secondary-button',
+  parentId = 'notification-parent'
 }: EmbeddedMessageData): string {
   const defaultTitleStyles = `
     font-size: 20px;
@@ -81,16 +86,16 @@ export function Notification({
     <style>${mediaStyle}</style>
     <div 
       class="notification" 
+      id="${parentId}"
       style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: pointer;" 
     >
       <div class="notification" 
        style="${defaultTextParentStyles}">
-        <p class="titleText notification" style="${defaultTitleStyles}; ${
-    titleStyle || ''
-  }">
+        <p class="titleText notification" id="${titleId}" 
+        style="${defaultTitleStyles}; ${titleStyle || ''}">
           ${message?.elements?.title || 'Title Here'}
         </p>
-        <p class="titleText notification" style="${defaultTextStyles}; ${
+        <p class="titleText notification" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
           ${message?.elements?.body}
@@ -115,6 +120,7 @@ export function Notification({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="
                   max-width: calc(50% - 32px); 

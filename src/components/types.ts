@@ -12,4 +12,10 @@ export interface EmbeddedMessageData {
   primaryDisableBtnStyle?: string;
   secondaryBtnStyle?: string;
   secondaryDisableBtnStyle?: string;
+  titleId?: string;
+  textId?: string;
+  primaryButtonId?: string;
+  secondaryButtonId?: string;
+  parentId?: string;
+  imageId?: string;
 }

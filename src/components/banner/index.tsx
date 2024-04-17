@@ -12,7 +12,13 @@ export function Banner({
   secondaryDisableBtnStyle,
   textStyle,
   titleStyle,
-  message
+  message,
+  titleId = 'banner-title',
+  textId = 'banner-text',
+  primaryButtonId = 'banner-primary-button',
+  secondaryButtonId = 'banner-secondary-button',
+  parentId = 'banner-parent',
+  imageId = 'banner-image'
 }: EmbeddedMessageData): string {
   const defaultBannerStyles = `
     border: 1px solid #ccc;
@@ -115,18 +121,19 @@ export function Banner({
     <style>${mediaStyle}</style>
     <div 
       class="banner" 
+      id="${parentId}"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
       <div class="banner" 
       style="display: flex; flex-direction: row;">
         <div class="banner" 
         style="${defaultTextParentStyles}">
-          <text class="titleText banner" style="${defaultTitleStyles}; ${
+          <text class="titleText banner"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
             ${message?.elements?.title || 'Title Here'}
           </text>
-          <text class="titleText banner" style="${defaultTextStyles}; ${
+          <text class="titleText banner" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
             ${message?.elements?.body}
@@ -134,7 +141,7 @@ export function Banner({
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img class="banner" 
+            ? `<img class="banner" id="${imageId}"
             style="${defaultImageStyles}; ${imgStyle || ''}" src="${
                 message?.elements?.mediaUrl
               }" />`
@@ -162,6 +169,7 @@ export function Banner({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
                 ${defaultTitleStyles}; ${titleStyle || ''}
                 style="${defaultButtonStyles};  ${buttonStyle || ''} ${

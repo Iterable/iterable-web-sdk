@@ -12,7 +12,13 @@ export function Card({
   secondaryDisableBtnStyle,
   textStyle,
   titleStyle,
-  message
+  message,
+  titleId = 'card-title',
+  textId = 'card-text',
+  primaryButtonId = 'card-primary-button',
+  secondaryButtonId = 'card-secondary-button',
+  parentId = 'card-parent',
+  imageId = 'card-image'
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -119,21 +125,24 @@ export function Card({
     <style>${mediaStyle}</style>
     <div 
       class="card"
+      id="${parentId}"
       style="${defaultCardStyles}; ${parentStyle || ''}" 
     >
       ${
         message?.elements?.mediaUrl
-          ? `<img class="card" style="${defaultImageStyles}; ${imgStyle || ''}" 
+          ? `<img class="card" id="${imageId}" style="${defaultImageStyles}; ${
+              imgStyle || ''
+            }" 
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
       <div class="card" style="${defaultTextParentStyles}">
-        <text class="titleText card" style="${defaultTitleStyles}; ${
+        <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
           ${message?.elements?.title || 'Title Here'}
         </text>
-        <text class="titleText card" style="${defaultTextStyles}; ${
+        <text class="titleText card" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
           ${message?.elements?.body}
@@ -159,6 +168,7 @@ export function Card({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="card-button-primary-secondary" 
                 style="
                   ${defaultButtonStyles}; 
