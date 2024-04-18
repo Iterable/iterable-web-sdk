@@ -104,11 +104,11 @@ export function Banner({
     embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
   };
 
-  function buttonsClick(button: HTMLElement, index: number) {
+  function addButtonClickEvent(button: HTMLElement, index: number) {
     button.addEventListener('click', (event) => {
       // Prevent the click event from bubbling up to the div
       event.stopPropagation();
-      if (!message || !message.elements || !message.elements.buttons) {
+      if (!message?.elements?.buttons) {
         return '';
       }
       handleButtonClick(message?.elements?.buttons[index]);
@@ -123,10 +123,10 @@ export function Banner({
       notificationDiv.addEventListener('click', handleBannerClick);
     }
     if (primaryButtonClick) {
-      buttonsClick(primaryButtonClick, 0);
+      addButtonClickEvent(primaryButtonClick, 0);
     }
     if (secondaryButtonClick) {
-      buttonsClick(secondaryButtonClick, 1);
+      addButtonClickEvent(secondaryButtonClick, 1);
     }
   }, 0);
 
