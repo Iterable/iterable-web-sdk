@@ -47,7 +47,7 @@ export function Notification({
     }
   `;
   const embeddedManager = new EmbeddedManager();
-  const handleNotificationClick = () => {
+  function handleNotificationClick() {
     const clickedUrl =
       message?.elements?.defaultAction?.data?.trim() ||
       message?.elements?.defaultAction?.type ||
@@ -58,29 +58,40 @@ export function Notification({
       '',
       clickedUrl ? clickedUrl : ''
     );
-  };
+  }
 
-  const handleButtonClick = (button: any) => {
+  function handleButtonClick(button: any) {
     const clickedUrl =
       button?.action?.data?.trim() || button?.action?.type || '';
     embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
     embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
-  };
+  }
 
-  document.addEventListener('click', (event) => {
-    const target = event.target as HTMLElement;
-    if (target.classList.contains('notification')) {
-      handleNotificationClick();
-    } else if (
-      target.classList.contains('notification-button-primary-secondary')
-    ) {
-      const index = parseInt(target.getAttribute('data-index') || '0', 10);
+  function buttonsClick(button: HTMLElement, index: number) {
+    button.addEventListener('click', (event) => {
+      // Prevent the click event from bubbling up to the div
+      event.stopPropagation();
       if (!message || !message.elements || !message.elements.buttons) {
         return '';
       }
       handleButtonClick(message?.elements?.buttons[index]);
+    });
+  }
+
+  setTimeout(() => {
+    const notificationDiv = document.getElementById(parentId);
+    const primaryButtonClick = document.getElementById(primaryButtonId);
+    const secondaryButtonClick = document.getElementById(secondaryButtonId);
+    if (notificationDiv) {
+      notificationDiv.addEventListener('click', handleNotificationClick);
     }
-  });
+    if (primaryButtonClick) {
+      buttonsClick(primaryButtonClick, 0);
+    }
+    if (secondaryButtonClick) {
+      buttonsClick(secondaryButtonClick, 1);
+    }
+  }, 0);
 
   return `
     <style>${mediaStyle}</style>
