@@ -5,7 +5,8 @@ import {
   Banner,
   initialize,
   EmbeddedManager,
-  IterableEmbeddedMessage
+  IterableEmbeddedMessage,
+  EmbeddedMessageUpdateHandler
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
@@ -18,8 +19,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [messages, setMessages] = useState([]);
 
   const changeCustomElement = () => {
-    const titleElement = document.getElementById('notification-title-custom');
-    const imageElement = document.getElementById('banner-image-custom');
+    const titleElement = document.getElementById('notification-title-custom-0');
+    const imageElement = document.getElementById('banner-image-custom-1');
 
     if (titleElement) {
       titleElement.innerText = 'Custom title';
@@ -42,14 +43,25 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const embeddedManager = new EmbeddedManager();
-
+      const updateListener: EmbeddedMessageUpdateHandler = {
+        onMessagesUpdated: function (): void {
+          setMessages(embeddedManager.getMessages());
+        },
+        onEmbeddedMessagingDisabled: function (): void {
+          setMessages([]);
+        }
+      };
+      embeddedManager.addUpdateListener(updateListener);
       await embeddedManager.syncMessages(
         userId,
         'Web',
         '1',
         'my-website',
         () => {
-          setMessages(embeddedManager.getMessages());
+          console.log(
+            'messages',
+            JSON.stringify(embeddedManager.getMessages())
+          );
         }
       );
     } catch (error: any) {
@@ -145,11 +157,11 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }}
       >
         {messages.length > 0 ? (
-          messages.map((message: IterableEmbeddedMessage) => {
+          messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
             const notification = Notification({
               message: data,
-              titleId: 'notification-title-custom',
+              titleId: `notification-title-custom-${index}`,
               textStyle: `
                 font-size: 20px;
               `
@@ -163,7 +175,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 padding: 10px;
                 color: #ffffff;
                 `,
-              imageId: 'banner-image-custom'
+              imageId: `banner-image-custom-${index}`
             });
             const card = Card({
               message: data,
