@@ -28,7 +28,7 @@ export function Card({
     margin-top: 10px;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    cursor: pointer;
+    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
   `;
   const defaultImageStyles = `
     width: 100%;

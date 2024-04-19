@@ -105,7 +105,9 @@ export function Notification({
       class="notification" 
       id="${parentId}"
       name="${message?.metadata?.messageId}-notification"
-      style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: pointer;" 
+      style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: ${
+        message?.elements?.defaultAction ? 'pointer' : 'auto'
+      };" 
     >
       <div class="notification" 
        style="${defaultTextParentStyles}">

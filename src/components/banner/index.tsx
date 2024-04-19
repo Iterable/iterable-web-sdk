@@ -28,7 +28,7 @@ export function Banner({
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 16px;
-    cursor: pointer;
+    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
   `;
   const defaultImageStyles = `
     width: 70px;
