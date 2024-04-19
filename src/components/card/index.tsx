@@ -120,11 +120,17 @@ export function Card({
   }
 
   setTimeout(() => {
-    const notificationDiv = document.getElementById(parentId);
-    const primaryButtonClick = document.getElementById(primaryButtonId);
-    const secondaryButtonClick = document.getElementById(secondaryButtonId);
-    if (notificationDiv) {
-      notificationDiv.addEventListener('click', handleCardClick);
+    const cardDiv = document.getElementsByName(
+      `${message?.metadata?.messageId}-card`
+    )[0];
+    const primaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-card-primaryButton`
+    )[0];
+    const secondaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-card-secondaryButton`
+    )[0];
+    if (cardDiv) {
+      cardDiv.addEventListener('click', handleCardClick);
     }
     if (primaryButtonClick) {
       addButtonClickEvent(primaryButtonClick, 0);
@@ -139,6 +145,7 @@ export function Card({
     <div 
       class="card"
       id="${parentId}"
+      name="${message?.metadata?.messageId}-card"
       style="${defaultCardStyles}; ${parentStyle || ''}" 
     >
       ${
@@ -181,6 +188,9 @@ export function Card({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                name="${message?.metadata?.messageId}${
+              index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
+            }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="card-button-primary-secondary" 
                 style="

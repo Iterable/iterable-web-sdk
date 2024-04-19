@@ -79,9 +79,15 @@ export function Notification({
   }
 
   setTimeout(() => {
-    const notificationDiv = document.getElementById(parentId);
-    const primaryButtonClick = document.getElementById(primaryButtonId);
-    const secondaryButtonClick = document.getElementById(secondaryButtonId);
+    const notificationDiv = document.getElementsByName(
+      `${message?.metadata?.messageId}-notifiation`
+    )[0];
+    const primaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-notification-primaryButton`
+    )[0];
+    const secondaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-notification-secondaryButton`
+    )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', handleNotificationClick);
     }
@@ -98,6 +104,7 @@ export function Notification({
     <div 
       class="notification" 
       id="${parentId}"
+      name="${message?.metadata?.messageId}-notification"
       style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: pointer;" 
     >
       <div class="notification" 
@@ -131,6 +138,11 @@ export function Notification({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                name="${message?.metadata?.messageId}${
+              index === 0
+                ? '-notification-primaryButton'
+                : '-notification-secondaryButton'
+            }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="

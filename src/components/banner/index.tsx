@@ -116,11 +116,17 @@ export function Banner({
   }
 
   setTimeout(() => {
-    const notificationDiv = document.getElementById(parentId);
-    const primaryButtonClick = document.getElementById(primaryButtonId);
-    const secondaryButtonClick = document.getElementById(secondaryButtonId);
-    if (notificationDiv) {
-      notificationDiv.addEventListener('click', handleBannerClick);
+    const bannerDiv = document.getElementsByName(
+      `${message?.metadata?.messageId}-banner`
+    )[0];
+    const primaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-banner-primaryButton`
+    )[0];
+    const secondaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-banner-secondaryButton`
+    )[0];
+    if (bannerDiv) {
+      bannerDiv.addEventListener('click', handleBannerClick);
     }
     if (primaryButtonClick) {
       addButtonClickEvent(primaryButtonClick, 0);
@@ -135,6 +141,7 @@ export function Banner({
     <div 
       class="banner" 
       id="${parentId}"
+      name="${message?.metadata?.messageId}-banner"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
       <div class="banner" 
@@ -182,6 +189,9 @@ export function Banner({
                     : 'enabled'
                 } 
                 data-index="${index}"
+                name="${message?.metadata?.messageId}${
+              index === 0 ? '-banner-primaryButton' : '-banner-secondaryButton'
+            }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
                 ${defaultTitleStyles}; ${titleStyle || ''}
