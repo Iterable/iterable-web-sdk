@@ -42,6 +42,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const embeddedManager = new EmbeddedManager();
+
       await embeddedManager.syncMessages(
         userId,
         'Web',
@@ -155,7 +156,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             });
             const banner = Banner({
               message: data,
-              parentStyle: ` margin: 0; `,
+              parentStyle: ` margin-bottom: 10; `,
               primaryBtnStyle: `
                 background-color: #000fff;
                 border-radius: 8px;
@@ -166,7 +167,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             });
             const card = Card({
               message: data,
-              parentStyle: ` margin: 0; `
+              parentStyle: ` margin-bottom: 10; `
             });
             switch (selectedButtonIndex) {
               case 0:
