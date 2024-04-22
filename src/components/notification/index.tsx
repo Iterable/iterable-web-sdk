@@ -1,5 +1,9 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager, EmbeddedMessageElementsButton } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
 export function Notification({
   message,
@@ -60,44 +64,10 @@ export function Notification({
       }
     }
   `;
-  const embeddedManager = new EmbeddedManager();
-  function handleNotificationClick() {
-    const clickedUrl =
-      message?.elements?.defaultAction?.data?.trim() ||
-      message?.elements?.defaultAction?.type ||
-      null;
-    embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-    embeddedManager.trackEmbeddedClick(
-      message,
-      '',
-      clickedUrl ? clickedUrl : ''
-    );
-  }
-
-  const handleButtonClick = (button: EmbeddedMessageElementsButton) => {
-    const clickedUrl =
-      button?.action?.data?.trim() || button?.action?.type || '';
-    if (button?.id === null || button?.id === undefined) {
-      return '';
-    }
-    embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
-    embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
-  };
-
-  function addButtonClickEvent(button: HTMLElement, index: number) {
-    button.addEventListener('click', (event) => {
-      // Prevent the click event from bubbling up to the div
-      event.stopPropagation();
-      if (!message?.elements?.buttons) {
-        return '';
-      }
-      handleButtonClick(message?.elements?.buttons[index]);
-    });
-  }
 
   setTimeout(() => {
     const notificationDiv = document.getElementsByName(
-      `${message?.metadata?.messageId}-notifiation`
+      `${message?.metadata?.messageId}-notification`
     )[0];
     const primaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-notification-primaryButton`
@@ -106,13 +76,15 @@ export function Notification({
       `${message?.metadata?.messageId}-notification-secondaryButton`
     )[0];
     if (notificationDiv) {
-      notificationDiv.addEventListener('click', handleNotificationClick);
+      notificationDiv.addEventListener('click', () =>
+        handleElementClick(message)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0);
+      addButtonClickEvent(primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1);
+      addButtonClickEvent(secondaryButtonClick, 1, message);
     }
   }, 0);
 
@@ -157,10 +129,11 @@ export function Notification({
       <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
         ${message?.elements?.buttons
           ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
             return `
               <button 
                 key="${index}" 
-                ${getStyleObj(index).disableButton}  
+                ${buttonStyleObj.disableButton}  
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0
@@ -173,8 +146,8 @@ export function Notification({
                   background: ${index === 0 ? '#2196f3' : 'none'}; 
                   color: ${index === 0 ? 'white' : '#2196f3'}; 
                   ${defaultButtonStyles}; 
-                  ${getStyleObj(index).buttonStyle || ''}; 
-                  ${getStyleObj(index).disableStyle || ''}" 
+                  ${buttonStyleObj.buttonStyle || ''}; 
+                  ${buttonStyleObj.disableStyle || ''}" 
                   >
                 ${button.title || `Button ${index + 1}`}
               </button>
