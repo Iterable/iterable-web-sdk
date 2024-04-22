@@ -1,5 +1,5 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedManager, EmbeddedMessageElementsButton } from '../../embedded';
 
 export function Card({
   parentStyle,
@@ -18,7 +18,9 @@ export function Card({
   primaryButtonId = 'card-primary-button',
   secondaryButtonId = 'card-secondary-button',
   parentId = 'card-parent',
-  imageId = 'card-image'
+  imageId = 'card-image',
+  buttonsDivId = 'card-buttons-div',
+  textTitleDivId = 'card-text-title-div'
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -101,9 +103,12 @@ export function Card({
     );
   };
 
-  const handleButtonClick = (button: any) => {
+  const handleButtonClick = (button: EmbeddedMessageElementsButton) => {
     const clickedUrl =
       button?.action?.data?.trim() || button?.action?.type || '';
+    if (button?.id === null || button?.id === undefined) {
+      return '';
+    }
     embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
     embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
   };
@@ -140,6 +145,22 @@ export function Card({
     }
   }, 0);
 
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
+
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -156,7 +177,7 @@ export function Card({
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div class="card" style="${defaultTextParentStyles}">
+      <div id="${textTitleDivId}" class="card" style="${defaultTextParentStyles}">
         <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
@@ -168,25 +189,13 @@ export function Card({
           ${message?.elements?.body}
         </text>
       </div>
-      <div class="card" style="${cardButtons}">
+      <div id="${buttonsDivId}" class="card" style="${cardButtons}">
         ${message?.elements?.buttons
-          ?.map((button: any, index: number) => {
-            const buttonStyle =
-              index === 0 ? primaryBtnStyle : secondaryBtnStyle;
-            const disableStyle =
-              index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle;
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
             return `
               <button 
                 key="${index}" 
-                ${
-                  index === 0
-                    ? disablePrimaryBtn
-                      ? 'disabled'
-                      : 'enabled'
-                    : disableSecondaryBtn
-                    ? 'disabled'
-                    : 'enabled'
-                } 
+                ${getStyleObj(index).disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
@@ -195,17 +204,8 @@ export function Card({
                 class="card-button-primary-secondary" 
                 style="
                   ${defaultButtonStyles}; 
-                  ${
-                    index === 0
-                      ? disablePrimaryBtn
-                        ? primaryDisableBtnStyle || ''
-                        : primaryBtnStyle || ''
-                      : disableSecondaryBtn
-                      ? secondaryDisableBtnStyle || ''
-                      : secondaryBtnStyle || ''
-                  };
-                  ${buttonStyle || ''}; 
-                  ${disableStyle || ''}" 
+                  ${getStyleObj(index).buttonStyle || ''}; 
+                  ${getStyleObj(index).disableStyle || ''}" 
               >
                 ${button.title ? button.title : `Button ${index + 1}`}
               </button>

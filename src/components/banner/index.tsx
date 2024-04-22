@@ -1,5 +1,5 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedManager, EmbeddedMessageElementsButton } from '../../embedded';
 
 export function Banner({
   parentStyle,
@@ -18,7 +18,10 @@ export function Banner({
   primaryButtonId = 'banner-primary-button',
   secondaryButtonId = 'banner-secondary-button',
   parentId = 'banner-parent',
-  imageId = 'banner-image'
+  imageId = 'banner-image',
+  buttonsDivId = 'banner-buttons-div',
+  textTitleDivId = 'banner-text-title-div',
+  textTitleImageDivId = 'banner-text-title-image-div'
 }: EmbeddedMessageData): string {
   const defaultBannerStyles = `
     border: 1px solid #ccc;
@@ -97,9 +100,12 @@ export function Banner({
     );
   };
 
-  const handleButtonClick = (button: any) => {
+  const handleButtonClick = (button: EmbeddedMessageElementsButton) => {
     const clickedUrl =
       button?.action?.data?.trim() || button?.action?.type || '';
+    if (button?.id === null || button?.id === undefined) {
+      return '';
+    }
     embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
     embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
   };
@@ -136,6 +142,22 @@ export function Banner({
     }
   }, 0);
 
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
+
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -144,9 +166,10 @@ export function Banner({
       name="${message?.metadata?.messageId}-banner"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
-      <div class="banner" 
+      <div class="banner" id="${textTitleImageDivId}"
       style="display: flex; flex-direction: row;">
         <div class="banner" 
+        id="${textTitleDivId}"
         style="${defaultTextParentStyles}">
           <text class="titleText banner"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
@@ -168,36 +191,23 @@ export function Banner({
             : ''
         }
       </div>
-      <div class="banner" 
+      <div class="banner" id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
-          ?.map((button: any, index: number) => {
-            const buttonStyle =
-              index === 0 ? primaryBtnStyle : secondaryBtnStyle;
-            const disableStyle =
-              index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle;
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
             return `
               <button 
                 key="${index}" 
-                ${
-                  index === 0
-                    ? disablePrimaryBtn
-                      ? 'disabled'
-                      : 'enabled'
-                    : disableSecondaryBtn
-                    ? 'disabled'
-                    : 'enabled'
-                } 
+                ${getStyleObj(index).disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0 ? '-banner-primaryButton' : '-banner-secondaryButton'
             }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
-                ${defaultTitleStyles}; ${titleStyle || ''}
-                style="${defaultButtonStyles};  ${buttonStyle || ''} ${
-              disableStyle || ''
-            }"
+                style="${defaultButtonStyles};  
+                ${getStyleObj(index).buttonStyle || ''} 
+                ${getStyleObj(index).disableStyle || ''}"
               >
                 ${button.title ? button.title : `Button ${index + 1}`}
               </button>
