@@ -3,14 +3,15 @@ import axios from 'axios';
 import {
   initialize,
   getInAppMessages,
-  updateUserEmail
+  updateUserEmail,
+  GenerateJWTPayload
 } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    ({ email }) => {
+    ({ email }: GenerateJWTPayload) => {
       return axios
         .post(
           'http://localhost:5000/generate',
@@ -25,7 +26,7 @@ import {
             }
           }
         )
-        .then((response) => {
+        .then((response: any) => {
           return response.data?.token;
         });
     }
@@ -72,7 +73,7 @@ import {
       startBtn.setAttribute('aria-disabled', 'true');
       startBtn.className = 'disabled';
       request()
-        .then((response) => {
+        .then((response: any) => {
           triggerDisplayMessages(response.data.inAppMessages);
           startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
         })

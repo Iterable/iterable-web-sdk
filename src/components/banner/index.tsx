@@ -1,57 +1,32 @@
 import React, { CSSProperties } from 'react';
+import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageData } from '../types';
 
-interface IBannerProps {
-  imgSrc?: string;
-  title: string;
-  text: string;
-  primaryBtnLabel?: string;
-  secondaryBtnLabel?: string;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  onClickPrimaryBtn?: () => void;
-  onClickSecondaryBtn?: () => void;
-  imgStyle?: CSSProperties;
-  titleStyle?: CSSProperties;
-  BannerStyle?: CSSProperties;
-  textStyle?: CSSProperties;
-  primaryBtnStyle?: CSSProperties;
-  primaryDisableBtnStyle?: CSSProperties;
-  secondaryBtnStyle?: CSSProperties;
-  secondaryDisableBtnStyle?: CSSProperties;
-  onClickView?: () => void;
-}
-
-export const Banner = (props: IBannerProps) => {
+/* WARNING: OOTB Views not officially supported for Beta */
+export const Banner = (props: EmbeddedMessageData) => {
   const {
-    text,
-    title,
-    BannerStyle,
+    parentStyle,
     disablePrimaryBtn,
     disableSecondaryBtn,
-    imgSrc,
     imgStyle,
-    onClickPrimaryBtn,
-    onClickSecondaryBtn,
-    primaryBtnLabel,
     primaryBtnStyle,
     primaryDisableBtnStyle,
-    secondaryBtnLabel,
     secondaryBtnStyle,
     secondaryDisableBtnStyle,
     textStyle,
     titleStyle,
-    onClickView
+    message
   } = props;
 
   const defaultBannerStyles = {
     border: '1px solid #ccc',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    width: '60%',
     margin: 'auto',
     marginTop: '10px',
     marginBottom: '10px',
-    padding: '16px'
+    padding: '16px',
+    cursor: 'pointer'
   };
   const defaultImageStyles = {
     width: '70px',
@@ -62,90 +37,138 @@ export const Banner = (props: IBannerProps) => {
   const defaultTitleStyles = {
     fontSize: '20px',
     fontWeight: 'bold',
-    marginBottom: '8px'
+    marginBottom: '4px',
+    display: 'block'
   };
   const defaultTextStyles = {
     fontSize: '16px',
-    marginBottom: '16px'
+    marginBottom: '10px',
+    display: 'block'
   };
-  const bannerButtons = {
-    marginTop: '20px'
+  const bannerButtons: CSSProperties = {
+    marginTop: 'auto'
   };
-  const defaultButtonStyles = {
+  const defaultButtonStyles: CSSProperties = {
+    maxWidth: 'calc(50% - 32px)',
+    textAlign: 'left',
     fontSize: '16px',
     fontWeight: 'bold',
     backgroundColor: 'transparent',
     color: '#433d99',
     border: 'none',
     borderRadius: 0,
-    cursor: 'pointer'
+    cursor: 'pointer',
+    padding: '5px',
+    overflowWrap: 'break-word'
   };
   const defaultTextParentStyles = {
-    flex: '1'
+    flex: '1',
+    maxWidth: 'calc(100% - 80px)'
   };
+  const mediaStyle = `
+  @media screen and (max-width: 800px) {
+      .titleText {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 2.6em;
+        line-height: 1.3em;
+      }
+      .banner {
+        min-height: 150px;
+        display: flex;
+        flex-direction: column;
+      }
+    }
+  `;
+
+  const embeddedManager = new EmbeddedManager();
 
   return (
-    <div
-      className="banner"
-      style={{
-        ...defaultBannerStyles,
-        ...BannerStyle
-      }}
-      onClick={onClickView}
-    >
+    <>
+      <style>{mediaStyle}</style>
       <div
+        className="banner"
         style={{
-          display: 'flex',
-          flexDirection: 'row'
+          ...defaultBannerStyles,
+          ...parentStyle
+        }}
+        onClick={() => {
+          const clickedUrl =
+            message?.elements?.defaultAction?.data?.trim() ||
+            message?.elements?.defaultAction?.type ||
+            null;
+          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+          embeddedManager.trackEmbeddedClick(
+            message,
+            '',
+            clickedUrl ? clickedUrl : ''
+          );
         }}
       >
-        <div style={defaultTextParentStyles}>
-          <div style={{ overflowWrap: 'anywhere' }}>
-            <text style={{ ...defaultTitleStyles, ...titleStyle }}>
-              {title}
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row'
+          }}
+        >
+          <div style={defaultTextParentStyles}>
+            <text
+              className="titleText"
+              style={{
+                ...defaultTitleStyles,
+                ...titleStyle
+              }}
+            >
+              {message?.elements?.title || 'Title Here'}
             </text>
-            <br></br>
-            <text style={{ ...defaultTextStyles, ...textStyle }}>{text}</text>
+            <text
+              className="titleText"
+              style={{ ...defaultTextStyles, ...textStyle }}
+            >
+              {message?.elements?.body}
+            </text>
           </div>
-          <div style={bannerButtons}>
-            {primaryBtnLabel ? (
-              <button
-                disabled={disablePrimaryBtn}
-                style={
-                  disablePrimaryBtn
-                    ? {
-                        ...defaultButtonStyles,
-                        ...primaryDisableBtnStyle
-                      }
-                    : { ...defaultButtonStyles, ...primaryBtnStyle }
-                }
-                onClick={onClickPrimaryBtn}
-              >
-                {primaryBtnLabel ? primaryBtnLabel : 'Button 1'}
-              </button>
-            ) : null}
-            {secondaryBtnLabel ? (
-              <button
-                disabled={disableSecondaryBtn}
-                style={
-                  disableSecondaryBtn
-                    ? {
-                        ...defaultButtonStyles,
-                        ...secondaryDisableBtnStyle
-                      }
-                    : { ...defaultButtonStyles, ...secondaryBtnStyle }
-                }
-                onClick={onClickSecondaryBtn}
-              >
-                {secondaryBtnLabel ? secondaryBtnLabel : 'Button 2'}
-              </button>
-            ) : null}
-          </div>
+          {message?.elements?.mediaUrl && (
+            <img
+              style={{ ...defaultImageStyles, ...imgStyle }}
+              src={message?.elements?.mediaUrl}
+            />
+          )}
         </div>
-        {imgSrc && (
-          <img style={{ ...defaultImageStyles, ...imgStyle }} src={imgSrc} />
-        )}
+        <div style={bannerButtons}>
+          {message?.elements?.buttons?.map((button: any, index: number) => (
+            <button
+              key={index}
+              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
+              style={
+                index === 0
+                  ? disablePrimaryBtn
+                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
+                    : { ...defaultButtonStyles, ...primaryBtnStyle }
+                  : disableSecondaryBtn
+                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
+                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
+              }
+              onClick={() => {
+                const clickedUrl =
+                  button?.action?.data?.trim() || button?.action?.type || '';
+                embeddedManager.handleEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+                embeddedManager.trackEmbeddedClick(
+                  message,
+                  button?.id,
+                  clickedUrl
+                );
+              }}
+            >
+              {button.title ? button.title : `Button ${index + 1}`}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 };

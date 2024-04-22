@@ -1,7 +1,8 @@
 import { baseIterableRequest } from '../request';
 import {
   EmbeddedMessageUpdateHandler,
-  EmbeddedMessageActionHandler
+  IterableActionSource,
+  IterableAction
 } from './types';
 import { IterableResponse } from '../types';
 import { IEmbeddedMessage } from '../events/embedded/types';
@@ -10,11 +11,20 @@ import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { functions } from 'src/utils/functions';
 import { LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS } from 'src/constants';
+import { IterableActionRunner } from 'src/utils/IterableActionRunner';
+import {
+  URL_SCHEME_ITBL,
+  URL_SCHEME_ACTION,
+  URL_SCHEME_OPEN,
+  WEB_PLATFORM
+} from '../constants';
+import { IterableEmbeddedMessage } from './embeddedMessage';
+import { EndPoints } from 'src/events/consts';
+import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessage[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
-  private actionListeners: EmbeddedMessageActionHandler[] = [];
 
   public async syncMessages(
     userIdOrEmail: string,
@@ -43,10 +53,6 @@ export class EmbeddedManager {
   ) {
     try {
       let url = `${embedded_msg_endpoint}?`;
-
-      url += functions.checkEmailValidation(userIdOrEmail)
-        ? `email=${userIdOrEmail}&`
-        : `userId=${userIdOrEmail}&`;
       url += `platform=${platform}`;
       url += `&sdkVersion=${sdkVersion}`;
       url += `&packageName=${packageName}`;
@@ -144,6 +150,9 @@ export class EmbeddedManager {
     userIdOrEmail: string
   ) {
     const msgsList = _processor.newlyRetrievedMessages();
+    if (msgsList.length > 0) {
+      this.notifyUpdateDelegates();
+    }
     for (let i = 0; i < msgsList.length; i++) {
       const messages = {} as IEmbeddedMessage;
       messages.messageId = msgsList[i].metadata.messageId;
@@ -159,17 +168,15 @@ export class EmbeddedManager {
     this.updateListeners.push(updateListener);
   }
 
-  public addActionHandler(actionHandler: EmbeddedMessageActionHandler) {
-    this.actionListeners.push(actionHandler);
+  private notifyUpdateDelegates() {
+    this.updateListeners.forEach(
+      (updateListener: EmbeddedMessageUpdateHandler) => {
+        updateListener.onMessagesUpdated();
+      }
+    );
   }
 
-  // private notifyUpdateDelegates() {
-  //     this.updateListeners.forEach((updateListener: EmbeddedMessageUpdateHandler) => {
-  //         updateListener.onMessagesUpdated();
-  //     });
-  // }
-
-  public notifyDelegatesOfInvalidApiKeyOrSyncStop() {
+  private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
       (updateListener: EmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
@@ -177,12 +184,68 @@ export class EmbeddedManager {
     );
   }
 
-  public getActionHandlers(): Array<EmbeddedMessageActionHandler> {
-    return this.actionListeners;
-  }
-
   //Get the list of updateHandlers
   public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
     return this.updateListeners;
+  }
+
+  handleEmbeddedClick(
+    message: any,
+    buttonIdentifier: string | null,
+    clickedUrl: string | null
+  ) {
+    if (clickedUrl && clickedUrl.trim() !== '') {
+      let actionType: string;
+      let actionName: string;
+
+      if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
+        actionType = URL_SCHEME_ACTION;
+        actionName = clickedUrl.replace(URL_SCHEME_ACTION, '');
+      } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
+        actionType = URL_SCHEME_ITBL;
+        actionName = clickedUrl.replace(URL_SCHEME_ITBL, '');
+      } else {
+        actionType = URL_SCHEME_OPEN;
+        actionName = clickedUrl.replace(URL_SCHEME_OPEN, '');
+      }
+
+      const iterableAction: IterableAction = {
+        type: actionType,
+        data: actionName
+      };
+
+      IterableActionRunner.executeAction(
+        null,
+        iterableAction,
+        IterableActionSource.EMBEDDED
+      );
+    }
+  }
+
+  trackEmbeddedClick(
+    message: IterableEmbeddedMessage,
+    buttonIdentifier: string,
+    clickedUrl: string
+  ) {
+    const payload = {
+      messageId: message?.metadata?.messageId,
+      buttonIdentifier: buttonIdentifier,
+      targetUrl: clickedUrl,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: window.location.hostname
+      },
+      createdAt: Date.now()
+    };
+
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: EndPoints.msg_click_event_track,
+      data: payload,
+      validation: {
+        data: trackEmbeddedMessageClickSchema
+      }
+    });
   }
 }

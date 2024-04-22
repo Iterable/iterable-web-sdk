@@ -57,6 +57,11 @@ export const CLOSE_X_BUTTON_ID = 'close-x-button';
 export const ABSOLUTE_DISMISS_BUTTON_ID = 'absolute-dismiss-button';
 
 export const LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS = 'itbl_current_embedded_msgs';
+export const URL_SCHEME_ITBL = 'itbl://';
+export const URL_SCHEME_ACTION = 'action://';
+export const URL_SCHEME_OPEN = 'openUrl';
+export const SHARED_PREF_USER_ID = 'userId';
+export const SHARED_PREF_EMAIL = 'email';
 
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION

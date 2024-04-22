@@ -6,7 +6,9 @@ import {
   IS_PRODUCTION,
   LOCAL_STORAGE_CURRENT_EMBEDDED_MSGS,
   RETRY_USER_ATTEMPTS,
-  STATIC_HEADERS
+  STATIC_HEADERS,
+  SHARED_PREF_USER_ID,
+  SHARED_PREF_EMAIL
 } from '../constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -21,12 +23,12 @@ import { config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
-interface GenerateJWTPayload {
+export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
 }
 
-interface WithJWT {
+export interface WithJWT {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -34,7 +36,7 @@ interface WithJWT {
   refreshJwtToken: (authTypes: string) => Promise<string>;
 }
 
-interface WithoutJWT {
+export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
   setEmail: (email: string) => void;
@@ -68,13 +70,11 @@ export function initialize(
   */
   let authInterceptor: number | null = generateJWT
     ? null
-    : baseAxiosRequest.interceptors.request.use((config) => ({
-        ...config,
-        headers: {
-          ...config.headers,
-          'Api-Key': authToken
-        }
-      }));
+    : baseAxiosRequest.interceptors.request.use((config) => {
+        config.headers.set('Api-Key', authToken);
+
+        return config;
+      });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
@@ -124,7 +124,7 @@ export function initialize(
         if (millisecondsToExpired < MAX_TIMEOUT) {
           timer = setTimeout(() => {
             /* get new token */
-            return callback().catch((e) => {
+            return callback().catch((e: any) => {
               console.warn(e);
               console.warn(
                 'Could not refresh JWT. Try identifying the user again.'
@@ -159,7 +159,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
+          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
@@ -176,7 +176,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+          /(commerce\/updateCart)|(commerce\/trackPurchase)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
         )
       ) {
         return {
@@ -194,7 +194,7 @@ export function initialize(
       /*
         endpoints that use _email_ query param in GET requests
       */
-      if (!!(config?.url || '').match(/getMessages/gim)) {
+      if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
         return {
           ...config,
           params: {
@@ -217,13 +217,10 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
         authInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => ({
-            ...config,
-            headers: {
-              ...config.headers,
-              'Api-Key': newToken
-            }
-          })
+          (config) => {
+            config.headers.set('Api-Key', newToken);
+            return config;
+          }
         );
       },
       clearAuthToken: () => {
@@ -236,6 +233,7 @@ export function initialize(
       setEmail: (email: string) => {
         typeOfAuth = 'email';
         authIdentifier = email;
+        localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -249,6 +247,7 @@ export function initialize(
       setUserID: async (userId: string) => {
         typeOfAuth = 'userID';
         authIdentifier = userId;
+        localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
 
         if (typeof userInterceptor === 'number') {
@@ -404,22 +403,20 @@ export function initialize(
                 We can't do this with Axios because it's built upon XHR and that doesn't support
                 "keepalive" so we fall back to the fetch API
               */
-              return cancelAxiosRequestAndMakeFetch(
+              const cancelConfig = cancelAxiosRequestAndMakeFetch(
                 config,
                 { email: payload.email, userID: payload.userID },
                 token,
                 authToken
               );
+
+              return cancelConfig;
             }
 
-            return {
-              ...config,
-              headers: {
-                ...config.headers,
-                'Api-Key': authToken,
-                Authorization: `Bearer ${token}`
-              }
-            };
+            config.headers.set('Api-Key', authToken);
+            config.headers.set('Authorization', `Bearer ${token}`);
+
+            return config;
           }
         );
 
@@ -485,14 +482,10 @@ export function initialize(
                         );
                       }
 
-                      return {
-                        ...config,
-                        headers: {
-                          ...config.headers,
-                          Api_Key: authToken,
-                          Authorization: `Bearer ${newToken}`
-                        }
-                      };
+                      config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
+
+                      return config;
                     }
                   );
 
@@ -512,7 +505,7 @@ export function initialize(
                   */
                   handleTokenExpiration(newToken, () => {
                     /* re-run the JWT generation */
-                    return doRequest(payloadToPass).catch((e) => {
+                    return doRequest(payloadToPass).catch((e: any) => {
                       console.warn(e);
                       console.warn(
                         'Could not refresh JWT. Try identifying the user again.'
@@ -567,14 +560,10 @@ export function initialize(
                         );
                       }
 
-                      return {
-                        ...config,
-                        headers: {
-                          ...config.headers,
-                          'Api-Key': authToken,
-                          Authorization: `Bearer ${newToken}`
-                        }
-                      };
+                      config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
+
+                      return config;
                     }
                   );
 
@@ -592,7 +581,7 @@ export function initialize(
                     }
                   });
                 })
-                .catch((e) => {
+                .catch((e: any) => {
                   /*
                     if the JWT generation failed, 
                     just abort with a Promise rejection.
@@ -606,7 +595,7 @@ export function initialize(
         );
         handleTokenExpiration(token, () => {
           /* re-run the JWT generation */
-          return doRequest(payload).catch((e) => {
+          return doRequest(payload).catch((e: any) => {
             if (logLevel === 'verbose') {
               console.warn(e);
               console.warn(
@@ -617,7 +606,7 @@ export function initialize(
         });
         return token;
       })
-      .catch((error) => {
+      .catch((error: any) => {
         /* clear interceptor */
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -633,6 +622,7 @@ export function initialize(
     setEmail: (email: string) => {
       typeOfAuth = 'email';
       authIdentifier = email;
+      localStorage.setItem(SHARED_PREF_EMAIL, email);
       /* clear previous user */
       clearMessages();
       if (typeof userInterceptor === 'number') {
@@ -641,7 +631,7 @@ export function initialize(
 
       addEmailToRequest(email);
 
-      return doRequest({ email }).catch((e) => {
+      return doRequest({ email }).catch((e: any) => {
         if (logLevel === 'verbose') {
           console.warn(
             'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
@@ -653,6 +643,7 @@ export function initialize(
     setUserID: async (userId: string) => {
       typeOfAuth = 'userID';
       authIdentifier = userId;
+      localStorage.setItem(SHARED_PREF_USER_ID, userId);
       clearMessages();
 
       if (typeof userInterceptor === 'number') {
@@ -750,7 +741,7 @@ export function initialize(
           await tryUser()();
           return token;
         })
-        .catch((e) => {
+        .catch((e: any) => {
           if (logLevel === 'verbose') {
             console.warn(
               'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
@@ -784,7 +775,7 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
       const payloadToPass = { [isEmail(user) ? 'email' : 'userID']: user };
-      return doRequest(payloadToPass).catch((e) => {
+      return doRequest(payloadToPass).catch((e: any) => {
         if (logLevel === 'verbose') {
           console.warn(e);
           console.warn('Could not refresh JWT. Try Refresh the JWT again.');

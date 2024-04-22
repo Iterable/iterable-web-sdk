@@ -49,13 +49,12 @@ export class EmbeddedSessionManager {
     undefined
   );
 
-  public isTracking(): boolean {
+  private isTracking(): boolean {
     return this.session.start !== null;
   }
 
   public startSession() {
     if (this.isTracking()) {
-      console.log('Embedded session started twice');
       return;
     }
 
@@ -64,7 +63,6 @@ export class EmbeddedSessionManager {
 
   public async endSession() {
     if (!this.isTracking()) {
-      console.log('Embedded session ended without start');
       return;
     }
 
@@ -74,7 +72,6 @@ export class EmbeddedSessionManager {
     this.session.end = new Date();
 
     if (!this.session.impressions?.length) {
-      console.log('No impressions in the session. Skipping tracking.');
       return;
     }
 
@@ -111,12 +108,10 @@ export class EmbeddedSessionManager {
       this.impressions.get(messageId);
 
     if (!impressionData) {
-      console.log('onMessageImpressionEnded: impressionData not found');
       return;
     }
 
     if (impressionData?.start === null) {
-      console.log('onMessageImpressionEnded: impressionStarted is null');
       return;
     }
 

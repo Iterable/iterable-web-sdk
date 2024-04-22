@@ -40,7 +40,6 @@ describe('EmbeddedManager', () => {
       }
 
       jest.spyOn(embeddedManager, 'syncMessages');
-      jest.spyOn(embeddedManager, 'notifyDelegatesOfInvalidApiKeyOrSyncStop');
       await embeddedManager.syncMessages(
         'user123',
         'Web',
@@ -72,20 +71,6 @@ describe('EmbeddedManager', () => {
           embeddedManager.addUpdateListener(updateListener);
 
           expect(embeddedManager.getUpdateHandlers()).toContain(updateListener);
-        }
-      });
-    });
-
-    describe('addActionHandler', () => {
-      it('should add an action handler to the list', () => {
-        if (embeddedManager instanceof EmbeddedManager) {
-          const actionHandler = {
-            onTapAction: jest.fn()
-          };
-
-          embeddedManager.addActionHandler(actionHandler);
-
-          expect(embeddedManager.getActionHandlers()).toContain(actionHandler);
         }
       });
     });
