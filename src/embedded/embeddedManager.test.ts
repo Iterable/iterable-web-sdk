@@ -18,7 +18,6 @@ describe('EmbeddedManager', () => {
       const callbackMock = jest.fn();
 
       await embeddedManager.syncMessages(
-        'user123',
         'Web',
         '1',
         'my-website',
@@ -40,14 +39,9 @@ describe('EmbeddedManager', () => {
       }
 
       jest.spyOn(embeddedManager, 'syncMessages');
-      await embeddedManager.syncMessages(
-        'user123',
-        'Web',
-        '1',
-        'my-website',
-        jest.fn(),
-        [0]
-      );
+      await embeddedManager.syncMessages('Web', '1', 'my-website', jest.fn(), [
+        0
+      ]);
 
       expect(() => mockTest()).rejects.toMatch('Invalid API Key');
     });
