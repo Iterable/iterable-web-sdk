@@ -167,14 +167,14 @@ export class EmbeddedManager {
       let actionName: string;
 
       if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
-        actionType = URL_SCHEME_ACTION;
-        actionName = clickedUrl.replace(URL_SCHEME_ACTION, '');
+        actionName = '';
+        actionType = clickedUrl.replace(URL_SCHEME_ACTION, '');
       } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
-        actionType = URL_SCHEME_ITBL;
-        actionName = clickedUrl.replace(URL_SCHEME_ITBL, '');
+        actionName = '';
+        actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
       } else {
         actionType = URL_SCHEME_OPEN;
-        actionName = clickedUrl.replace(URL_SCHEME_OPEN, '');
+        actionName = clickedUrl;
       }
 
       const iterableAction: IterableAction = {
