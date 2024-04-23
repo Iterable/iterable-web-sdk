@@ -54,7 +54,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }
       };
       embeddedManager.addUpdateListener(updateListener);
-      await embeddedManager.syncMessages('Web', '1', 'my-website', () => {
+      await embeddedManager.syncMessages('my-website', () => {
         console.log('messages', JSON.stringify(embeddedManager.getMessages()));
       });
     } catch (error: any) {

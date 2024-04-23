@@ -16,7 +16,8 @@ import {
   URL_SCHEME_OPEN,
   WEB_PLATFORM,
   SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL
+  SHARED_PREF_EMAIL,
+  SDK_VERSION
 } from '../constants';
 import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
@@ -37,24 +38,15 @@ export class EmbeddedManager {
     return jsonParams;
   }
   public async syncMessages(
-    platform: string,
-    sdkVersion: string,
     packageName: string,
     callback: () => void,
     placementIds?: number[]
   ) {
-    await this.retrieveEmbeddedMessages(
-      platform,
-      sdkVersion,
-      packageName,
-      placementIds || []
-    );
+    await this.retrieveEmbeddedMessages(packageName, placementIds || []);
     callback();
   }
 
   private async retrieveEmbeddedMessages(
-    platform: string,
-    sdkVersion: string,
     packageName: string,
     placementIds: number[]
   ) {
@@ -73,8 +65,8 @@ export class EmbeddedManager {
         url: url,
         params: {
           ...params,
-          platform: platform,
-          sdkVersion: sdkVersion,
+          platform: 'Web',
+          sdkVersion: SDK_VERSION,
           packageName: packageName
         }
       });
