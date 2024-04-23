@@ -1,3 +1,5 @@
+import { UpdateAnonymousUserParams } from '..';
+
 interface AnonSessionContext {
   totalAnonSessionCount?: number;
   lastAnonSession?: number;
@@ -8,8 +10,7 @@ interface AnonSessionContext {
 }
 
 export interface TrackAnonSessionParams {
-  email?: string | null;
-  userId?: string | null;
+  user: UpdateAnonymousUserParams;
   createdAt: number;
   deviceInfo: {
     deviceId: string;
