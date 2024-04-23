@@ -38,29 +38,26 @@ export const EmbeddedMsgs: FC<Props> = () => {
   };
 
   useEffect(() => {
-    const listenerUri: IterableUrlHandler = {
+    const urlHandler: IterableUrlHandler = {
       handleIterableURL: function (
         uri: string,
         actionContext: IterableActionContext
       ): boolean {
-        console.log('uri', uri);
-        console.log('actionContext', actionContext);
+        window.open(uri, '_blank');
         return true;
       }
     };
-    IterableConfig.urlHandler = listenerUri;
+    IterableConfig.urlHandler = urlHandler;
 
-    const listenerCustomAction: IterableCustomActionHandler = {
+    const customActionHandler: IterableCustomActionHandler = {
       handleIterableCustomAction: function (
         action: IterableAction,
         actionContext: IterableActionContext
       ): boolean {
-        console.log('action', action);
-        console.log('actionContext', actionContext);
-        return true;
+        return false;
       }
     };
-    IterableConfig.customActionHandler = listenerCustomAction;
+    IterableConfig.customActionHandler = customActionHandler;
 
     const timeoutId = setTimeout(() => {
       changeCustomElement();
