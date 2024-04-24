@@ -1,11 +1,11 @@
 import { baseIterableRequest } from '../../request';
 import {
-  IEmbeddedMessage,
   IEmbeddedMessageMetadata,
   IEmbeddedSession,
   EnbeddedMessagingDismiss,
   EnbeddedMessagingSession
 } from '../../../src/types';
+import { IEmbeddedMessage } from '../../../src/events/types';
 import { IterableResponse } from '../../types';
 import {
   trackEmbeddedMessageSchema,

@@ -61,15 +61,6 @@ export interface IEmbeddedMessageElementsDefaultAction {
   data?: string;
 }
 
-export interface IEmbeddedMessage {
-  email?: string;
-  userId?: string;
-  messageId?: string;
-  metadata: IEmbeddedMessageMetadata;
-  elements?: IEmbeddedMessageElements;
-  payload?: Array<any>;
-}
-
 export interface IEmbeddedMessageMetadata {
   messageId: string;
   campaignId?: number;
