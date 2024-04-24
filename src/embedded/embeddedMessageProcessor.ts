@@ -1,4 +1,4 @@
-import { IEmbeddedMessage } from '../../src/events/types';
+import { IEmbeddedMessage } from '../../src/events/embedded/types';
 
 export class EmbeddedMessagingProcessor {
   private currentMessages: Array<IEmbeddedMessage>;

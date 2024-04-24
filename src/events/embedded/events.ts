@@ -3,9 +3,9 @@ import {
   IEmbeddedMessageMetadata,
   IEmbeddedSession,
   EmbeddedMessagingDismiss,
-  EmbeddedMessagingSession
-} from '../../../src/types';
-import { IEmbeddedMessage } from '../../../src/events/types';
+  EmbeddedMessagingSession,
+  IEmbeddedMessage
+} from '../../../src/events/embedded/types';
 import { IterableResponse } from '../../types';
 import {
   trackEmbeddedMessageSchema,

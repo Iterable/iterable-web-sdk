@@ -1,10 +1,13 @@
 import { baseIterableRequest } from '../request';
+import { InAppTrackRequestParams } from './in-app/types';
 import {
-  InAppTrackRequestParams,
+  IEmbeddedMessageMetadata,
   IEmbeddedMessage,
-  IEventEmbeddedSession
-} from './in-app/types';
-import { IterableResponse, IEmbeddedMessageMetadata } from '../types';
+  IEmbeddedSession,
+  EmbeddedMessagingDismiss,
+  EmbeddedMessagingSession
+} from '../../src/events/embedded/types';
+import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import {
   trackSchema,
@@ -15,11 +18,6 @@ import {
   embaddedMessagingSessionSchema
 } from './events.schema';
 import { EndPoints } from './consts';
-
-import {
-  EmbeddedMessagingDismiss,
-  EmbeddedMessagingSession
-} from '../../src/types';
 import { functions } from 'src/utils/functions';
 
 export const track = (payload: InAppTrackRequestParams) => {
@@ -85,7 +83,7 @@ export const trackEmbeddedMessageClick = (
   });
 };
 
-export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
+export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: '/embedded-messaging/events/impression',
