@@ -17,8 +17,8 @@ import {
 import { EndPoints } from './consts';
 
 import {
-  EnbeddedMessagingDismiss,
-  EnbeddedMessagingSession
+  EmbeddedMessagingDismiss,
+  EmbeddedMessagingSession
 } from '../../src/types';
 import { functions } from 'src/utils/functions';
 
@@ -104,7 +104,7 @@ export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
 };
 
 export const trackEmbeddedMessagingDismiss = (
-  payload: EnbeddedMessagingDismiss
+  payload: EmbeddedMessagingDismiss
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -117,7 +117,7 @@ export const trackEmbeddedMessagingDismiss = (
 };
 
 export const trackEmbeddedMessagingSession = (
-  payload: EnbeddedMessagingSession
+  payload: EmbeddedMessagingSession
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

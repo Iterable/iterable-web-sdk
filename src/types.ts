@@ -88,7 +88,7 @@ export interface DeviceInfo {
   appPackageName: string;
 }
 
-export interface EnbeddedMessagingDismiss {
+export interface EmbeddedMessagingDismiss {
   email?: string;
   userId?: string;
   messageId: string;
@@ -110,7 +110,7 @@ export interface Impression {
   placementId?: string;
 }
 
-export interface EnbeddedMessagingSession {
+export interface EmbeddedMessagingSession {
   userId?: string;
   email?: string;
   session: Session;

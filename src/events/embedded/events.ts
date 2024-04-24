@@ -2,8 +2,8 @@ import { baseIterableRequest } from '../../request';
 import {
   IEmbeddedMessageMetadata,
   IEmbeddedSession,
-  EnbeddedMessagingDismiss,
-  EnbeddedMessagingSession
+  EmbeddedMessagingDismiss,
+  EmbeddedMessagingSession
 } from '../../../src/types';
 import { IEmbeddedMessage } from '../../../src/events/types';
 import { IterableResponse } from '../../types';
@@ -62,7 +62,7 @@ export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
 };
 
 export const trackEmbeddedMessagingDismiss = (
-  payload: EnbeddedMessagingDismiss
+  payload: EmbeddedMessagingDismiss
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -75,7 +75,7 @@ export const trackEmbeddedMessagingDismiss = (
 };
 
 export const trackEmbeddedMessagingSession = (
-  payload: EnbeddedMessagingSession
+  payload: EmbeddedMessagingSession
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
