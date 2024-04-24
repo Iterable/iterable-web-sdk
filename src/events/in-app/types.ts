@@ -1,4 +1,8 @@
-import { IEmbeddedImpression } from '../../../src/types';
+import {
+  IEmbeddedImpression,
+  IEmbeddedMessageElements,
+  IEmbeddedMessageMetadata
+} from '../../../src/types';
 export interface InAppTrackRequestParams {
   eventName: string;
   id?: string;
@@ -7,7 +11,6 @@ export interface InAppTrackRequestParams {
   campaignId?: number;
   templateId?: number;
 }
-
 export interface InAppEventRequestParams {
   messageId: string;
   clickedUrl?: string;
@@ -23,45 +26,6 @@ export interface InAppEventRequestParams {
   inboxSessionId?: string;
   createdAt?: number;
 }
-
-export interface IEmbeddedMessageMetadata {
-  messageId: string;
-  campaignId?: number;
-  isProof?: boolean;
-  placementId?: number;
-}
-
-export interface IEmbeddedMessageElementsButton {
-  id: string;
-  title: string;
-  action?: IEmbeddedMessageElementsButtonAction;
-}
-
-export interface IEmbeddedMessageElementsText {
-  id: string;
-  text?: string;
-}
-
-export interface IEmbeddedMessageElementsButtonAction {
-  type: string;
-  data?: string;
-}
-
-export interface IEmbeddedMessageElementsDefaultAction {
-  type: string;
-  data?: string;
-}
-
-export interface IEmbeddedMessageElements {
-  title?: string;
-  body?: string;
-  mediaUrl?: string;
-
-  buttons?: [IEmbeddedMessageElementsButton];
-  text?: [IEmbeddedMessageElementsText];
-  defaultAction?: IEmbeddedMessageElementsDefaultAction;
-}
-
 export interface IEmbeddedMessage {
   email?: string;
   userId?: string;

@@ -2,10 +2,9 @@ import { baseIterableRequest } from '../request';
 import {
   InAppTrackRequestParams,
   IEmbeddedMessage,
-  IEmbeddedMessageMetadata,
   IEventEmbeddedSession
 } from './in-app/types';
-import { IterableResponse } from '../types';
+import { IterableResponse, IEmbeddedMessageMetadata } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import {
   trackSchema,
