@@ -168,7 +168,7 @@ export class EmbeddedManager {
 
       if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
         actionName = '';
-        actionType = clickedUrl.replace(URL_SCHEME_ACTION, '');
+        actionType = clickedUrl;
       } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
         actionName = '';
         actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
