@@ -1,3 +1,4 @@
+import { IEmbeddedImpression } from '../../../src/types';
 export interface InAppTrackRequestParams {
   eventName: string;
   id?: string;
@@ -73,13 +74,6 @@ export interface IEmbeddedMessage {
   };
 }
 
-export interface IEmbeddedImpression {
-  messageId: string;
-  displayCount: number;
-  duration: number;
-  displayDuration?: number;
-}
-
 export interface ISession {
   start?: number;
   end?: number;
@@ -93,12 +87,4 @@ export interface IEventEmbeddedSession {
   deviceInfo: {
     appPackageName: string; // customer-defined name
   };
-}
-
-export interface IEmbeddedSession {
-  start?: Date;
-  end?: Date;
-  id: string;
-  placementId?: string;
-  impressions?: Array<IEmbeddedImpression>;
 }

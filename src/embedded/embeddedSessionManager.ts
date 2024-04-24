@@ -1,8 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import {
-  IEmbeddedSession,
-  IEmbeddedImpression
-} from '../events/embedded/types';
+import { IEmbeddedSession, IEmbeddedImpression } from '../../src/types';
 import { IEmbeddedImpressionData } from './types';
 import { trackEmbeddedSession } from '../events/embedded/events';
 

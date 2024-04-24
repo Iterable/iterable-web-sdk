@@ -5,7 +5,7 @@ import {
   IEmbeddedSession,
   EnbeddedMessagingDismiss,
   EnbeddedMessagingSession
-} from './types';
+} from '../../../src/types';
 import { IterableResponse } from '../../types';
 import {
   trackEmbeddedMessageSchema,

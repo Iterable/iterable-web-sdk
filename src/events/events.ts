@@ -17,7 +17,10 @@ import {
 } from './events.schema';
 import { EndPoints } from './consts';
 
-import { EnbeddedMessagingDismiss, EnbeddedMessagingSession } from './types';
+import {
+  EnbeddedMessagingDismiss,
+  EnbeddedMessagingSession
+} from '../../src/types';
 import { functions } from 'src/utils/functions';
 
 export const track = (payload: InAppTrackRequestParams) => {
