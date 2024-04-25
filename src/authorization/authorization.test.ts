@@ -24,7 +24,6 @@ const localStorageMock = {
     "email": "width.tester@gmail.com"
   }
 */
-
 const MOCK_JWT_KEY =
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA2MTc3MzQsImlhdCI6MTYzMDYxNzQzNCwiZW1haWwiOiJ3aWR0aC50ZXN0ZXJAZ21haWwuY29tIn0.knLmbgO8kKM9CHP2TH2v85OSC2Jorh2JjRm76FFsPQc';
 const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
