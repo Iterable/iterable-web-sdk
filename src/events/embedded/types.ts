@@ -1,31 +1,12 @@
-export interface IEmbeddedMessageMetadata {
-  messageId: string;
-  campaignId?: number;
-  isProof?: boolean;
-  placementId?: number;
-}
-
 export interface IEmbeddedMessageElementsButton {
   id: string;
   title: string;
   action?: IEmbeddedMessageElementsButtonAction;
 }
-
-export interface IEmbeddedMessageElementsText {
-  id: string;
-  text?: string;
-}
-
 export interface IEmbeddedMessageElementsButtonAction {
   type: string;
   data?: string;
 }
-
-export interface IEmbeddedMessageElementsDefaultAction {
-  type: string;
-  data?: string;
-}
-
 export interface IEmbeddedMessageElements {
   title?: string;
   body?: string;
@@ -35,28 +16,20 @@ export interface IEmbeddedMessageElements {
   text?: [IEmbeddedMessageElementsText];
   defaultAction?: IEmbeddedMessageElementsDefaultAction;
 }
-
-export interface IEmbeddedMessage {
-  email?: string;
-  userId?: string;
-  messageId?: string;
-  metadata: IEmbeddedMessageMetadata;
-  elements?: IEmbeddedMessageElements;
-  payload?: Array<any>;
-}
-
-export interface IEmbeddedImpression {
-  messageId: string;
-  displayCount: number;
-  duration: number;
-}
-
-export interface IEmbeddedSession {
-  start?: Date;
-  end?: Date;
-  placementId?: string;
-  impressions?: Array<IEmbeddedImpression>;
+export interface IEmbeddedMessageElementsText {
   id: string;
+  text?: string;
+}
+export interface IEmbeddedMessageElementsDefaultAction {
+  type: string;
+  data?: string;
+}
+
+export interface IEmbeddedMessageMetadata {
+  messageId: string;
+  campaignId?: number;
+  isProof?: boolean;
+  placementId?: number;
 }
 
 export interface DeviceInfo {
@@ -65,7 +38,28 @@ export interface DeviceInfo {
   appPackageName: string;
 }
 
-export interface EnbeddedMessagingDismiss {
+export interface IEmbeddedMessageData {
+  email?: string;
+  userId?: string;
+  messageId: string;
+  metadata: IEmbeddedMessageMetadata;
+  elements?: IEmbeddedMessageElements;
+  payload?: Array<any>;
+}
+
+export interface IEmbeddedMessage {
+  email?: string;
+  userId?: string;
+  messageId: string;
+  metadata?: IEmbeddedMessageMetadata;
+  elements?: IEmbeddedMessageElements;
+  payload?: Array<any>;
+  deviceInfo: {
+    appPackageName: string; // customer-defined name
+  };
+}
+
+export interface EmbeddedMessagingDismiss {
   email?: string;
   userId?: string;
   messageId: string;
@@ -76,8 +70,8 @@ export interface EnbeddedMessagingDismiss {
 
 export interface Session {
   id: string;
-  start: number;
-  end: number;
+  start?: number;
+  end?: number;
 }
 
 export interface Impression {
@@ -87,11 +81,27 @@ export interface Impression {
   placementId?: string;
 }
 
-export interface EnbeddedMessagingSession {
+export interface EmbeddedMessagingSession {
   userId?: string;
   email?: string;
   session: Session;
   impressions: Array<Impression>;
   deviceInfo: DeviceInfo;
   createdAt: number;
+}
+export interface IEmbeddedImpressionData {
+  messageId: string;
+  displayCount: number;
+  duration: number;
+  start?: Date;
+}
+export interface IEmbeddedSession {
+  start?: Date;
+  end?: Date;
+  placementId?: string;
+  impressions?: Array<IEmbeddedImpressionData>;
+  id: string;
+  deviceInfo?: {
+    appPackageName: string; // customer-defined name
+  };
 }
