@@ -63,7 +63,7 @@ export const EmbeddedForm: FC<Props> = ({
       };
       const embeddedManager = new EmbeddedManager();
       embeddedManager.addUpdateListener(updateListener);
-      await embeddedManager.syncMessages(userId, 'Web', '1', 'my-website', () =>
+      await embeddedManager.syncMessages('my-website', () =>
         console.log('Synced message')
       );
     } catch (error: any) {

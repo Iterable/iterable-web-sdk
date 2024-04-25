@@ -10,12 +10,14 @@ import {
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
+import { useUser } from 'src/context/Users';
 
 interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
+  const { loggedInUser, setLoggedInUser } = useUser();
+
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
-  const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
 
   const changeCustomElement = () => {
@@ -52,42 +54,24 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }
       };
       embeddedManager.addUpdateListener(updateListener);
-      await embeddedManager.syncMessages(
-        userId,
-        'Web',
-        '1',
-        'my-website',
-        () => {
-          console.log(
-            'messages',
-            JSON.stringify(embeddedManager.getMessages())
-          );
-        }
-      );
+      await embeddedManager.syncMessages('my-website', () => {
+        console.log('messages', JSON.stringify(embeddedManager.getMessages()));
+      });
     } catch (error: any) {
       console.log('error', error);
     }
   };
 
+  useEffect(() => {
+    if (loggedInUser === '') {
+      setMessages([]);
+    } else {
+      handleFetchEmbeddedMessages();
+    }
+  }, [loggedInUser]);
+
   return (
     <>
-      <h1>Fetch Embedded Msgs</h1>
-      <label htmlFor="item-1">UserId</label>
-      <TextField
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        id="item-1"
-        placeholder="e.g. phone_number"
-        data-qa-update-user-input
-        required
-      />
-      <Button
-        style={{ marginLeft: 20, width: '100px' }}
-        onClick={() => handleFetchEmbeddedMessages()}
-      >
-        Submit
-      </Button>
-      <br />
       <div
         style={{
           display: 'flex',
