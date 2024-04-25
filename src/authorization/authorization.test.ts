@@ -11,7 +11,8 @@ import { GETMESSAGES_PATH } from '../constants';
 let mockRequest: any = null;
 
 const localStorageMock = {
-  setItem: jest.fn()
+  setItem: jest.fn(),
+  removeItem: jest.fn()
 };
 
 /*
@@ -38,6 +39,7 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
+    (global as any).localStorage = localStorageMock;
     mockRequest.onPost('/users/update').reply(200, {
       data: 'something'
     });
