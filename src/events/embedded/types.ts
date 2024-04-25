@@ -31,13 +31,6 @@ export interface IEmbeddedMessageMetadata {
   isProof?: boolean;
   placementId?: number;
 }
-export interface IEmbeddedImpression {
-  messageId: string;
-  displayCount: number;
-  duration: number;
-  displayDuration?: number;
-  start?: Date;
-}
 
 export interface DeviceInfo {
   deviceId: string;
@@ -45,14 +38,23 @@ export interface DeviceInfo {
   appPackageName: string;
 }
 
-export interface IEmbeddedMessage {
+export interface IEmbeddedMessageData {
   email?: string;
   userId?: string;
   messageId: string;
   metadata: IEmbeddedMessageMetadata;
   elements?: IEmbeddedMessageElements;
   payload?: Array<any>;
-  deviceInfo?: {
+}
+
+export interface IEmbeddedMessage {
+  email?: string;
+  userId?: string;
+  messageId: string;
+  metadata?: IEmbeddedMessageMetadata;
+  elements?: IEmbeddedMessageElements;
+  payload?: Array<any>;
+  deviceInfo: {
     appPackageName: string; // customer-defined name
   };
 }
@@ -87,12 +89,17 @@ export interface EmbeddedMessagingSession {
   deviceInfo: DeviceInfo;
   createdAt: number;
 }
-
+export interface IEmbeddedImpressionData {
+  messageId: string;
+  displayCount: number;
+  duration: number;
+  start?: Date;
+}
 export interface IEmbeddedSession {
   start?: Date;
   end?: Date;
   placementId?: string;
-  impressions?: Array<IEmbeddedImpression>;
+  impressions?: Array<IEmbeddedImpressionData>;
   id: string;
   deviceInfo?: {
     appPackageName: string; // customer-defined name

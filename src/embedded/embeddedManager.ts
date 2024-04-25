@@ -5,7 +5,7 @@ import {
   IterableAction
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessage } from '../../src/events/embedded/types';
+import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
@@ -24,7 +24,7 @@ import { EndPoints } from 'src/events/consts';
 import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
-  private messages: IEmbeddedMessage[] = [];
+  private messages: IEmbeddedMessageData[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
 
   private addEmailOrUserIdToJson(jsonParams: any): any {
@@ -97,8 +97,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): IEmbeddedMessage[] {
-    let messages: IEmbeddedMessage[] = [];
+  private getEmbeddedMessages(placements: any): IEmbeddedMessageData[] {
+    let messages: IEmbeddedMessageData[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -109,11 +109,13 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): Array<IEmbeddedMessage> {
+  public getMessages(): Array<IEmbeddedMessageData> {
     return this.messages;
   }
 
-  public getMessagesForPlacement(placementId: number): Array<IEmbeddedMessage> {
+  public getMessagesForPlacement(
+    placementId: number
+  ): Array<IEmbeddedMessageData> {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
@@ -125,7 +127,7 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      let messages = {} as IEmbeddedMessage;
+      let messages = {} as IEmbeddedMessageData;
       messages.messageId = msgsList[i].metadata.messageId;
       messages = this.addEmailOrUserIdToJson(messages);
       await trackEmbeddedMessageReceived(messages);

@@ -4,7 +4,7 @@ import {
   IEmbeddedSession,
   EmbeddedMessagingDismiss,
   EmbeddedMessagingSession,
-  IEmbeddedMessage
+  IEmbeddedMessageData
 } from '../../../src/events/embedded/types';
 import { IterableResponse } from '../../types';
 import {
@@ -16,7 +16,7 @@ import {
 } from './events.schema';
 import { EndPoints } from '../consts';
 
-export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
+export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessageData) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: EndPoints.msg_received_event_track,
