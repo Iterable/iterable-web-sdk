@@ -332,7 +332,7 @@ describe('Events Requests', () => {
   });
 
   it('return the correct payload for embedded message received', async () => {
-    const payload = {
+    const response = await trackEmbeddedSession({
       session: {
         id: '123',
         start: 18686876876876,
@@ -353,8 +353,7 @@ describe('Events Requests', () => {
         }
       ],
       deviceInfo: { appPackageName: 'my-lil-site' }
-    };
-    const response = await trackEmbeddedSession(payload);
+    } as any);
 
     expect(JSON.parse(response.config.data).session.id).toBe('123');
   });
