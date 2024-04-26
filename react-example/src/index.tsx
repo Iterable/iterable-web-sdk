@@ -16,6 +16,7 @@ import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
+import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -88,6 +89,10 @@ const HomeLink = styled(Link)`
               <Route path="/inApp" element={<InApp />} />
               <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
               <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route
+                path="/embedded-msgs-impression-tracker"
+                element={<EmbeddedMsgsImpressionTracker />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>
