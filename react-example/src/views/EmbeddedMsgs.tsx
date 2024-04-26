@@ -58,7 +58,9 @@ export const EmbeddedMsgs: FC<Props> = () => {
       }
     };
     IterableConfig.customActionHandler = customActionHandler;
+  }, []);
 
+  useEffect(() => {
     const timeoutId = setTimeout(() => {
       changeCustomElement();
     }, 3000);
