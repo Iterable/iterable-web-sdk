@@ -3,10 +3,14 @@ import {
   Card,
   Notification,
   Banner,
-  initialize,
   EmbeddedManager,
   IterableEmbeddedMessage,
-  EmbeddedMessageUpdateHandler
+  EmbeddedMessageUpdateHandler,
+  IterableUrlHandler,
+  IterableActionContext,
+  IterableCustomActionHandler,
+  IterableAction,
+  IterableConfig
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
 import TextField from 'src/components/TextField';
@@ -32,6 +36,29 @@ export const EmbeddedMsgs: FC<Props> = () => {
       imageElement.style.width = '100px';
     }
   };
+
+  useEffect(() => {
+    const urlHandler: IterableUrlHandler = {
+      handleIterableURL: function (
+        uri: string,
+        actionContext: IterableActionContext
+      ): boolean {
+        window.open(uri, '_blank');
+        return true;
+      }
+    };
+    IterableConfig.urlHandler = urlHandler;
+
+    const customActionHandler: IterableCustomActionHandler = {
+      handleIterableCustomAction: function (
+        action: IterableAction,
+        actionContext: IterableActionContext
+      ): boolean {
+        return false;
+      }
+    };
+    IterableConfig.customActionHandler = customActionHandler;
+  }, []);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {

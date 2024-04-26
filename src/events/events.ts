@@ -1,9 +1,12 @@
 import { baseIterableRequest } from '../request';
+import { InAppTrackRequestParams } from './in-app/types';
 import {
-  InAppTrackRequestParams,
+  EmbeddedMessagingDismiss,
+  EmbeddedMessagingSession,
+  EmbeddedTrackClick,
   IEmbeddedMessage,
-  IEventEmbeddedSession
-} from './in-app/types';
+  IEmbeddedSession
+} from './embedded/types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import {
@@ -15,10 +18,7 @@ import {
   embaddedMessagingSessionSchema
 } from './events.schema';
 import { EndPoints } from './consts';
-
-import { EnbeddedMessagingDismiss, EnbeddedMessagingSession } from './types';
 import { functions } from 'src/utils/functions';
-import { EmbeddedTrackClick } from './embedded/types';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -77,7 +77,7 @@ export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
   });
 };
 
-export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
+export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: EndPoints.msg_impression_event_track,
@@ -96,7 +96,7 @@ export const trackEmbeddedSession = (payload: IEventEmbeddedSession) => {
 };
 
 export const trackEmbeddedMessagingDismiss = (
-  payload: EnbeddedMessagingDismiss
+  payload: EmbeddedMessagingDismiss
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -109,7 +109,7 @@ export const trackEmbeddedMessagingDismiss = (
 };
 
 export const trackEmbeddedMessagingSession = (
-  payload: EnbeddedMessagingSession
+  payload: EmbeddedMessagingSession
 ) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

@@ -3,13 +3,6 @@ export interface EmbeddedMessageUpdateHandler {
   onEmbeddedMessagingDisabled: () => void;
 }
 
-export interface IEmbeddedImpressionData {
-  messageId: string;
-  displayCount: number;
-  duration: number;
-  start?: Date;
-}
-
 export enum IterableActionSource {
   PUSH = 'PUSH',
   APP_LINK = 'APP_LINK',
