@@ -1,5 +1,9 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
 export function Banner({
   parentStyle,
@@ -18,7 +22,10 @@ export function Banner({
   primaryButtonId = 'banner-primary-button',
   secondaryButtonId = 'banner-secondary-button',
   parentId = 'banner-parent',
-  imageId = 'banner-image'
+  imageId = 'banner-image',
+  buttonsDivId = 'banner-buttons-div',
+  textTitleDivId = 'banner-text-title-div',
+  textTitleImageDivId = 'banner-text-title-image-div'
 }: EmbeddedMessageData): string {
   const defaultBannerStyles = `
     border: 1px solid #ccc;
@@ -83,38 +90,6 @@ export function Banner({
     }
   `;
 
-  const embeddedManager = new EmbeddedManager();
-  const handleBannerClick = () => {
-    const clickedUrl =
-      message?.elements?.defaultAction?.data?.trim() ||
-      message?.elements?.defaultAction?.type ||
-      null;
-    embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-    embeddedManager.trackEmbeddedClick(
-      message,
-      '',
-      clickedUrl ? clickedUrl : ''
-    );
-  };
-
-  const handleButtonClick = (button: any) => {
-    const clickedUrl =
-      button?.action?.data?.trim() || button?.action?.type || '';
-    embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
-    embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
-  };
-
-  function addButtonClickEvent(button: HTMLElement, index: number) {
-    button.addEventListener('click', (event) => {
-      // Prevent the click event from bubbling up to the div
-      event.stopPropagation();
-      if (!message?.elements?.buttons) {
-        return '';
-      }
-      handleButtonClick(message?.elements?.buttons[index]);
-    });
-  }
-
   setTimeout(() => {
     const bannerDiv = document.getElementsByName(
       `${message?.metadata?.messageId}-banner`
@@ -126,15 +101,31 @@ export function Banner({
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
     if (bannerDiv) {
-      bannerDiv.addEventListener('click', handleBannerClick);
+      bannerDiv.addEventListener('click', () => handleElementClick(message));
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0);
+      addButtonClickEvent(primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1);
+      addButtonClickEvent(secondaryButtonClick, 1, message);
     }
   }, 0);
+
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
 
   return `
     <style>${mediaStyle}</style>
@@ -144,9 +135,10 @@ export function Banner({
       name="${message?.metadata?.messageId}-banner"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
-      <div class="banner" 
+      <div class="banner" id="${textTitleImageDivId}"
       style="display: flex; flex-direction: row;">
         <div class="banner" 
+        id="${textTitleDivId}"
         style="${defaultTextParentStyles}">
           <text class="titleText banner"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
@@ -168,36 +160,24 @@ export function Banner({
             : ''
         }
       </div>
-      <div class="banner" 
+      <div class="banner" id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
-          ?.map((button: any, index: number) => {
-            const buttonStyle =
-              index === 0 ? primaryBtnStyle : secondaryBtnStyle;
-            const disableStyle =
-              index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle;
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
             return `
               <button 
                 key="${index}" 
-                ${
-                  index === 0
-                    ? disablePrimaryBtn
-                      ? 'disabled'
-                      : 'enabled'
-                    : disableSecondaryBtn
-                    ? 'disabled'
-                    : 'enabled'
-                } 
+                ${buttonStyleObj.disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0 ? '-banner-primaryButton' : '-banner-secondaryButton'
             }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
-                ${defaultTitleStyles}; ${titleStyle || ''}
-                style="${defaultButtonStyles};  ${buttonStyle || ''} ${
-              disableStyle || ''
-            }"
+                style="${defaultButtonStyles};  
+                ${buttonStyleObj.buttonStyle || ''} 
+                ${buttonStyleObj.disableStyle || ''}"
               >
                 ${button.title ? button.title : `Button ${index + 1}`}
               </button>

@@ -18,4 +18,7 @@ export interface EmbeddedMessageData {
   secondaryButtonId?: string;
   parentId?: string;
   imageId?: string;
+  buttonsDivId?: string;
+  textTitleDivId?: string;
+  textTitleImageDivId?: string;
 }

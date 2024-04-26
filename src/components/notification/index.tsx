@@ -1,5 +1,9 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
 export function Notification({
   message,
@@ -15,7 +19,9 @@ export function Notification({
   textId = 'notification-text',
   primaryButtonId = 'notification-primary-button',
   secondaryButtonId = 'notification-secondary-button',
-  parentId = 'notification-parent'
+  parentId = 'notification-parent',
+  buttonsDivId = 'notification-buttons-div',
+  textTitleDivId = 'notification-text-title-div'
 }: EmbeddedMessageData): string {
   const defaultTitleStyles = `
     font-size: 20px;
@@ -30,6 +36,18 @@ export function Notification({
   `;
   const defaultTextParentStyles = `
     overflow-wrap: break-word;
+  `;
+  const defaultButtonStyles = `
+    max-width: calc(50% - 32px); 
+    text-align: left; 
+   
+    border-radius: 4px; 
+    padding: 8px; 
+    margin-right: 8px; 
+    cursor: pointer; 
+    border: none; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
+    overflow-wrap: break-word; 
   `;
   const mediaStyle = `
     @media screen and (max-width: 800px) {
@@ -46,41 +64,10 @@ export function Notification({
       }
     }
   `;
-  const embeddedManager = new EmbeddedManager();
-  function handleNotificationClick() {
-    const clickedUrl =
-      message?.elements?.defaultAction?.data?.trim() ||
-      message?.elements?.defaultAction?.type ||
-      null;
-    embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-    embeddedManager.trackEmbeddedClick(
-      message,
-      '',
-      clickedUrl ? clickedUrl : ''
-    );
-  }
-
-  function handleButtonClick(button: any) {
-    const clickedUrl =
-      button?.action?.data?.trim() || button?.action?.type || '';
-    embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
-    embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
-  }
-
-  function addButtonClickEvent(button: HTMLElement, index: number) {
-    button.addEventListener('click', (event) => {
-      // Prevent the click event from bubbling up to the div
-      event.stopPropagation();
-      if (!message?.elements?.buttons) {
-        return '';
-      }
-      handleButtonClick(message?.elements?.buttons[index]);
-    });
-  }
 
   setTimeout(() => {
     const notificationDiv = document.getElementsByName(
-      `${message?.metadata?.messageId}-notifiation`
+      `${message?.metadata?.messageId}-notification`
     )[0];
     const primaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-notification-primaryButton`
@@ -89,15 +76,33 @@ export function Notification({
       `${message?.metadata?.messageId}-notification-secondaryButton`
     )[0];
     if (notificationDiv) {
-      notificationDiv.addEventListener('click', handleNotificationClick);
+      notificationDiv.addEventListener('click', () =>
+        handleElementClick(message)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0);
+      addButtonClickEvent(primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1);
+      addButtonClickEvent(secondaryButtonClick, 1, message);
     }
   }, 0);
+
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
 
   return `
     <style>${mediaStyle}</style>
@@ -109,7 +114,7 @@ export function Notification({
         message?.elements?.defaultAction ? 'pointer' : 'auto'
       };" 
     >
-      <div class="notification" 
+      <div class="notification" id="${textTitleDivId}"
        style="${defaultTextParentStyles}">
         <p class="titleText notification" id="${titleId}" 
         style="${defaultTitleStyles}; ${titleStyle || ''}">
@@ -121,24 +126,14 @@ export function Notification({
           ${message?.elements?.body}
         </p>
       </div>
-      <div class="notification" style="margin-top: auto;">
+      <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
         ${message?.elements?.buttons
-          ?.map((button: any, index: number) => {
-            const buttonStyle =
-              index === 0 ? primaryBtnStyle : secondaryBtnStyle;
-
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
             return `
               <button 
                 key="${index}" 
-                ${
-                  index === 0
-                    ? disablePrimaryBtn
-                      ? 'disabled'
-                      : 'enabled'
-                    : disableSecondaryBtn
-                    ? 'disabled'
-                    : 'enabled'
-                } 
+                ${buttonStyleObj.disableButton}  
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0
@@ -148,27 +143,11 @@ export function Notification({
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="
-                  max-width: calc(50% - 32px); 
-                  text-align: left; 
                   background: ${index === 0 ? '#2196f3' : 'none'}; 
                   color: ${index === 0 ? 'white' : '#2196f3'}; 
-                  border-radius: 4px; 
-                  padding: 8px; 
-                  margin-right: 8px; 
-                  cursor: pointer; 
-                  border: none; 
-                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
-                  overflow-wrap: break-word; 
-                  ${buttonStyle || ''}; 
-                  ${
-                    index === 0
-                      ? disablePrimaryBtn
-                        ? primaryDisableBtnStyle || ''
-                        : primaryBtnStyle || ''
-                      : disableSecondaryBtn
-                      ? secondaryDisableBtnStyle || ''
-                      : secondaryBtnStyle || ''
-                  }"
+                  ${defaultButtonStyles}; 
+                  ${buttonStyleObj.buttonStyle || ''}; 
+                  ${buttonStyleObj.disableStyle || ''}" 
                   >
                 ${button.title || `Button ${index + 1}`}
               </button>
