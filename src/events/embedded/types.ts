@@ -95,3 +95,10 @@ export interface EnbeddedMessagingSession {
   deviceInfo: DeviceInfo;
   createdAt: number;
 }
+
+export interface EmbeddedTrackClick {
+  messageId: string;
+  buttonIdentifier: string;
+  clickedUrl: string;
+  appPackageName?: string;
+}
