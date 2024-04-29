@@ -15,8 +15,6 @@ import {
   URL_SCHEME_ACTION,
   URL_SCHEME_OPEN,
   WEB_PLATFORM,
-  SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL,
   SDK_VERSION
 } from '../constants';
 import { IterableEmbeddedMessage } from './embeddedMessage';
@@ -27,16 +25,6 @@ export class EmbeddedManager {
   private messages: IEmbeddedMessageData[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
 
-  private addEmailOrUserIdToJson(jsonParams: any): any {
-    const userId = localStorage.getItem(SHARED_PREF_USER_ID);
-    const email = localStorage.getItem(SHARED_PREF_EMAIL);
-    if (userId) {
-      jsonParams.userId = userId;
-    } else if (email) {
-      jsonParams.email = email;
-    }
-    return jsonParams;
-  }
   public async syncMessages(
     packageName: string,
     callback: () => void,
@@ -52,8 +40,7 @@ export class EmbeddedManager {
   ) {
     try {
       let url = `${embedded_msg_endpoint}?`;
-      let params: any = {};
-      params = this.addEmailOrUserIdToJson(params);
+      const params: any = {};
       if (placementIds.length > 0) {
         params.placementIds = placementIds
           .map((id) => `&placementIds=${id}`)
@@ -127,9 +114,8 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      let messages = {} as IEmbeddedMessageData;
+      const messages = {} as IEmbeddedMessageData;
       messages.messageId = msgsList[i].metadata.messageId;
-      messages = this.addEmailOrUserIdToJson(messages);
       await trackEmbeddedMessageReceived(messages);
     }
   }

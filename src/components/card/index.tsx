@@ -1,5 +1,9 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
 export function Card({
   parentStyle,
@@ -18,7 +22,9 @@ export function Card({
   primaryButtonId = 'card-primary-button',
   secondaryButtonId = 'card-secondary-button',
   parentId = 'card-parent',
-  imageId = 'card-image'
+  imageId = 'card-image',
+  buttonsDivId = 'card-buttons-div',
+  textTitleDivId = 'card-text-title-div'
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -87,38 +93,6 @@ export function Card({
       }
     `;
 
-  const embeddedManager = new EmbeddedManager();
-  const handleCardClick = () => {
-    const clickedUrl =
-      message?.elements?.defaultAction?.data?.trim() ||
-      message?.elements?.defaultAction?.type ||
-      null;
-    embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-    embeddedManager.trackEmbeddedClick(
-      message,
-      '',
-      clickedUrl ? clickedUrl : ''
-    );
-  };
-
-  const handleButtonClick = (button: any) => {
-    const clickedUrl =
-      button?.action?.data?.trim() || button?.action?.type || '';
-    embeddedManager.handleEmbeddedClick(message, button?.id, clickedUrl);
-    embeddedManager.trackEmbeddedClick(message, button?.id, clickedUrl);
-  };
-
-  function addButtonClickEvent(button: HTMLElement, index: number) {
-    button.addEventListener('click', (event) => {
-      // Prevent the click event from bubbling up to the div
-      event.stopPropagation();
-      if (!message?.elements?.buttons) {
-        return '';
-      }
-      handleButtonClick(message?.elements?.buttons[index]);
-    });
-  }
-
   setTimeout(() => {
     const cardDiv = document.getElementsByName(
       `${message?.metadata?.messageId}-card`
@@ -130,15 +104,31 @@ export function Card({
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
     if (cardDiv) {
-      cardDiv.addEventListener('click', handleCardClick);
+      cardDiv.addEventListener('click', () => handleElementClick(message));
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0);
+      addButtonClickEvent(primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1);
+      addButtonClickEvent(secondaryButtonClick, 1, message);
     }
   }, 0);
+
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
 
   return `
     <style>${mediaStyle}</style>
@@ -156,7 +146,7 @@ export function Card({
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div class="card" style="${defaultTextParentStyles}">
+      <div id="${textTitleDivId}" class="card" style="${defaultTextParentStyles}">
         <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
@@ -168,25 +158,14 @@ export function Card({
           ${message?.elements?.body}
         </text>
       </div>
-      <div class="card" style="${cardButtons}">
+      <div id="${buttonsDivId}" class="card" style="${cardButtons}">
         ${message?.elements?.buttons
-          ?.map((button: any, index: number) => {
-            const buttonStyle =
-              index === 0 ? primaryBtnStyle : secondaryBtnStyle;
-            const disableStyle =
-              index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle;
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
             return `
               <button 
                 key="${index}" 
-                ${
-                  index === 0
-                    ? disablePrimaryBtn
-                      ? 'disabled'
-                      : 'enabled'
-                    : disableSecondaryBtn
-                    ? 'disabled'
-                    : 'enabled'
-                } 
+                ${buttonStyleObj.disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
               index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
@@ -195,17 +174,8 @@ export function Card({
                 class="card-button-primary-secondary" 
                 style="
                   ${defaultButtonStyles}; 
-                  ${
-                    index === 0
-                      ? disablePrimaryBtn
-                        ? primaryDisableBtnStyle || ''
-                        : primaryBtnStyle || ''
-                      : disableSecondaryBtn
-                      ? secondaryDisableBtnStyle || ''
-                      : secondaryBtnStyle || ''
-                  };
-                  ${buttonStyle || ''}; 
-                  ${disableStyle || ''}" 
+                  ${buttonStyleObj.buttonStyle || ''}; 
+                  ${buttonStyleObj.disableStyle || ''}" 
               >
                 ${button.title ? button.title : `Button ${index + 1}`}
               </button>

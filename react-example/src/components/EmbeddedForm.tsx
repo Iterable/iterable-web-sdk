@@ -9,7 +9,7 @@ import {
 import {
   EmbeddedManager,
   trackEmbeddedMessageReceived,
-  trackEmbeddedMessageClick,
+  trackEmbeddedClick,
   trackEmbeddedMessagingDismiss,
   trackEmbeddedMessagingSession,
   EmbeddedMessageUpdateHandler
@@ -111,14 +111,12 @@ export const EmbeddedForm: FC<Props> = ({
     const clickedUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
 
-    trackEmbeddedMessageClick(
-      payload,
+    trackEmbeddedClick({
+      messageId: payload.messageId,
       buttonIdentifier,
       clickedUrl,
-      appPackageName,
-      Date.now(),
-      userId
-    )
+      appPackageName
+    })
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);

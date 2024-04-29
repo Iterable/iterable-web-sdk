@@ -3,7 +3,7 @@ import { baseAxiosRequest } from '../request';
 import {
   track,
   trackEmbeddedMessageReceived,
-  trackEmbeddedMessageClick,
+  trackEmbeddedClick,
   trackEmbeddedSession
 } from './events';
 import {
@@ -17,6 +17,10 @@ import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
+const localStorageMock = {
+  setItem: jest.fn(),
+  getItem: jest.fn()
+};
 
 describe('Events Requests', () => {
   beforeAll(() => {
@@ -291,34 +295,33 @@ describe('Events Requests', () => {
       campaignId: 1
     };
 
+    (global as any).localStorage = localStorageMock;
     const buttonIdentifier = 'button-123';
     const clickedUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
-    const response = await trackEmbeddedMessageClick(
-      payload,
+    const response = await trackEmbeddedClick({
+      messageId: payload.messageId,
       buttonIdentifier,
       clickedUrl,
-      appPackageName,
-      0,
-      'abc123'
-    );
+      appPackageName
+    });
 
     expect(JSON.parse(response.config.data).messageId).toBe('abc123');
   });
 
   it('should reject embedded message click on bad params', async () => {
+    global.window = Object.create({});
+    Object.defineProperty(window, 'location', {
+      value: {
+        hostname: 'example.com'
+      }
+    });
     try {
-      await trackEmbeddedMessageClick(
-        {
-          messageId: 'abc123',
-          campaignId: 1
-        } as any,
-        '',
-        '',
-        '',
-        0,
-        'abc123'
-      );
+      await trackEmbeddedClick({
+        messageId: 'abc123',
+        buttonIdentifier: '',
+        clickedUrl: ''
+      });
     } catch (e: any) {
       expect(e).toEqual(
         createClientError([
@@ -374,6 +377,7 @@ describe('Events Requests', () => {
   });
 
   it('should not send up passed email or userId params', async () => {
+    (global as any).localStorage = localStorageMock;
     const trackResponse = await track({
       email: 'hello@gmail.com',
       userId: '1234',
@@ -422,17 +426,12 @@ describe('Events Requests', () => {
       },
       deviceInfo: { appPackageName: 'my-lil-site' }
     });
-    const trackEmClickResponse = await trackEmbeddedMessageClick(
-      {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      'button-123',
-      'https://example.com',
-      'my-lil-site',
-      0,
-      'abc123'
-    );
+    const trackEmClickResponse = await trackEmbeddedClick({
+      messageId: 'abc123',
+      buttonIdentifier: 'button-123',
+      clickedUrl: 'https://example.com',
+      appPackageName: 'my-lil-site'
+    });
     const trackSessionResponse = await trackEmbeddedSession({
       session: {
         id: '123',
@@ -517,7 +516,7 @@ describe('Events Requests', () => {
     ).toBeUndefined();
 
     expect(JSON.parse(trackEmClickResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBe('abc123');
+    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBeUndefined();
 
     expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
