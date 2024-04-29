@@ -9,7 +9,7 @@ import {
 import {
   EmbeddedManager,
   trackEmbeddedMessageReceived,
-  trackEmbeddedMessageClick,
+  trackEmbeddedClick,
   trackEmbeddedMessagingDismiss,
   trackEmbeddedMessagingSession,
   EmbeddedMessageUpdateHandler
@@ -17,6 +17,7 @@ import {
 import TextField from 'src/components/TextField';
 import { Functions } from 'src/utils/Functions';
 import { v4 as uuidv4 } from 'uuid';
+import { IEmbeddedMessage } from '@iterable/web-sdk';
 
 interface Props {
   userId: string;
@@ -76,12 +77,12 @@ export const EmbeddedForm: FC<Props> = ({
   ) => {
     e.preventDefault();
     setTrackingEvent(true);
+    let receivedMessage = {} as IEmbeddedMessage;
 
-    const receivedMessage = {
+    receivedMessage = {
       [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       messageId: messageId,
-      deviceInfo: { appPackageName: 'my-lil-site' },
-      createdAt: Date.now()
+      deviceInfo: { appPackageName: 'my-lil-site' }
     };
 
     trackEmbeddedMessageReceived(receivedMessage)
@@ -110,14 +111,12 @@ export const EmbeddedForm: FC<Props> = ({
     const clickedUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
 
-    trackEmbeddedMessageClick(
-      payload,
+    trackEmbeddedClick({
+      messageId: payload.messageId,
       buttonIdentifier,
       clickedUrl,
-      appPackageName,
-      Date.now(),
-      userId
-    )
+      appPackageName
+    })
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);

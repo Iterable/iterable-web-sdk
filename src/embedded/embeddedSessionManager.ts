@@ -1,23 +1,22 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
-  IEmbeddedSession,
-  IEmbeddedImpression
-} from '../events/embedded/types';
-import { IEmbeddedImpressionData } from './types';
+  IEmbeddedImpressionData,
+  IEmbeddedSession
+} from '../../src/events/embedded/types';
 import { trackEmbeddedSession } from '../events/embedded/events';
 
 class EmbeddedSession {
   public start?: Date;
   public end?: Date;
   public placementId?: string;
-  public impressions?: Array<IEmbeddedImpression>;
+  public impressions?: Array<IEmbeddedImpressionData>;
   public id: string;
 
   constructor(
     start?: Date,
     end?: Date,
     placementId?: string,
-    impressions?: Array<IEmbeddedImpression>
+    impressions?: Array<IEmbeddedImpressionData>
   ) {
     this.start = start;
     this.end = end;
@@ -41,7 +40,7 @@ class EmbeddedImpressionData {
 }
 
 export class EmbeddedSessionManager {
-  private impressions: Map<string, IEmbeddedImpression> = new Map();
+  private impressions: Map<string, IEmbeddedImpressionData> = new Map();
   public session: IEmbeddedSession = new EmbeddedSession(
     undefined,
     undefined,
