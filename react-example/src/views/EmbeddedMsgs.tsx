@@ -7,19 +7,17 @@ import {
   IterableEmbeddedMessage,
   EmbeddedMessageUpdateHandler,
   IterableUrlHandler,
-  IterableActionContext,
   IterableCustomActionHandler,
   IterableAction,
   IterableConfig
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
-import TextField from 'src/components/TextField';
 import { useUser } from 'src/context/Users';
 
 interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
-  const { loggedInUser, setLoggedInUser } = useUser();
+  const { loggedInUser } = useUser();
 
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [messages, setMessages] = useState([]);
@@ -39,10 +37,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   useEffect(() => {
     const urlHandler: IterableUrlHandler = {
-      handleIterableURL: function (
-        uri: string,
-        actionContext: IterableActionContext
-      ): boolean {
+      handleIterableURL: function (uri: string): boolean {
         window.open(uri, '_blank');
         return true;
       }
@@ -50,10 +45,11 @@ export const EmbeddedMsgs: FC<Props> = () => {
     IterableConfig.urlHandler = urlHandler;
 
     const customActionHandler: IterableCustomActionHandler = {
-      handleIterableCustomAction: function (
-        action: IterableAction,
-        actionContext: IterableActionContext
-      ): boolean {
+      handleIterableCustomAction: function (action: IterableAction): boolean {
+        if (action.data === 'news') {
+          // handle the custom action here
+          return true;
+        }
         return false;
       }
     };
