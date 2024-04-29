@@ -158,7 +158,7 @@ export function initialize(
       */
       if (
         !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
+          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/impression)|(events\/received)/gim
         )
       ) {
         return {
@@ -273,7 +273,7 @@ export function initialize(
             */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/click)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/impression)|(events\/click)/gim
               )
             ) {
               return {
@@ -666,7 +666,7 @@ export function initialize(
         */
         if (
           !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/click)/gim
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/impression)|(events\/click)/gim
           )
         ) {
           return {
