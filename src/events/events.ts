@@ -1,12 +1,12 @@
 import { baseIterableRequest } from '../request';
 import { InAppTrackRequestParams } from './in-app/types';
 import {
-  IEmbeddedMessageMetadata,
-  IEmbeddedMessage,
-  IEmbeddedSession,
   EmbeddedMessagingDismiss,
-  EmbeddedMessagingSession
-} from '../../src/events/embedded/types';
+  EmbeddedMessagingSession,
+  EmbeddedTrackClick,
+  IEmbeddedMessage,
+  IEmbeddedSession
+} from './embedded/types';
 import { IterableResponse } from '../types';
 import { WEB_PLATFORM } from '../constants';
 import {
@@ -38,7 +38,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/received',
+    url: EndPoints.msg_received_event_track,
     data: {
       ...payload,
       deviceInfo: {
@@ -53,30 +53,24 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
   });
 };
 
-export const trackEmbeddedMessageClick = (
-  payload: IEmbeddedMessageMetadata,
-  buttonIdentifier: string,
-  clickedUrl: string,
-  appPackageName: string,
-  createdAt: number,
-  userIdOrEmail: string
-) => {
+export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
+  let data: any = {
+    messageId: payload.messageId,
+    buttonIdentifier: payload.buttonIdentifier,
+    targetUrl: payload.clickedUrl,
+    deviceInfo: {
+      platform: WEB_PLATFORM,
+      deviceId: global.navigator.userAgent || '',
+      appPackageName: payload.appPackageName || window.location.hostname
+    },
+    createdAt: Date.now()
+  };
+  data = functions.addEmailOrUserIdToJson(data, localStorage);
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/click',
-    data: {
-      [functions.checkEmailValidation(userIdOrEmail) ? 'email' : 'userId']:
-        userIdOrEmail,
-      messageId: payload.messageId,
-      buttonIdentifier: buttonIdentifier,
-      targetUrl: clickedUrl,
-      deviceInfo: {
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || '',
-        appPackageName: appPackageName
-      },
-      createdAt: createdAt
-    },
+    url: EndPoints.msg_click_event_track,
+    data,
     validation: {
       data: trackEmbeddedMessageClickSchema
     }
@@ -86,7 +80,7 @@ export const trackEmbeddedMessageClick = (
 export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/embedded-messaging/events/impression',
+    url: EndPoints.msg_impression_event_track,
     data: {
       ...payload,
       deviceInfo: {

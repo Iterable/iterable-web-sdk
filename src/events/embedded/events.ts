@@ -1,15 +1,13 @@
 import { baseIterableRequest } from '../../request';
 import {
-  IEmbeddedMessageMetadata,
-  IEmbeddedSession,
   EmbeddedMessagingDismiss,
   EmbeddedMessagingSession,
-  IEmbeddedMessageData
+  IEmbeddedMessageData,
+  IEmbeddedSession
 } from '../../../src/events/embedded/types';
 import { IterableResponse } from '../../types';
 import {
   trackEmbeddedMessageSchema,
-  trackEmbeddedMessageClickSchema,
   trackEmbeddedSessionSchema,
   embaddedMessagingDismissSchema,
   embaddedMessagingSessionSchema
@@ -23,29 +21,6 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessageData) => {
     data: payload,
     validation: {
       data: trackEmbeddedMessageSchema
-    }
-  });
-};
-
-export const trackEmbeddedMessageClick = (
-  payload: IEmbeddedMessageMetadata,
-  buttonIdentifier: string,
-  clickedUrl: string,
-  appPackageName: string
-) => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.msg_click_event_track,
-    data: {
-      messageId: payload.messageId,
-      buttonIdentifier: buttonIdentifier,
-      targetUrl: clickedUrl,
-      deviceInfo: {
-        appPackageName: appPackageName
-      }
-    },
-    validation: {
-      data: trackEmbeddedMessageClickSchema
     }
   });
 };

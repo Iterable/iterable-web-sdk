@@ -89,12 +89,21 @@ export interface EmbeddedMessagingSession {
   deviceInfo: DeviceInfo;
   createdAt: number;
 }
+
+export interface EmbeddedTrackClick {
+  messageId: string;
+  buttonIdentifier: string;
+  clickedUrl: string;
+  appPackageName?: string;
+}
+
 export interface IEmbeddedImpressionData {
   messageId: string;
   displayCount: number;
   duration: number;
   start?: Date;
 }
+
 export interface IEmbeddedSession {
   start?: Date;
   end?: Date;
