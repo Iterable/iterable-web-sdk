@@ -24,11 +24,11 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
           ([entry]) => {
             if (entry.isIntersecting && !visibilityStatus[index]) {
               visibilityStatus[index] = true; // Update visibility status
-              embeddedSessionManager.startImpression(msg.messageId);
+              embeddedSessionManager.startImpression(msg.metadata.messageId);
             }
             if (!entry.isIntersecting && visibilityStatus[index]) {
               visibilityStatus[index] = false; // Update visibility status
-              embeddedSessionManager.pauseImpression(msg.messageId);
+              embeddedSessionManager.pauseImpression(msg.metadata.messageId);
             }
           },
           {
@@ -103,7 +103,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-start',
-          marginTop: 100
+          marginTop: 130
         }}
       >
         {messages.length > 0 ? (
