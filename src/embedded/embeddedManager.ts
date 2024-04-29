@@ -20,7 +20,6 @@ import {
 import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
 import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
-import { functions } from 'src/utils/functions';
 
 export class EmbeddedManager {
   private messages: IEmbeddedMessageData[] = [];
@@ -41,8 +40,7 @@ export class EmbeddedManager {
   ) {
     try {
       let url = `${embedded_msg_endpoint}?`;
-      let params: any = {};
-      params = functions.addEmailOrUserIdToJson(params, localStorage);
+      const params: any = {};
       if (placementIds.length > 0) {
         params.placementIds = placementIds
           .map((id) => `&placementIds=${id}`)
@@ -116,9 +114,8 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      let messages = {} as IEmbeddedMessageData;
+      const messages = {} as IEmbeddedMessageData;
       messages.messageId = msgsList[i].metadata.messageId;
-      messages = functions.addEmailOrUserIdToJson(messages, localStorage);
       await trackEmbeddedMessageReceived(messages);
     }
   }

@@ -18,7 +18,6 @@ import {
   embaddedMessagingSessionSchema
 } from './events.schema';
 import { EndPoints } from './consts';
-import { functions } from 'src/utils/functions';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -54,7 +53,7 @@ export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessage) => {
 };
 
 export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
-  let data: any = {
+  const data: any = {
     messageId: payload.messageId,
     buttonIdentifier: payload.buttonIdentifier,
     targetUrl: payload.clickedUrl,
@@ -65,7 +64,6 @@ export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
     },
     createdAt: Date.now()
   };
-  data = functions.addEmailOrUserIdToJson(data, localStorage);
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
