@@ -7,7 +7,6 @@ import {
   IterableEmbeddedMessage,
   EmbeddedMessageUpdateHandler,
   IterableUrlHandler,
-  IterableActionContext,
   IterableCustomActionHandler,
   IterableAction,
   IterableConfig
