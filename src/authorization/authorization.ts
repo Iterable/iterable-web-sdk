@@ -273,7 +273,7 @@ export function initialize(
             */
             if (
               !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(embedded-messaging\/events\/received)|(embedded-messaging\/events\/click)/gim
+                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/click)/gim
               )
             ) {
               return {
@@ -308,11 +308,7 @@ export function initialize(
             /*
               endpoints that use _userId_ query param in GET requests
             */
-            if (
-              !!(config?.url || '').match(
-                /(getMessages)|(embedded-messaging\/messages)/gim
-              )
-            ) {
+            if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
               return {
                 ...config,
                 params: {
@@ -670,7 +666,7 @@ export function initialize(
         */
         if (
           !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(embedded-messaging\/events\/received)|(embedded-messaging\/events\/click)/gim
+            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/click)/gim
           )
         ) {
           return {
@@ -705,11 +701,7 @@ export function initialize(
         /*
           endpoints that use _userId_ query param in GET requests
         */
-        if (
-          !!(config?.url || '').match(
-            /(getMessages)|(embedded-messaging\/messages)/gim
-          )
-        ) {
+        if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
           return {
             ...config,
             params: {
