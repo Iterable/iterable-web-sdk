@@ -103,6 +103,7 @@ export interface IEmbeddedImpressionData {
   duration: number;
   start?: Date;
 }
+
 export interface IEmbeddedSession {
   start?: Date;
   end?: Date;
