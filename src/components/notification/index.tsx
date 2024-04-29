@@ -1,78 +1,56 @@
-import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
-/* WARNING: OOTB Views not officially supported for Beta */
-export const Notification = (props: EmbeddedMessageData) => {
-  const {
-    disablePrimaryBtn,
-    disableSecondaryBtn,
-    primaryBtnStyle,
-    primaryDisableBtnStyle,
-    secondaryBtnStyle,
-    secondaryDisableBtnStyle,
-    textStyle,
-    titleStyle,
-    message
-  } = props;
-  const cardStyle: CSSProperties = {
-    background: 'white',
-    borderRadius: '10px',
-    padding: '20px',
-    border: '3px solid #caccd1',
-    marginBottom: '10px',
-    cursor: 'pointer'
-  };
-
-  const primaryButtonDefaultStyle: CSSProperties = {
-    maxWidth: 'calc(50% - 32px)',
-    textAlign: 'left',
-    background: '#2196f3',
-    color: 'white',
-    borderRadius: '4px',
-    padding: '8px',
-    marginRight: '8px',
-    cursor: 'pointer',
-    border: 'none',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06)',
-    overflowWrap: 'break-word'
-  };
-
-  const secondaryButtonDefaultStyle: CSSProperties = {
-    maxWidth: 'calc(50% - 32px)',
-    textAlign: 'left',
-    background: 'none',
-    border: 'none',
-    color: '#2196f3',
-    cursor: 'pointer',
-    padding: '5px',
-    overflowWrap: 'break-word'
-  };
-
-  const defaultTitleStyles = {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    marginBottom: '4px',
-    display: 'block'
-  };
-
-  const defaultTextStyles = {
-    fontSize: '16px',
-    marginBottom: '10px',
-    display: 'block'
-  };
-
-  const defaultTextParentStyles: TextParentStyles = {
-    overflowWrap: 'break-word'
-  };
-
-  const notificationButtons: CSSProperties = {
-    marginTop: 'auto'
-  };
-
+export function Notification({
+  message,
+  disablePrimaryBtn = false,
+  disableSecondaryBtn = false,
+  primaryBtnStyle,
+  primaryDisableBtnStyle,
+  secondaryBtnStyle,
+  secondaryDisableBtnStyle,
+  textStyle,
+  titleStyle,
+  titleId = 'notification-title',
+  textId = 'notification-text',
+  primaryButtonId = 'notification-primary-button',
+  secondaryButtonId = 'notification-secondary-button',
+  parentId = 'notification-parent',
+  buttonsDivId = 'notification-buttons-div',
+  textTitleDivId = 'notification-text-title-div'
+}: EmbeddedMessageData): string {
+  const defaultTitleStyles = `
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+  `;
+  const defaultTextStyles = `
+    font-size: 16px;
+    margin-bottom: 10px;
+    display: block;
+  `;
+  const defaultTextParentStyles = `
+    overflow-wrap: break-word;
+  `;
+  const defaultButtonStyles = `
+    max-width: calc(50% - 32px); 
+    text-align: left; 
+   
+    border-radius: 4px; 
+    padding: 8px; 
+    margin-right: 8px; 
+    cursor: pointer; 
+    border: none; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
+    overflow-wrap: break-word; 
+  `;
   const mediaStyle = `
-  @media screen and (max-width: 800px) {
+    @media screen and (max-width: 800px) {
       .titleText {
         overflow: hidden;
         text-overflow: ellipsis;
@@ -87,81 +65,96 @@ export const Notification = (props: EmbeddedMessageData) => {
     }
   `;
 
-  const embeddedManager = new EmbeddedManager();
+  setTimeout(() => {
+    const notificationDiv = document.getElementsByName(
+      `${message?.metadata?.messageId}-notification`
+    )[0];
+    const primaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-notification-primaryButton`
+    )[0];
+    const secondaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-notification-secondaryButton`
+    )[0];
+    if (notificationDiv) {
+      notificationDiv.addEventListener('click', () =>
+        handleElementClick(message)
+      );
+    }
+    if (primaryButtonClick) {
+      addButtonClickEvent(primaryButtonClick, 0, message);
+    }
+    if (secondaryButtonClick) {
+      addButtonClickEvent(secondaryButtonClick, 1, message);
+    }
+  }, 0);
 
-  return (
-    <>
-      <style>{mediaStyle}</style>
-      <div
-        className="notification"
-        style={cardStyle}
-        onClick={() => {
-          const clickedUrl =
-            message?.elements?.defaultAction?.data?.trim() ||
-            message?.elements?.defaultAction?.type ||
-            null;
-          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-          embeddedManager.trackEmbeddedClick(
-            message,
-            '',
-            clickedUrl ? clickedUrl : ''
-          );
-        }}
-      >
-        <div style={{ ...defaultTextParentStyles }}>
-          <text
-            className="titleText"
-            style={{ ...defaultTitleStyles, ...titleStyle }}
-          >
-            {message?.elements?.title || 'Title Here'}
-          </text>
-          <text
-            className="titleText"
-            style={{ ...defaultTextStyles, ...textStyle }}
-          >
-            {message?.elements?.body}
-          </text>
-        </div>
-        <div style={notificationButtons}>
-          {message?.elements?.buttons?.map((button: any, index: number) => (
-            <button
-              key={index}
-              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
-              style={
-                index === 0
-                  ? disablePrimaryBtn
-                    ? {
-                        ...primaryButtonDefaultStyle,
-                        ...primaryDisableBtnStyle
-                      }
-                    : { ...primaryButtonDefaultStyle, ...primaryBtnStyle }
-                  : disableSecondaryBtn
-                  ? {
-                      ...secondaryButtonDefaultStyle,
-                      ...secondaryDisableBtnStyle
-                    }
-                  : { ...secondaryButtonDefaultStyle, ...secondaryBtnStyle }
-              }
-              onClick={() => {
-                const clickedUrl =
-                  button?.action?.data?.trim() || button?.action?.type || '';
-                embeddedManager.handleEmbeddedClick(
-                  message,
-                  button?.id,
-                  clickedUrl
-                );
-                embeddedManager.trackEmbeddedClick(
-                  message,
-                  button?.id,
-                  clickedUrl
-                );
-              }}
-            >
-              {button.title ? button.title : `Button ${index + 1}`}
-            </button>
-          ))}
-        </div>
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
+
+  return `
+    <style>${mediaStyle}</style>
+    <div 
+      class="notification" 
+      id="${parentId}"
+      name="${message?.metadata?.messageId}-notification"
+      style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: ${
+        message?.elements?.defaultAction ? 'pointer' : 'auto'
+      };" 
+    >
+      <div class="notification" id="${textTitleDivId}"
+       style="${defaultTextParentStyles}">
+        <p class="titleText notification" id="${titleId}" 
+        style="${defaultTitleStyles}; ${titleStyle || ''}">
+          ${message?.elements?.title || 'Title Here'}
+        </p>
+        <p class="titleText notification" id="${textId}" style="${defaultTextStyles}; ${
+    textStyle || ''
+  }">
+          ${message?.elements?.body}
+        </p>
       </div>
-    </>
-  );
-};
+      <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
+        ${message?.elements?.buttons
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
+            return `
+              <button 
+                key="${index}" 
+                ${buttonStyleObj.disableButton}  
+                data-index="${index}"
+                name="${message?.metadata?.messageId}${
+              index === 0
+                ? '-notification-primaryButton'
+                : '-notification-secondaryButton'
+            }"
+                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
+                class="notification-button-primary-secondary" 
+                style="
+                  background: ${index === 0 ? '#2196f3' : 'none'}; 
+                  color: ${index === 0 ? 'white' : '#2196f3'}; 
+                  ${defaultButtonStyles}; 
+                  ${buttonStyleObj.buttonStyle || ''}; 
+                  ${buttonStyleObj.disableStyle || ''}" 
+                  >
+                ${button.title || `Button ${index + 1}`}
+              </button>
+            `;
+          })
+          .join('')}
+      </div>
+    </div>
+  `;
+}
