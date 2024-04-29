@@ -17,10 +17,6 @@ import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
-const localStorageMock = {
-  setItem: jest.fn(),
-  getItem: jest.fn()
-};
 
 describe('Events Requests', () => {
   beforeAll(() => {
@@ -295,7 +291,6 @@ describe('Events Requests', () => {
       campaignId: 1
     };
 
-    (global as any).localStorage = localStorageMock;
     const buttonIdentifier = 'button-123';
     const clickedUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
@@ -377,7 +372,6 @@ describe('Events Requests', () => {
   });
 
   it('should not send up passed email or userId params', async () => {
-    (global as any).localStorage = localStorageMock;
     const trackResponse = await track({
       email: 'hello@gmail.com',
       userId: '1234',
