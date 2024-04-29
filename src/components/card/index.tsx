@@ -1,166 +1,188 @@
-import React, { CSSProperties } from 'react';
-import { TextParentStyles } from 'src/index';
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedManager } from '../../embedded';
+import { EmbeddedMessageElementsButton } from '../../embedded';
+import {
+  handleElementClick,
+  addButtonClickEvent
+} from '../../embedded/embeddedClickEvents';
 
-/* WARNING: OOTB Views not officially supported for Beta */
-export const Card = (props: EmbeddedMessageData) => {
-  const {
-    parentStyle,
-    disablePrimaryBtn,
-    disableSecondaryBtn,
-    imgStyle,
-    primaryBtnStyle,
-    primaryDisableBtnStyle,
-    secondaryBtnStyle,
-    secondaryDisableBtnStyle,
-    textStyle,
-    titleStyle,
-    message
-  } = props;
-
-  const defaultCardStyles = {
-    border: '1px solid #ccc',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-    margin: 'auto',
-    marginTop: '10px',
-    marginBottom: '10px',
-    paddingBottom: '10px',
-    cursor: 'pointer'
-  };
-  const defaultImageStyles = {
-    width: '100%',
-    height: 'auto',
-    borderTopLeftRadius: '8px',
-    borderTopRightRadius: '8px'
-  };
-  const defaultTitleStyles = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '4px',
-    display: 'block'
-  };
-  const defaultTextStyles = {
-    fontSize: '14px',
-    marginBottom: '10px',
-    display: 'block'
-  };
-  const defaultButtonStyles: CSSProperties = {
-    maxWidth: 'calc(50% - 32px)',
-    textAlign: 'left',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    backgroundColor: 'transparent',
-    color: disablePrimaryBtn ? 'grey' : '#433d99',
-    border: 'none',
-    borderRadius: 0,
-    cursor: 'pointer',
-    padding: '5px',
-    overflowWrap: 'break-word'
-  };
-
-  const defaultTextParentStyles: TextParentStyles = {
-    overflowWrap: 'break-word',
-    margin: '10px'
-  };
-
-  const cardButtons: CSSProperties = {
-    marginTop: 'auto',
-    marginLeft: '5px'
-  };
-
-  const mediaStyle = `
-  @media screen and (max-width: 800px) {
-      .titleText {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.6em;
-        line-height: 1.3em;
-      }
-      .card {
-        min-height: 350px;
-        display: flex;
-        flex-direction: column;
-      }
-    }
+export function Card({
+  parentStyle,
+  disablePrimaryBtn = false,
+  disableSecondaryBtn = false,
+  imgStyle,
+  primaryBtnStyle,
+  primaryDisableBtnStyle,
+  secondaryBtnStyle,
+  secondaryDisableBtnStyle,
+  textStyle,
+  titleStyle,
+  message,
+  titleId = 'card-title',
+  textId = 'card-text',
+  primaryButtonId = 'card-primary-button',
+  secondaryButtonId = 'card-secondary-button',
+  parentId = 'card-parent',
+  imageId = 'card-image',
+  buttonsDivId = 'card-buttons-div',
+  textTitleDivId = 'card-text-title-div'
+}: EmbeddedMessageData): string {
+  const defaultCardStyles = `
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
+  `;
+  const defaultImageStyles = `
+    width: 100%;
+    height: auto;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  `;
+  const defaultTitleStyles = `
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+  `;
+  const defaultTextStyles = `
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: block;
+  `;
+  const defaultButtonStyles = `
+    max-width: calc(50% - 32px);
+    text-align: left;
+    font-size: 16px;
+    font-weight: bold;
+    background-color: transparent;
+    color: ${disablePrimaryBtn ? 'grey' : '#433d99'};
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    padding: 5px;
+    overflow-wrap: break-word;
   `;
 
-  const embeddedManager = new EmbeddedManager();
+  const defaultTextParentStyles = `
+    overflow-wrap: break-word;
+    margin: 10px;
+  `;
 
-  return (
-    <>
-      <style>{mediaStyle}</style>
-      <div
-        className="card"
-        style={{ ...defaultCardStyles, ...parentStyle }}
-        onClick={() => {
-          const clickedUrl =
-            message?.elements?.defaultAction?.data?.trim() ||
-            message?.elements?.defaultAction?.type ||
-            null;
-          embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
-          embeddedManager.trackEmbeddedClick(
-            message,
-            '',
-            clickedUrl ? clickedUrl : ''
-          );
-        }}
-      >
-        {message?.elements?.mediaUrl && (
-          <img
-            style={{ ...defaultImageStyles, ...imgStyle }}
-            src={message?.elements?.mediaUrl}
-          />
-        )}
-        <div style={{ ...defaultTextParentStyles }}>
-          <text
-            className="titleText"
-            style={{ ...defaultTitleStyles, ...titleStyle }}
-          >
-            {message?.elements?.title || 'Title Here'}
-          </text>
-          <text
-            className="titleText"
-            style={{ ...defaultTextStyles, ...textStyle }}
-          >
-            {message?.elements?.body}
-          </text>
-        </div>
-        <div style={cardButtons}>
-          {message?.elements?.buttons?.map((button: any, index: number) => (
-            <button
-              key={index}
-              disabled={index === 0 ? disablePrimaryBtn : disableSecondaryBtn}
-              style={
-                index === 0
-                  ? disablePrimaryBtn
-                    ? { ...defaultButtonStyles, ...primaryDisableBtnStyle }
-                    : { ...defaultButtonStyles, ...primaryBtnStyle }
-                  : disableSecondaryBtn
-                  ? { ...defaultButtonStyles, ...secondaryDisableBtnStyle }
-                  : { ...defaultButtonStyles, ...secondaryBtnStyle }
-              }
-              onClick={() => {
-                const clickedUrl =
-                  button?.action?.data?.trim() || button?.action?.type || '';
-                embeddedManager.handleEmbeddedClick(
-                  message,
-                  button?.id,
-                  clickedUrl
-                );
-                embeddedManager.trackEmbeddedClick(
-                  message,
-                  button?.id,
-                  clickedUrl
-                );
-              }}
-            >
-              {button.title ? button.title : `Button ${index + 1}`}
-            </button>
-          ))}
-        </div>
+  const cardButtons = `
+    margin-top: auto;
+    margin-left: 5px;
+  `;
+
+  const mediaStyle = `
+    @media screen and (max-width: 800px) {
+        .titleText {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-height: 2.6em;
+          line-height: 1.3em;
+        }
+        .card {
+          min-height: 350px;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    `;
+
+  setTimeout(() => {
+    const cardDiv = document.getElementsByName(
+      `${message?.metadata?.messageId}-card`
+    )[0];
+    const primaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-card-primaryButton`
+    )[0];
+    const secondaryButtonClick = document.getElementsByName(
+      `${message?.metadata?.messageId}-card-secondaryButton`
+    )[0];
+    if (cardDiv) {
+      cardDiv.addEventListener('click', () => handleElementClick(message));
+    }
+    if (primaryButtonClick) {
+      addButtonClickEvent(primaryButtonClick, 0, message);
+    }
+    if (secondaryButtonClick) {
+      addButtonClickEvent(secondaryButtonClick, 1, message);
+    }
+  }, 0);
+
+  const getStyleObj = (index: number) => {
+    return {
+      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
+      disableStyle:
+        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
+      disableButton:
+        index === 0
+          ? disablePrimaryBtn
+            ? 'disabled'
+            : 'enabled'
+          : disableSecondaryBtn
+          ? 'disabled'
+          : 'enabled'
+    };
+  };
+
+  return `
+    <style>${mediaStyle}</style>
+    <div 
+      class="card"
+      id="${parentId}"
+      name="${message?.metadata?.messageId}-card"
+      style="${defaultCardStyles}; ${parentStyle || ''}" 
+    >
+      ${
+        message?.elements?.mediaUrl
+          ? `<img class="card" id="${imageId}" style="${defaultImageStyles}; ${
+              imgStyle || ''
+            }" 
+          src="${message?.elements?.mediaUrl}"/>`
+          : ''
+      }
+      <div id="${textTitleDivId}" class="card" style="${defaultTextParentStyles}">
+        <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
+    titleStyle || ''
+  }">
+          ${message?.elements?.title || 'Title Here'}
+        </text>
+        <text class="titleText card" id="${textId}" style="${defaultTextStyles}; ${
+    textStyle || ''
+  }">
+          ${message?.elements?.body}
+        </text>
       </div>
-    </>
-  );
-};
+      <div id="${buttonsDivId}" class="card" style="${cardButtons}">
+        ${message?.elements?.buttons
+          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+            const buttonStyleObj = getStyleObj(index);
+            return `
+              <button 
+                key="${index}" 
+                ${buttonStyleObj.disableButton} 
+                data-index="${index}"
+                name="${message?.metadata?.messageId}${
+              index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
+            }"
+                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
+                class="card-button-primary-secondary" 
+                style="
+                  ${defaultButtonStyles}; 
+                  ${buttonStyleObj.buttonStyle || ''}; 
+                  ${buttonStyleObj.disableStyle || ''}" 
+              >
+                ${button.title ? button.title : `Button ${index + 1}`}
+              </button>
+            `;
+          })
+          .join('')}
+      </div>
+    </div>
+  `;
+}
