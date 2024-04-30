@@ -10,11 +10,12 @@ import { useUser } from 'src/context/Users';
 
 interface Props {}
 
+const embeddedSessionManager = new EmbeddedSessionManager();
+
 export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const elementCardRef = useRef([]);
   const { loggedInUser, setLoggedInUser } = useUser();
   const [messages, setMessages] = useState([]);
-  const embeddedSessionManager = new EmbeddedSessionManager();
 
   const getCardObserver = () => {
     const visibilityStatus = messages.map(() => false); // Initialize visibility status for each message
