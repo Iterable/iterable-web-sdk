@@ -362,7 +362,11 @@ describe('Events Requests', () => {
           {
             error: 'session.end is a required field',
             field: 'session.end'
-          }
+          },
+          {
+            error: "deviceInfo.appPackageName is a required field",
+            field: "deviceInfo.appPackageName",
+          },
         ])
       );
     }
