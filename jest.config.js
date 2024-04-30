@@ -17,7 +17,4 @@ module.exports = {
     prefix: '<rootDir>/'
   }),
   transformIgnorePatterns: ['node_modules/(?!axios)'],
-  globals: {
-    window: {}
-  }
 };

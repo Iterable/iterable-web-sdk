@@ -67,7 +67,6 @@ export const EmbeddedForm: FC<Props> = ({
         console.log('Synced message')
       );
     } catch (error: any) {
-      console.log({ error });
       setTrackResponse(JSON.stringify(error?.response?.data));
     }
   };
