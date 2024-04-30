@@ -61,7 +61,7 @@ export const EmbeddedForm: FC<Props> = ({
           console.log('onEmbeddedMessagingDisabled called');
         }
       };
-      const embeddedManager = new EmbeddedManager();
+      const embeddedManager = new EmbeddedManager('my-website');
       embeddedManager.addUpdateListener(updateListener);
       await embeddedManager.syncMessages('my-website', () =>
         console.log('Synced message')
@@ -82,7 +82,7 @@ export const EmbeddedForm: FC<Props> = ({
       appPackageName: 'my-lil-site'
     };
 
-    trackEmbeddedReceived(receivedMessage.messageId)
+    trackEmbeddedReceived(receivedMessage.messageId, 'my-website')
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
@@ -175,6 +175,7 @@ export const EmbeddedForm: FC<Props> = ({
         platform: 'Web',
         appPackageName: 'my-lil-site'
       },
+      appPackageName: 'my-website',
       createdAt: Date.now()
     };
 

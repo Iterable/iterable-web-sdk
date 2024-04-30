@@ -22,8 +22,13 @@ import { EmbeddedMessage } from '../events/embedded/types';
 import { trackEmbeddedReceived } from '../events/embedded/events';
 
 export class EmbeddedManager {
+  public appPackageName: string;
   private messages: EmbeddedMessage[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
+
+  constructor(appPackageName: string) {
+    this.appPackageName = appPackageName;
+  }
 
   public async syncMessages(
     packageName: string,
@@ -112,7 +117,10 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      await trackEmbeddedReceived(msgsList[i].metadata.messageId);
+      await trackEmbeddedReceived(
+        msgsList[i].metadata.messageId,
+        this.appPackageName
+      );
     }
   }
 

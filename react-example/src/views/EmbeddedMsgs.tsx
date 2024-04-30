@@ -22,6 +22,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [messages, setMessages] = useState([]);
 
+  const [embeddedManager] = useState<EmbeddedManager>(
+    new EmbeddedManager('my-website')
+  );
+
   const changeCustomElement = () => {
     const titleElement = document.getElementById('notification-title-custom-0');
     const imageElement = document.getElementById('banner-image-custom-1');
@@ -67,7 +71,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      const embeddedManager = new EmbeddedManager();
       const updateListener: EmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
           setMessages(embeddedManager.getMessages());
@@ -167,6 +170,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
             const notification = Notification({
+              embeddedManager,
               message: data,
               titleId: `notification-title-custom-${index}`,
               textStyle: `
@@ -174,6 +178,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
               `
             });
             const banner = Banner({
+              embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `,
               primaryBtnStyle: `
@@ -185,6 +190,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
               imageId: `banner-image-custom-${index}`
             });
             const card = Card({
+              embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `
             });

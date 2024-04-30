@@ -8,11 +8,7 @@ class EmbeddedSession {
   public impressions?: EmbeddedImpression[];
   public id: string;
 
-  constructor(
-    start?: Date,
-    end?: Date,
-    impressions?: EmbeddedImpression[]
-  ) {
+  constructor(start?: Date, end?: Date, impressions?: EmbeddedImpression[]) {
     this.start = start;
     this.end = end;
     this.impressions = impressions;
@@ -27,7 +23,12 @@ class EmbeddedImpression {
   public start?: Date = undefined;
   public placementId: number;
 
-  constructor(messageId: string, placementId: number, displayCount?: number, duration?: number) {
+  constructor(
+    messageId: string,
+    placementId: number,
+    displayCount?: number,
+    duration?: number
+  ) {
     this.messageId = messageId;
     this.displayCount = displayCount ? displayCount : 0;
     this.displayDuration = duration ? duration : 0.0;
@@ -36,12 +37,17 @@ class EmbeddedImpression {
 }
 
 export class EmbeddedSessionManager {
+  public appPackageName: string;
   private impressions: Map<string, EmbeddedImpression> = new Map();
   public session: EmbeddedSession = new EmbeddedSession(
     undefined,
     undefined,
-    [],
+    []
   );
+
+  constructor(appPackageName: string) {
+    this.appPackageName = appPackageName;
+  }
 
   private isTracking(): boolean {
     return this.session.start !== null;
@@ -52,11 +58,7 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.session = new EmbeddedSession(
-      new Date(),
-      undefined,
-      []
-    );
+    this.session = new EmbeddedSession(new Date(), undefined, []);
   }
 
   public async endSession() {
@@ -64,9 +66,7 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.impressions.forEach((_, messageId) =>
-      this.pauseImpression(messageId)
-    );
+    this.impressions.forEach((_, messageId) => this.pauseImpression(messageId));
     this.session.end = new Date();
 
     if (!this.session.impressions?.length) {
@@ -80,7 +80,8 @@ export class EmbeddedSessionManager {
           end: new Date().getTime(),
           id: this.session.id
         },
-        impressions: this.getImpressionList(),
+        appPackageName: this.appPackageName,
+        impressions: this.getImpressionList()
       };
 
       await trackEmbeddedSession(sessionPayload);

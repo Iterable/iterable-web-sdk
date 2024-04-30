@@ -4,8 +4,10 @@ import {
   IterableEmbeddedMessage
 } from '../embedded';
 
-const embeddedManager = new EmbeddedManager();
-export const handleElementClick = (message: IterableEmbeddedMessage) => {
+export const handleElementClick = (
+  embeddedManager: EmbeddedManager,
+  message: IterableEmbeddedMessage
+) => {
   const clickedUrl =
     message?.elements?.defaultAction?.data?.trim() ||
     message?.elements?.defaultAction?.type ||
@@ -15,16 +17,17 @@ export const handleElementClick = (message: IterableEmbeddedMessage) => {
 };
 
 export const handleButtonClick = (
+  embeddedManager: EmbeddedManager,
   button: EmbeddedMessageElementsButton,
   message: IterableEmbeddedMessage
 ) => {
-  const embeddedManager = new EmbeddedManager();
   const clickedUrl = button?.action?.data?.trim() || button?.action?.type || '';
   embeddedManager.handleEmbeddedClick(clickedUrl);
   embeddedManager.trackEmbeddedClick(message, button?.id || '', clickedUrl);
 };
 
 export const addButtonClickEvent = (
+  embeddedManager: EmbeddedManager,
   button: HTMLElement,
   index: number,
   message: IterableEmbeddedMessage
@@ -35,6 +38,10 @@ export const addButtonClickEvent = (
     if (!message?.elements?.buttons) {
       return '';
     }
-    handleButtonClick(message?.elements?.buttons[index], message);
+    handleButtonClick(
+      embeddedManager,
+      message?.elements?.buttons[index],
+      message
+    );
   });
 };

@@ -16,7 +16,7 @@ import { WEB_PLATFORM } from 'src/constants';
 
 export const trackEmbeddedReceived = (
   messageId: string,
-  appPackageName?: string
+  appPackageName: string
 ) =>
   baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -26,7 +26,7 @@ export const trackEmbeddedReceived = (
       deviceInfo: {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
-        appPackageName,
+        appPackageName
       }
     },
     validation: {

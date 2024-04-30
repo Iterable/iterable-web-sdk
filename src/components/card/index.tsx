@@ -6,6 +6,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 
 export function Card({
+  embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -104,13 +105,15 @@ export function Card({
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
     if (cardDiv) {
-      cardDiv.addEventListener('click', () => handleElementClick(message));
+      cardDiv.addEventListener('click', () =>
+        handleElementClick(embeddedManager, message)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
     }
   }, 0);
 

@@ -68,11 +68,11 @@ export interface EmbeddedClickRequestPayload {
   messageId: string;
   buttonIdentifier: string;
   clickedUrl: string;
-  appPackageName?: string;
+  appPackageName: string;
 }
 
 export interface EmbeddedSessionRequestPayload {
   session: Session;
   impressions?: Impression[];
-  appPackageName?: string;
+  appPackageName: string;
 }

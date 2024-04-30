@@ -6,6 +6,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 
 export function Notification({
+  embeddedManager,
   message,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -77,14 +78,14 @@ export function Notification({
     )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', () =>
-        handleElementClick(message)
+        handleElementClick(embeddedManager, message)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
     }
   }, 0);
 
