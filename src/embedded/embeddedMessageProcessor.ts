@@ -1,4 +1,4 @@
-import { EmbeddedMessage } from "..";
+import { EmbeddedMessage } from '..';
 
 export class EmbeddedMessagingProcessor {
   private currentMessages: EmbeddedMessage[];

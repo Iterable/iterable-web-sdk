@@ -1,4 +1,4 @@
-import { boolean, number, object, string, array, mixed } from 'yup';
+import { boolean, number, object, string } from 'yup';
 
 export const trackSchema = object().shape({
   eventName: string().required(),
