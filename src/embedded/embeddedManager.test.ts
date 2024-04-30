@@ -11,9 +11,10 @@ jest.mock('..', () => ({
 }));
 
 describe('EmbeddedManager', () => {
+  const appPackageName = 'my-website';
   describe('syncMessages', () => {
     it('should call syncMessages and callback', async () => {
-      const embeddedManager = new EmbeddedManager();
+      const embeddedManager = new EmbeddedManager(appPackageName);
       const syncMessagesMock = jest.spyOn(embeddedManager, 'syncMessages');
       const callbackMock = jest.fn();
 
@@ -24,7 +25,7 @@ describe('EmbeddedManager', () => {
     });
 
     it('should handle error and call notifyDelegatesOfInvalidApiKeyOrSyncStop', async () => {
-      const embeddedManager = new EmbeddedManager();
+      const embeddedManager = new EmbeddedManager(appPackageName);
 
       async function mockTest() {
         return new Promise(function (resolve, reject) {
@@ -43,7 +44,7 @@ describe('EmbeddedManager', () => {
     let embeddedManager: EmbeddedManager | null;
 
     beforeEach(() => {
-      embeddedManager = new EmbeddedManager();
+      embeddedManager = new EmbeddedManager(appPackageName);
     });
 
     describe('addUpdateListener', () => {
