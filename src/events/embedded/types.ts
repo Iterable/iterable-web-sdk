@@ -8,6 +8,7 @@ interface Impression {
   messageId: string;
   displayCount: number;
   displayDuration: number;
+  placementId?: number;
 }
 
 interface ButtonAction {
@@ -75,7 +76,6 @@ export interface EmbeddedClickRequestPayload {
 
 export interface EmbeddedSessionRequestPayload {
   session: Session;
-  placementId?: string;
   impressions?: Impression[];
   appPackageName?: string;
 }

@@ -48,8 +48,15 @@ describe('Events Requests', () => {
     mockRequest.onPost('/embedded-messaging/events/click').reply(200, {
       msg: 'hello'
     });
-    mockRequest.onPost('/embedded-messaging/events/impression').reply(200, {
+    mockRequest.onPost('/embedded-messaging/events/session').reply(200, {
       msg: 'hello'
+    });
+
+    global.window = Object.create({});
+    Object.defineProperty(window, 'location', {
+      value: {
+        hostname: 'example.com'
+      }
     });
   });
 
@@ -254,7 +261,7 @@ describe('Events Requests', () => {
 
   it('return the correct payload for embedded message received', async () => {
     const response = await trackEmbeddedReceived('abc123');
-    expect(response).toBe(response.status === 200);
+    expect(JSON.parse(response.config.data).messageId).toBe('abc123');
   });
 
   it('should reject embedded message received on bad params', async () => {
@@ -293,12 +300,6 @@ describe('Events Requests', () => {
   });
 
   it('should reject embedded message click on bad params', async () => {
-    global.window = Object.create({});
-    Object.defineProperty(window, 'location', {
-      value: {
-        hostname: 'example.com'
-      }
-    });
     try {
       await trackEmbeddedClick({
         messageId: 'abc123',
@@ -328,16 +329,18 @@ describe('Events Requests', () => {
         {
           messageId: 'abc123',
           displayCount: 3,
-          displayDuration: 10
+          displayDuration: 10,
+          placementId: 1,
         },
         {
           messageId: 'def456',
           displayCount: 2,
-          displayDuration: 8
+          displayDuration: 8,
+          placementId: 1,
         }
       ],
       appPackageName: 'my-lil-site'
-    } as any);
+    });
 
     expect(JSON.parse(response.config.data).session.id).toBe('123');
   });
@@ -349,8 +352,16 @@ describe('Events Requests', () => {
       expect(e).toEqual(
         createClientError([
           {
-            error: 'deviceInfo.appPackageName is a required field',
-            field: 'deviceInfo.appPackageName'
+            error: 'session.id is a required field',
+            field: 'session.id'
+          },
+          {
+            error: 'session.start is a required field',
+            field: 'session.start'
+          },
+          {
+            error: 'session.end is a required field',
+            field: 'session.end'
           }
         ])
       );
@@ -413,12 +424,14 @@ describe('Events Requests', () => {
           messageId: 'abc123',
           displayCount: 3,
           duration: 10,
+          placementId: 1,
           displayDuration: 10
         },
         {
           messageId: 'def456',
           displayCount: 2,
           duration: 8,
+          placementId: 1,
           displayDuration: 8
         }
       ],

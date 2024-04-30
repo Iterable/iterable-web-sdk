@@ -12,7 +12,7 @@ import {
   trackEmbeddedSession,
   trackEmbeddedReceived,
   trackEmbeddedClick,
-  trackEmbeddedDismiss,
+  trackEmbeddedDismiss
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 import { Functions } from 'src/utils/Functions';
@@ -78,7 +78,6 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const receivedMessage = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       messageId: messageId,
       appPackageName: 'my-lil-site'
     };
@@ -132,7 +131,6 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       messageId: messageId,
       buttonIdentifier: '123',
       deviceInfo: {
@@ -159,7 +157,6 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       session: {
         id: uuidv4(),
         start: startTime.getTime(),
