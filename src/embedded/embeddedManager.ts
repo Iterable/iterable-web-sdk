@@ -17,8 +17,9 @@ import {
 } from '../constants';
 import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
-import { EmbeddedMessage, trackEmbeddedReceived } from '..';
 import { trackEmbeddedClickSchema } from 'src/events/embedded/events.schema';
+import { EmbeddedMessage } from '../events/embedded/types';
+import { trackEmbeddedReceived } from '../events/embedded/events';
 
 export class EmbeddedManager {
   private messages: EmbeddedMessage[] = [];
