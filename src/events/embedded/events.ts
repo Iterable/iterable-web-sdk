@@ -26,7 +26,7 @@ export const trackEmbeddedReceived = (
       deviceInfo: {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
-        appPackageName: appPackageName || window?.location?.hostname
+        appPackageName,
       }
     },
     validation: {
@@ -45,7 +45,7 @@ export const trackEmbeddedClick = (payload: EmbeddedClickRequestPayload) => {
       deviceInfo: {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
-        appPackageName: appPackageName || window?.location?.hostname
+        appPackageName
       },
       createdAt: Date.now()
     },
@@ -68,7 +68,7 @@ export const trackEmbeddedDismiss = (
       deviceInfo: {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
-        appPackageName: appPackageName || window?.location?.hostname
+        appPackageName
       },
       createdAt: Date.now()
     },
@@ -91,7 +91,7 @@ export const trackEmbeddedSession = (
       deviceInfo: {
         platform: WEB_PLATFORM,
         deviceId: global.navigator.userAgent || '',
-        appPackageName: appPackageName || window?.location?.hostname
+        appPackageName
       },
       createdAt: Date.now()
     },

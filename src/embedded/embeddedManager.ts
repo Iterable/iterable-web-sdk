@@ -111,9 +111,7 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      const message = {} as EmbeddedMessage;
-      message.messageId = msgsList[i].metadata.messageId;
-      await trackEmbeddedReceived(message.messageId);
+      await trackEmbeddedReceived(msgsList[i].metadata.messageId);
     }
   }
 

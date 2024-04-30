@@ -18,7 +18,7 @@ interface ButtonAction {
 
 interface Button {
   id: string;
-  title: string;
+  title?: string;
   action?: ButtonAction;
 }
 
@@ -50,12 +50,9 @@ interface Metadata {
 }
 
 export interface EmbeddedMessage {
-  email?: string;
-  userId?: string;
-  messageId: string;
   metadata: Metadata;
   elements?: Elements;
-  payload?: Array<any>;
+  payload?: Record<string, any>;
 }
 
 export interface EmbeddedDismissRequestPayload {
