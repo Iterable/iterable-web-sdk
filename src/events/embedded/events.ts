@@ -8,8 +8,8 @@ import { IterableResponse } from '../../types';
 import {
   trackEmbeddedSchema,
   trackEmbeddedClickSchema,
-  embaddedDismissSchema,
-  embaddedSessionSchema
+  embeddedDismissSchema,
+  embeddedSessionSchema
 } from './events.schema';
 import { EndPoints } from '../consts';
 import { WEB_PLATFORM } from 'src/constants';
@@ -73,7 +73,7 @@ export const trackEmbeddedDismiss = (
       createdAt: Date.now()
     },
     validation: {
-      data: embaddedDismissSchema
+      data: embeddedDismissSchema
     }
   });
 };
@@ -96,7 +96,7 @@ export const trackEmbeddedSession = (
       createdAt: Date.now()
     },
     validation: {
-      data: embaddedSessionSchema
+      data: embeddedSessionSchema
     }
   });
 };

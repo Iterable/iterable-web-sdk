@@ -12,7 +12,7 @@ import {
   trackEmbeddedSession,
   trackEmbeddedReceived,
   trackEmbeddedClick,
-  trackEmbeddedDismiss
+  trackEmbeddedDismiss,
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
 import { Functions } from 'src/utils/Functions';

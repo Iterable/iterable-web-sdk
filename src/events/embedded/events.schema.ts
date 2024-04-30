@@ -46,7 +46,7 @@ export const trackEmbeddedClickSchema = object().shape({
   })
 });
 
-export const embaddedDismissSchema = object().shape({
+export const embeddedDismissSchema = object().shape({
   messageId: string().required(),
   buttonIdentifier: string(),
   deviceInfo: object().shape({
@@ -57,7 +57,7 @@ export const embaddedDismissSchema = object().shape({
   createdAt: number()
 });
 
-export const embaddedSessionSchema = object().shape({
+export const embeddedSessionSchema = object().shape({
   session: object()
     .shape({
       id: string().required(),
