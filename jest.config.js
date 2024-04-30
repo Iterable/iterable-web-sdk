@@ -16,5 +16,8 @@ module.exports = {
   moduleNameMapper: pathsToModuleNameMapper(config.compilerOptions.paths, {
     prefix: '<rootDir>/'
   }),
-  transformIgnorePatterns: ['node_modules/(?!axios)']
+  transformIgnorePatterns: ['node_modules/(?!axios)'],
+  globals: {
+    window: {}
+  }
 };

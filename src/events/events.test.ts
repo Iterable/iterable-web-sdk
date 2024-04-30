@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import {
-  track,
-  trackEmbeddedMessageReceived,
+  trackEmbeddedReceived,
   trackEmbeddedClick,
-  trackEmbeddedSession
-} from './events';
+  trackEmbeddedSession,
+} from './embedded/events';
+import { track } from './events';
 import {
   trackInAppClick,
   trackInAppClose,
@@ -253,30 +253,13 @@ describe('Events Requests', () => {
   });
 
   it('return the correct payload for embedded message received', async () => {
-    const payload = {
-      messageId: 'abc123',
-      metadata: {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      elements: {
-        title: 'Welcome Message',
-        body: 'Thank you for using our app!'
-      },
-      deviceInfo: { appPackageName: 'my-lil-site' }
-    };
-    const response = await trackEmbeddedMessageReceived(payload);
-
-    const result =
-      JSON.parse(response.config.data)?.elements?.title ===
-      payload.elements.title;
-
-    expect(result).toBe(true);
+    const response = await trackEmbeddedReceived('abc123');
+    expect(response).toBe(response.status === 200);
   });
 
   it('should reject embedded message received on bad params', async () => {
     try {
-      await trackEmbeddedMessageReceived({} as any);
+      await trackEmbeddedReceived({} as any);
     } catch (e: any) {
       expect(e).toEqual(
         createClientError([
@@ -345,17 +328,15 @@ describe('Events Requests', () => {
         {
           messageId: 'abc123',
           displayCount: 3,
-          duration: 10,
           displayDuration: 10
         },
         {
           messageId: 'def456',
           displayCount: 2,
-          duration: 8,
           displayDuration: 8
         }
       ],
-      deviceInfo: { appPackageName: 'my-lil-site' }
+      appPackageName: 'my-lil-site'
     } as any);
 
     expect(JSON.parse(response.config.data).session.id).toBe('123');
@@ -414,18 +395,7 @@ describe('Events Requests', () => {
       messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
-    const trackEmMsgRecvdResponse = await trackEmbeddedMessageReceived({
-      messageId: 'abc123',
-      metadata: {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      elements: {
-        title: 'Welcome Message',
-        body: 'Thank you for using our app!'
-      },
-      deviceInfo: { appPackageName: 'my-lil-site' }
-    });
+    const trackEmMsgRecvdResponse = await trackEmbeddedReceived('abc123');
     const trackEmClickResponse = await trackEmbeddedClick({
       messageId: 'abc123',
       buttonIdentifier: 'button-123',
@@ -452,7 +422,7 @@ describe('Events Requests', () => {
           displayDuration: 8
         }
       ],
-      deviceInfo: { appPackageName: 'my-lil-site' }
+      appPackageName: 'my-lil-site'
     } as any);
 
     expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();

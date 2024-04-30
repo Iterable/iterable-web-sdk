@@ -1,8 +1,6 @@
-import { boolean, number, object, string, array, mixed, date } from 'yup';
+import { boolean, number, object, string, array, mixed } from 'yup';
 
-export const trackEmbeddedMessageSchema = object().shape({
-  email: string(),
-  userId: string(),
+export const trackEmbeddedSchema = object().shape({
   metadata: object().shape({
     messageId: string(),
     campaignId: number(),
@@ -39,7 +37,7 @@ export const trackEmbeddedMessageSchema = object().shape({
   payload: array().of(mixed())
 });
 
-export const trackEmbeddedMessageClickSchema = object().shape({
+export const trackEmbeddedClickSchema = object().shape({
   messageId: string(),
   buttonIdentifier: string(),
   targetUrl: string(),
@@ -48,23 +46,7 @@ export const trackEmbeddedMessageClickSchema = object().shape({
   })
 });
 
-export const trackEmbeddedSessionSchema = object().shape({
-  start: date(),
-  end: date(),
-  placementId: string(),
-  impressions: array().of(
-    object().shape({
-      messageId: string(),
-      displayCount: number(),
-      duration: number()
-    })
-  ),
-  id: string()
-});
-
-export const embaddedMessagingDismissSchema = object().shape({
-  email: string(),
-  userId: string(),
+export const embaddedDismissSchema = object().shape({
   messageId: string().required(),
   buttonIdentifier: string(),
   deviceInfo: object().shape({
@@ -75,9 +57,7 @@ export const embaddedMessagingDismissSchema = object().shape({
   createdAt: number()
 });
 
-export const embaddedMessagingSessionSchema = object().shape({
-  email: string(),
-  userId: string(),
+export const embaddedSessionSchema = object().shape({
   session: object()
     .shape({
       id: string().required(),

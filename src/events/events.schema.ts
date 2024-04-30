@@ -91,28 +91,28 @@ export const trackEmbeddedMessageClickSchema = object().shape({
   createdAt: number().required()
 });
 
-export const trackEmbeddedSessionSchema = object().shape({
-  session: object().shape({
-    start: number(),
-    end: number(),
-    id: string()
-  }),
-  placementId: string(),
-  impressions: array().of(
-    object().shape({
-      messageId: string(),
-      displayCount: number(),
-      duration: number()
-    })
-  ),
-  deviceInfo: object()
-    .shape({
-      deviceId: string().required(),
-      platform: string().required(),
-      appPackageName: string().required()
-    })
-    .required()
-});
+// export const trackEmbeddedSessionSchema = object().shape({
+//   session: object().shape({
+//     start: number(),
+//     end: number(),
+//     id: string()
+//   }),
+//   placementId: string(),
+//   impressions: array().of(
+//     object().shape({
+//       messageId: string(),
+//       displayCount: number(),
+//       duration: number()
+//     })
+//   ),
+//   deviceInfo: object()
+//     .shape({
+//       deviceId: string().required(),
+//       platform: string().required(),
+//       appPackageName: string().required()
+//     })
+//     .required()
+// });
 
 export const embaddedMessagingDismissSchema = object().shape({
   email: string(),
