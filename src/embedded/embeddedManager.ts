@@ -5,10 +5,8 @@ import {
   IterableAction
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
-import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { IterableActionRunner } from 'src/utils/IterableActionRunner';
 import {
   URL_SCHEME_ITBL,
@@ -19,10 +17,11 @@ import {
 } from '../constants';
 import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
-import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
+import { EmbeddedMessage, trackEmbeddedReceived } from '..';
+import { trackEmbeddedClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
-  private messages: IEmbeddedMessageData[] = [];
+  private messages: EmbeddedMessage[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
 
   public async syncMessages(
@@ -84,8 +83,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): IEmbeddedMessageData[] {
-    let messages: IEmbeddedMessageData[] = [];
+  private getEmbeddedMessages(placements: any): EmbeddedMessage[] {
+    let messages: EmbeddedMessage[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -96,13 +95,11 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): Array<IEmbeddedMessageData> {
+  public getMessages(): EmbeddedMessage[] {
     return this.messages;
   }
 
-  public getMessagesForPlacement(
-    placementId: number
-  ): Array<IEmbeddedMessageData> {
+  public getMessagesForPlacement(placementId: number): EmbeddedMessage[] {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
@@ -114,9 +111,9 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      const messages = {} as IEmbeddedMessageData;
-      messages.messageId = msgsList[i].metadata.messageId;
-      await trackEmbeddedMessageReceived(messages);
+      const message = {} as EmbeddedMessage;
+      message.messageId = msgsList[i].metadata.messageId;
+      await trackEmbeddedReceived(message.messageId);
     }
   }
 
@@ -145,11 +142,7 @@ export class EmbeddedManager {
     return this.updateListeners;
   }
 
-  handleEmbeddedClick(
-    message: any,
-    buttonIdentifier: string | null,
-    clickedUrl: string | null
-  ) {
+  handleEmbeddedClick(clickedUrl: string | null) {
     if (clickedUrl && clickedUrl.trim() !== '') {
       let actionType: string;
       let actionName: string;
@@ -200,7 +193,7 @@ export class EmbeddedManager {
       url: EndPoints.msg_click_event_track,
       data: payload,
       validation: {
-        data: trackEmbeddedMessageClickSchema
+        data: trackEmbeddedClickSchema
       }
     });
   }

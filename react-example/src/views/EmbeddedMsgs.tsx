@@ -14,7 +14,7 @@ import {
 import Button from 'src/components/Button';
 import { useUser } from 'src/context/Users';
 
-interface Props { }
+interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
   const { loggedInUser } = useUser();

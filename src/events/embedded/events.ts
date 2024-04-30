@@ -2,7 +2,7 @@ import { baseIterableRequest } from '../../request';
 import {
   EmbeddedDismissRequestPayload,
   EmbeddedSessionRequestPayload,
-  EmbeddedClickRequestPayload,
+  EmbeddedClickRequestPayload
 } from './types';
 import { IterableResponse } from '../../types';
 import {
@@ -14,21 +14,25 @@ import {
 import { EndPoints } from '../consts';
 import { WEB_PLATFORM } from 'src/constants';
 
-export const trackEmbeddedReceived = (messageId: string, appPackageName?: string) => baseIterableRequest<IterableResponse>({
-  method: 'POST',
-  url: EndPoints.msg_received_event_track,
-  data: {
-    messageId,
-    deviceInfo: {
-      platform: WEB_PLATFORM,
-      deviceId: global.navigator.userAgent || '',
-      appPackageName: appPackageName || window?.location?.hostname
+export const trackEmbeddedReceived = (
+  messageId: string,
+  appPackageName?: string
+) =>
+  baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: EndPoints.msg_received_event_track,
+    data: {
+      messageId,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName: appPackageName || window?.location?.hostname
+      }
+    },
+    validation: {
+      data: trackEmbeddedSchema
     }
-  },
-  validation: {
-    data: trackEmbeddedSchema
-  }
-});
+  });
 
 export const trackEmbeddedClick = (payload: EmbeddedClickRequestPayload) => {
   const { appPackageName, ...rest } = payload;

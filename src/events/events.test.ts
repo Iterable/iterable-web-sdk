@@ -3,7 +3,7 @@ import { baseAxiosRequest } from '../request';
 import {
   trackEmbeddedReceived,
   trackEmbeddedClick,
-  trackEmbeddedSession,
+  trackEmbeddedSession
 } from './embedded/events';
 import { track } from './events';
 import {

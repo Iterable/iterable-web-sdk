@@ -1,9 +1,7 @@
 import { baseIterableRequest } from '../request';
 import { InAppTrackRequestParams } from './in-app/types';
 import { IterableResponse } from '../types';
-import {
-  trackSchema,
-} from './events.schema';
+import { trackSchema } from './events.schema';
 import { EndPoints } from './consts';
 
 export const track = (payload: InAppTrackRequestParams) => {

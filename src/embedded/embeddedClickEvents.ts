@@ -10,7 +10,7 @@ export const handleElementClick = (message: IterableEmbeddedMessage) => {
     message?.elements?.defaultAction?.data?.trim() ||
     message?.elements?.defaultAction?.type ||
     null;
-  embeddedManager.handleEmbeddedClick(message, null, clickedUrl);
+  embeddedManager.handleEmbeddedClick(clickedUrl);
   embeddedManager.trackEmbeddedClick(message, '', clickedUrl ? clickedUrl : '');
 };
 
@@ -20,7 +20,7 @@ export const handleButtonClick = (
 ) => {
   const embeddedManager = new EmbeddedManager();
   const clickedUrl = button?.action?.data?.trim() || button?.action?.type || '';
-  embeddedManager.handleEmbeddedClick(message, button?.id || null, clickedUrl);
+  embeddedManager.handleEmbeddedClick(clickedUrl);
   embeddedManager.trackEmbeddedClick(message, button?.id || '', clickedUrl);
 };
 

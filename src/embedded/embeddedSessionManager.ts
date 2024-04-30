@@ -54,7 +54,12 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.session = new EmbeddedSession(new Date(), undefined, placementId, undefined);
+    this.session = new EmbeddedSession(
+      new Date(),
+      undefined,
+      placementId,
+      undefined
+    );
   }
 
   public async endSession() {
@@ -76,11 +81,11 @@ export class EmbeddedSessionManager {
         session: {
           start: this.session.start?.getTime(),
           end: new Date().getTime(),
-          id: this.session.id,
+          id: this.session.id
         },
         impressions: this.session.impressions,
-        placementId: this.session.placementId,
-      }
+        placementId: this.session.placementId
+      };
 
       await trackEmbeddedSession(sessionPayload);
 
@@ -117,25 +122,7 @@ export class EmbeddedSessionManager {
     this.updateDisplayCountAndDuration(impressionData);
   }
 
-  private getImpressionList() {
-    const impressionList: EmbeddedImpression[] = [];
-
-    this.impressions.forEach((impressionData) => {
-      impressionList.push(
-        new EmbeddedImpression(
-          impressionData.messageId,
-          impressionData.displayCount,
-          impressionData.displayDuration
-        )
-      );
-    });
-
-    return impressionList;
-  }
-
-  private updateDisplayCountAndDuration(
-    impressionData: EmbeddedImpression
-  ) {
+  private updateDisplayCountAndDuration(impressionData: EmbeddedImpression) {
     if (impressionData.start) {
       impressionData.displayCount = impressionData.displayCount + 1;
       impressionData.displayDuration =
