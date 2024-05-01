@@ -4,12 +4,12 @@ import {
   EmbeddedManager,
   IterableEmbeddedMessage,
   EmbeddedMessageUpdateHandler,
-  EmbeddedSessionManager
+  EmbeddedSessionManager,
+  EmbeddedMessage
 } from '@iterable/web-sdk';
 import { useUser } from 'src/context/Users';
-import { EmbeddedMessage } from '@iterable/web-sdk';
 
-interface Props {}
+interface Props { }
 
 const embeddedSessionManager = new EmbeddedSessionManager('my-website');
 

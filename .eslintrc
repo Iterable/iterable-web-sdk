@@ -15,8 +15,10 @@
   ],
   "rules": {
     "no-console": 1,
+    "no-duplicate-imports": 2,
     "no-extra-boolean-cast": "off",
     "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/comma-spacing": 2,
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/array-type": [
       2,
