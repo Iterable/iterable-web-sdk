@@ -145,7 +145,7 @@ export class EmbeddedManager {
   }
 
   //Get the list of updateHandlers
-  public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
+  public getUpdateHandlers(): EmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }
 

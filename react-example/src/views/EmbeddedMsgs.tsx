@@ -180,7 +180,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             const banner = Banner({
               embeddedManager,
               message: data,
-              parentStyle: ` margin-bottom: 10; `,
+              parentStyle: ' margin-bottom: 10; ',
               primaryBtnStyle: `
                 background-color: #000fff;
                 border-radius: 8px;
@@ -192,7 +192,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             const card = Card({
               embeddedManager,
               message: data,
-              parentStyle: ` margin-bottom: 10; `
+              parentStyle: ' margin-bottom: 10; '
             });
             switch (selectedButtonIndex) {
               case 0:

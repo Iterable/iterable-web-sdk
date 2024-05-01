@@ -1,12 +1,12 @@
 export class IterableEmbeddedMessage {
   public metadata: EmbeddedMessageMetadata;
   public elements?: EmbeddedMessageElements;
-  public payload?: Array<any>;
+  public payload?: Record<string, any>;
 
   constructor(
     metadata: EmbeddedMessageMetadata,
     elements?: EmbeddedMessageElements,
-    payload?: Array<any>
+    payload?: Record<string, any>
   ) {
     this.metadata = metadata;
     this.elements = elements;
@@ -54,8 +54,8 @@ export class EmbeddedMessageElements {
   public body?: string = '';
   public mediaUrl = '';
 
-  public buttons?: Array<EmbeddedMessageElementsButton>;
-  public text?: Array<EmbeddedMessageElementsText>;
+  public buttons?: EmbeddedMessageElementsButton[];
+  public text?: EmbeddedMessageElementsText[];
   public defaultAction?: EmbeddedMessageElementsDefaultAction;
 }
 
