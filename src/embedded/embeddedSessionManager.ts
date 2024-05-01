@@ -8,10 +8,9 @@ class EmbeddedSession {
   public impressions?: EmbeddedImpression[];
   public id: string;
 
-  constructor(start?: Date, end?: Date, impressions?: EmbeddedImpression[]) {
+  constructor(start?: Date, end?: Date) {
     this.start = start;
     this.end = end;
-    this.impressions = impressions;
     this.id = uuidv4();
   }
 }
@@ -39,18 +38,14 @@ class EmbeddedImpression {
 export class EmbeddedSessionManager {
   public appPackageName: string;
   private impressions: Map<string, EmbeddedImpression> = new Map();
-  public session: EmbeddedSession = new EmbeddedSession(
-    undefined,
-    undefined,
-    []
-  );
+  public session: EmbeddedSession = new EmbeddedSession();
 
   constructor(appPackageName: string) {
     this.appPackageName = appPackageName;
   }
 
   private isTracking(): boolean {
-    return this.session.start !== null;
+    return this.session.start !== undefined;
   }
 
   public startSession() {
@@ -58,7 +53,7 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.session = new EmbeddedSession(new Date(), undefined, []);
+    this.session.start = new Date();
   }
 
   public async endSession() {
@@ -68,10 +63,6 @@ export class EmbeddedSessionManager {
 
     this.impressions.forEach((_, messageId) => this.pauseImpression(messageId));
     this.session.end = new Date();
-
-    if (!this.session.impressions?.length) {
-      return;
-    }
 
     if (this.impressions.size) {
       const sessionPayload: EmbeddedSessionRequestPayload = {
@@ -87,7 +78,7 @@ export class EmbeddedSessionManager {
       await trackEmbeddedSession(sessionPayload);
 
       //reset session for next session start
-      this.session = new EmbeddedSession(undefined, undefined, []);
+      this.session = new EmbeddedSession();
       this.impressions = new Map();
     }
   }
