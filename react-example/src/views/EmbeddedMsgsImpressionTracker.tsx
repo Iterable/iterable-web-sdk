@@ -7,25 +7,32 @@ import {
   EmbeddedSessionManager
 } from '@iterable/web-sdk';
 import { useUser } from 'src/context/Users';
+import { EmbeddedMessage } from '@iterable/web-sdk';
 
 interface Props {}
 
-const embeddedSessionManager = new EmbeddedSessionManager();
+const embeddedSessionManager = new EmbeddedSessionManager('my-website');
 
 export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const elementCardRef = useRef([]);
   const { loggedInUser, setLoggedInUser } = useUser();
   const [messages, setMessages] = useState([]);
+  const [embeddedManager] = useState<EmbeddedManager>(
+    new EmbeddedManager('my-website')
+  );
 
   const getCardObserver = () => {
     const visibilityStatus = messages.map(() => false); // Initialize visibility status for each message
     return messages.map(
-      (msg, index) =>
+      (msg: EmbeddedMessage, index) =>
         new IntersectionObserver(
           ([entry]) => {
             if (entry.isIntersecting && !visibilityStatus[index]) {
               visibilityStatus[index] = true; // Update visibility status
-              embeddedSessionManager.startImpression(msg.metadata.messageId);
+              embeddedSessionManager.startImpression(
+                msg.metadata.messageId,
+                msg.metadata.placementId
+              );
             }
             if (!entry.isIntersecting && visibilityStatus[index]) {
               visibilityStatus[index] = false; // Update visibility status
@@ -71,7 +78,6 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      const embeddedManager = new EmbeddedManager();
       const updateListener: EmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
           setMessages(embeddedManager.getMessages());
@@ -111,6 +117,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
             const card = Card({
+              embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `
             });
