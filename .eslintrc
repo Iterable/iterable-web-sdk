@@ -10,12 +10,26 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
-  "ignorePatterns": ["webpack.*.js"],
+  "ignorePatterns": [
+    "webpack.*.js"
+  ],
   "rules": {
     "no-console": 1,
+    "no-duplicate-imports": 2,
     "no-extra-boolean-cast": "off",
     "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/comma-spacing": 2,
     "@typescript-eslint/explicit-function-return-type": "off",
-    "eqeqeq": 2
+    "@typescript-eslint/array-type": [
+      2,
+      {
+        "default": "array"
+      }
+    ],
+    "eqeqeq": 2,
+    "quotes": [
+      2,
+      "single"
+    ]
   }
 }

@@ -1,8 +1,8 @@
 export class IterableEmbeddedPlacement {
   public placementId = '';
-  public messages: Array<IterableEmbeddedMessage> = [];
+  public messages: IterableEmbeddedMessage[] = [];
 
-  constructor(placementId: string, messages: Array<IterableEmbeddedMessage>) {
+  constructor(placementId: string, messages: IterableEmbeddedMessage[]) {
     this.placementId = placementId;
     this.messages = [...messages];
   }
@@ -14,7 +14,7 @@ export class IterableEmbeddedPlacement {
       embeddedPlacementJson['placementId'] = placement.placementId;
 
       if (placement?.messages !== null) {
-        const messagesJson: Array<any> = [];
+        const messagesJson: any[] = [];
 
         placement?.messages.forEach((message: any) => {
           messagesJson.push(IterableEmbeddedMessage.toJSONObject(message));
@@ -31,8 +31,8 @@ export class IterableEmbeddedPlacement {
   static fromJSONObject(placementJson: any): IterableEmbeddedPlacement {
     const parsedJson = placementJson;
     const placementId: string = parsedJson['placementId'];
-    const messagesJson: Array<any> = parsedJson['embeddedMessages'];
-    const messages: Array<IterableEmbeddedMessage> = [];
+    const messagesJson: any[] = parsedJson['embeddedMessages'];
+    const messages: IterableEmbeddedMessage[] = [];
 
     messagesJson.forEach((msgJson: any) => {
       const messageJson: any = msgJson;
