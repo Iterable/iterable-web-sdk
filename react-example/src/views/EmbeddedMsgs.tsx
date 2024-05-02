@@ -1,8 +1,8 @@
 import { FC, useState, useEffect } from 'react';
 import {
-  Card,
-  Notification,
-  Banner,
+  IterableEmbeddedCard,
+  IterableEmbeddedNotification,
+  IterableEmbeddedBanner,
   IterableEmbeddedManager,
   IterableEmbeddedMessage,
   IterableEmbeddedMessageUpdateHandler,
@@ -167,7 +167,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
-            const notification = Notification({
+            const notification = IterableEmbeddedNotification({
               embeddedManager,
               message: data,
               titleId: `notification-title-custom-${index}`,
@@ -175,7 +175,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 font-size: 20px;
               `
             });
-            const banner = Banner({
+            const banner = IterableEmbeddedBanner({
               embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `,
@@ -187,7 +187,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 `,
               imageId: `banner-image-custom-${index}`
             });
-            const card = Card({
+            const card = IterableEmbeddedCard({
               embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `

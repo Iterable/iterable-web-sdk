@@ -5,7 +5,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Banner({
+export function IterableEmbeddedBanner({
   embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,

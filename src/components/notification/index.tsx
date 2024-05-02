@@ -5,7 +5,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Notification({
+export function IterableEmbeddedNotification({
   embeddedManager,
   message,
   disablePrimaryBtn = false,

@@ -5,7 +5,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Card({
+export function IterableEmbeddedCard({
   embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,

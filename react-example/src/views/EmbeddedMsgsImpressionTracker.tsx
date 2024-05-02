@@ -1,6 +1,6 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import {
-  Card,
+  IterableEmbeddedCard,
   IterableEmbeddedManager,
   IterableEmbeddedMessage,
   IterableEmbeddedMessageUpdateHandler,
@@ -117,7 +117,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
-            const card = Card({
+            const card = IterableEmbeddedCard({
               embeddedManager,
               message: data,
               parentStyle: ` margin-bottom: 10; `
