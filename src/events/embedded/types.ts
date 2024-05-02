@@ -1,10 +1,10 @@
-interface IterableEmbeddedSession {
+export interface IterableEmbeddedSession {
   id: string;
   start?: number;
   end?: number;
 }
 
-interface IterableEmbeddedImpression {
+export interface IterableEmbeddedImpression {
   messageId: string;
   displayCount: number;
   displayDuration: number;

@@ -3,7 +3,7 @@ export interface IterableEmbeddedButtonAction {
   data?: string;
 }
 
-interface IterableEmbeddedElements {
+export interface IterableEmbeddedElements {
   title?: string;
   body?: string;
   mediaUrl?: string;
@@ -13,17 +13,17 @@ interface IterableEmbeddedElements {
   defaultAction?: IterableEmbeddedDefaultAction;
 }
 
-interface IterableEmbeddedText {
+export interface IterableEmbeddedText {
   id: string;
   text?: string;
 }
 
-interface IterableEmbeddedDefaultAction {
+export interface IterableEmbeddedDefaultAction {
   type: string;
   data?: string;
 }
 
-interface IterableEmbeddedMetadata {
+export interface IterableEmbeddedMetadata {
   messageId: string;
   campaignId?: number;
   isProof?: boolean;
