@@ -49,7 +49,7 @@ export class EmbeddedSessionManager {
   );
 
   private isTracking(): boolean {
-    return this.session.start !== null;
+    return this.session.start !== undefined;
   }
 
   public startSession() {
@@ -57,7 +57,7 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.session = new EmbeddedSession(new Date(), undefined, '0', undefined);
+    this.session.start = new Date();
   }
 
   public async endSession() {
@@ -70,14 +70,7 @@ export class EmbeddedSessionManager {
     );
     this.session.end = new Date();
 
-    if (!this.session.impressions?.length) {
-      return;
-    }
-
     if (this.impressions.size) {
-      //reset session for next session start
-      this.session = new EmbeddedSession(undefined, undefined, '0', undefined);
-
       const sessionToTrack = new EmbeddedSession(
         this.session.start,
         new Date(),
@@ -86,6 +79,8 @@ export class EmbeddedSessionManager {
       );
 
       await trackEmbeddedSession(sessionToTrack);
+      //reset session for next session start
+      this.session = new EmbeddedSession(undefined, undefined, '0', undefined);
       this.impressions = new Map();
     }
   }
