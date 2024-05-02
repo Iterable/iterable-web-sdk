@@ -1,11 +1,12 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Banner({
+export function IterableEmbeddedBanner({
+  embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -101,13 +102,15 @@ export function Banner({
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
     if (bannerDiv) {
-      bannerDiv.addEventListener('click', () => handleElementClick(message));
+      bannerDiv.addEventListener('click', () =>
+        handleElementClick(embeddedManager, message)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
     }
   }, 0);
 
@@ -163,7 +166,7 @@ export function Banner({
       <div class="banner" id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

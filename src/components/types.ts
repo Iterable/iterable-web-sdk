@@ -1,6 +1,7 @@
-import { IterableEmbeddedMessage } from '..';
+import { IterableEmbeddedManager, IterableEmbeddedMessage } from '..';
 
 export interface EmbeddedMessageData {
+  embeddedManager: IterableEmbeddedManager;
   message: IterableEmbeddedMessage;
   disablePrimaryBtn?: boolean;
   disableSecondaryBtn?: boolean;

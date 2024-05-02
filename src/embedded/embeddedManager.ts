@@ -1,14 +1,13 @@
 import { baseIterableRequest } from '../request';
 import {
-  EmbeddedMessageUpdateHandler,
+  IterableEmbeddedMessageUpdateHandler,
   IterableActionSource,
-  IterableAction
+  IterableAction,
+  IterableEmbeddedMessage
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
-import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
 import { IterableActionRunner } from 'src/utils/IterableActionRunner';
 import {
   URL_SCHEME_ITBL,
@@ -17,13 +16,18 @@ import {
   WEB_PLATFORM,
   SDK_VERSION
 } from '../constants';
-import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
-import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
+import { trackEmbeddedClickSchema } from 'src/events/embedded/events.schema';
+import { trackEmbeddedReceived } from '../events/embedded/events';
 
-export class EmbeddedManager {
-  private messages: IEmbeddedMessageData[] = [];
-  private updateListeners: EmbeddedMessageUpdateHandler[] = [];
+export class IterableEmbeddedManager {
+  public appPackageName: string;
+  private messages: IterableEmbeddedMessage[] = [];
+  private updateListeners: IterableEmbeddedMessageUpdateHandler[] = [];
+
+  constructor(appPackageName: string) {
+    this.appPackageName = appPackageName;
+  }
 
   public async syncMessages(
     packageName: string,
@@ -84,8 +88,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): IEmbeddedMessageData[] {
-    let messages: IEmbeddedMessageData[] = [];
+  private getEmbeddedMessages(placements: any): IterableEmbeddedMessage[] {
+    let messages: IterableEmbeddedMessage[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -96,13 +100,13 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): Array<IEmbeddedMessageData> {
+  public getMessages(): IterableEmbeddedMessage[] {
     return this.messages;
   }
 
   public getMessagesForPlacement(
     placementId: number
-  ): Array<IEmbeddedMessageData> {
+  ): IterableEmbeddedMessage[] {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
@@ -114,19 +118,22 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      const messages = {} as IEmbeddedMessageData;
-      messages.messageId = msgsList[i].metadata.messageId;
-      await trackEmbeddedMessageReceived(messages);
+      await trackEmbeddedReceived(
+        msgsList[i].metadata.messageId,
+        this.appPackageName
+      );
     }
   }
 
-  public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler) {
+  public addUpdateListener(
+    updateListener: IterableEmbeddedMessageUpdateHandler
+  ) {
     this.updateListeners.push(updateListener);
   }
 
   private notifyUpdateDelegates() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onMessagesUpdated();
       }
     );
@@ -134,22 +141,18 @@ export class EmbeddedManager {
 
   private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
       }
     );
   }
 
   //Get the list of updateHandlers
-  public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
+  public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }
 
-  handleEmbeddedClick(
-    message: any,
-    buttonIdentifier: string | null,
-    clickedUrl: string | null
-  ) {
+  handleEmbeddedClick(clickedUrl: string | null) {
     if (clickedUrl && clickedUrl.trim() !== '') {
       let actionType: string;
       let actionName: string;
@@ -200,7 +203,7 @@ export class EmbeddedManager {
       url: EndPoints.msg_click_event_track,
       data: payload,
       validation: {
-        data: trackEmbeddedMessageClickSchema
+        data: trackEmbeddedClickSchema
       }
     });
   }

@@ -1,11 +1,12 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Notification({
+export function IterableEmbeddedNotification({
+  embeddedManager,
   message,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -77,14 +78,14 @@ export function Notification({
     )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', () =>
-        handleElementClick(message)
+        handleElementClick(embeddedManager, message)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
     }
   }, 0);
 
@@ -128,7 +129,7 @@ export function Notification({
       </div>
       <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

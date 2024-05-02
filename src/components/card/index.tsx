@@ -1,11 +1,12 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Card({
+export function IterableEmbeddedCard({
+  embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -104,13 +105,15 @@ export function Card({
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
     if (cardDiv) {
-      cardDiv.addEventListener('click', () => handleElementClick(message));
+      cardDiv.addEventListener('click', () =>
+        handleElementClick(embeddedManager, message)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
     }
   }, 0);
 
@@ -160,7 +163,7 @@ export function Card({
       </div>
       <div id="${buttonsDivId}" class="card" style="${cardButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 
