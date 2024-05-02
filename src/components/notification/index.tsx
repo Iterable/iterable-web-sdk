@@ -1,11 +1,11 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Notification({
+export function IterableEmbeddedNotification({
   embeddedManager,
   message,
   disablePrimaryBtn = false,
@@ -129,7 +129,7 @@ export function Notification({
       </div>
       <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

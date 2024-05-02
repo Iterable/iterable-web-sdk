@@ -7,8 +7,8 @@ import {
   Response
 } from '../views/Components.styled';
 import {
-  EmbeddedManager,
-  EmbeddedMessageUpdateHandler,
+  IterableEmbeddedManager,
+  IterableEmbeddedMessageUpdateHandler,
   trackEmbeddedSession,
   trackEmbeddedReceived,
   trackEmbeddedClick,
@@ -52,7 +52,7 @@ export const EmbeddedForm: FC<Props> = ({
     e.preventDefault();
 
     try {
-      const updateListener: EmbeddedMessageUpdateHandler = {
+      const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated() {
           console.log('onMessagesUpdated called');
         },
@@ -60,7 +60,7 @@ export const EmbeddedForm: FC<Props> = ({
           console.log('onEmbeddedMessagingDisabled called');
         }
       };
-      const embeddedManager = new EmbeddedManager('my-website');
+      const embeddedManager = new IterableEmbeddedManager('my-website');
       embeddedManager.addUpdateListener(updateListener);
       await embeddedManager.syncMessages('my-website', () =>
         console.log('Synced message')

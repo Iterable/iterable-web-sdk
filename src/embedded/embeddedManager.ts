@@ -1,8 +1,9 @@
 import { baseIterableRequest } from '../request';
 import {
-  EmbeddedMessageUpdateHandler,
+  IterableEmbeddedMessageUpdateHandler,
   IterableActionSource,
-  IterableAction
+  IterableAction,
+  IterableEmbeddedMessage
 } from './types';
 import { IterableResponse } from '../types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
@@ -15,16 +16,14 @@ import {
   WEB_PLATFORM,
   SDK_VERSION
 } from '../constants';
-import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
 import { trackEmbeddedClickSchema } from 'src/events/embedded/events.schema';
-import { EmbeddedMessage } from '../events/embedded/types';
 import { trackEmbeddedReceived } from '../events/embedded/events';
 
-export class EmbeddedManager {
+export class IterableEmbeddedManager {
   public appPackageName: string;
-  private messages: EmbeddedMessage[] = [];
-  private updateListeners: EmbeddedMessageUpdateHandler[] = [];
+  private messages: IterableEmbeddedMessage[] = [];
+  private updateListeners: IterableEmbeddedMessageUpdateHandler[] = [];
 
   constructor(appPackageName: string) {
     this.appPackageName = appPackageName;
@@ -89,8 +88,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): EmbeddedMessage[] {
-    let messages: EmbeddedMessage[] = [];
+  private getEmbeddedMessages(placements: any): IterableEmbeddedMessage[] {
+    let messages: IterableEmbeddedMessage[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -101,11 +100,13 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): EmbeddedMessage[] {
+  public getMessages(): IterableEmbeddedMessage[] {
     return this.messages;
   }
 
-  public getMessagesForPlacement(placementId: number): EmbeddedMessage[] {
+  public getMessagesForPlacement(
+    placementId: number
+  ): IterableEmbeddedMessage[] {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
@@ -124,13 +125,15 @@ export class EmbeddedManager {
     }
   }
 
-  public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler) {
+  public addUpdateListener(
+    updateListener: IterableEmbeddedMessageUpdateHandler
+  ) {
     this.updateListeners.push(updateListener);
   }
 
   private notifyUpdateDelegates() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onMessagesUpdated();
       }
     );
@@ -138,14 +141,14 @@ export class EmbeddedManager {
 
   private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
       }
     );
   }
 
   //Get the list of updateHandlers
-  public getUpdateHandlers(): EmbeddedMessageUpdateHandler[] {
+  public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }
 

@@ -1,11 +1,11 @@
 import {
-  EmbeddedManager,
-  EmbeddedMessageElementsButton,
+  IterableEmbeddedManager,
+  IterableEmbeddedButton,
   IterableEmbeddedMessage
 } from '../embedded';
 
 export const handleElementClick = (
-  embeddedManager: EmbeddedManager,
+  embeddedManager: IterableEmbeddedManager,
   message: IterableEmbeddedMessage
 ) => {
   const clickedUrl =
@@ -17,8 +17,8 @@ export const handleElementClick = (
 };
 
 export const handleButtonClick = (
-  embeddedManager: EmbeddedManager,
-  button: EmbeddedMessageElementsButton,
+  embeddedManager: IterableEmbeddedManager,
+  button: IterableEmbeddedButton,
   message: IterableEmbeddedMessage
 ) => {
   const clickedUrl = button?.action?.data?.trim() || button?.action?.type || '';
@@ -27,7 +27,7 @@ export const handleButtonClick = (
 };
 
 export const addButtonClickEvent = (
-  embeddedManager: EmbeddedManager,
+  embeddedManager: IterableEmbeddedManager,
   button: HTMLElement,
   index: number,
   message: IterableEmbeddedMessage

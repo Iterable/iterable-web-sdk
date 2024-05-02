@@ -1,30 +1,31 @@
 import { FC, useState, useEffect, useRef } from 'react';
 import {
-  Card,
-  EmbeddedManager,
+  IterableEmbeddedCard,
+  IterableEmbeddedManager,
   IterableEmbeddedMessage,
-  EmbeddedMessageUpdateHandler,
-  EmbeddedSessionManager,
-  EmbeddedMessage
+  IterableEmbeddedMessageUpdateHandler,
+  IterableEmbeddedSessionManager
 } from '@iterable/web-sdk';
 import { useUser } from 'src/context/Users';
 
-interface Props { }
-
-const embeddedSessionManager = new EmbeddedSessionManager('my-website');
+interface Props {}
 
 export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const elementCardRef = useRef([]);
   const { loggedInUser, setLoggedInUser } = useUser();
   const [messages, setMessages] = useState([]);
-  const [embeddedManager] = useState<EmbeddedManager>(
-    new EmbeddedManager('my-website')
+  const [embeddedManager] = useState<IterableEmbeddedManager>(
+    new IterableEmbeddedManager('my-website')
+  );
+
+  const [embeddedSessionManager] = useState<IterableEmbeddedSessionManager>(
+    new IterableEmbeddedSessionManager('my-website')
   );
 
   const getCardObserver = () => {
     const visibilityStatus = messages.map(() => false); // Initialize visibility status for each message
     return messages.map(
-      (msg: EmbeddedMessage, index) =>
+      (msg: IterableEmbeddedMessage, index) =>
         new IntersectionObserver(
           ([entry]) => {
             if (entry.isIntersecting && !visibilityStatus[index]) {
@@ -78,7 +79,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      const updateListener: EmbeddedMessageUpdateHandler = {
+      const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
           setMessages(embeddedManager.getMessages());
         },
@@ -116,10 +117,10 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
-            const card = Card({
+            const card = IterableEmbeddedCard({
               embeddedManager,
               message: data,
-              parentStyle: ' margin-bottom: 10; '
+              parentStyle: ` margin-bottom: 10; `
             });
             return (
               <div

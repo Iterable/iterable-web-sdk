@@ -1,4 +1,4 @@
-import { EmbeddedManager } from './embeddedManager';
+import { IterableEmbeddedManager } from './embeddedManager';
 
 // Mock the baseIterableRequest function
 jest.mock('../request', () => ({
@@ -14,7 +14,7 @@ describe('EmbeddedManager', () => {
   const appPackageName = 'my-website';
   describe('syncMessages', () => {
     it('should call syncMessages and callback', async () => {
-      const embeddedManager = new EmbeddedManager(appPackageName);
+      const embeddedManager = new IterableEmbeddedManager(appPackageName);
       const syncMessagesMock = jest.spyOn(embeddedManager, 'syncMessages');
       const callbackMock = jest.fn();
 
@@ -25,7 +25,7 @@ describe('EmbeddedManager', () => {
     });
 
     it('should handle error and call notifyDelegatesOfInvalidApiKeyOrSyncStop', async () => {
-      const embeddedManager = new EmbeddedManager(appPackageName);
+      const embeddedManager = new IterableEmbeddedManager(appPackageName);
 
       async function mockTest() {
         return new Promise(function (resolve, reject) {
@@ -41,15 +41,15 @@ describe('EmbeddedManager', () => {
   });
 
   describe('EmbeddedManager', () => {
-    let embeddedManager: EmbeddedManager | null;
+    let embeddedManager: IterableEmbeddedManager | null;
 
     beforeEach(() => {
-      embeddedManager = new EmbeddedManager(appPackageName);
+      embeddedManager = new IterableEmbeddedManager(appPackageName);
     });
 
     describe('addUpdateListener', () => {
       it('should add an update listener to the list', () => {
-        if (embeddedManager instanceof EmbeddedManager) {
+        if (embeddedManager instanceof IterableEmbeddedManager) {
           const updateListener = {
             onMessagesUpdated: jest.fn(),
             onEmbeddedMessagingDisabled: jest.fn()

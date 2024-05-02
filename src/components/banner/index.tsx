@@ -1,11 +1,11 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Banner({
+export function IterableEmbeddedBanner({
   embeddedManager,
   parentStyle,
   disablePrimaryBtn = false,
@@ -166,7 +166,7 @@ export function Banner({
       <div class="banner" id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 
