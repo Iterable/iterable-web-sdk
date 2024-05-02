@@ -193,7 +193,7 @@ export function initialize(
       /*
         endpoints that use _email_ query param in GET requests
       */
-      if (!!(config?.url || '').match((/(getMessages)|(messages)/gim))) {
+      if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
         return {
           ...config,
           params: {
