@@ -1,21 +1,11 @@
 import { baseIterableRequest } from '../request';
-import {
-  EmbeddedMessageUpdateHandler,
-  IterableActionSource,
-  IterableAction
-} from './types';
+import { EmbeddedMessageUpdateHandler } from './types';
 import { IterableResponse } from '../types';
 import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
-import { IterableActionRunner } from 'src/utils/IterableActionRunner';
-import {
-  URL_SCHEME_ITBL,
-  URL_SCHEME_ACTION,
-  URL_SCHEME_OPEN,
-  SDK_VERSION
-} from '../constants';
+import { SDK_VERSION } from '../constants';
 export class EmbeddedManager {
   private messages: IEmbeddedMessageData[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
@@ -138,38 +128,5 @@ export class EmbeddedManager {
   //Get the list of updateHandlers
   public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
     return this.updateListeners;
-  }
-
-  handleEmbeddedClick(
-    message: any,
-    buttonIdentifier: string | null,
-    clickedUrl: string | null
-  ) {
-    if (clickedUrl && clickedUrl.trim() !== '') {
-      let actionType: string;
-      let actionName: string;
-
-      if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
-        actionName = '';
-        actionType = clickedUrl;
-      } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
-        actionName = '';
-        actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
-      } else {
-        actionType = URL_SCHEME_OPEN;
-        actionName = clickedUrl;
-      }
-
-      const iterableAction: IterableAction = {
-        type: actionType,
-        data: actionName
-      };
-
-      IterableActionRunner.executeAction(
-        null,
-        iterableAction,
-        IterableActionSource.EMBEDDED
-      );
-    }
   }
 }

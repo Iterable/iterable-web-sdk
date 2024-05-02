@@ -167,11 +167,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
       >
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
-            const data = message;
             switch (selectedButtonIndex) {
               case 0: {
                 const card = Card({
-                  message: data,
+                  message,
                   parentStyle: ` margin-bottom: 10; `,
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
@@ -180,7 +179,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
               case 1: {
                 const banner = Banner({
-                  message: data,
+                  message,
                   parentStyle: ` margin-bottom: 10; `,
                   primaryBtnStyle: `
                     background-color: #000fff;
@@ -195,7 +194,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
               case 2: {
                 const notification = Notification({
-                  message: data,
+                  message,
                   titleId: `notification-title-custom-${index}`,
                   textStyle: `
                       font-size: 20px;

@@ -72,14 +72,6 @@ export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
     validation: {
       data: trackEmbeddedMessageClickSchema
     }
-  }).catch((error) => {
-    if (payload.errorCallback) {
-      payload.errorCallback({
-        ...error?.response?.data,
-        statusCode: error?.response?.status
-      });
-    }
-    return error;
   });
 };
 

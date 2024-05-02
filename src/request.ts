@@ -1,6 +1,6 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 import { BASE_URL, STATIC_HEADERS } from './constants';
-import { IterablePromise, ClientError } from './types';
+import { IterablePromise, IterableResponse } from './types';
 import { AnySchema, ValidationError } from 'yup';
 import { config } from './utils/config';
 
@@ -15,6 +15,14 @@ interface ExtendedRequestConfig extends AxiosRequestConfig {
 export const baseAxiosRequest = Axios.create({
   baseURL: BASE_URL
 });
+
+interface ClientError extends IterableResponse {
+  clientErrors: {
+    error: string;
+    field?: string;
+  }[];
+  statusCode?: number;
+}
 
 export const baseIterableRequest = <T = any>(
   payload: ExtendedRequestConfig
