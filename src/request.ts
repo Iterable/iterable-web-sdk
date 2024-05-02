@@ -12,17 +12,16 @@ interface ExtendedRequestConfig extends AxiosRequestConfig {
   sendBeacon?: boolean;
 }
 
-export const baseAxiosRequest = Axios.create({
-  baseURL: BASE_URL
-});
-
 interface ClientError extends IterableResponse {
   clientErrors: {
     error: string;
     field?: string;
   }[];
-  statusCode?: number;
 }
+
+export const baseAxiosRequest = Axios.create({
+  baseURL: BASE_URL
+});
 
 export const baseIterableRequest = <T = any>(
   payload: ExtendedRequestConfig
