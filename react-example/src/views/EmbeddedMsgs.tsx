@@ -3,57 +3,98 @@ import {
   Card,
   Notification,
   Banner,
-  initialize,
-  EmbeddedManager
+  EmbeddedManager,
+  IterableEmbeddedMessage,
+  EmbeddedMessageUpdateHandler,
+  IterableUrlHandler,
+  IterableCustomActionHandler,
+  IterableAction,
+  IterableConfig
 } from '@iterable/web-sdk';
 import Button from 'src/components/Button';
-import TextField from 'src/components/TextField';
+import { useUser } from 'src/context/Users';
 
 interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
+  const { loggedInUser } = useUser();
+
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
-  const [userId, setUserId] = useState<string>();
   const [messages, setMessages] = useState([]);
-  const iterableApi = initialize(process.env.API_KEY);
+
+  const changeCustomElement = () => {
+    const titleElement = document.getElementById('notification-title-custom-0');
+    const imageElement = document.getElementById('banner-image-custom-1');
+
+    if (titleElement) {
+      titleElement.innerText = 'Custom title';
+    }
+    if (imageElement) {
+      imageElement.style.height = '100px';
+      imageElement.style.width = '100px';
+    }
+  };
+
+  useEffect(() => {
+    const urlHandler: IterableUrlHandler = {
+      handleIterableURL: function (uri: string): boolean {
+        window.open(uri, '_blank');
+        return true;
+      }
+    };
+    IterableConfig.urlHandler = urlHandler;
+
+    const customActionHandler: IterableCustomActionHandler = {
+      handleIterableCustomAction: function (action: IterableAction): boolean {
+        if (action.data === 'news') {
+          // handle the custom action here
+          return true;
+        }
+        return false;
+      }
+    };
+    IterableConfig.customActionHandler = customActionHandler;
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      changeCustomElement();
+    }, 3000);
+
+    // Clear the timeout to prevent memory leaks
+    return () => clearTimeout(timeoutId);
+  }, [selectedButtonIndex]);
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      //iterableApi.setUserID(userId);
       const embeddedManager = new EmbeddedManager();
-      await embeddedManager.syncMessages(
-        'hani',
-        'Web',
-        '1',
-        'my-website',
-        () => {
+      const updateListener: EmbeddedMessageUpdateHandler = {
+        onMessagesUpdated: function (): void {
           setMessages(embeddedManager.getMessages());
+        },
+        onEmbeddedMessagingDisabled: function (): void {
+          setMessages([]);
         }
-      );
+      };
+      embeddedManager.addUpdateListener(updateListener);
+      await embeddedManager.syncMessages('my-website', () => {
+        console.log('messages', JSON.stringify(embeddedManager.getMessages()));
+      });
     } catch (error: any) {
       console.log('error', error);
     }
   };
 
+  useEffect(() => {
+    if (loggedInUser === '') {
+      setMessages([]);
+    } else {
+      handleFetchEmbeddedMessages();
+    }
+  }, [loggedInUser]);
+
   return (
     <>
-      <h1>Fetch Embedded Msgs</h1>
-      <label htmlFor="item-1">UserId</label>
-      <TextField
-        value={userId}
-        onChange={(e) => setUserId(e.target.value)}
-        id="item-1"
-        placeholder="e.g. phone_number"
-        data-qa-update-user-input
-        required
-      />
-      <Button
-        style={{ marginLeft: 20, width: '100px' }}
-        onClick={() => handleFetchEmbeddedMessages()}
-      >
-        Submit
-      </Button>
-      <br />
       <div
         style={{
           display: 'flex',
@@ -123,36 +164,41 @@ export const EmbeddedMsgs: FC<Props> = () => {
         }}
       >
         {messages.length > 0 ? (
-          messages.map((message: any, index: number) => {
+          messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
-
+            const notification = Notification({
+              message: data,
+              titleId: `notification-title-custom-${index}`,
+              textStyle: `
+                font-size: 20px;
+              `
+            });
+            const banner = Banner({
+              message: data,
+              parentStyle: ` margin-bottom: 10; `,
+              primaryBtnStyle: `
+                background-color: #000fff;
+                border-radius: 8px;
+                padding: 10px;
+                color: #ffffff;
+                `,
+              imageId: `banner-image-custom-${index}`
+            });
+            const card = Card({
+              message: data,
+              parentStyle: ` margin-bottom: 10; `
+            });
             switch (selectedButtonIndex) {
               case 0:
-                return (
-                  <Card
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
-                  />
-                );
+                return <div dangerouslySetInnerHTML={{ __html: card }} />;
 
               case 1:
-                return (
-                  <Banner
-                    key={index.toString()}
-                    parentStyle={{ margin: 0 }}
-                    message={data}
-                    primaryBtnStyle={{
-                      backgroundColor: '#000fff',
-                      borderRadius: '8px',
-                      padding: '10px',
-                      color: '#ffffff'
-                    }}
-                  />
-                );
+                return <div dangerouslySetInnerHTML={{ __html: banner }} />;
 
               case 2:
-                return <Notification key={index.toString()} message={data} />;
+                return (
+                  <div dangerouslySetInnerHTML={{ __html: notification }} />
+                );
 
               default:
                 return null;

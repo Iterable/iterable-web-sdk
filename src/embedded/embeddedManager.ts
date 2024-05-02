@@ -5,65 +5,57 @@ import {
   IterableAction
 } from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessage } from '../events/embedded/types';
+import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
 import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
-import { functions } from 'src/utils/functions';
 import { IterableActionRunner } from 'src/utils/IterableActionRunner';
 import {
   URL_SCHEME_ITBL,
   URL_SCHEME_ACTION,
   URL_SCHEME_OPEN,
-  WEB_PLATFORM
+  WEB_PLATFORM,
+  SDK_VERSION
 } from '../constants';
 import { IterableEmbeddedMessage } from './embeddedMessage';
 import { EndPoints } from 'src/events/consts';
 import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
 
 export class EmbeddedManager {
-  private messages: IEmbeddedMessage[] = [];
+  private messages: IEmbeddedMessageData[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
 
   public async syncMessages(
-    userIdOrEmail: string,
-    platform: string,
-    sdkVersion: string,
     packageName: string,
     callback: () => void,
     placementIds?: number[]
   ) {
-    await this.retrieveEmbeddedMessages(
-      userIdOrEmail,
-      platform,
-      sdkVersion,
-      packageName,
-      placementIds || []
-    );
+    await this.retrieveEmbeddedMessages(packageName, placementIds || []);
     callback();
   }
 
   private async retrieveEmbeddedMessages(
-    userIdOrEmail: string,
-    platform: string,
-    sdkVersion: string,
     packageName: string,
     placementIds: number[]
   ) {
     try {
       let url = `${embedded_msg_endpoint}?`;
-      url += `platform=${platform}`;
-      url += `&userId=${userIdOrEmail}`;
-      url += `&sdkVersion=${sdkVersion}`;
-      url += `&packageName=${packageName}`;
-
+      const params: any = {};
       if (placementIds.length > 0) {
-        url += placementIds.map((id) => `&placementIds=${id}`).join('');
+        params.placementIds = placementIds
+          .map((id) => `&placementIds=${id}`)
+          .join('');
       }
       url = url.replace(/&$/, '');
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: url
+        url: url,
+        params: {
+          ...params,
+          platform: 'Web',
+          sdkVersion: SDK_VERSION,
+          packageName: packageName
+        }
       });
       const embeddedMessages = this.getEmbeddedMessages(
         iterableResult?.data?.placements || []
@@ -74,7 +66,7 @@ export class EmbeddedManager {
           this.getEmbeddedMessages(iterableResult?.data?.placements)
         );
         this.setMessages(processor);
-        await this.trackNewlyRetrieved(processor, userIdOrEmail);
+        await this.trackNewlyRetrieved(processor);
         this.messages = [
           ...this.getEmbeddedMessages(iterableResult?.data?.placements)
         ];
@@ -92,8 +84,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): IEmbeddedMessage[] {
-    let messages: IEmbeddedMessage[] = [];
+  private getEmbeddedMessages(placements: any): IEmbeddedMessageData[] {
+    let messages: IEmbeddedMessageData[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -104,31 +96,26 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): Array<IEmbeddedMessage> {
+  public getMessages(): Array<IEmbeddedMessageData> {
     return this.messages;
   }
 
-  public getMessagesForPlacement(placementId: number): Array<IEmbeddedMessage> {
+  public getMessagesForPlacement(
+    placementId: number
+  ): Array<IEmbeddedMessageData> {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
   }
 
-  private async trackNewlyRetrieved(
-    _processor: EmbeddedMessagingProcessor,
-    userIdOrEmail: string
-  ) {
+  private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
     if (msgsList.length > 0) {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      const messages = {} as IEmbeddedMessage;
+      const messages = {} as IEmbeddedMessageData;
       messages.messageId = msgsList[i].metadata.messageId;
-
-      functions.checkEmailValidation(userIdOrEmail)
-        ? (messages.email = userIdOrEmail)
-        : (messages.userId = userIdOrEmail);
       await trackEmbeddedMessageReceived(messages);
     }
   }
@@ -168,14 +155,14 @@ export class EmbeddedManager {
       let actionName: string;
 
       if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
-        actionType = URL_SCHEME_ACTION;
-        actionName = clickedUrl.replace(URL_SCHEME_ACTION, '');
+        actionName = '';
+        actionType = clickedUrl;
       } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
-        actionType = URL_SCHEME_ITBL;
-        actionName = clickedUrl.replace(URL_SCHEME_ITBL, '');
+        actionName = '';
+        actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
       } else {
         actionType = URL_SCHEME_OPEN;
-        actionName = clickedUrl.replace(URL_SCHEME_OPEN, '');
+        actionName = clickedUrl;
       }
 
       const iterableAction: IterableAction = {
