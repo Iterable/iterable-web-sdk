@@ -1,9 +1,9 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
 export function Card({
   embeddedManager,
@@ -163,7 +163,7 @@ export function Card({
       </div>
       <div id="${buttonsDivId}" class="card" style="${cardButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

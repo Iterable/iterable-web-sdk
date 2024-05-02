@@ -1,8 +1,8 @@
 import { baseIterableRequest } from '../../request';
 import {
-  EmbeddedDismissRequestPayload,
-  EmbeddedSessionRequestPayload,
-  EmbeddedClickRequestPayload
+  IterableEmbeddedDismissRequestPayload,
+  IterableEmbeddedSessionRequestPayload,
+  IterableEmbeddedClickRequestPayload
 } from './types';
 import { IterableResponse } from '../../types';
 import {
@@ -34,7 +34,9 @@ export const trackEmbeddedReceived = (
     }
   });
 
-export const trackEmbeddedClick = (payload: EmbeddedClickRequestPayload) => {
+export const trackEmbeddedClick = (
+  payload: IterableEmbeddedClickRequestPayload
+) => {
   const { appPackageName, ...rest } = payload;
 
   return baseIterableRequest<IterableResponse>({
@@ -56,7 +58,7 @@ export const trackEmbeddedClick = (payload: EmbeddedClickRequestPayload) => {
 };
 
 export const trackEmbeddedDismiss = (
-  payload: EmbeddedDismissRequestPayload
+  payload: IterableEmbeddedDismissRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
 
@@ -79,7 +81,7 @@ export const trackEmbeddedDismiss = (
 };
 
 export const trackEmbeddedSession = (
-  payload: EmbeddedSessionRequestPayload
+  payload: IterableEmbeddedSessionRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
 

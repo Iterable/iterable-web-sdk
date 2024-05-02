@@ -1,12 +1,53 @@
-export interface EmbeddedMessageUpdateHandler {
+export interface IterableEmbeddedButtonAction {
+  type: string;
+  data?: string;
+}
+
+interface IterableEmbeddedElements {
+  title?: string;
+  body?: string;
+  mediaUrl?: string;
+
+  buttons?: IterableEmbeddedButton[];
+  text?: IterableEmbeddedText[];
+  defaultAction?: IterableEmbeddedDefaultAction;
+}
+
+interface IterableEmbeddedText {
+  id: string;
+  text?: string;
+}
+
+interface IterableEmbeddedDefaultAction {
+  type: string;
+  data?: string;
+}
+
+interface IterableEmbeddedMetadata {
+  messageId: string;
+  campaignId?: number;
+  isProof?: boolean;
+  placementId?: number;
+}
+
+export interface IterableEmbeddedButton {
+  id: string;
+  title?: string;
+  action?: IterableEmbeddedButtonAction;
+}
+
+export interface IterableEmbeddedMessage {
+  metadata: IterableEmbeddedMetadata;
+  elements?: IterableEmbeddedElements;
+  payload?: Record<string, any>;
+}
+
+export interface IterableEmbeddedMessageUpdateHandler {
   onMessagesUpdated: () => void;
   onEmbeddedMessagingDisabled: () => void;
 }
 
 export enum IterableActionSource {
-  PUSH = 'PUSH',
-  APP_LINK = 'APP_LINK',
-  IN_APP = 'IN_APP',
   EMBEDDED = 'EMBEDDED'
 }
 

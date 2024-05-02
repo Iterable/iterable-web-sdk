@@ -3,9 +3,9 @@ import {
   Card,
   Notification,
   Banner,
-  EmbeddedManager,
+  IterableEmbeddedManager,
   IterableEmbeddedMessage,
-  EmbeddedMessageUpdateHandler,
+  IterableEmbeddedMessageUpdateHandler,
   IterableUrlHandler,
   IterableCustomActionHandler,
   IterableAction,
@@ -22,9 +22,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [messages, setMessages] = useState([]);
 
-  const [embeddedManager] = useState<EmbeddedManager>(
-    new EmbeddedManager('my-website')
-  );
+  const [embeddedManager] = useState(new IterableEmbeddedManager('my-website'));
 
   const changeCustomElement = () => {
     const titleElement = document.getElementById('notification-title-custom-0');
@@ -71,7 +69,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      const updateListener: EmbeddedMessageUpdateHandler = {
+      const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
           setMessages(embeddedManager.getMessages());
         },

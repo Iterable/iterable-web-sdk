@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { trackEmbeddedSession } from '../events/embedded/events';
-import { EmbeddedSessionRequestPayload } from '..';
+import { IterableEmbeddedSessionRequestPayload } from '..';
 
 class EmbeddedSession {
   public start?: Date;
@@ -35,7 +35,7 @@ class EmbeddedImpression {
   }
 }
 
-export class EmbeddedSessionManager {
+export class IterableEmbeddedSessionManager {
   public appPackageName: string;
   private impressions: Map<string, EmbeddedImpression> = new Map();
   public session: EmbeddedSession = new EmbeddedSession();
@@ -65,7 +65,7 @@ export class EmbeddedSessionManager {
     this.session.end = new Date();
 
     if (this.impressions.size) {
-      const sessionPayload: EmbeddedSessionRequestPayload = {
+      const sessionPayload: IterableEmbeddedSessionRequestPayload = {
         session: {
           start: this.session.start?.getTime(),
           end: new Date().getTime(),
