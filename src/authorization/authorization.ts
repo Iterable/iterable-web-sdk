@@ -70,10 +70,10 @@ export function initialize(
   let authInterceptor: number | null = generateJWT
     ? null
     : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
+      config.headers.set('Api-Key', authToken);
 
-        return config;
-      });
+      return config;
+    });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
@@ -308,7 +308,7 @@ export function initialize(
             /*
               endpoints that use _userId_ query param in GET requests
             */
-            if (!!(config?.url || '').match(/getMessages/gim)) {
+            if (!!(config?.url || '').match(/getMessages|(messages)/gim)) {
               return {
                 ...config,
                 params: {
@@ -701,7 +701,7 @@ export function initialize(
         /*
           endpoints that use _userId_ query param in GET requests
         */
-        if (!!(config?.url || '').match(/getMessages/gim)) {
+        if (!!(config?.url || '').match(/getMessages|(messages)/gim)) {
           return {
             ...config,
             params: {
