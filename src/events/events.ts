@@ -64,6 +64,7 @@ export const trackEmbeddedClick = (payload: EmbeddedTrackClick) => {
     },
     createdAt: Date.now()
   };
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: EndPoints.msg_click_event_track,

@@ -47,7 +47,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
     const customActionHandler: IterableCustomActionHandler = {
       handleIterableCustomAction: function (action: IterableAction): boolean {
         if (action.data === 'news') {
-          // handle the custom action here
+          // handle the custom action here and navigate based on action data
           return true;
         }
         return false;
@@ -68,8 +68,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const embeddedManager = new EmbeddedManager();
+      // callback listeners to get fetched messages
       const updateListener: EmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
+          // this callback gets called when messages are fetched/updated
           setMessages(embeddedManager.getMessages());
         },
         onEmbeddedMessagingDisabled: function (): void {
@@ -166,40 +168,43 @@ export const EmbeddedMsgs: FC<Props> = () => {
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
-            const notification = Notification({
-              message: data,
-              titleId: `notification-title-custom-${index}`,
-              textStyle: `
-                font-size: 20px;
-              `
-            });
-            const banner = Banner({
-              message: data,
-              parentStyle: ` margin-bottom: 10; `,
-              primaryBtnStyle: `
-                background-color: #000fff;
-                border-radius: 8px;
-                padding: 10px;
-                color: #ffffff;
-                `,
-              imageId: `banner-image-custom-${index}`
-            });
-            const card = Card({
-              message: data,
-              parentStyle: ` margin-bottom: 10; `,
-              errorCallback: (error) => console.log('hadleError: ', error)
-            });
             switch (selectedButtonIndex) {
-              case 0:
+              case 0: {
+                const card = Card({
+                  message: data,
+                  parentStyle: ` margin-bottom: 10; `,
+                  errorCallback: (error) => console.log('handleError: ', error)
+                });
                 return <div dangerouslySetInnerHTML={{ __html: card }} />;
+              }
 
-              case 1:
+              case 1: {
+                const banner = Banner({
+                  message: data,
+                  parentStyle: ` margin-bottom: 10; `,
+                  primaryBtnStyle: `
+                    background-color: #000fff;
+                    border-radius: 8px;
+                    padding: 10px;
+                    color: #ffffff;
+                    `,
+                  imageId: `banner-image-custom-${index}`
+                });
                 return <div dangerouslySetInnerHTML={{ __html: banner }} />;
+              }
 
-              case 2:
+              case 2: {
+                const notification = Notification({
+                  message: data,
+                  titleId: `notification-title-custom-${index}`,
+                  textStyle: `
+                      font-size: 20px;
+                    `
+                });
                 return (
                   <div dangerouslySetInnerHTML={{ __html: notification }} />
                 );
+              }
 
               default:
                 return null;
