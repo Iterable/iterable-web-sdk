@@ -186,7 +186,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
             });
             const card = Card({
               message: data,
-              parentStyle: ` margin-bottom: 10; `
+              parentStyle: ` margin-bottom: 10; `,
+              errorCallback: (error) => console.log('hadleError: ', error)
             });
             switch (selectedButtonIndex) {
               case 0:

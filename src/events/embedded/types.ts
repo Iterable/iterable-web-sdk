@@ -1,3 +1,5 @@
+import { ErrorHandler } from 'src/types';
+
 export interface IEmbeddedMessageElementsButton {
   id: string;
   title: string;
@@ -95,6 +97,7 @@ export interface EmbeddedTrackClick {
   buttonIdentifier: string;
   clickedUrl: string;
   appPackageName?: string;
+  errorCallback?: ErrorHandler;
 }
 
 export interface IEmbeddedImpressionData {

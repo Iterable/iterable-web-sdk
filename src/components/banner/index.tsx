@@ -25,7 +25,8 @@ export function Banner({
   imageId = 'banner-image',
   buttonsDivId = 'banner-buttons-div',
   textTitleDivId = 'banner-text-title-div',
-  textTitleImageDivId = 'banner-text-title-image-div'
+  textTitleImageDivId = 'banner-text-title-image-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultBannerStyles = `
     border: 1px solid #ccc;
@@ -101,13 +102,15 @@ export function Banner({
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
     if (bannerDiv) {
-      bannerDiv.addEventListener('click', () => handleElementClick(message));
+      bannerDiv.addEventListener('click', () =>
+        handleElementClick(message, errorCallback)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(primaryButtonClick, 0, message, errorCallback);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(secondaryButtonClick, 1, message, errorCallback);
     }
   }, 0);
 

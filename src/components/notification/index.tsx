@@ -21,7 +21,8 @@ export function Notification({
   secondaryButtonId = 'notification-secondary-button',
   parentId = 'notification-parent',
   buttonsDivId = 'notification-buttons-div',
-  textTitleDivId = 'notification-text-title-div'
+  textTitleDivId = 'notification-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultTitleStyles = `
     font-size: 20px;
@@ -77,14 +78,14 @@ export function Notification({
     )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', () =>
-        handleElementClick(message)
+        handleElementClick(message, errorCallback)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(primaryButtonClick, 0, message, errorCallback);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(secondaryButtonClick, 1, message, errorCallback);
     }
   }, 0);
 

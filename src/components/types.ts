@@ -1,4 +1,4 @@
-import { IterableEmbeddedMessage } from '..';
+import { ErrorHandler, IterableEmbeddedMessage } from '..';
 
 export interface EmbeddedMessageData {
   message: IterableEmbeddedMessage;
@@ -21,4 +21,5 @@ export interface EmbeddedMessageData {
   buttonsDivId?: string;
   textTitleDivId?: string;
   textTitleImageDivId?: string;
+  errorCallback?: ErrorHandler;
 }

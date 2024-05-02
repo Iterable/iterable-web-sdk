@@ -34,3 +34,15 @@ export interface IterableResponse {
   msg: string;
   params?: null | Record<string, any>;
 }
+
+export interface ClientError extends IterableResponse {
+  clientErrors: {
+    error: string;
+    field?: string;
+  }[];
+  statusCode?: number;
+}
+
+export interface ErrorHandler {
+  (error: ClientError): void;
+}

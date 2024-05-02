@@ -14,13 +14,8 @@ import {
   URL_SCHEME_ITBL,
   URL_SCHEME_ACTION,
   URL_SCHEME_OPEN,
-  WEB_PLATFORM,
   SDK_VERSION
 } from '../constants';
-import { IterableEmbeddedMessage } from './embeddedMessage';
-import { EndPoints } from 'src/events/consts';
-import { trackEmbeddedMessageClickSchema } from 'src/events/embedded/events.schema';
-
 export class EmbeddedManager {
   private messages: IEmbeddedMessageData[] = [];
   private updateListeners: EmbeddedMessageUpdateHandler[] = [];
@@ -176,32 +171,5 @@ export class EmbeddedManager {
         IterableActionSource.EMBEDDED
       );
     }
-  }
-
-  trackEmbeddedClick(
-    message: IterableEmbeddedMessage,
-    buttonIdentifier: string,
-    clickedUrl: string
-  ) {
-    const payload = {
-      messageId: message?.metadata?.messageId,
-      buttonIdentifier: buttonIdentifier,
-      targetUrl: clickedUrl,
-      deviceInfo: {
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || '',
-        appPackageName: window.location.hostname
-      },
-      createdAt: Date.now()
-    };
-
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: EndPoints.msg_click_event_track,
-      data: payload,
-      validation: {
-        data: trackEmbeddedMessageClickSchema
-      }
-    });
   }
 }

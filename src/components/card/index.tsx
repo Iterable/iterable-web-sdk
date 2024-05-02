@@ -24,7 +24,8 @@ export function Card({
   parentId = 'card-parent',
   imageId = 'card-image',
   buttonsDivId = 'card-buttons-div',
-  textTitleDivId = 'card-text-title-div'
+  textTitleDivId = 'card-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -104,13 +105,15 @@ export function Card({
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
     if (cardDiv) {
-      cardDiv.addEventListener('click', () => handleElementClick(message));
+      cardDiv.addEventListener('click', () =>
+        handleElementClick(message, errorCallback)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(primaryButtonClick, 0, message, errorCallback);
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(secondaryButtonClick, 1, message, errorCallback);
     }
   }, 0);
 
