@@ -81,6 +81,7 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
               onChange={(e) => updateEmail(e.target.value)}
               value={email}
               placeholder="e.g. hello@gmail.com"
+              type="email"
               required
             />
             <Button type="submit">Change</Button>
@@ -103,6 +104,7 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
             onChange={(e) => updateEmail(e.target.value)}
             value={email}
             placeholder="e.g. hello@gmail.com"
+            type="email"
             required
             data-qa-login-input
           />

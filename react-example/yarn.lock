@@ -552,7 +552,7 @@
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
 "@iterable/web-sdk@../":
-  version "1.1.0-beta"
+  version "1.0.8"
   dependencies:
     "@pabra/sortby" "^1.0.1"
     "@types/ws" "8.5.4"
@@ -6390,3 +6390,4 @@ yup@^0.32.9:
     nanoclone "^0.2.1"
     property-expr "^2.0.4"
     toposort "^2.0.2"
+    
