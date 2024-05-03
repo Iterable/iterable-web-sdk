@@ -1,11 +1,12 @@
+import { trackEmbeddedClick } from '../events/embedded/events';
 import {
-  EmbeddedMessageElementsButton,
+  IterableEmbeddedButton,
   IterableAction,
   IterableActionRunner,
   IterableActionSource,
   IterableEmbeddedMessage
 } from '../embedded';
-import { ErrorHandler, trackEmbeddedClick } from '..';
+import { ErrorHandler } from '../types';
 import {
   URL_SCHEME_ACTION,
   URL_SCHEME_ITBL,
@@ -14,6 +15,7 @@ import {
 
 export const handleElementClick = (
   message: IterableEmbeddedMessage,
+  appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
   const clickedUrl =
@@ -24,7 +26,8 @@ export const handleElementClick = (
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
     buttonIdentifier: '',
-    clickedUrl: clickedUrl ? clickedUrl : ''
+    clickedUrl: clickedUrl ? clickedUrl : '',
+    appPackageName
   }).catch((error) => {
     if (errorCallback) {
       errorCallback({
@@ -36,8 +39,9 @@ export const handleElementClick = (
 };
 
 export const handleButtonClick = (
-  button: EmbeddedMessageElementsButton,
+  button: IterableEmbeddedButton,
   message: IterableEmbeddedMessage,
+  appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
   const clickedUrl = button?.action?.data?.trim() || button?.action?.type || '';
@@ -45,7 +49,8 @@ export const handleButtonClick = (
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
     buttonIdentifier: button?.id || '',
-    clickedUrl
+    clickedUrl,
+    appPackageName
   }).catch((error) => {
     if (errorCallback) {
       errorCallback({
@@ -60,6 +65,7 @@ export const addButtonClickEvent = (
   button: HTMLElement,
   index: number,
   message: IterableEmbeddedMessage,
+  appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
   button.addEventListener('click', (event) => {
@@ -71,6 +77,7 @@ export const addButtonClickEvent = (
     handleButtonClick(
       message?.elements?.buttons[index],
       message,
+      appPackageName,
       errorCallback
     );
   });

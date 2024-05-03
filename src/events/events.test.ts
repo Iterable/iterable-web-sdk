@@ -1,11 +1,11 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import {
-  track,
-  trackEmbeddedMessageReceived,
+  trackEmbeddedReceived,
   trackEmbeddedClick,
   trackEmbeddedSession
-} from './events';
+} from './embedded/events';
+import { track } from './events';
 import {
   trackInAppClick,
   trackInAppClose,
@@ -48,8 +48,15 @@ describe('Events Requests', () => {
     mockRequest.onPost('/embedded-messaging/events/click').reply(200, {
       msg: 'hello'
     });
-    mockRequest.onPost('/embedded-messaging/events/impression').reply(200, {
+    mockRequest.onPost('/embedded-messaging/events/session').reply(200, {
       msg: 'hello'
+    });
+
+    global.window = Object.create({});
+    Object.defineProperty(window, 'location', {
+      value: {
+        hostname: 'example.com'
+      }
     });
   });
 
@@ -253,40 +260,8 @@ describe('Events Requests', () => {
   });
 
   it('return the correct payload for embedded message received', async () => {
-    const payload = {
-      messageId: 'abc123',
-      metadata: {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      elements: {
-        title: 'Welcome Message',
-        body: 'Thank you for using our app!'
-      },
-      deviceInfo: { appPackageName: 'my-lil-site' }
-    };
-    const response = await trackEmbeddedMessageReceived(payload);
-
-    const result =
-      JSON.parse(response.config.data)?.elements?.title ===
-      payload.elements.title;
-
-    expect(result).toBe(true);
-  });
-
-  it('should reject embedded message received on bad params', async () => {
-    try {
-      await trackEmbeddedMessageReceived({} as any);
-    } catch (e: any) {
-      expect(e).toEqual(
-        createClientError([
-          {
-            error: 'deviceInfo.appPackageName is a required field',
-            field: 'deviceInfo.appPackageName'
-          }
-        ])
-      );
-    }
+    const response = await trackEmbeddedReceived('abc123', 'packageName');
+    expect(JSON.parse(response.config.data).messageId).toBe('abc123');
   });
 
   it('return the correct payload for embedded message click', async () => {
@@ -309,31 +284,6 @@ describe('Events Requests', () => {
     expect(JSON.parse(response.config.data).messageId).toBe('abc123');
   });
 
-  it('should reject embedded message click on bad params', async () => {
-    global.window = Object.create({});
-    Object.defineProperty(window, 'location', {
-      value: {
-        hostname: 'example.com'
-      }
-    });
-    try {
-      await trackEmbeddedClick({
-        messageId: 'abc123',
-        buttonIdentifier: '',
-        clickedUrl: ''
-      });
-    } catch (e: any) {
-      expect(e).toEqual(
-        createClientError([
-          {
-            error: 'deviceInfo.appPackageName is a required field',
-            field: 'deviceInfo.appPackageName'
-          }
-        ])
-      );
-    }
-  });
-
   it('return the correct payload for embedded message received', async () => {
     const response = await trackEmbeddedSession({
       session: {
@@ -345,18 +295,18 @@ describe('Events Requests', () => {
         {
           messageId: 'abc123',
           displayCount: 3,
-          duration: 10,
-          displayDuration: 10
+          displayDuration: 10,
+          placementId: 1
         },
         {
           messageId: 'def456',
           displayCount: 2,
-          duration: 8,
-          displayDuration: 8
+          displayDuration: 8,
+          placementId: 1
         }
       ],
-      deviceInfo: { appPackageName: 'my-lil-site' }
-    } as any);
+      appPackageName: 'my-lil-site'
+    });
 
     expect(JSON.parse(response.config.data).session.id).toBe('123');
   });
@@ -367,6 +317,18 @@ describe('Events Requests', () => {
     } catch (e) {
       expect(e).toEqual(
         createClientError([
+          {
+            error: 'session.id is a required field',
+            field: 'session.id'
+          },
+          {
+            error: 'session.start is a required field',
+            field: 'session.start'
+          },
+          {
+            error: 'session.end is a required field',
+            field: 'session.end'
+          },
           {
             error: 'deviceInfo.appPackageName is a required field',
             field: 'deviceInfo.appPackageName'
@@ -414,18 +376,10 @@ describe('Events Requests', () => {
       messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
-    const trackEmMsgRecvdResponse = await trackEmbeddedMessageReceived({
-      messageId: 'abc123',
-      metadata: {
-        messageId: 'abc123',
-        campaignId: 1
-      },
-      elements: {
-        title: 'Welcome Message',
-        body: 'Thank you for using our app!'
-      },
-      deviceInfo: { appPackageName: 'my-lil-site' }
-    });
+    const trackEmMsgRecvdResponse = await trackEmbeddedReceived(
+      'abc123',
+      'packageName'
+    );
     const trackEmClickResponse = await trackEmbeddedClick({
       messageId: 'abc123',
       buttonIdentifier: 'button-123',
@@ -443,16 +397,18 @@ describe('Events Requests', () => {
           messageId: 'abc123',
           displayCount: 3,
           duration: 10,
+          placementId: 1,
           displayDuration: 10
         },
         {
           messageId: 'def456',
           displayCount: 2,
           duration: 8,
+          placementId: 1,
           displayDuration: 8
         }
       ],
-      deviceInfo: { appPackageName: 'my-lil-site' }
+      appPackageName: 'my-lil-site'
     } as any);
 
     expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();

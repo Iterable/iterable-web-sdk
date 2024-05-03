@@ -1,12 +1,12 @@
-import { IEmbeddedMessageData } from '../../src/events/embedded/types';
+import { IterableEmbeddedMessage } from './types';
 
 export class EmbeddedMessagingProcessor {
-  private currentMessages: Array<IEmbeddedMessageData>;
-  private fetchedMessages: Array<IEmbeddedMessageData>;
+  private currentMessages: IterableEmbeddedMessage[];
+  private fetchedMessages: IterableEmbeddedMessage[];
 
   constructor(
-    currentMessages: Array<IEmbeddedMessageData>,
-    fetchedMessages: Array<IEmbeddedMessageData>
+    currentMessages: IterableEmbeddedMessage[],
+    fetchedMessages: IterableEmbeddedMessage[]
   ) {
     this.currentMessages = currentMessages; // old messages
     this.fetchedMessages = fetchedMessages; // all messages
@@ -22,20 +22,20 @@ export class EmbeddedMessagingProcessor {
 
   public getNewMessages() {
     return this.fetchedMessages.filter(
-      (messageInfo: IEmbeddedMessageData) =>
+      (messageInfo: IterableEmbeddedMessage) =>
         !this.getCurrentMessageIds().includes(messageInfo.metadata.messageId)
     );
   }
 
   public getCurrentMessageIds(): string[] {
     return this.currentMessages.map(
-      (messageInfo: IEmbeddedMessageData) => messageInfo.metadata.messageId
+      (messageInfo: IterableEmbeddedMessage) => messageInfo.metadata.messageId
     );
   }
 
   public getFetchedMessageIds(): string[] {
     return this.fetchedMessages.map(
-      (messageInfo: IEmbeddedMessageData) => messageInfo.metadata.messageId
+      (messageInfo: IterableEmbeddedMessage) => messageInfo.metadata.messageId
     );
   }
 }

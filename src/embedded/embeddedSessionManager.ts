@@ -1,52 +1,48 @@
 import { v4 as uuidv4 } from 'uuid';
-import {
-  IEmbeddedImpressionData,
-  IEmbeddedSession
-} from '../../src/events/embedded/types';
 import { trackEmbeddedSession } from '../events/embedded/events';
+import { IterableEmbeddedSessionRequestPayload } from '..';
 
 class EmbeddedSession {
   public start?: Date;
   public end?: Date;
-  public placementId?: string;
-  public impressions?: Array<IEmbeddedImpressionData>;
+  public impressions?: EmbeddedImpression[];
   public id: string;
 
-  constructor(
-    start?: Date,
-    end?: Date,
-    placementId?: string,
-    impressions?: Array<IEmbeddedImpressionData>
-  ) {
+  constructor(start?: Date, end?: Date) {
     this.start = start;
     this.end = end;
-    this.placementId = placementId;
-    this.impressions = impressions;
     this.id = uuidv4();
   }
 }
 
-class EmbeddedImpressionData {
+class EmbeddedImpression {
   public messageId: string;
   public displayCount: number;
-  public duration: number;
+  public displayDuration: number;
   public start?: Date = undefined;
+  public placementId: number;
 
-  constructor(messageId: string, displayCount?: number, duration?: number) {
+  constructor(
+    messageId: string,
+    placementId: number,
+    displayCount?: number,
+    duration?: number
+  ) {
     this.messageId = messageId;
     this.displayCount = displayCount ? displayCount : 0;
-    this.duration = duration ? duration : 0.0;
+    this.displayDuration = duration ? duration : 0.0;
+    this.placementId = placementId;
   }
 }
 
-export class EmbeddedSessionManager {
-  private impressions: Map<string, IEmbeddedImpressionData> = new Map();
-  public session: IEmbeddedSession = new EmbeddedSession(
-    undefined,
-    undefined,
-    '0',
-    undefined
-  );
+export class IterableEmbeddedSessionManager {
+  public appPackageName: string;
+  private impressions: Map<string, EmbeddedImpression> = new Map();
+  public session: EmbeddedSession = new EmbeddedSession();
+
+  constructor(appPackageName: string) {
+    this.appPackageName = appPackageName;
+  }
 
   private isTracking(): boolean {
     return this.session.start !== undefined;
@@ -65,32 +61,34 @@ export class EmbeddedSessionManager {
       return;
     }
 
-    this.impressions.forEach((impressionData, messageId) =>
-      this.pauseImpression(messageId)
-    );
+    this.impressions.forEach((_, messageId) => this.pauseImpression(messageId));
     this.session.end = new Date();
 
     if (this.impressions.size) {
-      const sessionToTrack = new EmbeddedSession(
-        this.session.start,
-        new Date(),
-        '0',
-        this.getImpressionList()
-      );
+      const sessionPayload: IterableEmbeddedSessionRequestPayload = {
+        session: {
+          start: this.session.start?.getTime(),
+          end: new Date().getTime(),
+          id: this.session.id
+        },
+        appPackageName: this.appPackageName,
+        impressions: this.getImpressionList()
+      };
 
-      await trackEmbeddedSession(sessionToTrack);
+      await trackEmbeddedSession(sessionPayload);
+
       //reset session for next session start
-      this.session = new EmbeddedSession(undefined, undefined, '0', undefined);
+      this.session = new EmbeddedSession();
       this.impressions = new Map();
     }
   }
 
-  public startImpression(messageId: string) {
-    let impressionData: IEmbeddedImpressionData | undefined =
+  public startImpression(messageId: string, placementId: number) {
+    let impressionData: EmbeddedImpression | undefined =
       this.impressions.get(messageId);
 
     if (!impressionData) {
-      impressionData = new EmbeddedImpressionData(messageId);
+      impressionData = new EmbeddedImpression(messageId, placementId);
       this.impressions.set(messageId, impressionData);
     }
 
@@ -98,7 +96,7 @@ export class EmbeddedSessionManager {
   }
 
   public pauseImpression(messageId: string) {
-    const impressionData: IEmbeddedImpressionData | undefined =
+    const impressionData: EmbeddedImpression | undefined =
       this.impressions.get(messageId);
 
     if (!impressionData) {
@@ -113,14 +111,15 @@ export class EmbeddedSessionManager {
   }
 
   private getImpressionList() {
-    const impressionList: Array<EmbeddedImpressionData> = [];
+    const impressionList: EmbeddedImpression[] = [];
 
     this.impressions.forEach((impressionData) => {
       impressionList.push(
-        new EmbeddedImpressionData(
+        new EmbeddedImpression(
           impressionData.messageId,
+          impressionData.placementId,
           impressionData.displayCount,
-          impressionData.duration
+          impressionData.displayDuration
         )
       );
     });
@@ -128,13 +127,11 @@ export class EmbeddedSessionManager {
     return impressionList;
   }
 
-  private updateDisplayCountAndDuration(
-    impressionData: IEmbeddedImpressionData
-  ) {
+  private updateDisplayCountAndDuration(impressionData: EmbeddedImpression) {
     if (impressionData.start) {
       impressionData.displayCount = impressionData.displayCount + 1;
-      impressionData.duration =
-        impressionData.duration +
+      impressionData.displayDuration =
+        impressionData.displayDuration +
         (new Date().getTime() - impressionData.start.getTime()) / 1000.0;
       impressionData.start = undefined;
     }

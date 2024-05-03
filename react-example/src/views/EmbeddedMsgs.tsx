@@ -1,11 +1,11 @@
 import { FC, useState, useEffect } from 'react';
 import {
-  Card,
-  Notification,
-  Banner,
-  EmbeddedManager,
+  IterableEmbeddedCard,
+  IterableEmbeddedNotification,
+  IterableEmbeddedBanner,
+  IterableEmbeddedManager,
   IterableEmbeddedMessage,
-  EmbeddedMessageUpdateHandler,
+  IterableEmbeddedMessageUpdateHandler,
   IterableUrlHandler,
   IterableCustomActionHandler,
   IterableAction,
@@ -18,9 +18,13 @@ interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
   const { loggedInUser } = useUser();
-
+  const appPackageName = 'my-website';
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [messages, setMessages] = useState([]);
+
+  const [embeddedManager] = useState(
+    new IterableEmbeddedManager(appPackageName)
+  );
 
   const changeCustomElement = () => {
     const titleElement = document.getElementById('notification-title-custom-0');
@@ -67,9 +71,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   const handleFetchEmbeddedMessages = async () => {
     try {
-      const embeddedManager = new EmbeddedManager();
-      // callback listeners to get fetched messages
-      const updateListener: EmbeddedMessageUpdateHandler = {
+      const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
           // this callback gets called when messages are fetched/updated
           setMessages(embeddedManager.getMessages());
@@ -169,18 +171,20 @@ export const EmbeddedMsgs: FC<Props> = () => {
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             switch (selectedButtonIndex) {
               case 0: {
-                const card = Card({
+                const card = IterableEmbeddedCard({
+                  appPackageName,
                   message,
-                  parentStyle: ` margin-bottom: 10; `,
+                  parentStyle: ' margin-bottom: 10; ',
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return <div dangerouslySetInnerHTML={{ __html: card }} />;
               }
 
               case 1: {
-                const banner = Banner({
+                const banner = IterableEmbeddedBanner({
+                  appPackageName,
                   message,
-                  parentStyle: ` margin-bottom: 10; `,
+                  parentStyle: ' margin-bottom: 10; ',
                   primaryBtnStyle: `
                     background-color: #000fff;
                     border-radius: 8px;
@@ -193,12 +197,13 @@ export const EmbeddedMsgs: FC<Props> = () => {
               }
 
               case 2: {
-                const notification = Notification({
+                const notification = IterableEmbeddedNotification({
+                  appPackageName,
                   message,
                   titleId: `notification-title-custom-${index}`,
                   textStyle: `
-                      font-size: 20px;
-                    `
+                    font-size: 20px;
+                  `
                 });
                 return (
                   <div dangerouslySetInnerHTML={{ __html: notification }} />

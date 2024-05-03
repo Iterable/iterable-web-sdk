@@ -1,14 +1,22 @@
 import { baseIterableRequest } from '../request';
-import { EmbeddedMessageUpdateHandler } from './types';
+import {
+  IterableEmbeddedMessageUpdateHandler,
+  IterableEmbeddedMessage
+} from './types';
 import { IterableResponse } from '../types';
-import { IEmbeddedMessageData } from '../../src/events/embedded/types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { embedded_msg_endpoint, ErrorMessage } from './consts';
-import { trackEmbeddedMessageReceived } from 'src/events/embedded/events';
-import { SDK_VERSION } from '../constants';
-export class EmbeddedManager {
-  private messages: IEmbeddedMessageData[] = [];
-  private updateListeners: EmbeddedMessageUpdateHandler[] = [];
+import { SDK_VERSION, WEB_PLATFORM } from '../constants';
+import { trackEmbeddedReceived } from '../events/embedded/events';
+
+export class IterableEmbeddedManager {
+  public appPackageName: string;
+  private messages: IterableEmbeddedMessage[] = [];
+  private updateListeners: IterableEmbeddedMessageUpdateHandler[] = [];
+
+  constructor(appPackageName: string) {
+    this.appPackageName = appPackageName;
+  }
 
   public async syncMessages(
     packageName: string,
@@ -24,20 +32,18 @@ export class EmbeddedManager {
     placementIds: number[]
   ) {
     try {
-      let url = `${embedded_msg_endpoint}?`;
       const params: any = {};
       if (placementIds.length > 0) {
         params.placementIds = placementIds
           .map((id) => `&placementIds=${id}`)
           .join('');
       }
-      url = url.replace(/&$/, '');
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: url,
+        url: embedded_msg_endpoint,
         params: {
           ...params,
-          platform: 'Web',
+          platform: WEB_PLATFORM,
           sdkVersion: SDK_VERSION,
           packageName: packageName
         }
@@ -69,8 +75,8 @@ export class EmbeddedManager {
     }
   }
 
-  private getEmbeddedMessages(placements: any): IEmbeddedMessageData[] {
-    let messages: IEmbeddedMessageData[] = [];
+  private getEmbeddedMessages(placements: any): IterableEmbeddedMessage[] {
+    let messages: IterableEmbeddedMessage[] = [];
     placements.forEach((placement: any) => {
       messages = [...messages, ...placement.embeddedMessages];
     });
@@ -81,13 +87,13 @@ export class EmbeddedManager {
     this.messages = _processor.processedMessagesList();
   }
 
-  public getMessages(): Array<IEmbeddedMessageData> {
+  public getMessages(): IterableEmbeddedMessage[] {
     return this.messages;
   }
 
   public getMessagesForPlacement(
     placementId: number
-  ): Array<IEmbeddedMessageData> {
+  ): IterableEmbeddedMessage[] {
     return this.messages.filter((message) => {
       return message.metadata.placementId === placementId;
     });
@@ -99,19 +105,22 @@ export class EmbeddedManager {
       this.notifyUpdateDelegates();
     }
     for (let i = 0; i < msgsList.length; i++) {
-      const messages = {} as IEmbeddedMessageData;
-      messages.messageId = msgsList[i].metadata.messageId;
-      await trackEmbeddedMessageReceived(messages);
+      await trackEmbeddedReceived(
+        msgsList[i].metadata.messageId,
+        this.appPackageName
+      );
     }
   }
 
-  public addUpdateListener(updateListener: EmbeddedMessageUpdateHandler) {
+  public addUpdateListener(
+    updateListener: IterableEmbeddedMessageUpdateHandler
+  ) {
     this.updateListeners.push(updateListener);
   }
 
   private notifyUpdateDelegates() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onMessagesUpdated();
       }
     );
@@ -119,14 +128,14 @@ export class EmbeddedManager {
 
   private notifyDelegatesOfInvalidApiKeyOrSyncStop() {
     this.updateListeners.forEach(
-      (updateListener: EmbeddedMessageUpdateHandler) => {
+      (updateListener: IterableEmbeddedMessageUpdateHandler) => {
         updateListener.onEmbeddedMessagingDisabled();
       }
     );
   }
 
   //Get the list of updateHandlers
-  public getUpdateHandlers(): Array<EmbeddedMessageUpdateHandler> {
+  public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }
 }
