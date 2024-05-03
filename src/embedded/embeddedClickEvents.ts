@@ -13,20 +13,27 @@ import {
   URL_SCHEME_OPEN
 } from 'src/constants';
 
+function getClickedUrl(action?: any): string {
+  if (!action) return '';
+
+  if (action.type === URL_SCHEME_OPEN) {
+    return action?.data || '';
+  } else {
+    return action.type;
+  }
+}
+
 export const handleElementClick = (
   message: IterableEmbeddedMessage,
   appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
-  const clickedUrl =
-    message?.elements?.defaultAction?.data?.trim() ||
-    message?.elements?.defaultAction?.type ||
-    null;
+  const clickedUrl = getClickedUrl(message?.elements?.defaultAction);
   handleEmbeddedClick(clickedUrl);
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
     buttonIdentifier: '',
-    clickedUrl: clickedUrl ? clickedUrl : '',
+    clickedUrl: clickedUrl,
     appPackageName
   }).catch((error) => {
     if (errorCallback) {
@@ -44,7 +51,7 @@ export const handleButtonClick = (
   appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
-  const clickedUrl = button?.action?.data?.trim() || button?.action?.type || '';
+  const clickedUrl = getClickedUrl(button?.action);
   handleEmbeddedClick(clickedUrl);
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
