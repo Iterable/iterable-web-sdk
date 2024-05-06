@@ -120,7 +120,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
             const card = IterableEmbeddedCard({
               embeddedManager,
               message: data,
-              parentStyle: ` margin-bottom: 10; `
+              parentStyle: ' margin-bottom: 10; '
             });
             return (
               <div

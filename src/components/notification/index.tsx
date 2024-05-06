@@ -6,7 +6,7 @@ import {
 import { IterableEmbeddedButton } from 'src/embedded';
 
 export function IterableEmbeddedNotification({
-  embeddedManager,
+  appPackageName,
   message,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -22,7 +22,8 @@ export function IterableEmbeddedNotification({
   secondaryButtonId = 'notification-secondary-button',
   parentId = 'notification-parent',
   buttonsDivId = 'notification-buttons-div',
-  textTitleDivId = 'notification-text-title-div'
+  textTitleDivId = 'notification-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultTitleStyles = `
     font-size: 20px;
@@ -78,14 +79,26 @@ export function IterableEmbeddedNotification({
     )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', () =>
-        handleElementClick(embeddedManager, message)
+        handleElementClick(message, appPackageName, errorCallback)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
+      addButtonClickEvent(
+        primaryButtonClick,
+        0,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
+      addButtonClickEvent(
+        secondaryButtonClick,
+        1,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
   }, 0);
 

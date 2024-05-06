@@ -1,12 +1,13 @@
-import { EmbeddedMessageData } from '../types';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
+import { EmbeddedMessageData } from '../types';
 
 export function IterableEmbeddedCard({
-  embeddedManager,
+  appPackageName,
+  message,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -17,7 +18,6 @@ export function IterableEmbeddedCard({
   secondaryDisableBtnStyle,
   textStyle,
   titleStyle,
-  message,
   titleId = 'card-title',
   textId = 'card-text',
   primaryButtonId = 'card-primary-button',
@@ -25,7 +25,8 @@ export function IterableEmbeddedCard({
   parentId = 'card-parent',
   imageId = 'card-image',
   buttonsDivId = 'card-buttons-div',
-  textTitleDivId = 'card-text-title-div'
+  textTitleDivId = 'card-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -106,14 +107,26 @@ export function IterableEmbeddedCard({
     )[0];
     if (cardDiv) {
       cardDiv.addEventListener('click', () =>
-        handleElementClick(embeddedManager, message)
+        handleElementClick(message, appPackageName, errorCallback)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(embeddedManager, primaryButtonClick, 0, message);
+      addButtonClickEvent(
+        primaryButtonClick,
+        0,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(embeddedManager, secondaryButtonClick, 1, message);
+      addButtonClickEvent(
+        secondaryButtonClick,
+        1,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
   }, 0);
 

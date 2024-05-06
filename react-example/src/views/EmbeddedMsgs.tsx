@@ -18,11 +18,13 @@ interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
   const { loggedInUser } = useUser();
-
+  const appPackageName = 'my-website';
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
   const [messages, setMessages] = useState([]);
 
-  const [embeddedManager] = useState(new IterableEmbeddedManager('my-website'));
+  const [embeddedManager] = useState(
+    new IterableEmbeddedManager(appPackageName)
+  );
 
   const changeCustomElement = () => {
     const titleElement = document.getElementById('notification-title-custom-0');
@@ -49,7 +51,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
     const customActionHandler: IterableCustomActionHandler = {
       handleIterableCustomAction: function (action: IterableAction): boolean {
         if (action.data === 'news') {
-          // handle the custom action here
+          // handle the custom action here and navigate based on action data
           return true;
         }
         return false;
@@ -71,6 +73,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
     try {
       const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated: function (): void {
+          // this callback gets called when messages are fetched/updated
           setMessages(embeddedManager.getMessages());
         },
         onEmbeddedMessagingDisabled: function (): void {
@@ -166,43 +169,46 @@ export const EmbeddedMsgs: FC<Props> = () => {
       >
         {messages.length > 0 ? (
           messages.map((message: IterableEmbeddedMessage, index: number) => {
-            const data = message;
-            const notification = IterableEmbeddedNotification({
-              embeddedManager,
-              message: data,
-              titleId: `notification-title-custom-${index}`,
-              textStyle: `
-                font-size: 20px;
-              `
-            });
-            const banner = IterableEmbeddedBanner({
-              embeddedManager,
-              message: data,
-              parentStyle: ' margin-bottom: 10; ',
-              primaryBtnStyle: `
-                background-color: #000fff;
-                border-radius: 8px;
-                padding: 10px;
-                color: #ffffff;
-                `,
-              imageId: `banner-image-custom-${index}`
-            });
-            const card = IterableEmbeddedCard({
-              embeddedManager,
-              message: data,
-              parentStyle: ' margin-bottom: 10; '
-            });
             switch (selectedButtonIndex) {
-              case 0:
+              case 0: {
+                const card = IterableEmbeddedCard({
+                  appPackageName,
+                  message,
+                  parentStyle: ' margin-bottom: 10; ',
+                  errorCallback: (error) => console.log('handleError: ', error)
+                });
                 return <div dangerouslySetInnerHTML={{ __html: card }} />;
+              }
 
-              case 1:
+              case 1: {
+                const banner = IterableEmbeddedBanner({
+                  appPackageName,
+                  message,
+                  parentStyle: ' margin-bottom: 10; ',
+                  primaryBtnStyle: `
+                    background-color: #000fff;
+                    border-radius: 8px;
+                    padding: 10px;
+                    color: #ffffff;
+                    `,
+                  imageId: `banner-image-custom-${index}`
+                });
                 return <div dangerouslySetInnerHTML={{ __html: banner }} />;
+              }
 
-              case 2:
+              case 2: {
+                const notification = IterableEmbeddedNotification({
+                  appPackageName,
+                  message,
+                  titleId: `notification-title-custom-${index}`,
+                  textStyle: `
+                    font-size: 20px;
+                  `
+                });
                 return (
                   <div dangerouslySetInnerHTML={{ __html: notification }} />
                 );
+              }
 
               default:
                 return null;
