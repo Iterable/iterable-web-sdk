@@ -70,10 +70,10 @@ export function initialize(
   let authInterceptor: number | null = generateJWT
     ? null
     : baseAxiosRequest.interceptors.request.use((config) => {
-      config.headers.set('Api-Key', authToken);
+        config.headers.set('Api-Key', authToken);
 
-      return config;
-    });
+        return config;
+      });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /* 
