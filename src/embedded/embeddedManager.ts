@@ -5,8 +5,8 @@ import {
 } from './types';
 import { IterableResponse } from '../types';
 import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
-import { embedded_msg_endpoint, ErrorMessage } from './consts';
-import { SDK_VERSION, WEB_PLATFORM } from '../constants';
+import { ErrorMessage } from './consts';
+import { SDK_VERSION, WEB_PLATFORM, END_POINTS } from '../constants';
 import { trackEmbeddedReceived } from '../events/embedded/events';
 
 export class IterableEmbeddedManager {
@@ -40,7 +40,7 @@ export class IterableEmbeddedManager {
       }
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: embedded_msg_endpoint,
+        url: END_POINTS.get_embedded_messages,
         params: {
           ...params,
           platform: WEB_PLATFORM,

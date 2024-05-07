@@ -1,9 +1,8 @@
 import { baseIterableRequest } from '../../request';
 import { InAppEventRequestParams } from './types';
 import { IterableResponse } from '../../types';
-import { WEB_PLATFORM } from '../../constants';
+import { END_POINTS, WEB_PLATFORM } from '../../constants';
 import { eventRequestSchema } from './events.schema';
-import { EndPoints } from '../consts';
 
 export const trackInAppClose = (payload: InAppEventRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -12,7 +11,7 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.track_app_close,
+    url: END_POINTS.track_app_close,
     data: {
       ...payload,
       deviceInfo: {
@@ -39,7 +38,7 @@ export const trackInAppOpen = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.track_app_open,
+    url: END_POINTS.track_app_open,
     data: {
       ...payload,
       deviceInfo: {
@@ -68,7 +67,7 @@ export const trackInAppClick = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.track_app_click,
+    url: END_POINTS.track_app_click,
     sendBeacon,
     data: {
       ...payload,
@@ -96,7 +95,7 @@ export const trackInAppDelivery = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.track_app_delivery,
+    url: END_POINTS.track_app_delivery,
     data: {
       ...payload,
       deviceInfo: {
@@ -127,7 +126,7 @@ export const trackInAppConsume = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.track_app_consume,
+    url: END_POINTS.track_app_consume,
     data: {
       ...payload,
       deviceInfo: {

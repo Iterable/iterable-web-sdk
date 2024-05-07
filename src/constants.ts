@@ -62,6 +62,27 @@ export const URL_SCHEME_OPEN = 'openUrl';
 export const SHARED_PREF_USER_ID = 'userId';
 export const SHARED_PREF_EMAIL = 'email';
 
+export const END_POINTS = {
+  event_track: '/events/track',
+  get_embedded_messages: '/embedded-messaging/messages',
+  msg_received_event_track: '/embedded-messaging/events/received',
+  msg_click_event_track: '/embedded-messaging/events/click',
+  track_app_close: '/events/trackInAppClose',
+  track_app_open: '/events/trackInAppOpen',
+  track_app_click: '/events/trackInAppClick',
+  track_app_delivery: '/events/trackInAppDelivery',
+  track_app_consume: '/events/inAppConsume',
+  msg_dismiss: '/embedded-messaging/events/dismiss',
+  msg_session_event_track: '/embedded-messaging/events/session'
+};
+
+export const INTERCEPTOR_REGEX = new RegExp(
+  Object.entries(END_POINTS).reduce((acc, curr) => {
+    return (acc += `|${curr}`);
+  }, ''),
+  'gim'
+);
+
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION
 ) => `

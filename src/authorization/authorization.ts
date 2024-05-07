@@ -7,7 +7,8 @@ import {
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
   SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL
+  SHARED_PREF_EMAIL,
+  INTERCEPTOR_REGEX
 } from '../constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -143,7 +144,7 @@ export function initialize(
       /* 
         endpoints that use _currentEmail_ payload prop in POST/PUT requests 
       */
-      if (!!(config?.url || '').match(/updateEmail/gim)) {
+      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
         return {
           ...config,
           data: {
@@ -156,11 +157,7 @@ export function initialize(
       /*
         endpoints that use _email_ payload prop in POST/PUT requests 
       */
-      if (
-        !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/impression)|(events\/received)/gim
-        )
-      ) {
+      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
         return {
           ...config,
           data: {
@@ -173,11 +170,8 @@ export function initialize(
       /*
         endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
       */
-      if (
-        !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)|(events\/click)|(events\/session)|(events\/dismiss)|(events\/received)/gim
-        )
-      ) {
+      console.log({ INTERCEPTOR_REGEX });
+      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
         return {
           ...config,
           data: {
@@ -193,7 +187,7 @@ export function initialize(
       /*
         endpoints that use _email_ query param in GET requests
       */
-      if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
+      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
         return {
           ...config,
           params: {
@@ -258,7 +252,7 @@ export function initialize(
         */
         userInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
-            if (!!(config?.url || '').match(/updateEmail/gim)) {
+            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
               return {
                 ...config,
                 data: {
@@ -271,11 +265,7 @@ export function initialize(
             /*
               endpoints that use _userId_ payload prop in POST/PUT requests 
             */
-            if (
-              !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/impression)|(events\/click)/gim
-              )
-            ) {
+            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
               return {
                 ...config,
                 data: {
@@ -288,11 +278,7 @@ export function initialize(
             /*
               endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
             */
-            if (
-              !!(config?.url || '').match(
-                /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-              )
-            ) {
+            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
               return {
                 ...config,
                 data: {
@@ -308,7 +294,7 @@ export function initialize(
             /*
               endpoints that use _userId_ query param in GET requests
             */
-            if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
+            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
               return {
                 ...config,
                 params: {
@@ -419,7 +405,7 @@ export function initialize(
 
         responseInterceptor = baseAxiosRequest.interceptors.response.use(
           (config) => {
-            if (config.config.url?.match(/users\/updateEmail/gim)) {
+            if (config.config.url?.match(INTERCEPTOR_REGEX)) {
               try {
                 /* 
                   if the customer just called the POST /users/updateEmail 
@@ -617,6 +603,7 @@ export function initialize(
       handleTokenExpiration('');
     },
     setEmail: (email: string) => {
+      console.log({ INTERCEPTOR_REGEX });
       typeOfAuth = 'email';
       authIdentifier = email;
       localStorage.setItem(SHARED_PREF_EMAIL, email);
@@ -643,6 +630,8 @@ export function initialize(
       localStorage.setItem(SHARED_PREF_USER_ID, userId);
       clearMessages();
 
+      console.log({ INTERCEPTOR_REGEX });
+
       if (typeof userInterceptor === 'number') {
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
@@ -651,7 +640,7 @@ export function initialize(
         endpoints that use _userId_ payload prop in POST/PUT requests 
       */
       userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-        if (!!(config?.url || '').match(/updateEmail/gim)) {
+        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
           return {
             ...config,
             data: {
@@ -664,11 +653,7 @@ export function initialize(
         /*
           endpoints that use _userId_ payload prop in POST/PUT requests 
         */
-        if (
-          !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)|(events\/received)|(events\/impression)|(events\/click)/gim
-          )
-        ) {
+        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
           return {
             ...config,
             data: {
@@ -681,11 +666,7 @@ export function initialize(
         /*
           endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
         */
-        if (
-          !!(config?.url || '').match(
-            /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-          )
-        ) {
+        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
           return {
             ...config,
             data: {
@@ -701,7 +682,7 @@ export function initialize(
         /*
           endpoints that use _userId_ query param in GET requests
         */
-        if (!!(config?.url || '').match(/(getMessages)|(messages)/gim)) {
+        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
           return {
             ...config,
             params: {
