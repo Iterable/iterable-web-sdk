@@ -133,7 +133,8 @@ export const LoginForm: FC<Props> = ({
         required
         data-qa-login-input
       />
-      <Button type="submit">Login</Button>
+      <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
+      {isEditingUser && <Button onClick={handleCancelEditUser}>Cancel</Button>}
     </Form>
   );
 
