@@ -32,6 +32,13 @@ const StyledDiv = styled.div`
   align-items: flex-start;
 `;
 
+<<<<<<< HEAD
+=======
+const Error = styled.div`
+  color: red;
+`;
+
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
 interface Props {
   setEmail: (email: string) => Promise<string>;
   setUserId: (userId: string) => Promise<string>;
@@ -47,6 +54,10 @@ export const LoginForm: FC<Props> = ({
 }) => {
   const [useEmail, setUseEmail] = useState<boolean>(true);
   const [user, updateUser] = useState<string>(process.env.LOGIN_EMAIL || '');
+<<<<<<< HEAD
+=======
+  const [error, setError] = useState<string>('');
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
@@ -62,7 +73,11 @@ export const LoginForm: FC<Props> = ({
         setEditingUser(false);
         setLoggedInUser({ type: 'user_update', data: user });
       })
+<<<<<<< HEAD
       .catch(() => updateUser('Something went wrong!'));
+=======
+      .catch(() => setError('Something went wrong!'));
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
   };
 
   const handleLogout = () => {
@@ -91,6 +106,7 @@ export const LoginForm: FC<Props> = ({
   const first5 = loggedInUser.substring(0, 5);
   const last9 = loggedInUser.substring(loggedInUser.length - 9);
 
+<<<<<<< HEAD
   const editingUserForm = (
     <Form onSubmit={handleSubmit}>
       <TextField
@@ -105,6 +121,9 @@ export const LoginForm: FC<Props> = ({
   );
 
   const userIdOrEmailForm = (
+=======
+  const UserTypeForm = () => (
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
     <Form>
       <div>
         <input
@@ -131,7 +150,11 @@ export const LoginForm: FC<Props> = ({
     </Form>
   );
 
+<<<<<<< HEAD
   const loginForm = (
+=======
+  const LoginForm = () => (
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
     <Form onSubmit={handleSubmit} data-qa-login-form>
       <TextField
         onChange={(e) => updateUser(e.target.value)}
@@ -140,11 +163,20 @@ export const LoginForm: FC<Props> = ({
         required
         data-qa-login-input
       />
+<<<<<<< HEAD
       <Button type="submit">Login</Button>
     </Form>
   );
 
   const loggedInButtons = (
+=======
+      <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
+      {isEditingUser && <Button onClick={handleCancelEditUser}>Cancel</Button>}
+    </Form>
+  );
+
+  const Buttons = () => (
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
     <>
       <Button onClick={handleEditUser}>
         Logged in as {`${first5}...${last9}`} (change)
@@ -154,16 +186,29 @@ export const LoginForm: FC<Props> = ({
     </>
   );
 
+<<<<<<< HEAD
   const loggedInOrEditing = isEditingUser ? editingUserForm : loggedInButtons;
+=======
+  const LoggedInOrEditing = isEditingUser ? LoginForm : Buttons;
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
 
   return (
     <>
       {loggedInUser ? (
+<<<<<<< HEAD
         loggedInOrEditing
       ) : (
         <StyledDiv>
           {userIdOrEmailForm}
           {loginForm}
+=======
+        <LoggedInOrEditing />
+      ) : (
+        <StyledDiv>
+          <UserTypeForm />
+          <LoginForm />
+          {error && <Error>{error}</Error>}
+>>>>>>> 4bbbf172071fce5c09728335d93589a51ed5ddf5
         </StyledDiv>
       )}
     </>
