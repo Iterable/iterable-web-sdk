@@ -40,7 +40,7 @@ export class IterableEmbeddedManager {
       }
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
-        url: END_POINTS.get_embedded_messages,
+        url: END_POINTS.get_embedded_messages.route,
         params: {
           ...params,
           platform: WEB_PLATFORM,

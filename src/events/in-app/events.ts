@@ -11,7 +11,7 @@ export const trackInAppClose = (payload: InAppEventRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.track_app_close,
+    url: END_POINTS.track_app_close.route,
     data: {
       ...payload,
       deviceInfo: {
@@ -38,7 +38,7 @@ export const trackInAppOpen = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.track_app_open,
+    url: END_POINTS.track_app_open.route,
     data: {
       ...payload,
       deviceInfo: {
@@ -67,7 +67,7 @@ export const trackInAppClick = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.track_app_click,
+    url: END_POINTS.track_app_click.route,
     sendBeacon,
     data: {
       ...payload,
@@ -95,7 +95,7 @@ export const trackInAppDelivery = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.track_app_delivery,
+    url: END_POINTS.track_app_delivery.route,
     data: {
       ...payload,
       deviceInfo: {
@@ -126,7 +126,7 @@ export const trackInAppConsume = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.track_app_consume,
+    url: END_POINTS.track_app_consume.route,
     data: {
       ...payload,
       deviceInfo: {

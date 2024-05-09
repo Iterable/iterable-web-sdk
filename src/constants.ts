@@ -20,9 +20,6 @@ export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 
-/** @todo update once new endpoint is ready */
-export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
-
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
     return JSON.parse(process.env.ENABLE_INAPP_CONSUME);
@@ -62,26 +59,113 @@ export const URL_SCHEME_OPEN = 'openUrl';
 export const SHARED_PREF_USER_ID = 'userId';
 export const SHARED_PREF_EMAIL = 'email';
 
-export const END_POINTS = {
-  event_track: '/events/track',
-  get_embedded_messages: '/embedded-messaging/messages',
-  msg_received_event_track: '/embedded-messaging/events/received',
-  msg_click_event_track: '/embedded-messaging/events/click',
-  track_app_close: '/events/trackInAppClose',
-  track_app_open: '/events/trackInAppOpen',
-  track_app_click: '/events/trackInAppClick',
-  track_app_delivery: '/events/trackInAppDelivery',
-  track_app_consume: '/events/inAppConsume',
-  msg_dismiss: '/embedded-messaging/events/dismiss',
-  msg_session_event_track: '/embedded-messaging/events/session'
+export type RouteConfig = {
+  route: string;
+  body: boolean; // true for POST/PUT requests
+  current: boolean; // true if email or userId in request needs to be prepended with `current`
+  nestedUser: boolean; // true if route expects email or userId field to be nested in user object
 };
 
-export const INTERCEPTOR_REGEX = new RegExp(
-  Object.entries(END_POINTS).reduce((acc, curr) => {
-    return (acc += `|${curr}`);
-  }, ''),
-  'gim'
-);
+type EndPointStructure = Record<string, RouteConfig>;
+
+export const END_POINTS: EndPointStructure = {
+  commerce_update_cart: {
+    route: '/commerce/updateCart',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  commerce_track_purchase: {
+    route: '/commerce/trackPurchase',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  update_email: {
+    route: '/updateEmail',
+    body: true,
+    current: true,
+    nestedUser: true
+  },
+  users_update: {
+    route: '/users/update',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  users_update_subscriptions: {
+    route: '/users/updateSubscriptions',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  get_in_app_messages: {
+    route: '/inApp/web/getMessages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  get_embedded_messages: {
+    route: '/embedded-messaging/messages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  msg_received_event_track: {
+    route: '/embedded-messaging/events/received',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_click_event_track: {
+    route: '/embedded-messaging/events/click',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_close: {
+    route: '/events/trackInAppClose',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_open: {
+    route: '/events/trackInAppOpen',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_click: {
+    route: '/events/trackInAppClick',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_delivery: {
+    route: '/events/trackInAppDelivery',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_consume: {
+    route: '/events/inAppConsume',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_dismiss: {
+    route: '/embedded-messaging/events/dismiss',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_session_event_track: {
+    route: '/embedded-messaging/events/session',
+    body: true,
+    current: false,
+    nestedUser: false
+  }
+};
 
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION

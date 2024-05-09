@@ -8,7 +8,8 @@ import {
   STATIC_HEADERS,
   SHARED_PREF_USER_ID,
   SHARED_PREF_EMAIL,
-  INTERCEPTOR_REGEX
+  END_POINTS,
+  RouteConfig
 } from '../constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -43,6 +44,15 @@ export interface WithoutJWT {
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }
+
+const doesRequestUrlContain = (routeConfig: RouteConfig) =>
+  Object.entries(END_POINTS).some(
+    (entry) =>
+      routeConfig.route === entry[1].route &&
+      routeConfig.body === entry[1].body &&
+      routeConfig.current === entry[1].current &&
+      routeConfig.nestedUser === entry[1].nestedUser
+  );
 
 export function initialize(
   authToken: string,
@@ -144,7 +154,14 @@ export function initialize(
       /* 
         endpoints that use _currentEmail_ payload prop in POST/PUT requests 
       */
-      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+      if (
+        doesRequestUrlContain({
+          route: config?.url ?? '',
+          body: true,
+          current: true,
+          nestedUser: false
+        })
+      ) {
         return {
           ...config,
           data: {
@@ -157,7 +174,14 @@ export function initialize(
       /*
         endpoints that use _email_ payload prop in POST/PUT requests 
       */
-      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+      if (
+        doesRequestUrlContain({
+          route: config?.url ?? '',
+          body: true,
+          current: false,
+          nestedUser: false
+        })
+      ) {
         return {
           ...config,
           data: {
@@ -170,8 +194,14 @@ export function initialize(
       /*
         endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
       */
-      console.log({ INTERCEPTOR_REGEX });
-      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+      if (
+        doesRequestUrlContain({
+          route: config?.url ?? '',
+          body: true,
+          current: false,
+          nestedUser: true
+        })
+      ) {
         return {
           ...config,
           data: {
@@ -187,7 +217,15 @@ export function initialize(
       /*
         endpoints that use _email_ query param in GET requests
       */
-      if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+
+      if (
+        doesRequestUrlContain({
+          route: config?.url ?? '',
+          body: false,
+          current: false,
+          nestedUser: false
+        })
+      ) {
         return {
           ...config,
           params: {
@@ -248,11 +286,18 @@ export function initialize(
         }
 
         /*
-          endpoints that use _userId_ payload prop in POST/PUT requests 
+          endpoints that use _currentUserId payload prop in POST/PUT requests nested in { user: {} }
         */
         userInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
-            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.url ?? '',
+                body: true,
+                current: true,
+                nestedUser: true
+              })
+            ) {
               return {
                 ...config,
                 data: {
@@ -265,7 +310,14 @@ export function initialize(
             /*
               endpoints that use _userId_ payload prop in POST/PUT requests 
             */
-            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.url ?? '',
+                body: true,
+                current: false,
+                nestedUser: false
+              })
+            ) {
               return {
                 ...config,
                 data: {
@@ -278,7 +330,14 @@ export function initialize(
             /*
               endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
             */
-            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.url ?? '',
+                body: true,
+                current: false,
+                nestedUser: true
+              })
+            ) {
               return {
                 ...config,
                 data: {
@@ -294,7 +353,14 @@ export function initialize(
             /*
               endpoints that use _userId_ query param in GET requests
             */
-            if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.url ?? '',
+                body: false,
+                current: false,
+                nestedUser: false
+              })
+            ) {
               return {
                 ...config,
                 params: {
@@ -405,7 +471,14 @@ export function initialize(
 
         responseInterceptor = baseAxiosRequest.interceptors.response.use(
           (config) => {
-            if (config.config.url?.match(INTERCEPTOR_REGEX)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.config?.url ?? '',
+                body: true,
+                current: true,
+                nestedUser: true
+              })
+            ) {
               try {
                 /* 
                   if the customer just called the POST /users/updateEmail 
@@ -603,7 +676,6 @@ export function initialize(
       handleTokenExpiration('');
     },
     setEmail: (email: string) => {
-      console.log({ INTERCEPTOR_REGEX });
       typeOfAuth = 'email';
       authIdentifier = email;
       localStorage.setItem(SHARED_PREF_EMAIL, email);
@@ -630,17 +702,22 @@ export function initialize(
       localStorage.setItem(SHARED_PREF_USER_ID, userId);
       clearMessages();
 
-      console.log({ INTERCEPTOR_REGEX });
-
       if (typeof userInterceptor === 'number') {
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
 
       /*
-        endpoints that use _userId_ payload prop in POST/PUT requests 
+        endpoints that use _currentUserId_ payload prop in POST/PUT requests nested in user object
       */
       userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+        if (
+          doesRequestUrlContain({
+            route: config?.url ?? '',
+            body: true,
+            current: true,
+            nestedUser: true
+          })
+        ) {
           return {
             ...config,
             data: {
@@ -651,9 +728,16 @@ export function initialize(
         }
 
         /*
-          endpoints that use _userId_ payload prop in POST/PUT requests 
+          endpoints that use _serId_ payload prop in POST/PUT requests 
         */
-        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+        if (
+          doesRequestUrlContain({
+            route: config?.url ?? '',
+            body: true,
+            current: false,
+            nestedUser: false
+          })
+        ) {
           return {
             ...config,
             data: {
@@ -666,7 +750,14 @@ export function initialize(
         /*
           endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
         */
-        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+        if (
+          doesRequestUrlContain({
+            route: config?.url ?? '',
+            body: true,
+            current: false,
+            nestedUser: true
+          })
+        ) {
           return {
             ...config,
             data: {
@@ -682,7 +773,14 @@ export function initialize(
         /*
           endpoints that use _userId_ query param in GET requests
         */
-        if (!!(config?.url || '').match(INTERCEPTOR_REGEX)) {
+        if (
+          doesRequestUrlContain({
+            route: config?.url ?? '',
+            body: false,
+            current: false,
+            nestedUser: false
+          })
+        ) {
           return {
             ...config,
             params: {

@@ -11,7 +11,7 @@ export const track = (payload: InAppTrackRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.event_track,
+    url: END_POINTS.event_track.route,
     data: payload,
     validation: {
       data: trackSchema
