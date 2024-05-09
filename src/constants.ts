@@ -111,6 +111,12 @@ export const END_POINTS: EndPointStructure = {
     current: false,
     nestedUser: false
   },
+  event_track: {
+    route: '/events/track',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
   msg_received_event_track: {
     route: '/embedded-messaging/events/received',
     body: true,
