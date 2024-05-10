@@ -159,7 +159,7 @@ export function initialize(
           route: config?.url ?? '',
           body: true,
           current: true,
-          nestedUser: false
+          nestedUser: true
         })
       ) {
         return {
