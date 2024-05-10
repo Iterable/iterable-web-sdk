@@ -2,7 +2,7 @@ import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
-import { END_POINTS } from 'src/constants';
+import { ENDPOINTS } from 'src/constants';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -13,7 +13,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.commerce_update_cart.route,
+    url: ENDPOINTS.commerce_update_cart.route,
     data: {
       ...payload,
       user: {
@@ -36,7 +36,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.commerce_track_purchase.route,
+    url: ENDPOINTS.commerce_track_purchase.route,
     data: {
       ...payload,
       user: {

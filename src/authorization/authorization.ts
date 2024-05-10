@@ -8,7 +8,7 @@ import {
   STATIC_HEADERS,
   SHARED_PREF_USER_ID,
   SHARED_PREF_EMAIL,
-  END_POINTS,
+  ENDPOINTS,
   RouteConfig
 } from '../constants';
 import {
@@ -46,7 +46,7 @@ export interface WithoutJWT {
 }
 
 const doesRequestUrlContain = (routeConfig: RouteConfig) =>
-  Object.entries(END_POINTS).some(
+  Object.entries(ENDPOINTS).some(
     (entry) =>
       routeConfig.route === entry[1].route &&
       routeConfig.body === entry[1].body &&

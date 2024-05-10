@@ -21,7 +21,7 @@ export const requestInAppMessages = ({
 }: RequestInAppMessagesProps) =>
   baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
-    /** @note Parameter will be enabled once new endpoint is ready */
+    /** @note TBD: Parameter will be enabled once new endpoint is ready */
     // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
     url: GETMESSAGES_PATH,
     validation: { params: schema },
@@ -38,7 +38,7 @@ type RequestMessagesProps = {
 };
 
 export const requestMessages = async ({ payload }: RequestMessagesProps) => {
-  /** @note Caching implementation and associated parameter will be enabled once new endpoint is ready */
+  /** @note TBD: Caching implementation and associated parameter will be enabled once new endpoint is ready */
   // if (!options?.useLocalCache) return await requestInAppMessages({});
   /** @note Always early return until then */
   return await requestInAppMessages({ payload });

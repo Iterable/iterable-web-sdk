@@ -68,7 +68,7 @@ export type RouteConfig = {
 
 type EndPointStructure = Record<string, RouteConfig>;
 
-export const END_POINTS: EndPointStructure = {
+export const ENDPOINTS: EndPointStructure = {
   commerce_update_cart: {
     route: '/commerce/updateCart',
     body: true,

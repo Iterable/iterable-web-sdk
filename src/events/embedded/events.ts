@@ -11,7 +11,7 @@ import {
   embeddedDismissSchema,
   embeddedSessionSchema
 } from './events.schema';
-import { WEB_PLATFORM, END_POINTS } from 'src/constants';
+import { WEB_PLATFORM, ENDPOINTS } from 'src/constants';
 
 export const trackEmbeddedReceived = (
   messageId: string,
@@ -19,7 +19,7 @@ export const trackEmbeddedReceived = (
 ) =>
   baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.msg_received_event_track.route,
+    url: ENDPOINTS.msg_received_event_track.route,
     data: {
       messageId,
       deviceInfo: {
@@ -40,7 +40,7 @@ export const trackEmbeddedClick = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.msg_click_event_track.route,
+    url: ENDPOINTS.msg_click_event_track.route,
     data: {
       ...rest,
       deviceInfo: {
@@ -63,7 +63,7 @@ export const trackEmbeddedDismiss = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.msg_dismiss.route,
+    url: ENDPOINTS.msg_dismiss.route,
     data: {
       ...rest,
       deviceInfo: {
@@ -86,7 +86,7 @@ export const trackEmbeddedSession = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: END_POINTS.msg_session_event_track.route,
+    url: ENDPOINTS.msg_session_event_track.route,
     data: {
       ...rest,
       deviceInfo: {
