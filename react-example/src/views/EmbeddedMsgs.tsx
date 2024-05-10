@@ -177,7 +177,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   parentStyle: ' margin-bottom: 10; ',
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
-                return <div dangerouslySetInnerHTML={{ __html: card }} />;
+                return (
+                  <div
+                    key={message.metadata.messageId}
+                    dangerouslySetInnerHTML={{ __html: card }}
+                  />
+                );
               }
 
               case 1: {
@@ -193,7 +198,12 @@ export const EmbeddedMsgs: FC<Props> = () => {
                     `,
                   imageId: `banner-image-custom-${index}`
                 });
-                return <div dangerouslySetInnerHTML={{ __html: banner }} />;
+                return (
+                  <div
+                    key={message.metadata.messageId}
+                    dangerouslySetInnerHTML={{ __html: banner }}
+                  />
+                );
               }
 
               case 2: {
@@ -206,7 +216,10 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   `
                 });
                 return (
-                  <div dangerouslySetInnerHTML={{ __html: notification }} />
+                  <div
+                    key={message.metadata.messageId}
+                    dangerouslySetInnerHTML={{ __html: notification }}
+                  />
                 );
               }
 
