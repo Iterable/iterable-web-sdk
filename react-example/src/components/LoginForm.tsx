@@ -51,6 +51,7 @@ export const LoginForm: FC<Props> = ({
 }) => {
   const [useEmail, setUseEmail] = useState<boolean>(true);
   const [user, updateUser] = useState<string>(process.env.LOGIN_EMAIL || '');
+
   const [error, setError] = useState<string>('');
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
