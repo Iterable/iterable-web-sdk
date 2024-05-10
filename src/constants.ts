@@ -82,7 +82,7 @@ export const END_POINTS: EndPointStructure = {
     nestedUser: true
   },
   update_email: {
-    route: '/updateEmail',
+    route: '/users/updateEmail',
     body: true,
     current: true,
     nestedUser: true
