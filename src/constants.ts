@@ -61,9 +61,12 @@ export const SHARED_PREF_EMAIL = 'email';
 
 export type RouteConfig = {
   route: string;
-  body: boolean; // true for POST/PUT requests
-  current: boolean; // true if email or userId in request needs to be prepended with `current`
-  nestedUser: boolean; // true if route expects email or userId field to be nested in user object
+  /** true for POST/PUT requests */
+  body: boolean;
+  /** true if email or userId in request needs to be prepended with `current` */
+  current: boolean;
+  /** true if route expects email or userId field to be nested in user object */
+  nestedUser: boolean;
 };
 
 type EndPointStructure = Record<string, RouteConfig>;
