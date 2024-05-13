@@ -97,67 +97,55 @@ export const LoginForm: FC<Props> = ({
   const first5 = loggedInUser.substring(0, 5);
   const last9 = loggedInUser.substring(loggedInUser.length - 9);
 
-  const UserTypeForm = () => (
-    <Form>
-      <div>
-        <input
-          type="radio"
-          id="userId"
-          name="userId"
-          value="userId"
-          checked={!useEmail}
-          onChange={handleRadioChange}
-        />
-        <label>UserId</label>
-      </div>
-      <div>
-        <input
-          type="radio"
-          id="email"
-          name="email"
-          value="email"
-          checked={useEmail}
-          onChange={handleRadioChange}
-        />
-        <label>Email</label>
-      </div>
-    </Form>
-  );
-
-  const LoginForm = () => (
-    <Form onSubmit={handleSubmit} data-qa-login-form>
-      <TextField
-        onChange={(e) => updateUser(e.target.value)}
-        value={user}
-        placeholder="e.g. hello@gmail.com"
-        required
-        data-qa-login-input
-      />
-      <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
-      {isEditingUser && <Button onClick={handleCancelEditUser}>Cancel</Button>}
-    </Form>
-  );
-
-  const Buttons = () => (
-    <>
-      <Button onClick={handleEditUser}>
-        Logged in as {`${first5}...${last9}`} (change)
-      </Button>
-      <Button onClick={handleJwtRefresh}>Manually Refresh JWT Token</Button>
-      <Button onClick={handleLogout}>Logout</Button>
-    </>
-  );
-
-  const LoggedInOrEditing = isEditingUser ? LoginForm : Buttons;
-
   return (
     <>
-      {loggedInUser ? (
-        <LoggedInOrEditing />
+      {loggedInUser && !isEditingUser ? (
+        <>
+          <Button onClick={handleEditUser}>
+            Logged in as {`${first5}...${last9}`} (change)
+          </Button>
+          <Button onClick={handleJwtRefresh}>Manually Refresh JWT Token</Button>
+          <Button onClick={handleLogout}>Logout</Button>
+        </>
       ) : (
         <StyledDiv>
-          <UserTypeForm />
-          <LoginForm />
+          <Form>
+            <div>
+              <input
+                type="radio"
+                id="userId"
+                name="userId"
+                value="userId"
+                checked={!useEmail}
+                onChange={handleRadioChange}
+              />
+              <label>UserId</label>
+            </div>
+            <div>
+              <input
+                type="radio"
+                id="email"
+                name="email"
+                value="email"
+                checked={useEmail}
+                onChange={handleRadioChange}
+              />
+              <label>Email</label>
+            </div>
+          </Form>
+          <Form onSubmit={handleSubmit} data-qa-login-form>
+            <TextField
+              onChange={(e) => updateUser(e.target.value)}
+              value={user}
+              placeholder="e.g. hello@gmail.com"
+              required
+              data-qa-login-input
+            />
+            <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
+            {isEditingUser && (
+              <Button onClick={handleCancelEditUser}>Cancel</Button>
+            )}
+          </Form>
           {error && <Error>{error}</Error>}
         </StyledDiv>
       )}
