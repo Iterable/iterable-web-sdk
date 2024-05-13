@@ -26,19 +26,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
     new IterableEmbeddedManager(appPackageName)
   );
 
-  const changeCustomElement = () => {
-    const titleElement = document.getElementById('notification-title-custom-0');
-    const imageElement = document.getElementById('banner-image-custom-1');
-
-    if (titleElement) {
-      titleElement.innerText = 'Custom title';
-    }
-    if (imageElement) {
-      imageElement.style.height = '100px';
-      imageElement.style.width = '100px';
-    }
-  };
-
   useEffect(() => {
     const urlHandler: IterableUrlHandler = {
       handleIterableURL: function (uri: string): boolean {
@@ -59,15 +46,6 @@ export const EmbeddedMsgs: FC<Props> = () => {
     };
     IterableConfig.customActionHandler = customActionHandler;
   }, []);
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      changeCustomElement();
-    }, 3000);
-
-    // Clear the timeout to prevent memory leaks
-    return () => clearTimeout(timeoutId);
-  }, [selectedButtonIndex]);
 
   const handleFetchEmbeddedMessages = async () => {
     try {
