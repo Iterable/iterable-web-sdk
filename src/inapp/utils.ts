@@ -286,7 +286,7 @@ const generateSecuredIFrame = () => {
   // event handlers on elements in it preventing our custom link handling
   iframe.setAttribute(
     'sandbox',
-    'allow-same-origin allow-popups allow-top-navigation'
+    'allow-same-origin allow-popups allow-top-navigation allow-popups-to-escape-sandbox'
   );
   /*
     _display: none_ would remove the ability to set event handlers on elements
