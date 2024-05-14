@@ -24,12 +24,14 @@ export function Notification({
   textTitleDivId = 'notification-text-title-div'
 }: EmbeddedMessageData): string {
   const defaultTitleStyles = `
+    margin-top: 0px;
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 4px;
     display: block;
   `;
   const defaultTextStyles = `
+    margin-top: 0.3em;
     font-size: 16px;
     margin-bottom: 10px;
     display: block;
@@ -47,7 +49,14 @@ export function Notification({
     cursor: pointer; 
     border: none; 
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
-    overflow-wrap: break-word; 
+    min-width: fit-content;
+  `;
+  const notificationButtons = `
+    margin-top: auto;
+    display:flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+    row-gap: 0.3em;
   `;
   const mediaStyle = `
     @media screen and (max-width: 800px) {
@@ -58,7 +67,6 @@ export function Notification({
         line-height: 1.3em;
       }
       .notification {
-        min-height: 100px;
         display: flex;
         flex-direction: column;
       }
@@ -114,19 +122,19 @@ export function Notification({
         message?.elements?.defaultAction ? 'pointer' : 'auto'
       };" 
     >
-      <div class="notification" id="${textTitleDivId}"
+      <div id="${textTitleDivId}"
        style="${defaultTextParentStyles}">
-        <p class="titleText notification" id="${titleId}" 
+        <p class="titleText" id="${titleId}" 
         style="${defaultTitleStyles}; ${titleStyle || ''}">
           ${message?.elements?.title || 'Title Here'}
         </p>
-        <p class="titleText notification" id="${textId}" style="${defaultTextStyles}; ${
+        <p class="titleText" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
           ${message?.elements?.body}
         </p>
       </div>
-      <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
+      <div id="${buttonsDivId}" style="${notificationButtons}">
         ${message?.elements?.buttons
           ?.map((button: EmbeddedMessageElementsButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);

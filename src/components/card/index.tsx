@@ -64,7 +64,7 @@ export function Card({
     border-radius: 0;
     cursor: pointer;
     padding: 5px;
-    overflow-wrap: break-word;
+    min-width: fit-content;
   `;
 
   const defaultTextParentStyles = `
@@ -75,6 +75,9 @@ export function Card({
   const cardButtons = `
     margin-top: auto;
     margin-left: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   `;
 
   const mediaStyle = `
@@ -86,7 +89,6 @@ export function Card({
           line-height: 1.3em;
         }
         .card {
-          min-height: 350px;
           display: flex;
           flex-direction: column;
         }
@@ -140,25 +142,25 @@ export function Card({
     >
       ${
         message?.elements?.mediaUrl
-          ? `<img class="card" id="${imageId}" style="${defaultImageStyles}; ${
+          ? `<img id="${imageId}" style="${defaultImageStyles}; ${
               imgStyle || ''
             }" 
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div id="${textTitleDivId}" class="card" style="${defaultTextParentStyles}">
-        <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
+      <div id="${textTitleDivId}" style="${defaultTextParentStyles}">
+        <text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
           ${message?.elements?.title || 'Title Here'}
         </text>
-        <text class="titleText card" id="${textId}" style="${defaultTextStyles}; ${
+        <text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
           ${message?.elements?.body}
         </text>
       </div>
-      <div id="${buttonsDivId}" class="card" style="${cardButtons}">
+      <div id="${buttonsDivId}" style="${cardButtons}">
         ${message?.elements?.buttons
           ?.map((button: EmbeddedMessageElementsButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);

@@ -56,6 +56,10 @@ export function Banner({
   `;
   const bannerButtons = `
     margin-top: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    row-gap: 0.2em;
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px);
@@ -68,7 +72,7 @@ export function Banner({
     border-radius: 0;
     cursor: pointer;
     padding: 5px;
-    overflow-wrap: break-word;
+    min-width: fit-content;
   `;
   const defaultTextParentStyles = `
     flex: 1;
@@ -83,9 +87,9 @@ export function Banner({
         line-height: 1.3em;
       }
       .banner {
-        min-height: 150px;
         display: flex;
         flex-direction: column;
+        min-width: fit-content;
       }
     }
   `;
@@ -135,17 +139,17 @@ export function Banner({
       name="${message?.metadata?.messageId}-banner"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
-      <div class="banner" id="${textTitleImageDivId}"
+      <div id="${textTitleImageDivId}"
       style="display: flex; flex-direction: row;">
-        <div class="banner" 
+        <div
         id="${textTitleDivId}"
         style="${defaultTextParentStyles}">
-          <text class="titleText banner"  id="${titleId}" style="${defaultTitleStyles}; ${
+          <text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
     titleStyle || ''
   }">
             ${message?.elements?.title || 'Title Here'}
           </text>
-          <text class="titleText banner" id="${textId}" style="${defaultTextStyles}; ${
+          <text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
     textStyle || ''
   }">
             ${message?.elements?.body}
@@ -153,14 +157,14 @@ export function Banner({
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img class="banner" id="${imageId}"
+            ? `<img id="${imageId}"
             style="${defaultImageStyles}; ${imgStyle || ''}" src="${
                 message?.elements?.mediaUrl
               }" />`
             : ''
         }
       </div>
-      <div class="banner" id="${buttonsDivId}"
+      <div id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
           ?.map((button: EmbeddedMessageElementsButton, index: number) => {
