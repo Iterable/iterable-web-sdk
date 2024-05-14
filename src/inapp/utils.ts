@@ -1,6 +1,7 @@
 import { by } from '@pabra/sortby';
 import {
   ANIMATION_DURATION,
+  dangerouslyAllowJsPopupExecution,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
 } from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
@@ -288,9 +289,7 @@ const generateSecuredIFrame = () => {
   iframe.setAttribute(
     'sandbox',
     `allow-same-origin allow-popups allow-top-navigation ${
-      process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION
-        ? 'allow-popups-to-escape-sandbox'
-        : ''
+      dangerouslyAllowJsPopupExecution ? 'allow-popups-to-escape-sandbox' : ''
     }`
   );
   /*
