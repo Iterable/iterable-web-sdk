@@ -9,6 +9,8 @@ function getParsedEnv() {
       ...env.parsed,
       VERSION: version,
       IS_EU_ITERABLE_SERVICE: process.env.IS_EU_ITERABLE_SERVICE || false,
+      DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION:
+        process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION || false
     };
   }
 

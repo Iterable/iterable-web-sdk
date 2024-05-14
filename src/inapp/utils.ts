@@ -284,9 +284,14 @@ const generateSecuredIFrame = () => {
   iframe.setAttribute('id', 'iterable-iframe');
   // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
   // event handlers on elements in it preventing our custom link handling
+  console.log({ p: process.env });
   iframe.setAttribute(
     'sandbox',
-    'allow-same-origin allow-popups allow-top-navigation allow-popups-to-escape-sandbox'
+    `allow-same-origin allow-popups allow-top-navigation ${
+      process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION
+        ? 'allow-popups-to-escape-sandbox'
+        : ''
+    }`
   );
   /*
     _display: none_ would remove the ability to set event handlers on elements
