@@ -4,14 +4,16 @@ import {
   initialize,
   getInAppMessages,
   updateUserEmail,
-  GenerateJWTPayload
+  GenerateJWTPayload,
+  HandleLinks,
+  DisplayOptions
 } from '@iterable/web-sdk';
 
 ((): void => {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    ({ email }: GenerateJWTPayload) => {
+    async ({ email }: GenerateJWTPayload) => {
       return axios
         .post(
           'http://localhost:5000/generate',
@@ -48,7 +50,7 @@ import {
       rightOffset: '20px',
       topOffset: '20px',
       bottomOffset: '20px',
-      handleLinks: 'external-new-tab',
+      handleLinks: HandleLinks['ExternalNewTab'],
       closeButton: {
         color: 'white'
         // position: 'top-right',
@@ -58,7 +60,7 @@ import {
         // topOffset: '6%'
       }
     },
-    { display: 'deferred' }
+    { display: DisplayOptions['Deferred'] }
   );
 
   const startBtn = document.getElementById('start');
@@ -77,6 +79,7 @@ import {
           triggerDisplayMessages(response.data.inAppMessages);
           startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
         })
+        // eslint-disable-next-line no-console
         .catch(console.warn);
     }
   };
