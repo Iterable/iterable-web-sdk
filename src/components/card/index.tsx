@@ -38,9 +38,10 @@ export function Card({
   `;
   const defaultImageStyles = `
     width: 100%;
-    height: auto;
+    aspect-ratio: 16/9;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    object-fit: cover;
   `;
   const defaultTitleStyles = `
     font-size: 18px;
@@ -83,9 +84,7 @@ export function Card({
   const mediaStyle = `
     @media screen and (max-width: 800px) {
         .titleText {
-          overflow: hidden;
           text-overflow: ellipsis;
-          max-height: 2.6em;
           line-height: 1.3em;
         }
         .card {

@@ -34,7 +34,7 @@ export function Banner({
     margin: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    padding: 16px;
+    padding: 10px 20px 15px 20px;
     ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
   `;
   const defaultImageStyles = `
@@ -42,6 +42,7 @@ export function Banner({
     height: 70px;
     border-radius: 8px;
     margin-left: 10px;
+    object-fit: cover;
   `;
   const defaultTitleStyles = `
     font-size: 20px;
