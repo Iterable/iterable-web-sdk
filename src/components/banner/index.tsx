@@ -43,6 +43,7 @@ export function Banner({
     border-radius: 8px;
     margin-left: 10px;
     object-fit: cover;
+    margin-top: 5px;
   `;
   const defaultTitleStyles = `
     font-size: 20px;
