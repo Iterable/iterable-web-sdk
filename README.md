@@ -931,6 +931,24 @@ const SomeComponent = () => {
 };
 ```
 
+## Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
+
+To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`.  On Safari, this configuration blocks JavaScript execution in tabs that open because of link clicks in the `iframe`.
+
+To allow JavaScript to run in these new tabs: 
+
+- On your web server, set the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable to `true`. This adds `allow-popups-to-escape-sandbox` to the `iframe`'s `sandbox` attribute, which allows new tabs to open with a clean browsing context.
+- However, use caution. Allowing JavaScript to run in new tabs opens the door to the possibility of malicious code execution.
+
+SDK version support: 
+
+- Versions [`1.0.10+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
+
+For more information, see:
+
+- [MDN docs for `allow-popups-to-escape-sandbox`](https://developer.mozilla.org/docs/Web/HTML/Element/iframe#allow-popups-to-escape-sandbox)
+- [Can I Use? `allow-popups-to-escape-sandbox`](https://caniuse.com/mdn-html_elements_iframe_sandbox_allow-popups-to-escape-sandbox)
+
 # TypeScript
 
 The Iterable Web SDK includes TypeScript definitions out of the box. All SDK methods
