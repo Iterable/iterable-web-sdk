@@ -75,6 +75,11 @@ export function IterableEmbeddedNotification({
     flex-wrap: wrap;
     row-gap: 0.3em;
   `;
+  const defaultPrimaryButtonStyle = `
+  background: #622a6a; 
+  color: white; 
+  padding: 8px 12px;
+  `;
   const mediaStyle = `
     @media screen and (max-width: 800px) {
       .titleText {
@@ -176,11 +181,7 @@ export function IterableEmbeddedNotification({
                 class="notification-button-primary-secondary" 
                 style="
                   ${defaultButtonStyles}; 
-                  ${
-                    index === 0
-                      ? 'background: #622a6a; color: white; padding: 8px 12px;'
-                      : ''
-                  }
+                  ${index === 0 ? defaultPrimaryButtonStyle : ''}
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
                   >

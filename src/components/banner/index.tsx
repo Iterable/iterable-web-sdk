@@ -82,6 +82,11 @@ export function IterableEmbeddedBanner({
     color: #622a6a;
     background: none;
   `;
+  const defaultPrimaryButtonStyle = `
+    background: #622a6a;
+    color: white; 
+    padding: 8px 12px;
+   `;
   const defaultTextParentStyles = `
     flex: 1;
     max-width: calc(100% - 80px);
@@ -200,11 +205,7 @@ export function IterableEmbeddedBanner({
                 class="banner-button-primary-secondary" 
                 style="
                 ${defaultButtonStyles}; 
-                ${
-                  index === 0
-                    ? 'background: #622a6a; color: white; padding: 8px 12px;'
-                    : ''
-                }
+                ${index === 0 ? defaultPrimaryButtonStyle : ''}
                 ${buttonStyleObj.buttonStyle || ''} 
                 ${buttonStyleObj.disableStyle || ''}"
               >
