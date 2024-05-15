@@ -35,7 +35,7 @@ export function Banner({
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 10px 20px 15px 20px;
-    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
+    cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
   `;
   const defaultImageStyles = `
     width: 70px;
@@ -48,13 +48,16 @@ export function Banner({
   const defaultTitleStyles = `
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    margin-bottom: 25px;
+    color: rgb(120, 113, 116);
   `;
   const bannerButtons = `
     margin-top: auto;
@@ -68,13 +71,14 @@ export function Banner({
     text-align: left;
     font-size: 16px;
     font-weight: bold;
-    background-color: transparent;
-    color: #433d99;
     border: none;
-    border-radius: 0;
+    border-radius: 100px;
     cursor: pointer;
-    padding: 5px;
+    padding: 8px 0px;
     min-width: fit-content;
+    margin-right: 12px;
+    color: #622a6a;
+    background: none;
   `;
   const defaultTextParentStyles = `
     flex: 1;
@@ -83,9 +87,6 @@ export function Banner({
   const mediaStyle = `
     @media screen and (max-width: 800px) {
       .titleText {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.6em;
         line-height: 1.3em;
       }
       .banner {
@@ -181,7 +182,13 @@ export function Banner({
             }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
-                style="${defaultButtonStyles};  
+                style="
+                ${defaultButtonStyles}; 
+                ${
+                  index === 0
+                    ? 'background: #622a6a; color: white; padding: 8px 12px;'
+                    : ''
+                }
                 ${buttonStyleObj.buttonStyle || ''} 
                 ${buttonStyleObj.disableStyle || ''}"
               >

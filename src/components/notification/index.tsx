@@ -6,6 +6,7 @@ import {
 } from '../../embedded/embeddedClickEvents';
 
 export function Notification({
+  parentStyle,
   message,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -23,18 +24,28 @@ export function Notification({
   buttonsDivId = 'notification-buttons-div',
   textTitleDivId = 'notification-text-title-div'
 }: EmbeddedMessageData): string {
+  const defaultNotificationStyles = `
+  background: white;
+  border-radius: 10px;
+  padding: 10px 20px 15px 20px;
+  border: 3px solid #caccd1;
+  margin-bottom: 10px;
+  cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
+  `;
   const defaultTitleStyles = `
     margin-top: 0px;
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 4px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    margin-top: 0.3em;
-    font-size: 16px;
+    margin-top: 0.2em;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    color: rgb(120, 113, 116);
   `;
   const defaultTextParentStyles = `
     overflow-wrap: break-word;
@@ -42,14 +53,16 @@ export function Notification({
   const defaultButtonStyles = `
     max-width: calc(50% - 32px); 
     text-align: left; 
-   
-    border-radius: 4px; 
-    padding: 8px; 
-    margin-right: 8px; 
+    font-weight: bold;
+    border-radius: 100px;
+    padding: 8px 0px;
+    margin-right: 12px; 
     cursor: pointer; 
     border: none; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
     min-width: fit-content;
+    font-size: 16px;
+    color: #622a6a;
+    background: none;
   `;
   const notificationButtons = `
     margin-top: auto;
@@ -61,9 +74,6 @@ export function Notification({
   const mediaStyle = `
     @media screen and (max-width: 800px) {
       .titleText {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.6em;
         line-height: 1.3em;
       }
       .notification {
@@ -118,9 +128,7 @@ export function Notification({
       class="notification" 
       id="${parentId}"
       name="${message?.metadata?.messageId}-notification"
-      style="background: white; border-radius: 10px; padding: 10px 20px 15px 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: ${
-        message?.elements?.defaultAction ? 'pointer' : 'auto'
-      };" 
+      style="${defaultNotificationStyles}; ${parentStyle || ''}" 
     >
       <div id="${textTitleDivId}"
        style="${defaultTextParentStyles}">
@@ -151,9 +159,12 @@ export function Notification({
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="
-                  background: ${index === 0 ? '#2196f3' : 'none'}; 
-                  color: ${index === 0 ? 'white' : '#2196f3'}; 
                   ${defaultButtonStyles}; 
+                  ${
+                    index === 0
+                      ? 'background: #622a6a; color: white; padding: 8px 12px;'
+                      : ''
+                  }
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
                   >

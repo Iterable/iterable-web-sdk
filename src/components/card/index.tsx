@@ -34,7 +34,7 @@ export function Card({
     margin-top: 10px;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
+    cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
   `;
   const defaultImageStyles = `
     width: 100%;
@@ -44,15 +44,17 @@ export function Card({
     object-fit: cover;
   `;
   const defaultTitleStyles = `
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 9px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    font-size: 14px;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    color: rgb(120, 113, 116);
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px);
@@ -60,7 +62,7 @@ export function Card({
     font-size: 16px;
     font-weight: bold;
     background-color: transparent;
-    color: ${disablePrimaryBtn ? 'grey' : '#433d99'};
+    color: ${disablePrimaryBtn ? 'grey' : '#622a6a'};
     border: none;
     border-radius: 0;
     cursor: pointer;
@@ -84,7 +86,6 @@ export function Card({
   const mediaStyle = `
     @media screen and (max-width: 800px) {
         .titleText {
-          text-overflow: ellipsis;
           line-height: 1.3em;
         }
         .card {
