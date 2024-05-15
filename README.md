@@ -942,7 +942,7 @@ To allow JavaScript to run in these new tabs:
 
 SDK version support: 
 
-- Versions [`1.0.1+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.1) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
+- Versions [`1.0.10+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
 
 For more information, see:
 
