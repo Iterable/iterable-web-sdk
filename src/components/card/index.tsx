@@ -1,11 +1,13 @@
-import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
+import { EmbeddedMessageData } from '../types';
 
-export function Card({
+export function IterableEmbeddedCard({
+  appPackageName,
+  message,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -16,7 +18,6 @@ export function Card({
   secondaryDisableBtnStyle,
   textStyle,
   titleStyle,
-  message,
   titleId = 'card-title',
   textId = 'card-text',
   primaryButtonId = 'card-primary-button',
@@ -24,7 +25,8 @@ export function Card({
   parentId = 'card-parent',
   imageId = 'card-image',
   buttonsDivId = 'card-buttons-div',
-  textTitleDivId = 'card-text-title-div'
+  textTitleDivId = 'card-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultCardStyles = `
     border: 1px solid #ccc;
@@ -106,13 +108,27 @@ export function Card({
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
     if (cardDiv) {
-      cardDiv.addEventListener('click', () => handleElementClick(message));
+      cardDiv.addEventListener('click', () =>
+        handleElementClick(message, appPackageName, errorCallback)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(
+        primaryButtonClick,
+        0,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(
+        secondaryButtonClick,
+        1,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
   }, 0);
 
@@ -162,7 +178,7 @@ export function Card({
       </div>
       <div id="${buttonsDivId}" style="${cardButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

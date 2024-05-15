@@ -1,13 +1,14 @@
 import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
 
-export function Notification({
-  parentStyle,
+export function IterableEmbeddedNotification({
+  appPackageName,
   message,
+  parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
   primaryBtnStyle,
@@ -22,7 +23,8 @@ export function Notification({
   secondaryButtonId = 'notification-secondary-button',
   parentId = 'notification-parent',
   buttonsDivId = 'notification-buttons-div',
-  textTitleDivId = 'notification-text-title-div'
+  textTitleDivId = 'notification-text-title-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultNotificationStyles = `
   background: white;
@@ -95,14 +97,26 @@ export function Notification({
     )[0];
     if (notificationDiv) {
       notificationDiv.addEventListener('click', () =>
-        handleElementClick(message)
+        handleElementClick(message, appPackageName, errorCallback)
       );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(
+        primaryButtonClick,
+        0,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(
+        secondaryButtonClick,
+        1,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
   }, 0);
 
@@ -144,7 +158,7 @@ export function Notification({
       </div>
       <div id="${buttonsDivId}" style="${notificationButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

@@ -1,11 +1,13 @@
-import { EmbeddedMessageData } from '../types';
-import { EmbeddedMessageElementsButton } from '../../embedded';
 import {
   handleElementClick,
   addButtonClickEvent
 } from '../../embedded/embeddedClickEvents';
+import { IterableEmbeddedButton } from 'src/embedded';
+import { EmbeddedMessageData } from '../types';
 
-export function Banner({
+export function IterableEmbeddedBanner({
+  appPackageName,
+  message,
   parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
@@ -16,7 +18,6 @@ export function Banner({
   secondaryDisableBtnStyle,
   textStyle,
   titleStyle,
-  message,
   titleId = 'banner-title',
   textId = 'banner-text',
   primaryButtonId = 'banner-primary-button',
@@ -25,7 +26,8 @@ export function Banner({
   imageId = 'banner-image',
   buttonsDivId = 'banner-buttons-div',
   textTitleDivId = 'banner-text-title-div',
-  textTitleImageDivId = 'banner-text-title-image-div'
+  textTitleImageDivId = 'banner-text-title-image-div',
+  errorCallback
 }: EmbeddedMessageData): string {
   const defaultBannerStyles = `
     border: 1px solid #ccc;
@@ -108,13 +110,27 @@ export function Banner({
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
     if (bannerDiv) {
-      bannerDiv.addEventListener('click', () => handleElementClick(message));
+      bannerDiv.addEventListener('click', () =>
+        handleElementClick(message, appPackageName, errorCallback)
+      );
     }
     if (primaryButtonClick) {
-      addButtonClickEvent(primaryButtonClick, 0, message);
+      addButtonClickEvent(
+        primaryButtonClick,
+        0,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
     if (secondaryButtonClick) {
-      addButtonClickEvent(secondaryButtonClick, 1, message);
+      addButtonClickEvent(
+        secondaryButtonClick,
+        1,
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
   }, 0);
 
@@ -170,7 +186,7 @@ export function Banner({
       <div id="${buttonsDivId}"
        style="${bannerButtons}">
         ${message?.elements?.buttons
-          ?.map((button: EmbeddedMessageElementsButton, index: number) => {
+          ?.map((button: IterableEmbeddedButton, index: number) => {
             const buttonStyleObj = getStyleObj(index);
             return `
               <button 

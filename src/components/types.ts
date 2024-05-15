@@ -1,6 +1,8 @@
-import { IterableEmbeddedMessage } from '..';
+import { ErrorHandler } from '../types';
+import { IterableEmbeddedMessage } from '../embedded/types';
 
 export interface EmbeddedMessageData {
+  appPackageName: string;
   message: IterableEmbeddedMessage;
   disablePrimaryBtn?: boolean;
   disableSecondaryBtn?: boolean;
@@ -21,4 +23,5 @@ export interface EmbeddedMessageData {
   buttonsDivId?: string;
   textTitleDivId?: string;
   textTitleImageDivId?: string;
+  errorCallback?: ErrorHandler;
 }

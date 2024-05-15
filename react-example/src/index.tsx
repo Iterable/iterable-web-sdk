@@ -16,6 +16,7 @@ import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
+import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -40,7 +41,7 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken, setUserID } = initialize(
+  const { setEmail, setUserID, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
     ({ email, userID }) => {
       return axios
@@ -48,7 +49,8 @@ const HomeLink = styled(Link)`
           process.env.JWT_GENERATOR || 'http://localhost:3000/generate',
           {
             exp_minutes: 2,
-            userId: userID,
+            email,
+            user_id: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
@@ -74,7 +76,8 @@ const HomeLink = styled(Link)`
               Home
             </HomeLink>
             <LoginForm
-              setEmail={setUserID}
+              setEmail={setEmail}
+              setUserId={setUserID}
               logout={logout}
               refreshJwt={refreshJwtToken}
             />
@@ -88,6 +91,10 @@ const HomeLink = styled(Link)`
               <Route path="/inApp" element={<InApp />} />
               <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
               <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route
+                path="/embedded-msgs-impression-tracker"
+                element={<EmbeddedMsgsImpressionTracker />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>

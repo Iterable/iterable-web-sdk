@@ -4,6 +4,7 @@ import {
   IterableActionContext,
   IterableActionSource
 } from '../embedded/types';
+import { URL_SCHEME_OPEN } from 'src/constants';
 
 class IterableActionRunnerImpl {
   static executeAction(
@@ -16,7 +17,7 @@ class IterableActionRunnerImpl {
     }
 
     const actionContext: IterableActionContext = { action, source };
-    if (action.type === 'openUrl') {
+    if (action.type === URL_SCHEME_OPEN) {
       return IterableActionRunnerImpl.openUri(action.data, actionContext);
     } else {
       return IterableActionRunnerImpl.callCustomActionIfSpecified(

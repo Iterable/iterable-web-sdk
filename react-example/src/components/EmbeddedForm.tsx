@@ -7,17 +7,15 @@ import {
   Response
 } from '../views/Components.styled';
 import {
-  EmbeddedManager,
-  trackEmbeddedMessageReceived,
+  IterableEmbeddedManager,
+  IterableEmbeddedMessageUpdateHandler,
+  trackEmbeddedSession,
+  trackEmbeddedReceived,
   trackEmbeddedClick,
-  trackEmbeddedMessagingDismiss,
-  trackEmbeddedMessagingSession,
-  EmbeddedMessageUpdateHandler
+  trackEmbeddedDismiss
 } from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
-import { Functions } from 'src/utils/Functions';
 import { v4 as uuidv4 } from 'uuid';
-import { IEmbeddedMessage } from '@iterable/web-sdk';
 
 interface Props {
   userId: string;
@@ -54,7 +52,7 @@ export const EmbeddedForm: FC<Props> = ({
     e.preventDefault();
 
     try {
-      const updateListener: EmbeddedMessageUpdateHandler = {
+      const updateListener: IterableEmbeddedMessageUpdateHandler = {
         onMessagesUpdated() {
           console.log('onMessagesUpdated called');
         },
@@ -62,13 +60,13 @@ export const EmbeddedForm: FC<Props> = ({
           console.log('onEmbeddedMessagingDisabled called');
         }
       };
-      const embeddedManager = new EmbeddedManager();
+      const embeddedManager = new IterableEmbeddedManager('my-website');
       embeddedManager.addUpdateListener(updateListener);
       await embeddedManager.syncMessages('my-website', () =>
         console.log('Synced message')
       );
     } catch (error: any) {
-      setTrackResponse(JSON.stringify(error.response.data));
+      setTrackResponse(JSON.stringify(error?.response?.data));
     }
   };
 
@@ -77,15 +75,13 @@ export const EmbeddedForm: FC<Props> = ({
   ) => {
     e.preventDefault();
     setTrackingEvent(true);
-    let receivedMessage = {} as IEmbeddedMessage;
 
-    receivedMessage = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
+    const receivedMessage = {
       messageId: messageId,
-      deviceInfo: { appPackageName: 'my-lil-site' }
+      appPackageName: 'my-lil-site'
     };
 
-    trackEmbeddedMessageReceived(receivedMessage)
+    trackEmbeddedReceived(receivedMessage.messageId, 'my-website')
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
@@ -134,7 +130,6 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       messageId: messageId,
       buttonIdentifier: '123',
       deviceInfo: {
@@ -145,7 +140,7 @@ export const EmbeddedForm: FC<Props> = ({
       createdAt: Date.now()
     };
 
-    trackEmbeddedMessagingDismiss(sessionData)
+    trackEmbeddedDismiss(sessionData)
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
@@ -161,7 +156,6 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      [Functions.checkEmailValidation(userId) ? 'email' : 'userId']: userId,
       session: {
         id: uuidv4(),
         start: startTime.getTime(),
@@ -180,10 +174,11 @@ export const EmbeddedForm: FC<Props> = ({
         platform: 'Web',
         appPackageName: 'my-lil-site'
       },
+      appPackageName: 'my-website',
       createdAt: Date.now()
     };
 
-    trackEmbeddedMessagingSession(sessionData)
+    trackEmbeddedSession(sessionData)
       .then((response: any) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);

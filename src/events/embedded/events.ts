@@ -1,63 +1,103 @@
 import { baseIterableRequest } from '../../request';
 import {
-  EmbeddedMessagingDismiss,
-  EmbeddedMessagingSession,
-  IEmbeddedMessageData,
-  IEmbeddedSession
-} from '../../../src/events/embedded/types';
+  IterableEmbeddedDismissRequestPayload,
+  IterableEmbeddedSessionRequestPayload,
+  IterableEmbeddedClickRequestPayload
+} from './types';
 import { IterableResponse } from '../../types';
 import {
-  trackEmbeddedMessageSchema,
-  trackEmbeddedSessionSchema,
-  embaddedMessagingDismissSchema,
-  embaddedMessagingSessionSchema
+  trackEmbeddedSchema,
+  trackEmbeddedClickSchema,
+  embeddedDismissSchema,
+  embeddedSessionSchema
 } from './events.schema';
-import { EndPoints } from '../consts';
+import { WEB_PLATFORM, ENDPOINTS } from 'src/constants';
 
-export const trackEmbeddedMessageReceived = (payload: IEmbeddedMessageData) => {
-  return baseIterableRequest<IterableResponse>({
+export const trackEmbeddedReceived = (
+  messageId: string,
+  appPackageName: string
+) =>
+  baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.msg_received_event_track,
-    data: payload,
+    url: ENDPOINTS.msg_received_event_track.route,
+    data: {
+      messageId,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName
+      }
+    },
     validation: {
-      data: trackEmbeddedMessageSchema
+      data: trackEmbeddedSchema
     }
   });
-};
 
-export const trackEmbeddedSession = (payload: IEmbeddedSession) => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: EndPoints.msg_impression_event_track,
-    data: payload,
-    validation: {
-      data: trackEmbeddedSessionSchema
-    }
-  });
-};
-
-export const trackEmbeddedMessagingDismiss = (
-  payload: EmbeddedMessagingDismiss
+export const trackEmbeddedClick = (
+  payload: IterableEmbeddedClickRequestPayload
 ) => {
+  const { appPackageName, ...rest } = payload;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.msg_dismiss,
-    data: payload,
+    url: ENDPOINTS.msg_click_event_track.route,
+    data: {
+      ...rest,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName
+      },
+      createdAt: Date.now()
+    },
     validation: {
-      data: embaddedMessagingDismissSchema
+      data: trackEmbeddedClickSchema
     }
   });
 };
 
-export const trackEmbeddedMessagingSession = (
-  payload: EmbeddedMessagingSession
+export const trackEmbeddedDismiss = (
+  payload: IterableEmbeddedDismissRequestPayload
 ) => {
+  const { appPackageName, ...rest } = payload;
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: EndPoints.msg_session_event_track,
-    data: payload,
+    url: ENDPOINTS.msg_dismiss.route,
+    data: {
+      ...rest,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName
+      },
+      createdAt: Date.now()
+    },
     validation: {
-      data: embaddedMessagingSessionSchema
+      data: embeddedDismissSchema
+    }
+  });
+};
+
+export const trackEmbeddedSession = (
+  payload: IterableEmbeddedSessionRequestPayload
+) => {
+  const { appPackageName, ...rest } = payload;
+
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: ENDPOINTS.msg_session_event_track.route,
+    data: {
+      ...rest,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName
+      },
+      createdAt: Date.now()
+    },
+    validation: {
+      data: embeddedSessionSchema
     }
   });
 };
