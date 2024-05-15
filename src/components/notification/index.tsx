@@ -28,9 +28,11 @@ export function IterableEmbeddedNotification({
 }: EmbeddedMessageData): string {
   const defaultNotificationStyles = `
   background: white;
-  border-radius: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   padding: 10px 20px 15px 20px;
-  border: 3px solid #caccd1;
+  margin-top: 10px;
   margin-bottom: 10px;
   cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
   `;
@@ -95,7 +97,7 @@ export function IterableEmbeddedNotification({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-notification-secondaryButton`
     )[0];
-    if (notificationDiv) {
+    if (notificationDiv && message?.elements?.defaultAction) {
       notificationDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );

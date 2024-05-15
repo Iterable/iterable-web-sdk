@@ -109,7 +109,7 @@ export function IterableEmbeddedBanner({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
-    if (bannerDiv) {
+    if (bannerDiv && message?.elements?.defaultAction) {
       bannerDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );

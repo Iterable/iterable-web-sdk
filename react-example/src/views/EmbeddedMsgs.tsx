@@ -170,7 +170,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   parentStyle: ' margin-bottom: 10; ',
                   primaryBtnStyle: `
                     background-color: #000fff;
-                    border-radius: 8px;
+                    border-radius: 10px;
                     padding: 10px;
                     color: #ffffff;
                     `,

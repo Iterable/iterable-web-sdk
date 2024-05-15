@@ -107,7 +107,7 @@ export function IterableEmbeddedCard({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
-    if (cardDiv) {
+    if (cardDiv && message?.elements?.defaultAction) {
       cardDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );
