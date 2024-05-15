@@ -50,7 +50,7 @@ const HomeLink = styled(Link)`
           {
             exp_minutes: 2,
             email,
-            user_id: userID,
+            userId: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
