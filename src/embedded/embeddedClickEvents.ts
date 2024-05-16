@@ -118,3 +118,42 @@ const handleEmbeddedClick = (clickedUrl: string | null) => {
     );
   }
 };
+
+export function getTrimmedText(text: string | undefined) {
+  return text && typeof text === 'string' ? text.trim() : '';
+}
+
+export function setButtonPadding(selector = '') {
+  const primaryButtons = document.querySelectorAll(selector) || [];
+
+  primaryButtons.forEach((primaryButton: any) => {
+    if (primaryButton.getAttribute('data-index') !== 0) return;
+    const computedStyle = window.getComputedStyle(primaryButton);
+    const fontSize = parseFloat(computedStyle.fontSize);
+    const height = parseFloat(computedStyle.height);
+    const lineHeight = parseFloat(computedStyle.lineHeight);
+    const computedLineHeight = fontSize * 1.2;
+    let numberOfLines = Math.round(height / computedLineHeight);
+
+    if (!isNaN(lineHeight)) {
+      numberOfLines = Math.round(height / lineHeight);
+    }
+    if (window.innerWidth <= 650) {
+      // Adjust padding for smaller screens
+      if (numberOfLines > 3) {
+        primaryButton.style.padding = '1em';
+      } else {
+        primaryButton.style.padding = '8px 12px';
+      }
+
+      if (numberOfLines > 5) {
+        primaryButton.style.borderRadius = '50px';
+      } else {
+        primaryButton.style.borderRadius = '100px';
+      }
+    } else {
+      primaryButton.style.padding = '8px 12px';
+      primaryButton.style.borderRadius = '100px';
+    }
+  });
+}

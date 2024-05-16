@@ -1,6 +1,7 @@
 import {
   handleElementClick,
-  addButtonClickEvent
+  addButtonClickEvent,
+  getTrimmedText
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
 import { EmbeddedMessageData } from '../types';
@@ -60,7 +61,7 @@ export function IterableEmbeddedCard({
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px);
-    text-align: left;
+    text-align: center;
     font-size: 16px;
     font-weight: bold;
     background-color: transparent;
@@ -148,6 +149,17 @@ export function IterableEmbeddedCard({
     };
   };
 
+  const title = getTrimmedText(message?.elements?.title);
+  const body = getTrimmedText(message?.elements?.body);
+  if (
+    !(
+      title.length ||
+      body.length ||
+      message?.elements?.buttons?.length ||
+      message?.elements?.mediaUrl
+    )
+  )
+    return '';
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -165,29 +177,42 @@ export function IterableEmbeddedCard({
           : ''
       }
       <div id="${textTitleDivId}" style="${defaultTextParentStyles}">
-        <text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
-    titleStyle || ''
-  }">
-          ${message?.elements?.title || 'Title Here'}
-        </text>
-        <text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
-    textStyle || ''
-  }">
-          ${message?.elements?.body}
-        </text>
+        ${
+          title.length
+            ? `<text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
+                titleStyle || ''
+              }">
+          ${title}
+        </text>`
+            : ''
+        }
+        ${
+          body.length
+            ? `<text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
+                textStyle || ''
+              }">
+          ${body}
+        </text>`
+            : ''
+        }
       </div>
       <div id="${buttonsDivId}" style="${cardButtons}">
-        ${message?.elements?.buttons
-          ?.map((button: IterableEmbeddedButton, index: number) => {
-            const buttonStyleObj = getStyleObj(index);
-            return `
+        ${
+          message?.elements?.buttons
+            ?.map((button: IterableEmbeddedButton, index: number) => {
+              const buttonTitle = getTrimmedText(button.title);
+              if (!buttonTitle.length) {
+                return null;
+              }
+              const buttonStyleObj = getStyleObj(index);
+              return `
               <button 
                 key="${index}" 
                 ${buttonStyleObj.disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
-              index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
-            }"
+                index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
+              }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="card-button-primary-secondary" 
                 style="
@@ -195,11 +220,12 @@ export function IterableEmbeddedCard({
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
               >
-                ${button.title ? button.title : `Button ${index + 1}`}
+                ${buttonTitle}
               </button>
             `;
-          })
-          .join('')}
+            })
+            .join('') || ''
+        }
       </div>
     </div>
   `;

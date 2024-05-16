@@ -1,7 +1,9 @@
 import { EmbeddedMessageData } from '../types';
 import {
   handleElementClick,
-  addButtonClickEvent
+  addButtonClickEvent,
+  getTrimmedText,
+  setButtonPadding
 } from '../../embedded/embeddedClickEvents';
 import { IterableEmbeddedButton } from 'src/embedded';
 
@@ -56,7 +58,7 @@ export function IterableEmbeddedNotification({
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px); 
-    text-align: left; 
+    text-align: center; 
     font-weight: bold;
     border-radius: 100px;
     padding: 8px 0px;
@@ -125,6 +127,9 @@ export function IterableEmbeddedNotification({
         errorCallback
       );
     }
+    setButtonPadding('.notification-button-primary-secondary');
+    window.onresize = () =>
+      setButtonPadding('.notification-button-primary-secondary');
   }, 0);
 
   const getStyleObj = (index: number) => {
@@ -142,7 +147,10 @@ export function IterableEmbeddedNotification({
           : 'enabled'
     };
   };
-
+  const title = getTrimmedText(message?.elements?.title);
+  const body = getTrimmedText(message?.elements?.body);
+  if (!(title.length || body.length || message?.elements?.buttons?.length))
+    return '';
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -153,30 +161,43 @@ export function IterableEmbeddedNotification({
     >
       <div id="${textTitleDivId}"
        style="${defaultTextParentStyles}">
-        <p class="titleText" id="${titleId}" 
+       ${
+         title.length
+           ? `<p class="titleText" id="${titleId}" 
         style="${defaultTitleStyles}; ${titleStyle || ''}">
-          ${message?.elements?.title || 'Title Here'}
-        </p>
-        <p class="titleText" id="${textId}" style="${defaultTextStyles}; ${
-    textStyle || ''
-  }">
-          ${message?.elements?.body}
-        </p>
+          ${title}
+        </p>`
+           : ''
+       }
+        ${
+          body.length
+            ? `<p class="titleText" id="${textId}" style="${defaultTextStyles}; ${
+                textStyle || ''
+              }">
+          ${body}
+        </p>`
+            : ''
+        }
       </div>
       <div id="${buttonsDivId}" style="${notificationButtons}">
-        ${message?.elements?.buttons
-          ?.map((button: IterableEmbeddedButton, index: number) => {
-            const buttonStyleObj = getStyleObj(index);
-            return `
+        ${
+          message?.elements?.buttons
+            ?.map((button: IterableEmbeddedButton, index: number) => {
+              const buttonTitle = getTrimmedText(button.title);
+              if (!buttonTitle.length) {
+                return null;
+              }
+              const buttonStyleObj = getStyleObj(index);
+              return `
               <button 
                 key="${index}" 
                 ${buttonStyleObj.disableButton}  
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
-              index === 0
-                ? '-notification-primaryButton'
-                : '-notification-secondaryButton'
-            }"
+                index === 0
+                  ? '-notification-primaryButton'
+                  : '-notification-secondaryButton'
+              }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="
@@ -185,11 +206,12 @@ export function IterableEmbeddedNotification({
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
                   >
-                ${button.title || `Button ${index + 1}`}
+                ${buttonTitle}
               </button>
             `;
-          })
-          .join('')}
+            })
+            .join('') || ''
+        }
       </div>
     </div>
   `;
