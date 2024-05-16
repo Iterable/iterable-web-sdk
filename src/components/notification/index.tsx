@@ -3,8 +3,8 @@ import {
   handleElementClick,
   addButtonClickEvent,
   getTrimmedText,
-  setButtonPadding
-} from '../../embedded/embeddedClickEvents';
+  updateButtonPadding
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 
 export function IterableEmbeddedNotification({
@@ -127,9 +127,9 @@ export function IterableEmbeddedNotification({
         errorCallback
       );
     }
-    setButtonPadding('.notification-button-primary-secondary');
+    updateButtonPadding('.notification-button-primary-secondary');
     window.onresize = () =>
-      setButtonPadding('.notification-button-primary-secondary');
+      updateButtonPadding('.notification-button-primary-secondary');
   }, 0);
 
   const getStyleObj = (index: number) => {

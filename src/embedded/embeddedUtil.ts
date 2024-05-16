@@ -123,7 +123,7 @@ export function getTrimmedText(text: string | undefined) {
   return text && typeof text === 'string' ? text.trim() : '';
 }
 
-export function setButtonPadding(selector = '') {
+export function updateButtonPadding(selector = '') {
   const primaryButtons = document.querySelectorAll(selector) || [];
 
   primaryButtons.forEach((primaryButton: any) => {

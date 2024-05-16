@@ -2,8 +2,8 @@ import {
   handleElementClick,
   addButtonClickEvent,
   getTrimmedText,
-  setButtonPadding
-} from '../../embedded/embeddedClickEvents';
+  updateButtonPadding
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 import { EmbeddedMessageData } from '../types';
 
@@ -139,9 +139,9 @@ export function IterableEmbeddedBanner({
         errorCallback
       );
     }
-    setButtonPadding('.banner-button-primary-secondary');
+    updateButtonPadding('.banner-button-primary-secondary');
     window.onresize = () =>
-      setButtonPadding('.banner-button-primary-secondary');
+      updateButtonPadding('.banner-button-primary-secondary');
   }, 0);
 
   const getStyleObj = (index: number) => {

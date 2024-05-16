@@ -2,7 +2,7 @@ import {
   handleElementClick,
   addButtonClickEvent,
   getTrimmedText
-} from '../../embedded/embeddedClickEvents';
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 import { EmbeddedMessageData } from '../types';
 
