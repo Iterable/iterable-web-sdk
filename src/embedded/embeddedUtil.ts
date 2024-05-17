@@ -120,7 +120,17 @@ const handleEmbeddedClick = (clickedUrl: string | null) => {
 };
 
 export function getTrimmedText(text: string | undefined) {
-  return text && typeof text === 'string' ? text.trim() : '';
+  const unsafeText = text && typeof text === 'string' ? text.trim() : '';
+  return escapeHtml(unsafeText);
+}
+
+function escapeHtml(unsafe: string) {
+  return unsafe
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 export function updateButtonPadding(selector = '') {
