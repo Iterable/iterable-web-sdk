@@ -1,7 +1,8 @@
 import {
   handleElementClick,
-  addButtonClickEvent
-} from '../../embedded/embeddedClickEvents';
+  addButtonClickEvent,
+  getTrimmedText
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 import { EmbeddedMessageData } from '../types';
 
@@ -36,37 +37,40 @@ export function IterableEmbeddedCard({
     margin-top: 10px;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
+    cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
   `;
   const defaultImageStyles = `
     width: 100%;
-    height: auto;
+    aspect-ratio: 16/9;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
+    object-fit: cover;
   `;
   const defaultTitleStyles = `
-    font-size: 18px;
+    font-size: 20px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 9px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    font-size: 14px;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    color: rgb(120, 113, 116);
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px);
-    text-align: left;
+    text-align: center;
     font-size: 16px;
     font-weight: bold;
     background-color: transparent;
-    color: ${disablePrimaryBtn ? 'grey' : '#433d99'};
+    color: ${disablePrimaryBtn ? 'grey' : '#622a6a'};
     border: none;
     border-radius: 0;
     cursor: pointer;
     padding: 5px;
-    overflow-wrap: break-word;
+    min-width: fit-content;
   `;
 
   const defaultTextParentStyles = `
@@ -77,18 +81,17 @@ export function IterableEmbeddedCard({
   const cardButtons = `
     margin-top: auto;
     margin-left: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
   `;
 
   const mediaStyle = `
     @media screen and (max-width: 800px) {
         .titleText {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-height: 2.6em;
           line-height: 1.3em;
         }
         .card {
-          min-height: 350px;
           display: flex;
           flex-direction: column;
         }
@@ -105,7 +108,7 @@ export function IterableEmbeddedCard({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-card-secondaryButton`
     )[0];
-    if (cardDiv) {
+    if (cardDiv && message?.elements?.defaultAction) {
       cardDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );
@@ -146,6 +149,17 @@ export function IterableEmbeddedCard({
     };
   };
 
+  const title = getTrimmedText(message?.elements?.title);
+  const body = getTrimmedText(message?.elements?.body);
+  if (
+    !(
+      title.length ||
+      body.length ||
+      message?.elements?.buttons?.length ||
+      message?.elements?.mediaUrl
+    )
+  )
+    return '';
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -156,36 +170,49 @@ export function IterableEmbeddedCard({
     >
       ${
         message?.elements?.mediaUrl
-          ? `<img class="card" id="${imageId}" style="${defaultImageStyles}; ${
+          ? `<img id="${imageId}" style="${defaultImageStyles}; ${
               imgStyle || ''
             }" 
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div id="${textTitleDivId}" class="card" style="${defaultTextParentStyles}">
-        <text class="titleText card"  id="${titleId}" style="${defaultTitleStyles}; ${
-    titleStyle || ''
-  }">
-          ${message?.elements?.title || 'Title Here'}
-        </text>
-        <text class="titleText card" id="${textId}" style="${defaultTextStyles}; ${
-    textStyle || ''
-  }">
-          ${message?.elements?.body}
-        </text>
+      <div id="${textTitleDivId}" style="${defaultTextParentStyles}">
+        ${
+          title.length
+            ? `<text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
+                titleStyle || ''
+              }">
+          ${title}
+        </text>`
+            : ''
+        }
+        ${
+          body.length
+            ? `<text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
+                textStyle || ''
+              }">
+          ${body}
+        </text>`
+            : ''
+        }
       </div>
-      <div id="${buttonsDivId}" class="card" style="${cardButtons}">
-        ${message?.elements?.buttons
-          ?.map((button: IterableEmbeddedButton, index: number) => {
-            const buttonStyleObj = getStyleObj(index);
-            return `
+      <div id="${buttonsDivId}" style="${cardButtons}">
+        ${
+          message?.elements?.buttons
+            ?.map((button: IterableEmbeddedButton, index: number) => {
+              const buttonTitle = getTrimmedText(button.title);
+              if (!buttonTitle.length) {
+                return null;
+              }
+              const buttonStyleObj = getStyleObj(index);
+              return `
               <button 
                 key="${index}" 
                 ${buttonStyleObj.disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
-              index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
-            }"
+                index === 0 ? '-card-primaryButton' : '-card-secondaryButton'
+              }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="card-button-primary-secondary" 
                 style="
@@ -193,11 +220,12 @@ export function IterableEmbeddedCard({
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
               >
-                ${button.title ? button.title : `Button ${index + 1}`}
+                ${buttonTitle}
               </button>
             `;
-          })
-          .join('')}
+            })
+            .join('') || ''
+        }
       </div>
     </div>
   `;

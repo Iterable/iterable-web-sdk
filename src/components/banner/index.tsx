@@ -1,7 +1,9 @@
 import {
   handleElementClick,
-  addButtonClickEvent
-} from '../../embedded/embeddedClickEvents';
+  addButtonClickEvent,
+  getTrimmedText,
+  updateButtonPadding
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 import { EmbeddedMessageData } from '../types';
 
@@ -36,42 +38,57 @@ export function IterableEmbeddedBanner({
     margin: auto;
     margin-top: 10px;
     margin-bottom: 10px;
-    padding: 16px;
-    ${message?.elements?.defaultAction ? 'cursor: pointer;' : 'auto'}
+    padding: 10px 20px 15px 20px;
+    cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
   `;
   const defaultImageStyles = `
     width: 70px;
     height: 70px;
     border-radius: 8px;
     margin-left: 10px;
+    object-fit: cover;
+    margin-top: 5px;
   `;
   const defaultTitleStyles = `
     font-size: 20px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    font-size: 16px;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    margin-bottom: 25px;
+    color: rgb(120, 113, 116);
   `;
   const bannerButtons = `
     margin-top: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    row-gap: 0.2em;
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px);
-    text-align: left;
+    text-align: center;
     font-size: 16px;
     font-weight: bold;
-    background-color: transparent;
-    color: #433d99;
     border: none;
-    border-radius: 0;
+    border-radius: 100px;
     cursor: pointer;
-    padding: 5px;
-    overflow-wrap: break-word;
+    padding: 8px 0px;
+    min-width: fit-content;
+    margin-right: 12px;
+    color: #622a6a;
+    background: none;
   `;
+  const defaultPrimaryButtonStyle = `
+    background: #622a6a;
+    color: white; 
+    padding: 8px 12px;
+   `;
   const defaultTextParentStyles = `
     flex: 1;
     max-width: calc(100% - 80px);
@@ -79,15 +96,12 @@ export function IterableEmbeddedBanner({
   const mediaStyle = `
     @media screen and (max-width: 800px) {
       .titleText {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.6em;
         line-height: 1.3em;
       }
       .banner {
-        min-height: 150px;
         display: flex;
         flex-direction: column;
+        min-width: fit-content;
       }
     }
   `;
@@ -102,7 +116,7 @@ export function IterableEmbeddedBanner({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-banner-secondaryButton`
     )[0];
-    if (bannerDiv) {
+    if (bannerDiv && message?.elements?.defaultAction) {
       bannerDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );
@@ -125,6 +139,9 @@ export function IterableEmbeddedBanner({
         errorCallback
       );
     }
+    updateButtonPadding('.banner-button-primary-secondary');
+    window.onresize = () =>
+      updateButtonPadding('.banner-button-primary-secondary');
   }, 0);
 
   const getStyleObj = (index: number) => {
@@ -143,6 +160,17 @@ export function IterableEmbeddedBanner({
     };
   };
 
+  const title = getTrimmedText(message?.elements?.title);
+  const body = getTrimmedText(message?.elements?.body);
+  if (
+    !(
+      title.length ||
+      body.length ||
+      message?.elements?.buttons?.length ||
+      message?.elements?.mediaUrl
+    )
+  )
+    return '';
   return `
     <style>${mediaStyle}</style>
     <div 
@@ -151,55 +179,73 @@ export function IterableEmbeddedBanner({
       name="${message?.metadata?.messageId}-banner"
       style="${defaultBannerStyles}; ${parentStyle || ''}" 
     >
-      <div class="banner" id="${textTitleImageDivId}"
+      <div id="${textTitleImageDivId}"
       style="display: flex; flex-direction: row;">
-        <div class="banner" 
+        <div
         id="${textTitleDivId}"
         style="${defaultTextParentStyles}">
-          <text class="titleText banner"  id="${titleId}" style="${defaultTitleStyles}; ${
-    titleStyle || ''
-  }">
-            ${message?.elements?.title || 'Title Here'}
-          </text>
-          <text class="titleText banner" id="${textId}" style="${defaultTextStyles}; ${
-    textStyle || ''
-  }">
-            ${message?.elements?.body}
-          </text>
+          ${
+            title.length
+              ? `<text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
+                  titleStyle || ''
+                }">
+            ${title}
+          </text>`
+              : ''
+          }
+          ${
+            body.length
+              ? `<text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
+                  textStyle || ''
+                }">
+            ${body}
+          </text>`
+              : ''
+          }
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img class="banner" id="${imageId}"
+            ? `<img id="${imageId}"
             style="${defaultImageStyles}; ${imgStyle || ''}" src="${
                 message?.elements?.mediaUrl
               }" />`
             : ''
         }
       </div>
-      <div class="banner" id="${buttonsDivId}"
+      <div id="${buttonsDivId}"
        style="${bannerButtons}">
-        ${message?.elements?.buttons
-          ?.map((button: IterableEmbeddedButton, index: number) => {
-            const buttonStyleObj = getStyleObj(index);
-            return `
+        ${
+          message?.elements?.buttons
+            ?.map((button: IterableEmbeddedButton, index: number) => {
+              const buttonTitle = getTrimmedText(button.title);
+              if (!buttonTitle.length) {
+                return null;
+              }
+              const buttonStyleObj = getStyleObj(index);
+              return `
               <button 
                 key="${index}" 
                 ${buttonStyleObj.disableButton} 
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
-              index === 0 ? '-banner-primaryButton' : '-banner-secondaryButton'
-            }"
+                index === 0
+                  ? '-banner-primaryButton'
+                  : '-banner-secondaryButton'
+              }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="banner-button-primary-secondary" 
-                style="${defaultButtonStyles};  
+                style="
+                ${defaultButtonStyles}; 
+                ${index === 0 ? defaultPrimaryButtonStyle : ''}
                 ${buttonStyleObj.buttonStyle || ''} 
                 ${buttonStyleObj.disableStyle || ''}"
               >
-                ${button.title ? button.title : `Button ${index + 1}`}
+                ${buttonTitle}
               </button>
             `;
-          })
-          .join('')}
+            })
+            .join('') || ''
+        }
       </div>
     </div>
   `;

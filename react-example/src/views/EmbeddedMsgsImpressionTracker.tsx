@@ -13,13 +13,14 @@ interface Props {}
 export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const elementCardRef = useRef([]);
   const { loggedInUser, setLoggedInUser } = useUser();
+  const appPackageName = 'my-website';
   const [messages, setMessages] = useState([]);
   const [embeddedManager] = useState<IterableEmbeddedManager>(
-    new IterableEmbeddedManager('my-website')
+    new IterableEmbeddedManager(appPackageName)
   );
 
   const [embeddedSessionManager] = useState<IterableEmbeddedSessionManager>(
-    new IterableEmbeddedSessionManager('my-website')
+    new IterableEmbeddedSessionManager(appPackageName)
   );
 
   const getCardObserver = () => {
@@ -118,7 +119,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
           messages.map((message: IterableEmbeddedMessage, index: number) => {
             const data = message;
             const card = IterableEmbeddedCard({
-              embeddedManager,
+              appPackageName,
               message: data,
               parentStyle: ' margin-bottom: 10; '
             });

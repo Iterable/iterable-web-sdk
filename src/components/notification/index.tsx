@@ -1,13 +1,16 @@
 import { EmbeddedMessageData } from '../types';
 import {
   handleElementClick,
-  addButtonClickEvent
-} from '../../embedded/embeddedClickEvents';
+  addButtonClickEvent,
+  getTrimmedText,
+  updateButtonPadding
+} from '../../embedded/embeddedUtil';
 import { IterableEmbeddedButton } from 'src/embedded';
 
 export function IterableEmbeddedNotification({
   appPackageName,
   message,
+  parentStyle,
   disablePrimaryBtn = false,
   disableSecondaryBtn = false,
   primaryBtnStyle,
@@ -25,42 +28,66 @@ export function IterableEmbeddedNotification({
   textTitleDivId = 'notification-text-title-div',
   errorCallback
 }: EmbeddedMessageData): string {
+  const defaultNotificationStyles = `
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 10px 20px 15px 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
+  `;
   const defaultTitleStyles = `
+    margin-top: 0px;
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 4px;
+    color: rgb(61, 58, 59);
     display: block;
   `;
   const defaultTextStyles = `
-    font-size: 16px;
+    margin-top: 0.2em;
+    font-size: 17px;
     margin-bottom: 10px;
     display: block;
+    color: rgb(120, 113, 116);
   `;
   const defaultTextParentStyles = `
     overflow-wrap: break-word;
   `;
   const defaultButtonStyles = `
     max-width: calc(50% - 32px); 
-    text-align: left; 
-   
-    border-radius: 4px; 
-    padding: 8px; 
-    margin-right: 8px; 
+    text-align: center; 
+    font-weight: bold;
+    border-radius: 100px;
+    padding: 8px 0px;
+    margin-right: 12px; 
     cursor: pointer; 
     border: none; 
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 2px 3px rgba(0, 0, 0, 0.06); 
-    overflow-wrap: break-word; 
+    min-width: fit-content;
+    font-size: 16px;
+    color: #622a6a;
+    background: none;
+  `;
+  const notificationButtons = `
+    margin-top: auto;
+    display:flex;
+    flex-direction:row;
+    flex-wrap: wrap;
+    row-gap: 0.3em;
+  `;
+  const defaultPrimaryButtonStyle = `
+  background: #622a6a; 
+  color: white; 
+  padding: 8px 12px;
   `;
   const mediaStyle = `
     @media screen and (max-width: 800px) {
       .titleText {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-height: 2.6em;
         line-height: 1.3em;
       }
       .notification {
-        min-height: 100px;
         display: flex;
         flex-direction: column;
       }
@@ -77,7 +104,7 @@ export function IterableEmbeddedNotification({
     const secondaryButtonClick = document.getElementsByName(
       `${message?.metadata?.messageId}-notification-secondaryButton`
     )[0];
-    if (notificationDiv) {
+    if (notificationDiv && message?.elements?.defaultAction) {
       notificationDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );
@@ -100,6 +127,9 @@ export function IterableEmbeddedNotification({
         errorCallback
       );
     }
+    updateButtonPadding('.notification-button-primary-secondary');
+    window.onresize = () =>
+      updateButtonPadding('.notification-button-primary-secondary');
   }, 0);
 
   const getStyleObj = (index: number) => {
@@ -117,57 +147,71 @@ export function IterableEmbeddedNotification({
           : 'enabled'
     };
   };
-
+  const title = getTrimmedText(message?.elements?.title);
+  const body = getTrimmedText(message?.elements?.body);
+  if (!(title.length || body.length || message?.elements?.buttons?.length))
+    return '';
   return `
     <style>${mediaStyle}</style>
     <div 
       class="notification" 
       id="${parentId}"
       name="${message?.metadata?.messageId}-notification"
-      style="background: white; border-radius: 10px; padding: 20px; border: 3px solid #caccd1; margin-bottom: 10px; cursor: ${
-        message?.elements?.defaultAction ? 'pointer' : 'auto'
-      };" 
+      style="${defaultNotificationStyles}; ${parentStyle || ''}" 
     >
-      <div class="notification" id="${textTitleDivId}"
+      <div id="${textTitleDivId}"
        style="${defaultTextParentStyles}">
-        <p class="titleText notification" id="${titleId}" 
+       ${
+         title.length
+           ? `<p class="titleText" id="${titleId}" 
         style="${defaultTitleStyles}; ${titleStyle || ''}">
-          ${message?.elements?.title || 'Title Here'}
-        </p>
-        <p class="titleText notification" id="${textId}" style="${defaultTextStyles}; ${
-    textStyle || ''
-  }">
-          ${message?.elements?.body}
-        </p>
+          ${title}
+        </p>`
+           : ''
+       }
+        ${
+          body.length
+            ? `<p class="titleText" id="${textId}" style="${defaultTextStyles}; ${
+                textStyle || ''
+              }">
+          ${body}
+        </p>`
+            : ''
+        }
       </div>
-      <div class="notification" id="${buttonsDivId}" style="margin-top: auto;">
-        ${message?.elements?.buttons
-          ?.map((button: IterableEmbeddedButton, index: number) => {
-            const buttonStyleObj = getStyleObj(index);
-            return `
+      <div id="${buttonsDivId}" style="${notificationButtons}">
+        ${
+          message?.elements?.buttons
+            ?.map((button: IterableEmbeddedButton, index: number) => {
+              const buttonTitle = getTrimmedText(button.title);
+              if (!buttonTitle.length) {
+                return null;
+              }
+              const buttonStyleObj = getStyleObj(index);
+              return `
               <button 
                 key="${index}" 
                 ${buttonStyleObj.disableButton}  
                 data-index="${index}"
                 name="${message?.metadata?.messageId}${
-              index === 0
-                ? '-notification-primaryButton'
-                : '-notification-secondaryButton'
-            }"
+                index === 0
+                  ? '-notification-primaryButton'
+                  : '-notification-secondaryButton'
+              }"
                 id="${index === 0 ? primaryButtonId : secondaryButtonId}"
                 class="notification-button-primary-secondary" 
                 style="
-                  background: ${index === 0 ? '#2196f3' : 'none'}; 
-                  color: ${index === 0 ? 'white' : '#2196f3'}; 
                   ${defaultButtonStyles}; 
+                  ${index === 0 ? defaultPrimaryButtonStyle : ''}
                   ${buttonStyleObj.buttonStyle || ''}; 
                   ${buttonStyleObj.disableStyle || ''}" 
                   >
-                ${button.title || `Button ${index + 1}`}
+                ${buttonTitle}
               </button>
             `;
-          })
-          .join('')}
+            })
+            .join('') || ''
+        }
       </div>
     </div>
   `;
