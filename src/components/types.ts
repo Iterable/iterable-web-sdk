@@ -1,27 +1,27 @@
 import { ErrorHandler } from '../types';
 import { IterableEmbeddedMessage } from '../embedded/types';
 
-export interface EmbeddedMessageData {
+export type OutOfTheBoxElement = {
+  id?: string;
+  styles?: string;
+};
+
+export type OutOfTheBoxButton = OutOfTheBoxElement & {
+  disabled?: boolean;
+  disabledStyles?: string;
+};
+
+export type OOTB = {
   appPackageName: string;
   message: IterableEmbeddedMessage;
-  disablePrimaryBtn?: boolean;
-  disableSecondaryBtn?: boolean;
-  imgStyle?: string;
-  titleStyle?: string;
-  parentStyle?: string;
-  textStyle?: string;
-  primaryBtnStyle?: string;
-  primaryDisableBtnStyle?: string;
-  secondaryBtnStyle?: string;
-  secondaryDisableBtnStyle?: string;
-  titleId?: string;
-  textId?: string;
-  primaryButtonId?: string;
-  secondaryButtonId?: string;
-  parentId?: string;
-  imageId?: string;
-  buttonsDivId?: string;
-  textTitleDivId?: string;
-  textTitleImageDivId?: string;
+  img?: OutOfTheBoxElement;
+  title?: OutOfTheBoxElement;
+  primaryButton?: OutOfTheBoxButton;
+  secondaryButton?: OutOfTheBoxButton;
+  body?: OutOfTheBoxElement;
+  parent?: OutOfTheBoxElement;
+  buttonsDiv?: OutOfTheBoxElement;
+  textTitle?: OutOfTheBoxElement;
+  textTitleImg?: OutOfTheBoxElement;
   errorCallback?: ErrorHandler;
-}
+};
