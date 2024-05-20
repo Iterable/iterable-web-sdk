@@ -14,20 +14,25 @@ import {
   addButtonClickEvent,
   handleElementClick
 } from 'src/embedded/embeddedClickEvents';
-import { getTrimmedText, updateButtonPadding } from 'src/embedded/utils';
+import { getTrimmedText } from 'src/embedded/utils';
+
+const emptyElement = {
+  id: '',
+  styles: ''
+};
 
 export function IterableEmbeddedBanner({
   appPackageName,
   message,
-  parent,
-  img,
-  title,
-  primaryButton,
-  secondaryButton,
-  body,
-  buttonsDiv,
-  textTitle,
-  textTitleImg,
+  parent = emptyElement,
+  img = emptyElement,
+  title = emptyElement,
+  primaryButton = emptyElement,
+  secondaryButton = emptyElement,
+  body = emptyElement,
+  buttonsDiv = emptyElement,
+  textTitle = emptyElement,
+  textTitleImg = emptyElement,
   errorCallback
 }: OOTB): string {
   const bannerSelector = `${message?.metadata?.messageId}-banner`;
@@ -64,8 +69,6 @@ export function IterableEmbeddedBanner({
         errorCallback
       );
     }
-    updateButtonPadding('.banner-button');
-    window.onresize = () => updateButtonPadding('.banner-button');
   }, 0);
 
   const trimmedTitle = getTrimmedText(message?.elements?.title);
@@ -99,7 +102,7 @@ export function IterableEmbeddedBanner({
             trimmedTitle.length
               ? `<text id="${title?.id}" style="${defaultTitleStyles}; ${
                   title?.styles || ''
-                }">${title}</text>`
+                }">${trimmedTitle}</text>`
               : ''
           }
           ${
@@ -143,7 +146,7 @@ export function IterableEmbeddedBanner({
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
                 ${secondaryButton?.disabled ? 'disabled' : 'enabled'} 
-                data-index="${0}"
+                data-index="${1}"
                 name="${secondaryButtonSelector}"
                 id="${secondaryButton?.id}"
                 class="banner-button" 

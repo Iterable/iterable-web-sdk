@@ -69,10 +69,12 @@ export const defaultButtonStyles = `
   border-radius: 100px;
   cursor: pointer;
   padding: 8px 0px;
-  min-width: fit-content;
   margin-right: 12px;
   color: #622a6a;
   background: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 export const defaultPrimaryButtonStyle = `

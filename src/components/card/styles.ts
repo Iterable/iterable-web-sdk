@@ -55,7 +55,9 @@ export const defaultButtonStyles = (disabled: boolean) => `
   border-radius: 0;
   cursor: pointer;
   padding: 5px;
-  min-width: fit-content;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 export const defaultTextParentStyles = `

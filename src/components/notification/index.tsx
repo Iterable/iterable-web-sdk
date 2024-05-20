@@ -12,17 +12,23 @@ import {
   defaultPrimaryButtonStyle,
   defaultButtonsDiv
 } from './styles';
+import { getTrimmedText } from 'src/embedded/utils';
+
+const emptyElement = {
+  id: '',
+  styles: ''
+};
 
 export function IterableEmbeddedNotification({
   appPackageName,
   message,
-  parent,
-  title,
-  primaryButton,
-  secondaryButton,
-  body,
-  buttonsDiv,
-  textTitle,
+  parent = emptyElement,
+  title = emptyElement,
+  primaryButton = emptyElement,
+  secondaryButton = emptyElement,
+  body = emptyElement,
+  buttonsDiv = emptyElement,
+  textTitle = emptyElement,
   errorCallback
 }: OOTB): string {
   const notificationSelector = `${message?.metadata?.messageId}-notification`;
@@ -42,7 +48,7 @@ export function IterableEmbeddedNotification({
         handleElementClick(message, appPackageName, errorCallback)
       );
     }
-    console.log({ primaryButtonClick, secondaryButtonClick, notificationDiv });
+
     if (primaryButtonClick) {
       addButtonClickEvent(
         primaryButtonClick,
@@ -63,6 +69,19 @@ export function IterableEmbeddedNotification({
     }
   }, 0);
 
+  const trimmedTitle = getTrimmedText(message?.elements?.title);
+  const trimmedBody = getTrimmedText(message?.elements?.body);
+
+  if (
+    !(
+      trimmedTitle.length ||
+      trimmedBody.length ||
+      message?.elements?.buttons?.length ||
+      message?.elements?.mediaUrl
+    )
+  )
+    return '';
+
   return `
     <div 
       id="${parent?.id}"
@@ -76,10 +95,10 @@ export function IterableEmbeddedNotification({
         <p id="${title?.id}" style="${defaultTitleStyles}; ${
     title?.styles || ''
   }">
-            ${message?.elements?.title}
+            ${trimmedTitle}
         </p>
         <p id="${body?.id}" style="${defaultBodyStyles}; ${body?.styles || ''}">
-          ${message?.elements?.body}
+          ${trimmedBody}
         </p>
       </div>
       <div id="${buttonsDiv?.id}" style="${defaultButtonsDiv}; ${
@@ -93,9 +112,9 @@ export function IterableEmbeddedNotification({
                data-index="${0}"
                name="${primaryButtonSelector}"
                id="${primaryButton?.id}"
-               style="${defaultButtonStyles};  ${defaultPrimaryButtonStyle}; ${
+               style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
               primaryButton?.styles || ''
-            }; ${primaryButton?.disabledStyles || ''};"
+            } ${primaryButton?.disabledStyles || ''}"
              >
              ${message?.elements?.buttons?.[0]?.title}
            </button>`
@@ -106,7 +125,7 @@ export function IterableEmbeddedNotification({
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${secondaryButton?.disabled ? 'disabled' : 'enabled'} 
-               data-index="${0}"
+               data-index="${1}"
                name="${secondaryButtonSelector}"
                id="${secondaryButton?.id}"
                style="

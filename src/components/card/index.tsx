@@ -13,19 +13,23 @@ import {
   cardButtons,
   defaultButtonStyles
 } from './styles';
-import { defaultPrimaryButtonStyle } from '../banner/styles';
+
+const emptyElement = {
+  id: '',
+  styles: ''
+};
 
 export function IterableEmbeddedCard({
   appPackageName,
   message,
-  parent,
-  img,
-  title,
-  primaryButton,
-  secondaryButton,
-  body,
-  buttonsDiv,
-  textTitle,
+  parent = emptyElement,
+  img = emptyElement,
+  title = emptyElement,
+  primaryButton = emptyElement,
+  secondaryButton = emptyElement,
+  body = emptyElement,
+  buttonsDiv = emptyElement,
+  textTitle = emptyElement,
   errorCallback
 }: OOTB): string {
   const cardSelector = `${message?.metadata?.messageId}-card`;
@@ -127,9 +131,9 @@ export function IterableEmbeddedCard({
                id="${primaryButton?.id}"
                style="${defaultButtonStyles(
                  primaryButton?.disabled || false
-               )}; ${defaultPrimaryButtonStyle};${
-              primaryButton?.styles || ''
-            }; ${primaryButton?.disabledStyles || ''};"
+               )}; ${primaryButton?.styles || ''}; ${
+              primaryButton?.disabledStyles || ''
+            };"
              >
              ${message.elements.buttons[0].title}
            </button>`
@@ -140,7 +144,7 @@ export function IterableEmbeddedCard({
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${secondaryButton?.disabled ? 'disabled' : 'enabled'} 
-               data-index="${0}"
+               data-index="${1}"
                name="${secondaryButtonSelector}"
                id="${secondaryButton?.id}"
                style="${defaultButtonStyles(

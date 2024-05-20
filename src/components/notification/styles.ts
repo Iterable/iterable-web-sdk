@@ -72,10 +72,12 @@ export const defaultButtonStyles = `
   margin-right: 12px; 
   cursor: pointer; 
   border: none; 
-  min-width: fit-content;
   font-size: 16px;
   color: #622a6a;
   background: none;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 `;
 
 export const notificationButtons = `
