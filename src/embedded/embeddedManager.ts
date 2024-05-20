@@ -34,9 +34,13 @@ export class IterableEmbeddedManager {
     try {
       const params: any = {};
       if (placementIds.length > 0) {
-        params.placementIds = placementIds
-          .map((id) => `&placementIds=${id}`)
-          .join('');
+        params.placementIds = placementIds[0];
+        if (placementIds.length > 1) {
+          params.placementIds += placementIds
+            .slice(1)
+            .map((id) => `&placementIds=${id}`)
+            .join('');
+        }
       }
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
