@@ -44,13 +44,13 @@ export const defaultBodyStyles = `
     line-heißght: 1.3em;
   }
 `;
-export const defaultButtonStyles = (disabled: boolean) => `
+export const defaultButtonStyles = `
   max-width: calc(50% - 32px);
   text-align: center;
   font-size: 16px;
   font-weight: bold;
   background-color: transparent;
-  color: ${disabled ? 'grey' : '#622a6a'};
+  color: #622a6a;
   border: none;
   border-radius: 0;
   cursor: pointer;

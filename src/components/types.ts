@@ -7,7 +7,6 @@ export type OutOfTheBoxElement = {
 };
 
 export type OutOfTheBoxButton = OutOfTheBoxElement & {
-  disabled?: boolean;
   disabledStyles?: string;
 };
 

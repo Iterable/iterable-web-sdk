@@ -36,7 +36,13 @@ const StyleOverrides = {
   },
   secondaryButton: {
     id: 'secondary-button-id',
-    styles: ''
+    styles: '',
+    disabledStyles: `
+        opacity: .6;
+        cursor: not-allowed;
+        background: grey;
+        color: grey;
+      `
   },
   body: {
     id: 'body-id',

@@ -126,14 +126,14 @@ export function IterableEmbeddedBanner({
          message?.elements?.buttons?.[0]
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
-                ${primaryButton?.disabled ? 'disabled' : 'enabled'} 
+                ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
                 data-index="${0}"
                 name="${primaryButtonSelector}"
                 id="${primaryButton?.id}"
                 class="banner-button" 
-                style="${defaultButtonStyles}; ${defaultPrimaryButtonStyle}; ${
+                style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
                primaryButton?.styles || ''
-             }; ${primaryButton?.disabledStyles || ''};"
+             } ${primaryButton?.disabledStyles || ''}"
               >
               ${message?.elements?.buttons?.[0]?.title}
             </button>`
@@ -143,14 +143,14 @@ export function IterableEmbeddedBanner({
          message?.elements?.buttons?.[1]
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
-                ${secondaryButton?.disabled ? 'disabled' : 'enabled'} 
+                ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
                 data-index="${1}"
                 name="${secondaryButtonSelector}"
                 id="${secondaryButton?.id}"
                 class="banner-button" 
-                style="${defaultButtonStyles}; ${
+                style="${defaultButtonStyles} ${
                secondaryButton?.styles || ''
-             }; ${secondaryButton?.disabledStyles || ''};"
+             } ${secondaryButton?.disabledStyles || ''}"
               >
                 ${message?.elements?.buttons?.[1]?.title}
             </button>`
