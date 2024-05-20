@@ -86,6 +86,7 @@ export const defaultPrimaryButtonStyle = `
 export const defaultTextParentStyles = `
   flex: 1;
   max-width: calc(100% - 80px);
+  overflow-wrap: break-word;
 `;
 
 export const textTitleImageDefaultStyle = `
