@@ -1,3 +1,4 @@
+import { handleElementClick } from 'src/embedded/utils';
 import { OOTB } from '../types';
 import {
   bannerButtons,
@@ -10,11 +11,7 @@ import {
   defaultTitleStyles,
   textTitleImageDefaultStyle
 } from './styles';
-import {
-  addButtonClickEvent,
-  handleElementClick
-} from 'src/embedded/embeddedClickEvents';
-import { getTrimmedText } from 'src/embedded/utils';
+import { addButtonClickEvent, getTrimmedText } from 'src/embedded/utils';
 
 const emptyElement = {
   id: '',
@@ -38,6 +35,7 @@ export function IterableEmbeddedBanner({
   const bannerSelector = `${message?.metadata?.messageId}-banner`;
   const primaryButtonSelector = `${message?.metadata?.messageId}-banner-primaryButton`;
   const secondaryButtonSelector = `${message?.metadata?.messageId}-banner-secondaryButton`;
+
   setTimeout(() => {
     const bannerDiv = document.getElementsByName(bannerSelector)[0];
     const primaryButtonClick = document.getElementsByName(

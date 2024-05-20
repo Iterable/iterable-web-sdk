@@ -71,7 +71,7 @@ import {
   const handleGetMessagesClick = (event: MouseEvent) => {
     event.preventDefault();
     if (startBtn.getAttribute('aria-disabled') !== 'true') {
-      startBtn.innerText = `Loading...`;
+      startBtn.innerText = 'Loading...';
       startBtn.setAttribute('aria-disabled', 'true');
       startBtn.className = 'disabled';
       request()
@@ -94,7 +94,7 @@ import {
       /* login */
       loginBtn.setAttribute('aria-disabled', 'true');
       loginBtn.className = 'disabled';
-      loginBtn.innerText = `Loading...`;
+      loginBtn.innerText = 'Loading...';
       setEmail(email).then(() => {
         /* enable change email button */
         changeEmailBtn.classList.remove('disabled');
@@ -123,7 +123,7 @@ import {
 
     changeEmailBtn.setAttribute('aria-disabled', 'true');
     changeEmailBtn.className = 'disabled';
-    changeEmailBtn.innerText = `Loading...`;
+    changeEmailBtn.innerText = 'Loading...';
 
     startBtn.setAttribute('aria-disabled', 'true');
     startBtn.className = 'disabled';

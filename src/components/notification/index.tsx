@@ -1,9 +1,5 @@
 import { OOTB } from '../types';
 import {
-  handleElementClick,
-  addButtonClickEvent
-} from '../../embedded/embeddedClickEvents';
-import {
   defaultNotificationStyles,
   defaultTextParentStyles,
   defaultTitleStyles,
@@ -12,7 +8,11 @@ import {
   defaultPrimaryButtonStyle,
   defaultButtonsDiv
 } from './styles';
-import { getTrimmedText } from 'src/embedded/utils';
+import {
+  addButtonClickEvent,
+  getTrimmedText,
+  handleElementClick
+} from 'src/embedded/utils';
 
 const emptyElement = {
   id: '',
@@ -43,7 +43,7 @@ export function IterableEmbeddedNotification({
     const secondaryButtonClick = document.getElementsByName(
       secondaryButtonSelector
     )[0];
-    if (notificationDiv) {
+    if (notificationDiv && message?.elements?.defaultAction) {
       notificationDiv.addEventListener('click', () =>
         handleElementClick(message, appPackageName, errorCallback)
       );
