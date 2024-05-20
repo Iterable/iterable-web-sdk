@@ -1,6 +1,7 @@
 import { by } from '@pabra/sortby';
 import {
   ANIMATION_DURATION,
+  dangerouslyAllowJsPopupExecution,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
 } from '../constants';
 import { WebInAppDisplaySettings } from '../inapp';
@@ -286,7 +287,9 @@ const generateSecuredIFrame = () => {
   // event handlers on elements in it preventing our custom link handling
   iframe.setAttribute(
     'sandbox',
-    'allow-same-origin allow-popups allow-top-navigation'
+    `allow-same-origin allow-popups allow-top-navigation ${
+      dangerouslyAllowJsPopupExecution ? 'allow-popups-to-escape-sandbox' : ''
+    }`
   );
   /*
     _display: none_ would remove the ability to set event handlers on elements
