@@ -127,7 +127,7 @@ export function IterableEmbeddedBanner({
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
                 ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
-                data-index="${0}"
+                data-index="0"
                 name="${primaryButtonSelector}"
                 id="${primaryButton?.id}"
                 class="banner-button" 
@@ -144,7 +144,7 @@ export function IterableEmbeddedBanner({
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
                 ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
-                data-index="${1}"
+                data-index="1"
                 name="${secondaryButtonSelector}"
                 id="${secondaryButton?.id}"
                 class="banner-button" 

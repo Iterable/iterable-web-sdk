@@ -109,7 +109,7 @@ export function IterableEmbeddedNotification({
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
-               data-index="${0}"
+               data-index="0"
                name="${primaryButtonSelector}"
                id="${primaryButton?.id}"
                style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
@@ -125,7 +125,7 @@ export function IterableEmbeddedNotification({
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
-               data-index="${1}"
+               data-index="1"
                name="${secondaryButtonSelector}"
                id="${secondaryButton?.id}"
                style="
