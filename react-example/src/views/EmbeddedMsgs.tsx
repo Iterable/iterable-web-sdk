@@ -14,12 +14,63 @@ import {
 import Button from 'src/components/Button';
 import { useUser } from 'src/context/Users';
 
+const StyleOverrides = {
+  parent: {
+    id: 'parent-id',
+    styles: `
+      background: white;
+      border-color: purple;
+      border-radius: 30px;
+      padding: 10px;
+    `
+  },
+  img: {
+    id: 'img-id',
+    styles: ''
+  },
+  title: {
+    id: 'title-id',
+    styles: `
+      color: green;
+    `
+  },
+  primaryButton: {
+    id: 'primary-button-id',
+    styles: `
+      color: #8B0000;
+      background: #FFFFFF;
+    `
+  },
+  secondaryButton: {
+    id: 'secondary-button-id',
+    styles: '',
+    disabledStyles: `
+        opacity: .6;
+        cursor: not-allowed;
+        background: grey;
+        color: grey;
+      `
+  },
+  body: {
+    id: 'body-id',
+    styles: `
+      color: green;
+    `
+  },
+  buttonsDiv: {
+    id: 'buttons-div-id',
+    styles: ''
+  }
+};
+
 interface Props {}
 
 export const EmbeddedMsgs: FC<Props> = () => {
   const { loggedInUser } = useUser();
   const appPackageName = 'my-website';
   const [selectedButtonIndex, setSelectedButtonIndex] = useState(0);
+  const [useCustomStyles, setUseCustomStyles] = useState(false);
+
   const [messages, setMessages] = useState([]);
 
   const [embeddedManager] = useState(
@@ -77,6 +128,38 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   return (
     <>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center'
+        }}
+      >
+        <form>
+          <div>
+            <input
+              type="radio"
+              id="default"
+              name="default"
+              value="default"
+              checked={!useCustomStyles}
+              onChange={() => setUseCustomStyles(false)}
+            />
+            <label>Default OOTB Styles</label>
+          </div>
+          <div>
+            <input
+              type="radio"
+              id="custom"
+              name="custom"
+              value="custom"
+              checked={useCustomStyles}
+              onChange={() => setUseCustomStyles(true)}
+            />
+            <label>Custom OOTB Styles</label>
+          </div>
+        </form>
+      </div>
       <div
         style={{
           display: 'flex',
@@ -152,7 +235,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const card = IterableEmbeddedCard({
                   appPackageName,
                   message,
-                  parentStyle: ' margin-bottom: 10; ',
+                  ...(useCustomStyles && StyleOverrides),
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (
@@ -167,14 +250,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const banner = IterableEmbeddedBanner({
                   appPackageName,
                   message,
-                  parentStyle: ' margin-bottom: 10; ',
-                  primaryBtnStyle: `
-                    background-color: #000fff;
-                    border-radius: 10px;
-                    padding: 10px;
-                    color: #ffffff;
-                    `,
-                  imageId: `banner-image-custom-${index}`
+                  ...(useCustomStyles && StyleOverrides),
+                  errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (
                   <div
@@ -188,10 +265,8 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const notification = IterableEmbeddedNotification({
                   appPackageName,
                   message,
-                  titleId: `notification-title-custom-${index}`,
-                  textStyle: `
-                    font-size: 20px;
-                  `
+                  ...(useCustomStyles && StyleOverrides),
+                  errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (
                   <div

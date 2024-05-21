@@ -1,120 +1,48 @@
+import { handleElementClick } from 'src/embedded/utils';
+import { OOTB } from '../types';
 import {
-  handleElementClick,
-  addButtonClickEvent,
-  getTrimmedText,
-  updateButtonPadding
-} from '../../embedded/embeddedUtil';
-import { IterableEmbeddedButton } from 'src/embedded';
-import { EmbeddedMessageData } from '../types';
+  bannerButtons,
+  defaultBannerStyles,
+  defaultButtonStyles,
+  defaultImageStyles,
+  defaultPrimaryButtonStyle,
+  defaultTextParentStyles,
+  defaultBodyStyles,
+  defaultTitleStyles,
+  textTitleImageDefaultStyle
+} from './styles';
+import { addButtonClickEvent, getTrimmedText } from 'src/embedded/utils';
+
+const emptyElement = {
+  id: '',
+  styles: ''
+};
 
 export function IterableEmbeddedBanner({
   appPackageName,
   message,
-  parentStyle,
-  disablePrimaryBtn = false,
-  disableSecondaryBtn = false,
-  imgStyle,
-  primaryBtnStyle,
-  primaryDisableBtnStyle,
-  secondaryBtnStyle,
-  secondaryDisableBtnStyle,
-  textStyle,
-  titleStyle,
-  titleId = 'banner-title',
-  textId = 'banner-text',
-  primaryButtonId = 'banner-primary-button',
-  secondaryButtonId = 'banner-secondary-button',
-  parentId = 'banner-parent',
-  imageId = 'banner-image',
-  buttonsDivId = 'banner-buttons-div',
-  textTitleDivId = 'banner-text-title-div',
-  textTitleImageDivId = 'banner-text-title-image-div',
+  parent = emptyElement,
+  img = emptyElement,
+  title = emptyElement,
+  primaryButton = emptyElement,
+  secondaryButton = emptyElement,
+  body = emptyElement,
+  buttonsDiv = emptyElement,
+  textTitle = emptyElement,
+  textTitleImg = emptyElement,
   errorCallback
-}: EmbeddedMessageData): string {
-  const defaultBannerStyles = `
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: auto;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    padding: 10px 20px 15px 20px;
-    cursor: ${message?.elements?.defaultAction ? 'pointer' : 'auto'};
-  `;
-  const defaultImageStyles = `
-    width: 70px;
-    height: 70px;
-    border-radius: 8px;
-    margin-left: 10px;
-    object-fit: cover;
-    margin-top: 5px;
-  `;
-  const defaultTitleStyles = `
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 6px;
-    color: rgb(61, 58, 59);
-    display: block;
-  `;
-  const defaultTextStyles = `
-    font-size: 17px;
-    margin-bottom: 10px;
-    display: block;
-    margin-bottom: 25px;
-    color: rgb(120, 113, 116);
-  `;
-  const bannerButtons = `
-    margin-top: auto;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    row-gap: 0.2em;
-  `;
-  const defaultButtonStyles = `
-    max-width: calc(50% - 32px);
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 100px;
-    cursor: pointer;
-    padding: 8px 0px;
-    min-width: fit-content;
-    margin-right: 12px;
-    color: #622a6a;
-    background: none;
-  `;
-  const defaultPrimaryButtonStyle = `
-    background: #622a6a;
-    color: white; 
-    padding: 8px 12px;
-   `;
-  const defaultTextParentStyles = `
-    flex: 1;
-    max-width: calc(100% - 80px);
-  `;
-  const mediaStyle = `
-    @media screen and (max-width: 800px) {
-      .titleText {
-        line-height: 1.3em;
-      }
-      .banner {
-        display: flex;
-        flex-direction: column;
-        min-width: fit-content;
-      }
-    }
-  `;
+}: OOTB): string {
+  const bannerSelector = `${message?.metadata?.messageId}-banner`;
+  const primaryButtonSelector = `${message?.metadata?.messageId}-banner-primaryButton`;
+  const secondaryButtonSelector = `${message?.metadata?.messageId}-banner-secondaryButton`;
 
   setTimeout(() => {
-    const bannerDiv = document.getElementsByName(
-      `${message?.metadata?.messageId}-banner`
-    )[0];
+    const bannerDiv = document.getElementsByName(bannerSelector)[0];
     const primaryButtonClick = document.getElementsByName(
-      `${message?.metadata?.messageId}-banner-primaryButton`
+      primaryButtonSelector
     )[0];
     const secondaryButtonClick = document.getElementsByName(
-      `${message?.metadata?.messageId}-banner-secondaryButton`
+      secondaryButtonSelector
     )[0];
     if (bannerDiv && message?.elements?.defaultAction) {
       bannerDiv.addEventListener('click', () =>
@@ -139,113 +67,95 @@ export function IterableEmbeddedBanner({
         errorCallback
       );
     }
-    updateButtonPadding('.banner-button-primary-secondary');
-    window.onresize = () =>
-      updateButtonPadding('.banner-button-primary-secondary');
   }, 0);
 
-  const getStyleObj = (index: number) => {
-    return {
-      buttonStyle: index === 0 ? primaryBtnStyle : secondaryBtnStyle,
-      disableStyle:
-        index === 0 ? primaryDisableBtnStyle : secondaryDisableBtnStyle,
-      disableButton:
-        index === 0
-          ? disablePrimaryBtn
-            ? 'disabled'
-            : 'enabled'
-          : disableSecondaryBtn
-          ? 'disabled'
-          : 'enabled'
-    };
-  };
+  const trimmedTitle = getTrimmedText(message?.elements?.title);
+  const trimmedBody = getTrimmedText(message?.elements?.body);
 
-  const title = getTrimmedText(message?.elements?.title);
-  const body = getTrimmedText(message?.elements?.body);
   if (
     !(
-      title.length ||
-      body.length ||
+      trimmedTitle.length ||
+      trimmedBody.length ||
       message?.elements?.buttons?.length ||
       message?.elements?.mediaUrl
     )
   )
     return '';
+
   return `
-    <style>${mediaStyle}</style>
     <div 
-      class="banner" 
-      id="${parentId}"
-      name="${message?.metadata?.messageId}-banner"
-      style="${defaultBannerStyles}; ${parentStyle || ''}" 
+      id="${parent?.id}"
+      name="${bannerSelector}"
+      style="${defaultBannerStyles(message?.elements?.defaultAction)} ${
+    parent?.styles || ''
+  }" 
     >
-      <div id="${textTitleImageDivId}"
-      style="display: flex; flex-direction: row;">
-        <div
-        id="${textTitleDivId}"
-        style="${defaultTextParentStyles}">
+      <div id="${textTitleImg?.id}" style="${textTitleImageDefaultStyle}; ${
+    textTitleImg?.styles || ''
+  }">
+        <div id="${textTitle?.id}" style="${defaultTextParentStyles}; ${
+    textTitle?.styles || ''
+  }">
           ${
-            title.length
-              ? `<text class="titleText"  id="${titleId}" style="${defaultTitleStyles}; ${
-                  titleStyle || ''
-                }">
-            ${title}
-          </text>`
+            trimmedTitle.length
+              ? `<text id="${title?.id}" style="${defaultTitleStyles}; ${
+                  title?.styles || ''
+                }">${trimmedTitle}</text>`
               : ''
           }
           ${
-            body.length
-              ? `<text class="titleText" id="${textId}" style="${defaultTextStyles}; ${
-                  textStyle || ''
-                }">
-            ${body}
-          </text>`
+            trimmedBody.length
+              ? `<text id="${body?.id}" style="${defaultBodyStyles}; ${
+                  body?.styles || ''
+                }">${trimmedBody}</text>`
               : ''
           }
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img id="${imageId}"
-            style="${defaultImageStyles}; ${imgStyle || ''}" src="${
-                message?.elements?.mediaUrl
-              }" />`
+            ? `<img id="${img?.id}" style="${defaultImageStyles}; ${
+                img?.styles || ''
+              }" src="${message?.elements?.mediaUrl}" />`
             : ''
         }
       </div>
-      <div id="${buttonsDivId}"
-       style="${bannerButtons}">
-        ${
-          message?.elements?.buttons
-            ?.map((button: IterableEmbeddedButton, index: number) => {
-              const buttonTitle = getTrimmedText(button.title);
-              if (!buttonTitle.length) {
-                return null;
-              }
-              const buttonStyleObj = getStyleObj(index);
-              return `
-              <button 
-                key="${index}" 
-                ${buttonStyleObj.disableButton} 
-                data-index="${index}"
-                name="${message?.metadata?.messageId}${
-                index === 0
-                  ? '-banner-primaryButton'
-                  : '-banner-secondaryButton'
-              }"
-                id="${index === 0 ? primaryButtonId : secondaryButtonId}"
-                class="banner-button-primary-secondary" 
-                style="
-                ${defaultButtonStyles}; 
-                ${index === 0 ? defaultPrimaryButtonStyle : ''}
-                ${buttonStyleObj.buttonStyle || ''} 
-                ${buttonStyleObj.disableStyle || ''}"
+      <div id="${buttonsDiv?.id}" style="${bannerButtons}; ${
+    buttonsDiv?.styles
+  }">
+       ${
+         message?.elements?.buttons?.[0]
+           ? `<button 
+                key="button-${message?.metadata.messageId}" 
+                ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+                data-index="0"
+                name="${primaryButtonSelector}"
+                id="${primaryButton?.id}"
+                class="banner-button" 
+                style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
+               primaryButton?.styles || ''
+             } ${primaryButton?.disabledStyles || ''}"
               >
-                ${buttonTitle}
-              </button>
-            `;
-            })
-            .join('') || ''
-        }
+              ${message?.elements?.buttons?.[0]?.title}
+            </button>`
+           : ''
+       }
+       ${
+         message?.elements?.buttons?.[1]
+           ? `<button 
+                key="button-${message?.metadata.messageId}" 
+                ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+                data-index="1"
+                name="${secondaryButtonSelector}"
+                id="${secondaryButton?.id}"
+                class="banner-button" 
+                style="${defaultButtonStyles} ${
+               secondaryButton?.styles || ''
+             } ${secondaryButton?.disabledStyles || ''}"
+              >
+                ${message?.elements?.buttons?.[1]?.title}
+            </button>`
+           : ''
+       }
       </div>
     </div>
   `;
