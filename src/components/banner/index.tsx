@@ -86,7 +86,7 @@ export function IterableEmbeddedBanner({
     <div 
       id="${parent?.id}"
       name="${bannerSelector}"
-      style="${defaultBannerStyles(message?.elements?.defaultAction)}; ${
+      style="${defaultBannerStyles(message?.elements?.defaultAction)} ${
     parent?.styles || ''
   }" 
     >

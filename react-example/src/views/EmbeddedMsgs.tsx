@@ -17,7 +17,12 @@ import { useUser } from 'src/context/Users';
 const StyleOverrides = {
   parent: {
     id: 'parent-id',
-    styles: ''
+    styles: `
+      background: white;
+      border-color: purple;
+      border-radius: 30px;
+      padding: 10px;
+    `
   },
   img: {
     id: 'img-id',
@@ -25,7 +30,9 @@ const StyleOverrides = {
   },
   title: {
     id: 'title-id',
-    styles: ''
+    styles: `
+      color: green;
+    `
   },
   primaryButton: {
     id: 'primary-button-id',
@@ -46,7 +53,9 @@ const StyleOverrides = {
   },
   body: {
     id: 'body-id',
-    styles: ''
+    styles: `
+      color: green;
+    `
   },
   buttonsDiv: {
     id: 'buttons-div-id',

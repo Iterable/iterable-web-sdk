@@ -84,13 +84,13 @@ export function IterableEmbeddedCard({
     <div 
       id="${parent?.id || ''}"
       name="${cardSelector}"
-      style="${defaultCardStyles(message?.elements?.defaultAction)}; ${
+      style="${defaultCardStyles(message?.elements?.defaultAction)} ${
     parent?.styles || ''
   }" 
     >
       ${
         message?.elements?.mediaUrl
-          ? `<img id="${img?.id}" style="${defaultImageStyles}; ${
+          ? `<img id="${img?.id}" style="${defaultImageStyles} ${
               img?.styles || ''
             }" 
           src="${message?.elements?.mediaUrl}"/>`
@@ -103,7 +103,7 @@ export function IterableEmbeddedCard({
           trimmedTitle.length
             ? `<text class="titleText" id="${
                 title?.id
-              }" style="${defaultTitleStyles}; ${
+              }" style="${defaultTitleStyles} ${
                 title?.styles || ''
               }">${trimmedTitle}</text>`
             : ''
@@ -112,8 +112,8 @@ export function IterableEmbeddedCard({
           trimmedBody.length
             ? `<text class="titleText" id="${
                 body?.id
-              }" style="${defaultBodyStyles}; ${
-                body || ''
+              }" style="${defaultBodyStyles} ${
+                body?.styles || ''
               }">${trimmedBody}</text>`
             : ''
         }

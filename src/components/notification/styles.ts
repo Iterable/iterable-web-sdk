@@ -6,7 +6,7 @@ export const defaultNotificationStyles = (
   background: white;
   border-radius: 10px;
   padding: 20px;
-  border: 3px solid #caccd1;
+  border: 1px solid #ccc;
   margin-bottom: 10px;
   cursor: ${defaultAction ? 'pointer' : 'auto'};  
   

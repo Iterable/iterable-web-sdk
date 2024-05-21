@@ -86,22 +86,24 @@ export function IterableEmbeddedNotification({
     <div 
       id="${parent?.id}"
       name="${notificationSelector}"
-      style="${defaultNotificationStyles(message?.elements?.defaultAction)}" 
+      style="${defaultNotificationStyles(message?.elements?.defaultAction)} ${
+    parent?.styles
+  }" 
     >
       <div
         id="${textTitle?.id}"
-        style="${defaultTextParentStyles}; ${textTitle?.styles || ''}"
+        style="${defaultTextParentStyles} ${textTitle?.styles || ''}"
       >
-        <p id="${title?.id}" style="${defaultTitleStyles}; ${
+        <p id="${title?.id}" style="${defaultTitleStyles} ${
     title?.styles || ''
   }">
             ${trimmedTitle}
         </p>
-        <p id="${body?.id}" style="${defaultBodyStyles}; ${body?.styles || ''}">
+        <p id="${body?.id}" style="${defaultBodyStyles} ${body?.styles || ''}">
           ${trimmedBody}
         </p>
       </div>
-      <div id="${buttonsDiv?.id}" style="${defaultButtonsDiv}; ${
+      <div id="${buttonsDiv?.id}" style="${defaultButtonsDiv} ${
     buttonsDiv?.styles || ''
   }">
       ${
