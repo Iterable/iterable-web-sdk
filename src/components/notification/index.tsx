@@ -22,13 +22,15 @@ const emptyElement = {
 export function IterableEmbeddedNotification({
   appPackageName,
   message,
-  parent = emptyElement,
-  title = emptyElement,
-  primaryButton = emptyElement,
-  secondaryButton = emptyElement,
-  body = emptyElement,
-  buttonsDiv = emptyElement,
-  textTitle = emptyElement,
+  elements = {
+    parent: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement
+  },
   errorCallback
 }: OOTB): string {
   const notificationSelector = `${message?.metadata?.messageId}-notification`;
@@ -84,39 +86,45 @@ export function IterableEmbeddedNotification({
 
   return `
     <div 
-      id="${parent?.id}"
+      id="${elements?.parent?.id}"
       name="${notificationSelector}"
       style="${defaultNotificationStyles(message?.elements?.defaultAction)} ${
-    parent?.styles
+    elements?.parent?.styles
   }" 
     >
       <div
-        id="${textTitle?.id}"
-        style="${defaultTextParentStyles} ${textTitle?.styles || ''}"
+        id="${elements?.textTitle?.id}"
+        style="${defaultTextParentStyles} ${elements?.textTitle?.styles}"
       >
-        <p id="${title?.id}" style="${defaultTitleStyles} ${
-    title?.styles || ''
+        <p id="${elements?.title?.id}" style="${defaultTitleStyles} ${
+    elements?.title?.styles
   }">
             ${trimmedTitle}
         </p>
-        <p id="${body?.id}" style="${defaultBodyStyles} ${body?.styles || ''}">
+        <p id="${elements?.body?.id}" style="${defaultBodyStyles} ${
+    elements?.body?.styles
+  }">
           ${trimmedBody}
         </p>
       </div>
-      <div id="${buttonsDiv?.id}" style="${defaultButtonsDiv} ${
-    buttonsDiv?.styles || ''
+      <div id="${elements?.buttonsDiv?.id}" style="${defaultButtonsDiv} ${
+    elements?.buttonsDiv?.styles
   }">
       ${
         message?.elements?.buttons?.[0]
           ? `<button 
                key="button-${message?.metadata.messageId}" 
-               ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+               ${
+                 elements?.primaryButton?.disabledStyles
+                   ? 'disabled'
+                   : 'enabled'
+               } 
                data-index="0"
                name="${primaryButtonSelector}"
-               id="${primaryButton?.id}"
+               id="${elements?.primaryButton?.id}"
                style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
-              primaryButton?.styles || ''
-            } ${primaryButton?.disabledStyles || ''}"
+              elements?.primaryButton?.styles
+            } ${elements?.primaryButton?.disabledStyles}"
              >
              ${message?.elements?.buttons?.[0]?.title}
            </button>`
@@ -126,13 +134,17 @@ export function IterableEmbeddedNotification({
         message?.elements?.buttons?.[1]
           ? `<button 
                key="button-${message?.metadata.messageId}" 
-               ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+               ${
+                 elements?.secondaryButton?.disabledStyles
+                   ? 'disabled'
+                   : 'enabled'
+               } 
                data-index="1"
                name="${secondaryButtonSelector}"
-               id="${secondaryButton?.id}"
+               id="${elements?.secondaryButton?.id}"
                style="
                ${defaultButtonStyles}
-               ${secondaryButton?.disabledStyles || ''}"
+               ${elements?.secondaryButton?.disabledStyles}"
              >
                ${message?.elements?.buttons?.[1]?.title}
            </button>`
