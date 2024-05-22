@@ -2,10 +2,10 @@ import { trackEmbeddedClick } from '../events/embedded/events';
 import {
   IterableEmbeddedButton,
   IterableAction,
-  IterableActionRunner,
   IterableActionSource,
   IterableEmbeddedMessage
-} from './index';
+} from './types';
+import { IterableActionRunner } from '../utils/IterableActionRunner';
 import { ErrorHandler } from '../types';
 import {
   URL_SCHEME_ACTION,
