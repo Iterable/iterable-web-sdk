@@ -105,9 +105,7 @@ export class IterableEmbeddedManager {
 
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
-    if (msgsList.length > 0) {
-      this.notifyUpdateDelegates();
-    }
+    this.notifyUpdateDelegates();
     for (let i = 0; i < msgsList.length; i++) {
       await trackEmbeddedReceived(
         msgsList[i].metadata.messageId,
