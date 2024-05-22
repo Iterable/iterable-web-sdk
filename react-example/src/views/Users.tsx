@@ -40,34 +40,29 @@ export const Users: FC<Props> = () => {
   const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdatingUser(true);
-    try {
-      updateUser({
-        dataFields: { [userDataField]: 'test-data' }
+    updateUser({
+      dataFields: { [userDataField]: 'test-data' }
+    })
+      .then((response: any) => {
+        setUpdateUserResponse(JSON.stringify(response.data));
+        setUpdatingUser(false);
       })
-        .then((response) => {
-          setUpdateUserResponse(JSON.stringify(response.data));
-          setUpdatingUser(false);
-        })
-        .catch((e) => {
-          setUpdateUserResponse(JSON.stringify(e.response.data));
-          setUpdatingUser(false);
-        });
-    } catch (error) {
-      setUpdateUserResponse(JSON.stringify(error.message));
-      setUpdatingUser(false);
-    }
+      .catch((e: any) => {
+        setUpdateUserResponse(JSON.stringify(e.response.data));
+        setUpdatingUser(false);
+      });
   };
 
   const handleUpdateUserEmail = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdatingUserEmail(true);
     updateUserEmail(email)
-      .then((response) => {
+      .then((response: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(response.data));
         setLoggedInUser({ type: 'user_update', data: email });
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(e.response.data));
       });
@@ -78,11 +73,11 @@ export const Users: FC<Props> = () => {
 
     setUpdatingSubscriptions(true);
     updateSubscriptions({ emailListIds: [+emailListID] })
-      .then((response) => {
+      .then((response: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(response.data));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(e.response.data));
       });

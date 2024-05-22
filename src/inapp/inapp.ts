@@ -7,7 +7,7 @@ import {
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
-} from 'src/constants';
+} from '../constants';
 import { throttle } from 'throttle-debounce';
 import {
   trackInAppClick,
@@ -18,10 +18,9 @@ import {
 import { IterablePromise } from '../types';
 import { requestMessages } from './request';
 import {
-  DISPLAY_OPTIONS,
   DisplayOptions,
   GetInAppMessagesResponse,
-  HANDLE_LINKS,
+  HandleLinks,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -130,7 +129,7 @@ export function getInAppMessages(
                   clickedUrl: url
                 }
               : trackPayload
-          ).catch((e) => e);
+          ).catch((e: any) => e);
 
           if (shouldAnimate) {
             const animationTimer = global.setTimeout(() => {
@@ -388,7 +387,7 @@ export function getInAppMessages(
                 ? [trackInAppConsume(trackPayload)]
                 : [])
             ];
-            Promise.all(trackRequests).catch((e) => e);
+            Promise.all(trackRequests).catch((e: any) => e);
           }
 
           /* now we'll add click tracking to _all_ anchor tags */
@@ -426,9 +425,8 @@ export function getInAppMessages(
             ) => {
               if (typeof handleLinks === 'string') {
                 if (
-                  handleLinks === HANDLE_LINKS.OpenAllSameTab ||
-                  (isInternalLink &&
-                    handleLinks === HANDLE_LINKS.ExternalNewTab)
+                  handleLinks === HandleLinks.OpenAllSameTab ||
+                  (isInternalLink && handleLinks === HandleLinks.ExternalNewTab)
                 ) {
                   sameTabAction();
                 } else {
@@ -481,9 +479,9 @@ export function getInAppMessages(
                 if (clickedUrl) {
                   const isOpeningLinkInSameTab =
                     (!handleLinks && !openInNewTab) ||
-                    handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                    handleLinks === HandleLinks.OpenAllSameTab ||
                     (isInternalLink &&
-                      handleLinks === HANDLE_LINKS.ExternalNewTab);
+                      handleLinks === HandleLinks.ExternalNewTab);
 
                   trackInAppClick(
                     {
@@ -499,7 +497,7 @@ export function getInAppMessages(
                     */
                     isOpeningLinkInSameTab && !isIterableKeywordLink
                     /* swallow the network error */
-                  ).catch((e) => e);
+                  ).catch((e: any) => e);
 
                   if (isDismissNode || isActionLink) {
                     dismissMessage(activeIframe, clickedUrl);
@@ -574,7 +572,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred = options.display === DISPLAY_OPTIONS.deferred;
+    const isDeferred = options.display === DisplayOptions.Deferred;
 
     const triggerDisplayFn = isDeferred
       ? {
@@ -591,14 +589,14 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response) => {
+          .then((response: any) => {
             trackMessagesDelivered(
               response.data.inAppMessages || [],
               dupedPayload.packageName
             );
             return response;
           })
-          .then((response) => {
+          .then((response: any) => {
             if (isDeferred)
               /*
                 if the user passed "deferred" for the second argument to _getMessages_

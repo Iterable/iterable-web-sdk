@@ -1,6 +1,5 @@
 import { initialize } from '@iterable/web-sdk';
 import axios from 'axios';
-import ReactDOM from 'react-dom';
 import './styles/index.css';
 
 import Home from 'src/views/Home';
@@ -8,13 +7,16 @@ import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
 import Users from 'src/views/Users';
 import InApp from 'src/views/InApp';
+import EmbeddedMessage from 'src/views/Embedded';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
+import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 
 import { UserProvider } from 'src/context/Users';
-import { setAnonTracking } from '@iterable/web-sdk';
+import { createRoot } from 'react-dom/client';
+import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,15 +41,16 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
+  const { setEmail, setUserID, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
-    ({ email }) => {
+    ({ email, userID }) => {
       return axios
         .post(
-          'http://localhost:5000/generate',
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
           {
             exp_minutes: 2,
             email,
+            userId: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
@@ -56,14 +59,15 @@ const HomeLink = styled(Link)`
             }
           }
         )
-        .then((response) => {
+        .then((response: any) => {
           return response.data?.token;
         });
     }
   );
-  setAnonTracking(true);
 
-  ReactDOM.render(
+  const container = document.getElementById('root');
+  const root = createRoot(container);
+  root.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
@@ -73,6 +77,7 @@ const HomeLink = styled(Link)`
             </HomeLink>
             <LoginForm
               setEmail={setEmail}
+              setUserId={setUserID}
               logout={logout}
               refreshJwt={refreshJwtToken}
             />
@@ -84,11 +89,16 @@ const HomeLink = styled(Link)`
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
               <Route path="/inApp" element={<InApp />} />
+              <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
+              <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route
+                path="/embedded-msgs-impression-tracker"
+                element={<EmbeddedMsgsImpressionTracker />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>
       </Wrapper>
-    </BrowserRouter>,
-    document.getElementById('root')
+    </BrowserRouter>
   );
 })();

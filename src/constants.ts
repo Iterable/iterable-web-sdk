@@ -7,6 +7,9 @@ export const RETRY_USER_ATTEMPTS = 0;
 const IS_EU_ITERABLE_SERVICE =
   process.env.IS_EU_ITERABLE_SERVICE === 'true' ? true : false;
 
+export const dangerouslyAllowJsPopupExecution =
+  process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION === 'true' ? true : false;
+
 const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
 const EU_ITERABLE_DOMAIN = 'api.eu.iterable.com';
@@ -24,9 +27,6 @@ export const ENDPOINT_GET_USER_BY_USERID = 'users/byUserId';
 export const ENDPOINT_GET_USER_BY_EMAIL = 'users/getByEmail';
 export const ENDPOINT_MERGE_USER = 'users/merge';
 export const ENDPOINT_TRACK_ANON_SESSION = 'anonymoususer/events/session';
-
-/** @todo update once new endpoint is ready */
-export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
@@ -60,6 +60,129 @@ export const ANIMATION_DURATION = 400;
 export const DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE = 4;
 export const CLOSE_X_BUTTON_ID = 'close-x-button';
 export const ABSOLUTE_DISMISS_BUTTON_ID = 'absolute-dismiss-button';
+
+export const URL_SCHEME_ITBL = 'itbl://';
+export const URL_SCHEME_ACTION = 'action://';
+export const URL_SCHEME_OPEN = 'openUrl';
+export const SHARED_PREF_USER_ID = 'userId';
+export const SHARED_PREF_EMAIL = 'email';
+
+export type RouteConfig = {
+  route: string;
+  /** true for POST/PUT requests */
+  body: boolean;
+  /** true if email or userId in request needs to be prepended with `current` */
+  current: boolean;
+  /** true if route expects email or userId field to be nested in user object */
+  nestedUser: boolean;
+};
+
+type EndPointStructure = Record<string, RouteConfig>;
+
+export const ENDPOINTS: EndPointStructure = {
+  commerce_update_cart: {
+    route: '/commerce/updateCart',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  commerce_track_purchase: {
+    route: '/commerce/trackPurchase',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  update_email: {
+    route: '/users/updateEmail',
+    body: true,
+    current: true,
+    nestedUser: true
+  },
+  users_update: {
+    route: '/users/update',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  users_update_subscriptions: {
+    route: '/users/updateSubscriptions',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  get_in_app_messages: {
+    route: '/inApp/web/getMessages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  get_embedded_messages: {
+    route: '/embedded-messaging/messages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  event_track: {
+    route: '/events/track',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_received_event_track: {
+    route: '/embedded-messaging/events/received',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_click_event_track: {
+    route: '/embedded-messaging/events/click',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_close: {
+    route: '/events/trackInAppClose',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_open: {
+    route: '/events/trackInAppOpen',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_click: {
+    route: '/events/trackInAppClick',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_delivery: {
+    route: '/events/trackInAppDelivery',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_consume: {
+    route: '/events/inAppConsume',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_dismiss: {
+    route: '/embedded-messaging/events/dismiss',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_session_event_track: {
+    route: '/embedded-messaging/events/session',
+    body: true,
+    current: false,
+    nestedUser: false
+  }
+};
 
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION
@@ -159,8 +282,6 @@ export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
-export const SHARED_PREF_USER_ID = 'userId';
-export const SHARED_PREF_EMAIL = 'email';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';

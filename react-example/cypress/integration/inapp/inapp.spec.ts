@@ -1,6 +1,6 @@
 import * as mockMessages from '../../fixtures/inapp/200.json';
 
-const url = `/api/inApp/web/getMessages*`;
+const url = '/api/inApp/web/getMessages*';
 
 describe('Requesting In-App Messages', () => {
   it('should paint the correct 200 response', () => {

@@ -2,7 +2,6 @@ import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
 } from '../commerce/types';
-import { InAppTrackRequestParams } from '../events/types';
 import {
   GET_CRITERIA_PATH,
   KEY_EVENT_NAME,
@@ -37,6 +36,7 @@ import {
 import { trackSchema } from 'src/events/events.schema';
 import { UpdateUserParams } from 'src/users';
 import { updateUserSchema } from 'src/users/users.schema';
+import { InAppTrackRequestParams } from '..';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {

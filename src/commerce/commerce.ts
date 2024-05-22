@@ -4,7 +4,11 @@ import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import config from '../utils/config';
-import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from 'src/constants';
+import {
+  SHARED_PREF_EMAIL,
+  SHARED_PREF_USER_ID,
+  ENDPOINTS
+} from 'src/constants';
 
 const canTrackAnonUser = (payload: any): boolean => {
   if (
@@ -20,7 +24,6 @@ const canTrackAnonUser = (payload: any): boolean => {
   }
   return false;
 };
-
 export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser(payload)) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
@@ -31,7 +34,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/updateCart',
+    url: ENDPOINTS.commerce_update_cart.route,
     data: {
       ...payload,
       user: {
@@ -55,7 +58,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/trackPurchase',
+    url: ENDPOINTS.commerce_track_purchase.route,
     data: {
       ...payload,
       user: {
