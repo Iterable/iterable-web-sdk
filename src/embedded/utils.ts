@@ -90,7 +90,7 @@ export const addButtonClickEvent = (
   });
 };
 
-const handleEmbeddedClick = (clickedUrl: string | null) => {
+export const handleEmbeddedClick = (clickedUrl: string | null) => {
   if (clickedUrl && clickedUrl.trim() !== '') {
     let actionType: string;
     let actionName: string;
