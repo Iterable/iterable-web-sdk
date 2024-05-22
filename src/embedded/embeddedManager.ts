@@ -8,6 +8,7 @@ import { EmbeddedMessagingProcessor } from './embeddedMessageProcessor';
 import { ErrorMessage } from './consts';
 import { SDK_VERSION, WEB_PLATFORM, ENDPOINTS } from '../constants';
 import { trackEmbeddedReceived } from '../events/embedded/events';
+import { handleEmbeddedClick } from './utils';
 
 export class IterableEmbeddedManager {
   public appPackageName: string;
@@ -137,5 +138,9 @@ export class IterableEmbeddedManager {
   //Get the list of updateHandlers
   public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
+  }
+
+  public click(clickedUrl: string | null) {
+    handleEmbeddedClick(clickedUrl);
   }
 }

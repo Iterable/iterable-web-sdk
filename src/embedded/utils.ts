@@ -2,10 +2,10 @@ import { trackEmbeddedClick } from '../events/embedded/events';
 import {
   IterableEmbeddedButton,
   IterableAction,
-  IterableActionRunner,
   IterableActionSource,
   IterableEmbeddedMessage
-} from '../embedded';
+} from './types';
+import { IterableActionRunner } from '../utils/IterableActionRunner';
 import { ErrorHandler } from '../types';
 import {
   URL_SCHEME_ACTION,
@@ -90,7 +90,7 @@ export const addButtonClickEvent = (
   });
 };
 
-const handleEmbeddedClick = (clickedUrl: string | null) => {
+export const handleEmbeddedClick = (clickedUrl: string | null) => {
   if (clickedUrl && clickedUrl.trim() !== '') {
     let actionType: string;
     let actionName: string;
