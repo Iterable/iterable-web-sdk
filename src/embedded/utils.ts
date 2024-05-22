@@ -5,7 +5,7 @@ import {
   IterableActionRunner,
   IterableActionSource,
   IterableEmbeddedMessage
-} from '../embedded';
+} from './index';
 import { ErrorHandler } from '../types';
 import {
   URL_SCHEME_ACTION,
