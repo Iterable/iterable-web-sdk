@@ -52,7 +52,7 @@ export function initialize(
 ): WithoutJWT;
 export function initialize(
   authToken: string,
-  configOptions?: Partial<Options>,
+  configOptions: Partial<Options> = {},
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
   config.setConfig(configOptions ?? {});
