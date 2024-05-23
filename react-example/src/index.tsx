@@ -38,10 +38,6 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  config.setConfig({
-    isEuIterableService: true,
-    dangerouslyAllowJsPopups: true
-  });
   const { setEmail, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
     {
