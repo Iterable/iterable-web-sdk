@@ -777,7 +777,7 @@ export function initialize(
 export interface WithJWTParams {
   authToken: string;
   configOptions: Partial<Options>;
-  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
+  generateJWT: (payload: GenerateJWTPayload) => Promise<string>;
 }
 
 export interface WithoutJWTParams {

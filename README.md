@@ -47,7 +47,7 @@ To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERV
 ```ts
 import { initializeWithConfig } from '@iterable/web-sdk';
 
-const { clearRefresh, setEmail, setUserID, logout } = initialize({
+const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
   'my-API-key',
   {
     isEuIterableService: true,
@@ -278,7 +278,7 @@ interface InitializeParams {
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
 }
 
-initializeWithConfig: (initializeParams: InitializeParams) => Promise<string>) => {
+initializeWithConfig: (initializeParams: InitializeParams) => {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -291,7 +291,7 @@ Example:
 ```ts
 import { initializeWithConfig } from '@iterable/web-sdk';
 
-const { clearRefresh, setEmail, setUserID, logout } = initialize({
+const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
   'my-API-key',
   {
     isEuIterableService: false,
@@ -1016,7 +1016,7 @@ To allow JavaScript to run in these new tabs:
 ```ts
 import { initializeWithConfig } from '@iterable/web-sdk';
 
-const { clearRefresh, setEmail, setUserID, logout } = initialize({
+const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
   'my-API-key',
   {
     isEuIterableService: false,
