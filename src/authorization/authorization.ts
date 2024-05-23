@@ -16,7 +16,7 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { config } from '../utils/config';
+import { Options, config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
@@ -772,4 +772,35 @@ export function initialize(
       });
     }
   };
+}
+
+export interface WithJWTParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+  generateJWT: (payload: GenerateJWTPayload) => Promise<string>;
+}
+
+export interface WithoutJWTParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+}
+
+export interface InitializeParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
+}
+
+export function initializeWithConfig(initializeParams: WithJWTParams): WithJWT;
+
+export function initializeWithConfig(
+  initializeParams: WithoutJWTParams
+): WithoutJWT;
+
+export function initializeWithConfig(initializeParams: InitializeParams) {
+  const { authToken, configOptions, generateJWT } = initializeParams;
+  config.setConfig(configOptions ?? {});
+  return generateJWT
+    ? initialize(authToken, generateJWT)
+    : initialize(authToken);
 }
