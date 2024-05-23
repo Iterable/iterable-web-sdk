@@ -42,7 +42,7 @@ or with a CDN:
 
 If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints.
 
-To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with this in their builds, if this does not work, try importing `config` and adding this line
+To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with this in their builds. If this does not work, try importing `config` and adding this line
 
 ```
 config.setConfig({isEuIterableService: true});
@@ -947,7 +947,7 @@ To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `
 
 To allow JavaScript to run in these new tabs:
 
-- Where you call our `initialize` method in your app, import and call `config`.
+- Where you call our `initialize` method in your app, import and call `config` just before.
 
 ```
 config.setConfig({dangerouslyAllowJsPopups: true});
