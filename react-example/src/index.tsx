@@ -1,4 +1,10 @@
-import { initialize, config } from '@iterable/web-sdk';
+import {
+  initialize,
+  config,
+  initializeWithConfig,
+  WithoutJWTParams,
+  WithJWTParams
+} from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
@@ -38,13 +44,13 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    {
+  const initializeParams: WithJWTParams = {
+    authToken: process.env.API_KEY || '',
+    configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true
     },
-    ({ email }) => {
+    generateJWT: ({ email }) => {
       return axios
         .post(
           process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
@@ -63,7 +69,9 @@ const HomeLink = styled(Link)`
           return response.data?.token;
         });
     }
-  );
+  };
+  const { setEmail, logout, refreshJwtToken } =
+    initializeWithConfig(initializeParams);
 
   ReactDOM.render(
     <BrowserRouter>

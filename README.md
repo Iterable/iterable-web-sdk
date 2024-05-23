@@ -42,17 +42,27 @@ or with a CDN:
 
 If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints.
 
-To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with this in their builds. If this does not work, try adding `isEuIterableService: true` to the configOptions in `initialize`.
+To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with setting the environment variable. If you run into this, try migrating to [`initializeWithConfig`](#initializeWithConfig). You can then turn on the EU API usage by making these changes:
 
 ```ts
-const configOptions = {
-  isEuIterableService: true
-};
+import { initializeWithConfig } from '@iterable/web-sdk';
 
-initialize('YOUR_API_KEY_HERE', configOptions, ({ email, userID }) => ...
+const { clearRefresh, setEmail, setUserID, logout } = initialize({
+  'my-API-key',
+  {
+    isEuIterableService: true,
+  },
+  /*
+    _email_ will be defined if you call _setEmail_
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+}
+);
 ```
-
-above your `initialize` method.
 
 # API
 
@@ -62,6 +72,7 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
 | [`initialize`](#initialize)                            | Return methods for identifying users and setting a JWT                                                                                                                 |
+| [`initializeWithConfig`](#initializeWithConfig)        | Return methods for identifying users and setting a JWT while also taking a set of configuration options.                                                               |
 | [`refreshJwtToken`](#refreshJwtToken)                  | Fetch a new JWT token for the specified user and configure the SDK to use it for future requests. Only for manual token refresh.                                       |
 | [`track`](#track)                                      | Track custom events                                                                                                                                                    |
 | [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
@@ -214,7 +225,7 @@ request()
   .catch();
 ```
 
-:rotating_light: \*\_PLEASE NOTE\*\*: If you choose the `deferred` option, the SDK will \_not\* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: \*\_PLEASE NOTE*\*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
 If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to `filterHiddenInAppMessages` but does not filter out JSON-only messages.
 
@@ -223,14 +234,7 @@ If you want to keep the default sorting and filtering, please take advantage of 
 API:
 
 ```ts
-type Options = {
-  logLevel: 'none' | 'verbose';
-  baseURL: string;
-  isEuIterableService: boolean;
-  dangerouslyAllowJsPopups: boolean;
-};
-
-initialize: (authToken: string, configOptions: Partial<Options>, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => {
+initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
@@ -243,14 +247,8 @@ Example:
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-const configOptions = {
-  isEuIterableService: false,
-  dangerouslyAllowJsPopups: true
-};
-
 const { clearRefresh, setEmail, setUserID, logout } = initialize(
   'my-API-key',
-  configOptions,
   /* 
     _email_ will be defined if you call _setEmail_ 
     _userID_ will be defined if you call _setUserID_
@@ -259,6 +257,55 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
+);
+```
+
+## initializeWithConfig
+
+API:
+
+```ts
+type Options = {
+  logLevel: 'none' | 'verbose';
+  baseURL: string;
+  isEuIterableService: boolean;
+  dangerouslyAllowJsPopups: boolean;
+};
+
+interface InitializeParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
+}
+
+initializeWithConfig: (initializeParams: InitializeParams) => Promise<string>) => {
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+}
+```
+
+Example:
+
+```ts
+import { initializeWithConfig } from '@iterable/web-sdk';
+
+const { clearRefresh, setEmail, setUserID, logout } = initialize({
+  'my-API-key',
+  {
+    isEuIterableService: false,
+    dangerouslyAllowJsPopups: true,
+  },
+  /*
+    _email_ will be defined if you call _setEmail_
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+}
 );
 ```
 
@@ -508,11 +555,8 @@ Once you have a JWT or a service that can generate a JWT automatically, you're r
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-const configOptions = {
-  isEuIterableService: false,
-  dangerouslyAllowJsPopups: true
-}(() => {
-  initialize('YOUR_API_KEY_HERE', configOptions, ({ email, userID }) =>
+(() => {
+  initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -527,13 +571,9 @@ The syntax for identifying a user by user ID looks like this:
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-const configOptions = {
-  isEuIterableService: false,
-  dangerouslyAllowJsPopups: true
-}(() => {
+(() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    configOptions,
     ({ email, userID }) =>
       yourAsyncJWTGeneratorMethod({ email, userID }).then(
         ({ jwt_token }) => jwt_token
@@ -557,13 +597,9 @@ Doing this with an email is similar:
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-const configOptions = {
-  isEuIterableService: false,
-  dangerouslyAllowJsPopups: true
-}(() => {
+(() => {
   const { setEmail, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    configOptions,
     ({ email, userID }) =>
       yourAsyncJWTGeneratorMethod({ email, userID }).then(
         ({ jwt_token }) => jwt_token
@@ -590,13 +626,9 @@ Now let's put it altogether with an Iterable API method:
 ```ts
 import { initialize, track } from '@iterable/web-sdk';
 
-const configOptions = {
-  isEuIterableService: false,
-  dangerouslyAllowJsPopups: true
-}(() => {
+(() => {
   const { setUserID, logout } = initialize(
     'YOUR_API_KEY_HERE',
-    configOptions,
     ({ email, userID }) =>
       yourAsyncJWTGeneratorMethod({ email, userID }).then(
         ({ jwt_token }) => jwt_token
@@ -660,13 +692,10 @@ Normally to request a list of in-app messages, you'd make a request like this:
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    configOptions,
-    ({ email, userID }) =>
-      yourAsyncJWTGeneratorMethod({ email, userID }).then(
-        ({ jwt_token }) => jwt_token
-      )
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
   yourAsyncLoginMethod().then((response) => {
@@ -688,13 +717,10 @@ In order to take advantage of the SDK showing them automatically, you would impl
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    configOptions,
-    ({ email, userID }) =>
-      yourAsyncJWTGeneratorMethod({ email, userID }).then(
-        ({ jwt_token }) => jwt_token
-      )
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
   yourAsyncLoginMethod().then((response) => {
@@ -720,13 +746,10 @@ Optionally, you can pass arguments to fine-tune how you want the messages to app
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    configOptions,
-    ({ email, userID }) =>
-      yourAsyncJWTGeneratorMethod({ email, userID }).then(
-        ({ jwt_token }) => jwt_token
-      )
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
   yourAsyncLoginMethod().then((response) => {
@@ -761,13 +784,10 @@ You can also pause and resume the messages stream if you like
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    configOptions,
-    ({ email, userID }) =>
-      yourAsyncJWTGeneratorMethod({ email, userID }).then(
-        ({ jwt_token }) => jwt_token
-      )
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
   yourAsyncLoginMethod().then((response) => {
@@ -808,13 +828,10 @@ import {
 } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize(
-    'YOUR_API_KEY_HERE',
-    configOptions,
-    ({ email, userID }) =>
-      yourAsyncJWTGeneratorMethod({ email, userID }).then(
-        ({ jwt_token }) => jwt_token
-      )
+  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
   );
 
   yourAsyncLoginMethod().then((response) => {
@@ -887,7 +904,7 @@ As previously explained, when initializing the SDK you need to pass a function t
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-initialize('API_KEY_HERE', configOptions, ({ email, userID }) =>
+initialize('API_KEY_HERE', ({ email, userID }) =>
   yourAsyncJWTGenerationMethod({ email, userID }).then(
     (response) => response.jwt_token
   )
@@ -994,21 +1011,34 @@ To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `
 
 To allow JavaScript to run in these new tabs:
 
-- Where you call our `initialize` method in your app, add these `dangerouslyAllowJsPopups: true` to the config options object parameter.
+- You will need to migrate to the new [`initializeWithConfig`](#initializeWithConfig) method, pass in the configuration options, and set `dangerouslyAllowJsPopups` to `true`
 
 ```ts
-const configOptions = {
-  dangerouslyAllowJsPopups: true
-};
+import { initializeWithConfig } from '@iterable/web-sdk';
 
-initialize('YOUR_API_KEY_HERE', configOptions, ({ email, userID }) => ...
+const { clearRefresh, setEmail, setUserID, logout } = initialize({
+  'my-API-key',
+  {
+    isEuIterableService: false,
+    dangerouslyAllowJsPopups: true,
+  },
+  /*
+    _email_ will be defined if you call _setEmail_
+    _userID_ will be defined if you call _setUserID_
+  */
+  ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+}
+);
 ```
 
 - However, use caution. Allowing JavaScript to run in new tabs opens the door to the possibility of malicious code execution.
 
 SDK version support:
 
-- Versions [`1.0.11+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `dangerouslyAllowJsPopups` config.
+- Versions [`1.0.11+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
 
 For more information, see:
 

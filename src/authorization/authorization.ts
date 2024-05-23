@@ -43,19 +43,13 @@ export interface WithoutJWT {
 
 export function initialize(
   authToken: string,
-  configOptions: Partial<Options>,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
 ): WithJWT;
+export function initialize(authToken: string): WithoutJWT;
 export function initialize(
   authToken: string,
-  configOptions: Partial<Options>
-): WithoutJWT;
-export function initialize(
-  authToken: string,
-  configOptions: Partial<Options> = {},
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
-  config.setConfig(configOptions ?? {});
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -778,4 +772,35 @@ export function initialize(
       });
     }
   };
+}
+
+export interface WithJWTParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
+}
+
+export interface WithoutJWTParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+}
+
+export interface InitializeParams {
+  authToken: string;
+  configOptions: Partial<Options>;
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>;
+}
+
+export function initializeWithConfig(initializeParams: WithJWTParams): WithJWT;
+
+export function initializeWithConfig(
+  initializeParams: WithoutJWTParams
+): WithoutJWT;
+
+export function initializeWithConfig(initializeParams: InitializeParams) {
+  const { authToken, configOptions, generateJWT } = initializeParams;
+  config.setConfig(configOptions ?? {});
+  return generateJWT
+    ? initialize(authToken, generateJWT)
+    : initialize(authToken);
 }

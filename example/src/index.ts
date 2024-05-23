@@ -13,7 +13,6 @@ import {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    {},
     async ({ email }: GenerateJWTPayload) => {
       return axios
         .post(

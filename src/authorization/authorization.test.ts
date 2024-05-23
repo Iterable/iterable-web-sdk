@@ -9,6 +9,11 @@ import { trackPurchase, updateCart } from '../commerce';
 import { GETMESSAGES_PATH } from '../constants';
 
 let mockRequest: any = null;
+
+const localStorageMock = {
+  setItem: jest.fn()
+};
+
 /*
   decoded payload is:
 
@@ -55,7 +60,7 @@ describe('API Key Interceptors', () => {
 
   describe('non-JWT auth', () => {
     it('should add Api-Key header to all outgoing requests', async () => {
-      initialize('123', {});
+      initialize('123');
 
       const response = await getInAppMessages({
         count: 10,
@@ -65,7 +70,7 @@ describe('API Key Interceptors', () => {
     });
 
     it('should add Api-Key header to all outgoing requests with new token', async () => {
-      const { setNewAuthToken } = initialize('123', {});
+      const { setNewAuthToken } = initialize('123');
       setNewAuthToken('333');
 
       const response = await getInAppMessages({
@@ -76,7 +81,7 @@ describe('API Key Interceptors', () => {
     });
 
     it('should not add Api-Key header to all outgoing requests after cleared', async () => {
-      const { clearAuthToken } = initialize('123', {});
+      const { clearAuthToken } = initialize('123');
       clearAuthToken();
 
       const response = await getInAppMessages({
@@ -89,10 +94,10 @@ describe('API Key Interceptors', () => {
 
   describe('JWT auth', () => {
     it('should add Api-Key and Authorization headers to outgoing requests when setEmail is invoked', async () => {
-      const { setEmail } = initialize('123', {}, () =>
+      const { setEmail } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-
+      (global as any).localStorage = localStorageMock;
       await setEmail('hello@gmail.com');
 
       const response = await getInAppMessages({
@@ -106,10 +111,10 @@ describe('API Key Interceptors', () => {
     });
 
     it('should add Api-Key and Authorization headers to outgoing requests when setUserId is invoked', async () => {
-      const { setUserID } = initialize('123', {}, () =>
+      const { setUserID } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-
+      (global as any).localStorage = localStorageMock;
       await setUserID('123ffdas');
 
       const response = await getInAppMessages({
@@ -129,7 +134,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
       await setEmail('hello@gmail.com');
 
       expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
@@ -144,7 +149,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail, clearRefresh } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail, clearRefresh } = initialize('123', mockGenerateJWT);
       await setEmail('hello@gmail.com');
       clearRefresh();
 
@@ -160,7 +165,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.reject(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
 
       try {
         await setEmail('hello@gmail.com');
@@ -183,7 +188,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJW = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJW);
+      const { setEmail } = initialize('123', mockGenerateJW);
 
       try {
         await setEmail('hello@gmail.com');
@@ -201,7 +206,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
 
       await setEmail('hello@gmail.com');
       await updateUserEmail('helloworld@gmail.com');
@@ -216,7 +221,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
 
       await setEmail('hello@gmail.com');
       await updateUserEmail('helloworld@gmail.com');
@@ -240,7 +245,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
 
       await setEmail('hello@gmail.com');
       await updateUserEmail('helloworld@gmail.com');
@@ -260,8 +265,8 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setUserID } = initialize('123', {}, mockGenerateJWT);
-
+      const { setUserID } = initialize('123', mockGenerateJWT);
+      (global as any).localStorage = localStorageMock;
       await setUserID('mock-id');
       await updateUserEmail('helloworld@gmail.com');
       expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
@@ -289,7 +294,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
 
       await setEmail('first@gmail.com');
       await updateUserEmail('second@gmail.com');
@@ -321,7 +326,7 @@ describe('API Key Interceptors', () => {
       const mockGenerateJWT = jest
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY));
-      const { setEmail } = initialize('123', {}, mockGenerateJWT);
+      const { setEmail } = initialize('123', mockGenerateJWT);
       await setEmail('hello@gmail.com');
       // clearRefresh();
 
@@ -357,7 +362,7 @@ describe('User Identification', () => {
 
     describe('logout', () => {
       it('logout method removes the email field from requests', async () => {
-        const { logout, setEmail } = initialize('123', {});
+        const { logout, setEmail } = initialize('123');
         setEmail('hello@gmail.com');
         logout();
 
@@ -369,7 +374,8 @@ describe('User Identification', () => {
       });
 
       it('logout method removes the userId field from requests', async () => {
-        const { logout, setUserID } = initialize('123', {});
+        (global as any).localStorage = localStorageMock;
+        const { logout, setUserID } = initialize('123');
         await setUserID('hello@gmail.com');
         logout();
 
@@ -383,7 +389,7 @@ describe('User Identification', () => {
 
     describe('setEmail', () => {
       it('adds email param to endpoint that need an email as a param', async () => {
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
 
         const response = await getInAppMessages({
@@ -396,7 +402,7 @@ describe('User Identification', () => {
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
         setEmail('new@gmail.com');
 
@@ -414,7 +420,7 @@ describe('User Identification', () => {
       });
 
       it('adds email body to endpoint that need an email as a body', async () => {
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
 
         mockRequest.onPost('/events/trackInAppClose').reply(200, {
@@ -453,7 +459,7 @@ describe('User Identification', () => {
       });
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/updateEmail').reply(200, {
@@ -468,7 +474,7 @@ describe('User Identification', () => {
       });
 
       it('should add user.email param to endpoints that need it', async () => {
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
 
         mockRequest.onPost('/commerce/updateCart').reply(200, {
@@ -489,7 +495,7 @@ describe('User Identification', () => {
       });
 
       it('adds no email body or header information to unrelated endpoints', async () => {
-        const { setEmail } = initialize('123', {});
+        const { setEmail } = initialize('123');
         setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/hello').reply(200, {
@@ -510,7 +516,7 @@ describe('User Identification', () => {
       });
 
       it('should overwrite user ID set by setUserID', async () => {
-        const { setEmail, setUserID } = initialize('123', {});
+        const { setEmail, setUserID } = initialize('123');
         await setUserID('999');
         setEmail('hello@gmail.com');
 
@@ -528,7 +534,7 @@ describe('User Identification', () => {
         mockRequest.resetHistory();
       });
       it('adds userId param to endpoint that need an userId as a param', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         const response = await getInAppMessages({
@@ -540,7 +546,7 @@ describe('User Identification', () => {
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
         await setUserID('111');
 
@@ -558,7 +564,7 @@ describe('User Identification', () => {
       });
 
       it('adds userId param to endpoint that need an userId as a param', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         const response = await getInAppMessages({
@@ -569,7 +575,7 @@ describe('User Identification', () => {
       });
 
       it('adds userId body to endpoint that need an userId as a body', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         mockRequest.onPost('/events/trackInAppClose').reply(200, {
@@ -600,7 +606,7 @@ describe('User Identification', () => {
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         mockRequest.onPost('/users/updateEmail').reply(200, {
@@ -612,7 +618,7 @@ describe('User Identification', () => {
       });
 
       it('should add user.userId param to endpoints that need it', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         mockRequest.onPost('/commerce/updateCart').reply(200, {
@@ -629,7 +635,7 @@ describe('User Identification', () => {
       });
 
       it('adds no userId body or header information to unrelated endpoints', async () => {
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         mockRequest.onPost('/users/hello').reply(200, {
@@ -650,7 +656,7 @@ describe('User Identification', () => {
       });
 
       it('should overwrite email set by setEmail', async () => {
-        const { setEmail, setUserID } = initialize('123', {});
+        const { setEmail, setUserID } = initialize('123');
         setEmail('hello@gmail.com');
         await setUserID('999');
 
@@ -665,7 +671,7 @@ describe('User Identification', () => {
       it('should try /users/update 0 times if request to create a user fails', async () => {
         mockRequest.onPost('/users/update').reply(400, {});
 
-        const { setUserID } = initialize('123', {});
+        const { setUserID } = initialize('123');
         await setUserID('999');
 
         expect(
@@ -690,7 +696,7 @@ describe('User Identification', () => {
 
     describe('logout', () => {
       it('logout method removes the email field from requests', async () => {
-        const { logout, setEmail } = initialize('123', {}, () =>
+        const { logout, setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -704,7 +710,7 @@ describe('User Identification', () => {
       });
 
       it('logout method removes the userId field from requests', async () => {
-        const { logout, setUserID } = initialize('123', {}, () =>
+        const { logout, setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('hello@gmail.com');
@@ -720,7 +726,7 @@ describe('User Identification', () => {
 
     describe('setEmail', () => {
       it('adds email param to endpoint that need an email as a param', async () => {
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -735,7 +741,7 @@ describe('User Identification', () => {
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -755,7 +761,7 @@ describe('User Identification', () => {
       });
 
       it('adds email body to endpoint that need an email as a body', async () => {
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -796,7 +802,7 @@ describe('User Identification', () => {
       });
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -813,7 +819,7 @@ describe('User Identification', () => {
       });
 
       it('should add user.email param to endpoints that need it', async () => {
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -836,7 +842,7 @@ describe('User Identification', () => {
       });
 
       it('adds no email body or header information to unrelated endpoints', async () => {
-        const { setEmail } = initialize('123', {}, () =>
+        const { setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -859,7 +865,7 @@ describe('User Identification', () => {
       });
 
       it('should overwrite user ID set by setUserID', async () => {
-        const { setEmail, setUserID } = initialize('123', {}, () =>
+        const { setEmail, setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -879,7 +885,7 @@ describe('User Identification', () => {
         mockRequest.resetHistory();
       });
       it('adds userId param to endpoint that need an userId as a param', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -893,7 +899,7 @@ describe('User Identification', () => {
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -913,7 +919,7 @@ describe('User Identification', () => {
       });
 
       it('adds userId param to endpoint that need an userId as a param', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -926,7 +932,7 @@ describe('User Identification', () => {
       });
 
       it('adds userId body to endpoint that need an userId as a body', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -959,7 +965,7 @@ describe('User Identification', () => {
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -973,7 +979,7 @@ describe('User Identification', () => {
       });
 
       it('should add user.userId param to endpoints that need it', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -992,7 +998,7 @@ describe('User Identification', () => {
       });
 
       it('adds no userId body or header information to unrelated endpoints', async () => {
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setUserID('999');
@@ -1015,7 +1021,7 @@ describe('User Identification', () => {
       });
 
       it('should overwrite email set by setEmail', async () => {
-        const { setUserID, setEmail } = initialize('123', {}, () =>
+        const { setUserID, setEmail } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         await setEmail('hello@gmail.com');
@@ -1032,7 +1038,7 @@ describe('User Identification', () => {
       it('should try /users/update 0 times if request to create a user fails', async () => {
         mockRequest.onPost('/users/update').reply(400, {});
 
-        const { setUserID } = initialize('123', {}, () =>
+        const { setUserID } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
         try {
@@ -1053,7 +1059,7 @@ describe('User Identification', () => {
       });
 
       it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
-        const { refreshJwtToken } = initialize('123', {}, () =>
+        const { refreshJwtToken } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
 
@@ -1069,7 +1075,7 @@ describe('User Identification', () => {
       });
 
       it('should add Api-Key and Authorization headers to outgoing requests when refreshJwtToken is invoked', async () => {
-        const { refreshJwtToken } = initialize('123', {}, () =>
+        const { refreshJwtToken } = initialize('123', () =>
           Promise.resolve(MOCK_JWT_KEY)
         );
 
@@ -1092,7 +1098,7 @@ describe('User Identification', () => {
         const mockGenerateJWT = jest
           .fn()
           .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
-        const { refreshJwtToken } = initialize('123', {}, mockGenerateJWT);
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
         await refreshJwtToken('hello@gmail.com');
 
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
@@ -1107,7 +1113,7 @@ describe('User Identification', () => {
         const mockGenerateJWT = jest
           .fn()
           .mockReturnValue(Promise.reject(MOCK_JWT_KEY));
-        const { refreshJwtToken } = initialize('123', {}, mockGenerateJWT);
+        const { refreshJwtToken } = initialize('123', mockGenerateJWT);
 
         try {
           await refreshJwtToken('hello@gmail.com');
