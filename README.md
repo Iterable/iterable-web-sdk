@@ -40,9 +40,15 @@ or with a CDN:
 
 # Iterable's European data center (EUDC)
 
-If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints. 
+If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints.
 
-To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. 
+To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with this in their builds, if this does not work, try importing `config` and adding this line
+
+```
+config.setConfig({isEuIterableService: true});
+```
+
+above your `initialize` method.
 
 # API
 
@@ -76,7 +82,10 @@ The SDK does not track `inAppDelete` events.
 API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
 
 ```ts
-getInAppMessages: (payload: InAppMessagesRequestParams, options?: { display: 'deferred' | 'immediate' }) => Promise<TrackConsumeData> | PaintInAppMessageData
+getInAppMessages: (
+  payload: InAppMessagesRequestParams,
+  options?: { display: 'deferred' | 'immediate' }
+) => Promise<TrackConsumeData> | PaintInAppMessageData;
 ```
 
 :rotating_light: Notice: v1.0.0 of this SDK deprecates support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
@@ -85,18 +94,17 @@ SDK Specific Options:
 
 Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
 
-| Property Name                | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
-| animationDuration            | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
-| bottomOffset                 | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| displayInterval              | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
-| handleLinks                  | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
-| onOpenScreenReaderMessage    | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
-| onOpenNodeToTakeFocus        | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
-| rightOffset                  | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| topOffset                    | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| closeButton | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
-
+| Property Name             | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
+| animationDuration         | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
+| bottomOffset              | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| displayInterval           | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
+| handleLinks               | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| onOpenScreenReaderMessage | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
+| onOpenNodeToTakeFocus     | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
+| rightOffset               | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| topOffset                 | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| closeButton               | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
 
 Close Button Options:
 
@@ -202,7 +210,7 @@ request()
   .catch();
 ```
 
-:rotating_light: *_PLEASE NOTE_*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating*light: \*\_PLEASE NOTE*\*: If you choose the `deferred` option, the SDK will _not_ do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
 
 If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to `filterHiddenInAppMessages` but does not filter out JSON-only messages.
 
@@ -242,7 +250,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
 API:
 
 ```ts
-refreshJwtToken: (authTypes: string) => Promise<string>
+refreshJwtToken: (authTypes: string) => Promise<string>;
 ```
 
 Example:
@@ -250,16 +258,15 @@ Example:
 ```ts
 import { initialize } from '@iterable/web-sdk';
 
-refreshJwtToken("user@example.com").then().catch();
+refreshJwtToken('user@example.com').then().catch();
 ```
-
 
 ## track
 
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
 
 ```ts
-track: (payload: InAppTrackRequestParams) => Promise<TrackData>
+track: (payload: InAppTrackRequestParams) => Promise<TrackData>;
 ```
 
 Example:
@@ -275,7 +282,7 @@ track({ eventName: 'my-event' }).then().catch();
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
 
 ```ts
-trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>
+trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>;
 ```
 
 Example:
@@ -296,7 +303,7 @@ trackInAppClick({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
 
 ```ts
-trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>
+trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>;
 ```
 
 Example:
@@ -317,7 +324,8 @@ trackInAppClose({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
 
 ```ts
-trackInAppConsume: (payload: InAppEventRequestParams) => Promise<TrackConsumeData>
+trackInAppConsume: (payload: InAppEventRequestParams) =>
+  Promise<TrackConsumeData>;
 ```
 
 Example:
@@ -338,7 +346,8 @@ trackInAppConsume({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
 
 ```ts
-trackInAppDelivery: (payload: InAppEventRequestParams) => Promise<TrackDeliveryData>
+trackInAppDelivery: (payload: InAppEventRequestParams) =>
+  Promise<TrackDeliveryData>;
 ```
 
 Example:
@@ -359,7 +368,7 @@ trackInAppDelivery({
 API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
 
 ```ts
-trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>
+trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>;
 ```
 
 Example:
@@ -380,7 +389,8 @@ trackInAppOpen({
 API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
 
 ```ts
-trackPurchase: (payload: TrackPurchaseRequestParams) => Promise<TrackPurchaseData>
+trackPurchase: (payload: TrackPurchaseRequestParams) =>
+  Promise<TrackPurchaseData>;
 ```
 
 Example:
@@ -401,7 +411,7 @@ trackPurchase({
 API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
 
 ```ts
-updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>
+updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>;
 ```
 
 Example:
@@ -421,7 +431,8 @@ updateCart({
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
 
 ```ts
-updateSubscriptions: (payload?: UpdateSubscriptionParams) => Promise<UpdateSubsData>
+updateSubscriptions: (payload?: UpdateSubscriptionParams) =>
+  Promise<UpdateSubsData>;
 ```
 
 Example:
@@ -439,7 +450,7 @@ updateSubscriptions({ emailListIds: [1, 2, 3] })
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
 
 ```ts
-updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>
+updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>;
 ```
 
 Example:
@@ -455,7 +466,7 @@ updateUser({ dataFields: {} }).then().catch();
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
 
 ```ts
-updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>
+updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>;
 ```
 
 Example:
@@ -465,7 +476,6 @@ import { updateUserEmail } from '@iterable/web-sdk';
 
 updateUserEmail('user@example.com').then().catch();
 ```
-
 
 # FAQ
 
@@ -933,14 +943,19 @@ const SomeComponent = () => {
 
 ## Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
 
-To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`.  On Safari, this configuration blocks JavaScript execution in tabs that open because of link clicks in the `iframe`.
+To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`. On Safari, this configuration blocks JavaScript execution in tabs that open because of link clicks in the `iframe`.
 
-To allow JavaScript to run in these new tabs: 
+To allow JavaScript to run in these new tabs:
 
-- On your web server, set the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable to `true`. This adds `allow-popups-to-escape-sandbox` to the `iframe`'s `sandbox` attribute, which allows new tabs to open with a clean browsing context.
+- Where you call our `initialize` method in your app, import and call `config`.
+
+```
+config.setConfig({dangerouslyAllowJsPopups: true});
+```
+
 - However, use caution. Allowing JavaScript to run in new tabs opens the door to the possibility of malicious code execution.
 
-SDK version support: 
+SDK version support:
 
 - Versions [`1.0.10+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
 
