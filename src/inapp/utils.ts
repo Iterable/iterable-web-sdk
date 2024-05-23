@@ -1,13 +1,13 @@
 import { by } from '@pabra/sortby';
 import {
   ANIMATION_DURATION,
-  dangerouslyAllowJsPopupExecution,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
 } from 'src/constants';
 import { WebInAppDisplaySettings } from 'src/inapp';
 import { srSpeak } from 'src/utils/srSpeak';
 import { trackInAppDelivery } from '../events';
 import { CloseButtonPosition, InAppMessage } from './types';
+import { config } from '..';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -288,7 +288,9 @@ const generateSecuredIFrame = () => {
   iframe.setAttribute(
     'sandbox',
     `allow-same-origin allow-popups allow-top-navigation ${
-      dangerouslyAllowJsPopupExecution ? 'allow-popups-to-escape-sandbox' : ''
+      config.getConfig('dangerouslyAllowJsPopups')
+        ? 'allow-popups-to-escape-sandbox'
+        : ''
     }`
   );
   /*

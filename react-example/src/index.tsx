@@ -1,4 +1,4 @@
-import { initialize } from '@iterable/web-sdk';
+import { initialize, config } from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
@@ -38,6 +38,10 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
+  config.setConfig({
+    isEuIterableService: false,
+    dangerouslyAllowJsPopups: true
+  });
   const { setEmail, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
     ({ email }) => {
