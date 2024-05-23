@@ -39,11 +39,15 @@ const HomeLink = styled(Link)`
 
 ((): void => {
   config.setConfig({
-    isEuIterableService: false,
+    isEuIterableService: true,
     dangerouslyAllowJsPopups: true
   });
   const { setEmail, logout, refreshJwtToken } = initialize(
     process.env.API_KEY || '',
+    {
+      isEuIterableService: false,
+      dangerouslyAllowJsPopups: true
+    },
     ({ email }) => {
       return axios
         .post(

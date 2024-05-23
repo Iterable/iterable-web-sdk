@@ -1,5 +1,5 @@
 import Axios, { AxiosRequestConfig } from 'axios';
-import { BASE_URL, STATIC_HEADERS } from './constants';
+import { BASE_URL, STATIC_HEADERS, EU_ITERABLE_API } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { AnySchema, ValidationError } from 'yup';
 import { config } from './utils/config';
@@ -36,9 +36,13 @@ export const baseIterableRequest = <T = any>(
       });
     }
 
+    const baseURL = config.getConfig('isEuIterableService')
+      ? EU_ITERABLE_API
+      : config.getConfig('baseURL');
+
     return baseAxiosRequest({
       ...payload,
-      baseURL: config.getConfig('baseURL') || BASE_URL,
+      baseURL,
       headers: {
         ...payload.headers,
         ...STATIC_HEADERS

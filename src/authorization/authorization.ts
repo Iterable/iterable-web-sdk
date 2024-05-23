@@ -16,7 +16,7 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { config } from '../utils/config';
+import { Options, config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
@@ -43,13 +43,19 @@ export interface WithoutJWT {
 
 export function initialize(
   authToken: string,
+  configOptions: Partial<Options>,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
 ): WithJWT;
-export function initialize(authToken: string): WithoutJWT;
 export function initialize(
   authToken: string,
+  configOptions: Partial<Options>
+): WithoutJWT;
+export function initialize(
+  authToken: string,
+  configOptions?: Partial<Options>,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
+  config.setConfig(configOptions ?? {});
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */

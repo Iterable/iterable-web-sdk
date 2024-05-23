@@ -1,6 +1,6 @@
 import { BASE_URL } from '../constants';
 
-type Options = {
+export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
   isEuIterableService: boolean;

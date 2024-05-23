@@ -13,6 +13,8 @@ const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
 const EU_ITERABLE_DOMAIN = 'api.eu.iterable.com';
 
+export const EU_ITERABLE_API = `https://${EU_ITERABLE_DOMAIN}/api`;
+
 const ITERABLE_API_URL = `https://${
   config.getConfig('isEuIterableService') || IS_EU_ITERABLE_SERVICE
     ? EU_ITERABLE_DOMAIN
