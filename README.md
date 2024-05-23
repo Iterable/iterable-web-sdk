@@ -957,7 +957,7 @@ config.setConfig({dangerouslyAllowJsPopups: true});
 
 SDK version support:
 
-- Versions [`1.0.10+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
+- Versions [`1.0.11+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `dangerouslyAllowJsPopups` config.
 
 For more information, see:
 
