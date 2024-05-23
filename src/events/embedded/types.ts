@@ -12,8 +12,6 @@ export interface IterableEmbeddedImpression {
 }
 
 export interface IterableEmbeddedDismissRequestPayload {
-  email?: string;
-  userId?: string;
   messageId: string;
   buttonIdentifier: string;
   createdAt: number;
@@ -23,7 +21,7 @@ export interface IterableEmbeddedDismissRequestPayload {
 export interface IterableEmbeddedClickRequestPayload {
   messageId: string;
   buttonIdentifier: string;
-  clickedUrl: string;
+  targetUrl: string;
   appPackageName: string;
 }
 
