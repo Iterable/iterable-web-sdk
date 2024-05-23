@@ -1,10 +1,4 @@
-import {
-  initialize,
-  config,
-  initializeWithConfig,
-  WithoutJWTParams,
-  WithJWTParams
-} from '@iterable/web-sdk';
+import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
