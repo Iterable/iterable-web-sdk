@@ -6,12 +6,15 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 /* how many times we try to create a new user when _setUserID_ is invoked */
 export const RETRY_USER_ATTEMPTS = 0;
 
+const IS_EU_ITERABLE_SERVICE =
+  process.env.IS_EU_ITERABLE_SERVICE === 'true' ? true : false;
+
 const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
 const EU_ITERABLE_DOMAIN = 'api.eu.iterable.com';
 
 const ITERABLE_API_URL = `https://${
-  config.getConfig('isEuIterableService')
+  config.getConfig('isEuIterableService') || IS_EU_ITERABLE_SERVICE
     ? EU_ITERABLE_DOMAIN
     : US_ITERABLE_DOMAIN
 }/api`;

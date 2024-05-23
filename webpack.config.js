@@ -7,11 +7,14 @@ function getParsedEnv() {
   if (!env.error) {
     return {
       ...env.parsed,
-      VERSION: version
+      VERSION: version,
+      IS_EU_ITERABLE_SERVICE: process.env.IS_EU_ITERABLE_SERVICE || false
     };
   }
 
-  return { VERSION: version };
+  return {
+    VERSION: version
+  };
 }
 
 module.exports = {
