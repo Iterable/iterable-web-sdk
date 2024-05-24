@@ -3,7 +3,8 @@ import {
   IterableEmbeddedButton,
   IterableAction,
   IterableActionSource,
-  IterableEmbeddedMessage
+  IterableEmbeddedMessage,
+  IterableEmbeddedDefaultAction
 } from './types';
 import { IterableActionRunner } from '../utils/IterableActionRunner';
 import { ErrorHandler } from '../types';
@@ -13,7 +14,7 @@ import {
   URL_SCHEME_OPEN
 } from 'src/constants';
 
-function getClickedUrl(action?: any): string {
+function getTargetUrl(action?: IterableEmbeddedDefaultAction): string {
   if (!action) return '';
 
   if (action.type === URL_SCHEME_OPEN) {
@@ -28,7 +29,7 @@ export const handleElementClick = (
   appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
-  const targetUrl = getClickedUrl(message?.elements?.defaultAction);
+  const targetUrl = getTargetUrl(message?.elements?.defaultAction);
   handleEmbeddedClick(targetUrl);
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
@@ -51,7 +52,7 @@ export const handleButtonClick = (
   appPackageName: string,
   errorCallback?: ErrorHandler
 ) => {
-  const targetUrl = getClickedUrl(button?.action);
+  const targetUrl = getTargetUrl(button?.action);
   handleEmbeddedClick(targetUrl);
   trackEmbeddedClick({
     messageId: message.metadata.messageId,
