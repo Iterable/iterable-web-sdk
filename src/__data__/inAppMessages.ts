@@ -1,4 +1,4 @@
-import { InAppMessage } from '../inapp/types';
+import { DisplayPosition, InAppMessage } from '../inapp/types';
 
 const normalMessage: InAppMessage = {
   messageId: 'normalMessage!',
@@ -34,7 +34,7 @@ const normalMessage: InAppMessage = {
       }
     },
     webInAppDisplaySettings: {
-      position: 'Center'
+      position: DisplayPosition.Center
     }
   },
   customPayload: {},
@@ -88,7 +88,7 @@ const expiredMessage: InAppMessage = {
       }
     },
     webInAppDisplaySettings: {
-      position: 'Center'
+      position: DisplayPosition.Center
     }
   },
   customPayload: {
@@ -147,7 +147,7 @@ const previouslyCachedMessage: InAppMessage = {
       shouldAnimate: true
     },
     webInAppDisplaySettings: {
-      position: 'Center'
+      position: DisplayPosition.Center
     }
   },
   customPayload: {},

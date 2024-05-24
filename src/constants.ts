@@ -7,6 +7,9 @@ export const RETRY_USER_ATTEMPTS = 0;
 const IS_EU_ITERABLE_SERVICE =
   process.env.IS_EU_ITERABLE_SERVICE === 'true' ? true : false;
 
+export const dangerouslyAllowJsPopupExecution =
+  process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION === 'true' ? true : false;
+
 const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
 const EU_ITERABLE_DOMAIN = 'api.eu.iterable.com';
@@ -14,6 +17,8 @@ const EU_ITERABLE_DOMAIN = 'api.eu.iterable.com';
 const ITERABLE_API_URL = `https://${
   IS_EU_ITERABLE_SERVICE ? EU_ITERABLE_DOMAIN : US_ITERABLE_DOMAIN
 }/api`;
+
+export const EU_ITERABLE_API = `https://${EU_ITERABLE_DOMAIN}/api`;
 
 // Do not set `process.env.BASE_URL` if intending on using the prod or EU APIs.
 export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
