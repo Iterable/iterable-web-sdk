@@ -50,6 +50,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser(payload)) {
+    console.log('inside trackPurchase Anon');
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     const errorMessage =

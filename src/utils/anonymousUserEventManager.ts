@@ -208,6 +208,21 @@ export class AnonymousUserEventManager {
     }
   }
 
+  private injectUserDataIntoJSON(event: any) {
+    let userDataJson = {};
+    if (this.getUserID() !== null) {
+      userDataJson = {
+        [SHARED_PREF_USER_ID]: this.getUserID()
+      };
+    } else {
+      userDataJson = {
+        [SHARED_PREF_EMAIL]: this.getEmail()
+      };
+    }
+    event.user = userDataJson;
+    return event;
+  }
+
   async syncEvents() {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
@@ -221,30 +236,19 @@ export class AnonymousUserEventManager {
 
         switch (eventType) {
           case TRACK_EVENT: {
-            await this.track(event);
+            await this.track(this.injectUserDataIntoJSON(event));
             break;
           }
           case TRACK_PURCHASE: {
-            let userDataJson = {};
-            if (this.getEmail() !== null) {
-              userDataJson = {
-                [SHARED_PREF_EMAIL]: this.getEmail()
-              };
-            } else {
-              userDataJson = {
-                [SHARED_PREF_USER_ID]: this.getUserID()
-              };
-            }
-            event.user = userDataJson;
-            await this.trackPurchase(event);
+            await this.trackPurchase(this.injectUserDataIntoJSON(event));
             break;
           }
           case TRACK_UPDATE_CART: {
-            await this.updateCart(event);
+            await this.updateCart(this.injectUserDataIntoJSON(event));
             break;
           }
           case UPDATE_USER: {
-            await this.updateUser(event);
+            await this.updateUser(this.injectUserDataIntoJSON(event));
             break;
           }
           default: {

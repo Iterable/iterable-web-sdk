@@ -21,6 +21,7 @@ import {
   isEmail
 } from './utils';
 import { config } from '../utils/config';
+import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
 
 const MAX_TIMEOUT = ONE_DAY;
 
@@ -54,6 +55,20 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
       routeConfig.nestedUser === entry[1].nestedUser
   );
 
+export function setAnonTracking(enableAnonTracking: boolean) {
+  config.setConfig({ enableAnonTracking: enableAnonTracking });
+
+  try {
+    if (config.getConfig('enableAnonTracking')) {
+      const anonUserManager = new AnonymousUserEventManager();
+      anonUserManager.getAnonCriteria();
+      anonUserManager.updateAnonSession();
+    }
+  } catch (error) {
+    console.warn(error);
+  }
+}
+
 export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
@@ -73,7 +88,6 @@ export function initialize(
     }
     return;
   }
-
   /* 
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT

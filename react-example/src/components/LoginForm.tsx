@@ -37,10 +37,10 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string>;
-  setUserId: (userId: string) => Promise<string>;
+  setEmail: (email: string) => void;
+  setUserId: (userId: string) => void;
   logout: () => void;
-  refreshJwt: (authTypes: string) => Promise<string>;
+  refreshJwt: (authTypes: string) => void;
 }
 
 export const LoginForm: FC<Props> = ({

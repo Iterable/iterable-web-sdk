@@ -1,4 +1,4 @@
-import { initialize } from '@iterable/web-sdk';
+import { initialize, setAnonTracking } from '@iterable/web-sdk';
 import axios from 'axios';
 import './styles/index.css';
 
@@ -41,29 +41,9 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, setUserID, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    ({ email, userID }) => {
-      return axios
-        .post(
-          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            userId: userID,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response: any) => {
-          return response.data?.token;
-        });
-    }
-  );
+  const { setEmail, setUserID, logout } = initialize(process.env.API_KEY || '');
+
+  setAnonTracking(true);
 
   const container = document.getElementById('root');
   const root = createRoot(container);
@@ -76,10 +56,12 @@ const HomeLink = styled(Link)`
               Home
             </HomeLink>
             <LoginForm
-              setEmail={setEmail}
-              setUserId={setUserID}
+              setEmail={(email) => setEmail(email)}
+              setUserId={(userId) => setUserID(userId)}
               logout={logout}
-              refreshJwt={refreshJwtToken}
+              refreshJwt={() => {
+                console.log('aa');
+              }}
             />
           </HeaderWrapper>
           <RouteWrapper>
