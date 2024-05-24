@@ -104,13 +104,13 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     const buttonIdentifier = 'button-123';
-    const clickedUrl = 'https://example.com';
+    const targetUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
 
     trackEmbeddedClick({
       messageId: payload.messageId,
       buttonIdentifier,
-      clickedUrl,
+      targetUrl,
       appPackageName
     })
       .then((response: any) => {

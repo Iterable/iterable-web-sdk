@@ -272,12 +272,12 @@ describe('Events Requests', () => {
 
     (global as any).localStorage = localStorageMock;
     const buttonIdentifier = 'button-123';
-    const clickedUrl = 'https://example.com';
+    const targetUrl = 'https://example.com';
     const appPackageName = 'my-lil-site';
     const response = await trackEmbeddedClick({
       messageId: payload.messageId,
       buttonIdentifier,
-      clickedUrl,
+      targetUrl,
       appPackageName
     });
 
@@ -383,7 +383,7 @@ describe('Events Requests', () => {
     const trackEmClickResponse = await trackEmbeddedClick({
       messageId: 'abc123',
       buttonIdentifier: 'button-123',
-      clickedUrl: 'https://example.com',
+      targetUrl: 'https://example.com',
       appPackageName: 'my-lil-site'
     });
     const trackSessionResponse = await trackEmbeddedSession({
