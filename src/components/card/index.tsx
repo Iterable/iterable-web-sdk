@@ -22,14 +22,16 @@ const emptyElement = {
 export function IterableEmbeddedCard({
   appPackageName,
   message,
-  parent = emptyElement,
-  img = emptyElement,
-  title = emptyElement,
-  primaryButton = emptyElement,
-  secondaryButton = emptyElement,
-  body = emptyElement,
-  buttonsDiv = emptyElement,
-  textTitle = emptyElement,
+  htmlElements = {
+    parent: emptyElement,
+    img: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement
+  },
   errorCallback
 }: OOTB): string {
   const cardSelector = `${message?.metadata?.messageId}-card`;
@@ -82,56 +84,50 @@ export function IterableEmbeddedCard({
     return '';
   return `
     <div 
-      id="${parent?.id || ''}"
+      id="${htmlElements?.parent?.id}"
       name="${cardSelector}"
       style="${defaultCardStyles(message?.elements?.defaultAction)} ${
-    parent?.styles || ''
+    htmlElements?.parent?.styles
   }" 
     >
       ${
         message?.elements?.mediaUrl
-          ? `<img id="${img?.id}" style="${defaultImageStyles} ${
-              img?.styles || ''
-            }" 
+          ? `<img id="${htmlElements?.img?.id}" style="${defaultImageStyles} ${htmlElements?.img?.styles}" 
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div id="${textTitle?.id}" style="${defaultTextParentStyles}; ${
-    textTitle?.styles || ''
+      <div id="${htmlElements?.textTitle?.id}" style="${defaultTextParentStyles}; ${
+    htmlElements?.textTitle?.styles
   }">
         ${
           trimmedTitle.length
-            ? `<text class="titleText" id="${
-                title?.id
-              }" style="${defaultTitleStyles} ${
-                title?.styles || ''
-              }">${trimmedTitle}</text>`
+            ? `<text class="titleText" id="${htmlElements?.title?.id}" style="${defaultTitleStyles} ${htmlElements?.title?.styles}">${trimmedTitle}</text>`
             : ''
         }
         ${
           trimmedBody.length
-            ? `<text class="titleText" id="${
-                body?.id
-              }" style="${defaultBodyStyles} ${
-                body?.styles || ''
-              }">${trimmedBody}</text>`
+            ? `<text class="titleText" id="${htmlElements?.body?.id}" style="${defaultBodyStyles} ${htmlElements?.body?.styles}">${trimmedBody}</text>`
             : ''
         }
       </div>
-      <div id="${buttonsDiv?.id}" style="${cardButtons}; ${
-    buttonsDiv?.styles || ''
+      <div id="${htmlElements?.buttonsDiv?.id}" style="${cardButtons}; ${
+    htmlElements?.buttonsDiv?.styles
   }">
       ${
         message?.elements?.buttons?.[0]
           ? `<button 
                key="button-${message?.metadata.messageId}" 
-               ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+               ${
+                 htmlElements?.primaryButton?.disabledStyles
+                   ? 'disabled'
+                   : 'enabled'
+               } 
                data-index="0"
                name="${primaryButtonSelector}"
-               id="${primaryButton?.id}"
-               style="${defaultButtonStyles} ${primaryButton?.styles || ''} ${
-              primaryButton?.disabledStyles || ''
-            }"
+               id="${htmlElements?.primaryButton?.id}"
+               style="${defaultButtonStyles} ${
+              htmlElements?.primaryButton?.styles
+            } ${htmlElements?.primaryButton?.disabledStyles}"
              >
              ${message.elements.buttons[0].title}
            </button>`
@@ -141,13 +137,17 @@ export function IterableEmbeddedCard({
         message?.elements?.buttons?.[1]
           ? `<button 
                key="button-${message?.metadata.messageId}" 
-               ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+               ${
+                 htmlElements?.secondaryButton?.disabledStyles
+                   ? 'disabled'
+                   : 'enabled'
+               } 
                data-index="1"
                name="${secondaryButtonSelector}"
-               id="${secondaryButton?.id}"
-               style="${defaultButtonStyles} ${secondaryButton?.styles || ''} ${
-              secondaryButton?.disabledStyles || ''
-            }"
+               id="${htmlElements?.secondaryButton?.id}"
+               style="${defaultButtonStyles} ${
+              htmlElements?.secondaryButton?.styles
+            } ${htmlElements?.secondaryButton?.disabledStyles}"
              >
                ${message.elements.buttons[1].title}
            </button>`

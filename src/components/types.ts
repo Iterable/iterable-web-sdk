@@ -15,9 +15,7 @@ export type OutOfTheBoxButton = OutOfTheBoxElement & {
   disabledStyles?: string;
 };
 
-export type OOTB = {
-  appPackageName: string;
-  message: IterableEmbeddedMessage;
+type Elements = {
   /** img div*/
   img?: OutOfTheBoxElement;
   /** title div*/
@@ -36,6 +34,12 @@ export type OOTB = {
   textTitle?: OutOfTheBoxElement;
   /** textTitleImg div*/
   textTitleImg?: OutOfTheBoxElement;
+};
+
+export type OOTB = {
+  appPackageName: string;
+  message: IterableEmbeddedMessage;
+  htmlElements?: Elements;
   /** callback method to handle button or element click errors*/
   errorCallback?: ErrorHandler;
 };

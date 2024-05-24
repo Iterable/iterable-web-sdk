@@ -21,15 +21,17 @@ const emptyElement = {
 export function IterableEmbeddedBanner({
   appPackageName,
   message,
-  parent = emptyElement,
-  img = emptyElement,
-  title = emptyElement,
-  primaryButton = emptyElement,
-  secondaryButton = emptyElement,
-  body = emptyElement,
-  buttonsDiv = emptyElement,
-  textTitle = emptyElement,
-  textTitleImg = emptyElement,
+  htmlElements = {
+    parent: emptyElement,
+    img: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement,
+    textTitleImg: emptyElement
+  },
   errorCallback
 }: OOTB): string {
   const bannerSelector = `${message?.metadata?.messageId}-banner`;
@@ -84,56 +86,56 @@ export function IterableEmbeddedBanner({
 
   return `
     <div 
-      id="${parent?.id}"
+      id="${htmlElements?.parent?.id}"
       name="${bannerSelector}"
       style="${defaultBannerStyles(message?.elements?.defaultAction)} ${
-    parent?.styles || ''
+    htmlElements?.parent?.styles
   }" 
     >
-      <div id="${textTitleImg?.id}" style="${textTitleImageDefaultStyle}; ${
-    textTitleImg?.styles || ''
+      <div id="${
+        htmlElements?.textTitleImg?.id
+      }" style="${textTitleImageDefaultStyle}; ${
+    htmlElements?.textTitleImg?.styles
   }">
-        <div id="${textTitle?.id}" style="${defaultTextParentStyles}; ${
-    textTitle?.styles || ''
-  }">
+        <div id="${
+          htmlElements?.textTitle?.id
+        }" style="${defaultTextParentStyles}; ${htmlElements?.textTitle?.styles}">
           ${
             trimmedTitle.length
-              ? `<text id="${title?.id}" style="${defaultTitleStyles}; ${
-                  title?.styles || ''
-                }">${trimmedTitle}</text>`
+              ? `<text id="${htmlElements?.title?.id}" style="${defaultTitleStyles}; ${htmlElements?.title?.styles}">${trimmedTitle}</text>`
               : ''
           }
           ${
             trimmedBody.length
-              ? `<text id="${body?.id}" style="${defaultBodyStyles}; ${
-                  body?.styles || ''
-                }">${trimmedBody}</text>`
+              ? `<text id="${htmlElements?.body?.id}" style="${defaultBodyStyles}; ${htmlElements?.body?.styles}">${trimmedBody}</text>`
               : ''
           }
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img id="${img?.id}" style="${defaultImageStyles}; ${
-                img?.styles || ''
-              }" src="${message?.elements?.mediaUrl}" />`
+            ? `<img id="${htmlElements?.img?.id}" style="${defaultImageStyles}; ${htmlElements?.img?.styles}" src="${message?.elements?.mediaUrl}" />`
             : ''
         }
       </div>
-      <div id="${buttonsDiv?.id}" style="${bannerButtons}; ${
-    buttonsDiv?.styles
+      <div id="${htmlElements?.buttonsDiv?.id}" style="${bannerButtons}; ${
+    htmlElements?.buttonsDiv?.styles
   }">
        ${
          message?.elements?.buttons?.[0]
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
-                ${primaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+                ${
+                  htmlElements?.primaryButton?.disabledStyles
+                    ? 'disabled'
+                    : 'enabled'
+                } 
                 data-index="0"
                 name="${primaryButtonSelector}"
-                id="${primaryButton?.id}"
+                id="${htmlElements?.primaryButton?.id}"
                 class="banner-button" 
                 style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
-               primaryButton?.styles || ''
-             } ${primaryButton?.disabledStyles || ''}"
+               htmlElements?.primaryButton?.styles
+             } ${htmlElements?.primaryButton?.disabledStyles}"
               >
               ${message?.elements?.buttons?.[0]?.title}
             </button>`
@@ -143,14 +145,18 @@ export function IterableEmbeddedBanner({
          message?.elements?.buttons?.[1]
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
-                ${secondaryButton?.disabledStyles ? 'disabled' : 'enabled'} 
+                ${
+                  htmlElements?.secondaryButton?.disabledStyles
+                    ? 'disabled'
+                    : 'enabled'
+                } 
                 data-index="1"
                 name="${secondaryButtonSelector}"
-                id="${secondaryButton?.id}"
+                id="${htmlElements?.secondaryButton?.id}"
                 class="banner-button" 
                 style="${defaultButtonStyles} ${
-               secondaryButton?.styles || ''
-             } ${secondaryButton?.disabledStyles || ''}"
+               htmlElements?.secondaryButton?.styles
+             } ${htmlElements?.secondaryButton?.disabledStyles}"
               >
                 ${message?.elements?.buttons?.[1]?.title}
             </button>`
