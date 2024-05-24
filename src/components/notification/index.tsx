@@ -22,7 +22,7 @@ const emptyElement = {
 export function IterableEmbeddedNotification({
   appPackageName,
   message,
-  elements = {
+  htmlElements = {
     parent: emptyElement,
     title: emptyElement,
     primaryButton: emptyElement,
@@ -86,45 +86,45 @@ export function IterableEmbeddedNotification({
 
   return `
     <div 
-      id="${elements?.parent?.id}"
+      id="${htmlElements?.parent?.id}"
       name="${notificationSelector}"
       style="${defaultNotificationStyles(message?.elements?.defaultAction)} ${
-    elements?.parent?.styles
+    htmlElements?.parent?.styles
   }" 
     >
       <div
-        id="${elements?.textTitle?.id}"
-        style="${defaultTextParentStyles} ${elements?.textTitle?.styles}"
+        id="${htmlElements?.textTitle?.id}"
+        style="${defaultTextParentStyles} ${htmlElements?.textTitle?.styles}"
       >
-        <p id="${elements?.title?.id}" style="${defaultTitleStyles} ${
-    elements?.title?.styles
+        <p id="${htmlElements?.title?.id}" style="${defaultTitleStyles} ${
+    htmlElements?.title?.styles
   }">
             ${trimmedTitle}
         </p>
-        <p id="${elements?.body?.id}" style="${defaultBodyStyles} ${
-    elements?.body?.styles
+        <p id="${htmlElements?.body?.id}" style="${defaultBodyStyles} ${
+    htmlElements?.body?.styles
   }">
           ${trimmedBody}
         </p>
       </div>
-      <div id="${elements?.buttonsDiv?.id}" style="${defaultButtonsDiv} ${
-    elements?.buttonsDiv?.styles
+      <div id="${htmlElements?.buttonsDiv?.id}" style="${defaultButtonsDiv} ${
+    htmlElements?.buttonsDiv?.styles
   }">
       ${
         message?.elements?.buttons?.[0]
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${
-                 elements?.primaryButton?.disabledStyles
+                 htmlElements?.primaryButton?.disabledStyles
                    ? 'disabled'
                    : 'enabled'
                } 
                data-index="0"
                name="${primaryButtonSelector}"
-               id="${elements?.primaryButton?.id}"
+               id="${htmlElements?.primaryButton?.id}"
                style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
-              elements?.primaryButton?.styles
-            } ${elements?.primaryButton?.disabledStyles}"
+              htmlElements?.primaryButton?.styles
+            } ${htmlElements?.primaryButton?.disabledStyles}"
              >
              ${message?.elements?.buttons?.[0]?.title}
            </button>`
@@ -135,16 +135,16 @@ export function IterableEmbeddedNotification({
           ? `<button 
                key="button-${message?.metadata.messageId}" 
                ${
-                 elements?.secondaryButton?.disabledStyles
+                 htmlElements?.secondaryButton?.disabledStyles
                    ? 'disabled'
                    : 'enabled'
                } 
                data-index="1"
                name="${secondaryButtonSelector}"
-               id="${elements?.secondaryButton?.id}"
+               id="${htmlElements?.secondaryButton?.id}"
                style="
                ${defaultButtonStyles}
-               ${elements?.secondaryButton?.disabledStyles}"
+               ${htmlElements?.secondaryButton?.disabledStyles}"
              >
                ${message?.elements?.buttons?.[1]?.title}
            </button>`

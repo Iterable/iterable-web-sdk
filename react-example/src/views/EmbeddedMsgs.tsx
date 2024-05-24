@@ -235,7 +235,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const card = IterableEmbeddedCard({
                   appPackageName,
                   message,
-                  ...(useCustomStyles && { elements: StyleOverrides }),
+                  ...(useCustomStyles && { htmlElements: StyleOverrides }),
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (
@@ -250,7 +250,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const banner = IterableEmbeddedBanner({
                   appPackageName,
                   message,
-                  ...(useCustomStyles && { elements: StyleOverrides }),
+                  ...(useCustomStyles && { htmlElements: StyleOverrides }),
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (
@@ -265,7 +265,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                 const notification = IterableEmbeddedNotification({
                   appPackageName,
                   message,
-                  ...(useCustomStyles && { elements: StyleOverrides }),
+                  ...(useCustomStyles && { htmlElements: StyleOverrides }),
                   errorCallback: (error) => console.log('handleError: ', error)
                 });
                 return (

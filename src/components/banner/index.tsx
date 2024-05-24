@@ -21,7 +21,7 @@ const emptyElement = {
 export function IterableEmbeddedBanner({
   appPackageName,
   message,
-  elements = {
+  htmlElements = {
     parent: emptyElement,
     img: emptyElement,
     title: emptyElement,
@@ -86,56 +86,56 @@ export function IterableEmbeddedBanner({
 
   return `
     <div 
-      id="${elements?.parent?.id}"
+      id="${htmlElements?.parent?.id}"
       name="${bannerSelector}"
       style="${defaultBannerStyles(message?.elements?.defaultAction)} ${
-    elements?.parent?.styles
+    htmlElements?.parent?.styles
   }" 
     >
       <div id="${
-        elements?.textTitleImg?.id
+        htmlElements?.textTitleImg?.id
       }" style="${textTitleImageDefaultStyle}; ${
-    elements?.textTitleImg?.styles
+    htmlElements?.textTitleImg?.styles
   }">
         <div id="${
-          elements?.textTitle?.id
-        }" style="${defaultTextParentStyles}; ${elements?.textTitle?.styles}">
+          htmlElements?.textTitle?.id
+        }" style="${defaultTextParentStyles}; ${htmlElements?.textTitle?.styles}">
           ${
             trimmedTitle.length
-              ? `<text id="${elements?.title?.id}" style="${defaultTitleStyles}; ${elements?.title?.styles}">${trimmedTitle}</text>`
+              ? `<text id="${htmlElements?.title?.id}" style="${defaultTitleStyles}; ${htmlElements?.title?.styles}">${trimmedTitle}</text>`
               : ''
           }
           ${
             trimmedBody.length
-              ? `<text id="${elements?.body?.id}" style="${defaultBodyStyles}; ${elements?.body?.styles}">${trimmedBody}</text>`
+              ? `<text id="${htmlElements?.body?.id}" style="${defaultBodyStyles}; ${htmlElements?.body?.styles}">${trimmedBody}</text>`
               : ''
           }
         </div>
         ${
           message?.elements?.mediaUrl
-            ? `<img id="${elements?.img?.id}" style="${defaultImageStyles}; ${elements?.img?.styles}" src="${message?.elements?.mediaUrl}" />`
+            ? `<img id="${htmlElements?.img?.id}" style="${defaultImageStyles}; ${htmlElements?.img?.styles}" src="${message?.elements?.mediaUrl}" />`
             : ''
         }
       </div>
-      <div id="${elements?.buttonsDiv?.id}" style="${bannerButtons}; ${
-    elements?.buttonsDiv?.styles
+      <div id="${htmlElements?.buttonsDiv?.id}" style="${bannerButtons}; ${
+    htmlElements?.buttonsDiv?.styles
   }">
        ${
          message?.elements?.buttons?.[0]
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
                 ${
-                  elements?.primaryButton?.disabledStyles
+                  htmlElements?.primaryButton?.disabledStyles
                     ? 'disabled'
                     : 'enabled'
                 } 
                 data-index="0"
                 name="${primaryButtonSelector}"
-                id="${elements?.primaryButton?.id}"
+                id="${htmlElements?.primaryButton?.id}"
                 class="banner-button" 
                 style="${defaultButtonStyles} ${defaultPrimaryButtonStyle} ${
-               elements?.primaryButton?.styles
-             } ${elements?.primaryButton?.disabledStyles}"
+               htmlElements?.primaryButton?.styles
+             } ${htmlElements?.primaryButton?.disabledStyles}"
               >
               ${message?.elements?.buttons?.[0]?.title}
             </button>`
@@ -146,17 +146,17 @@ export function IterableEmbeddedBanner({
            ? `<button 
                 key="button-${message?.metadata.messageId}" 
                 ${
-                  elements?.secondaryButton?.disabledStyles
+                  htmlElements?.secondaryButton?.disabledStyles
                     ? 'disabled'
                     : 'enabled'
                 } 
                 data-index="1"
                 name="${secondaryButtonSelector}"
-                id="${elements?.secondaryButton?.id}"
+                id="${htmlElements?.secondaryButton?.id}"
                 class="banner-button" 
                 style="${defaultButtonStyles} ${
-               elements?.secondaryButton?.styles
-             } ${elements?.secondaryButton?.disabledStyles}"
+               htmlElements?.secondaryButton?.styles
+             } ${htmlElements?.secondaryButton?.disabledStyles}"
               >
                 ${message?.elements?.buttons?.[1]?.title}
             </button>`

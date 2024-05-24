@@ -39,7 +39,7 @@ type Elements = {
 export type OOTB = {
   appPackageName: string;
   message: IterableEmbeddedMessage;
-  elements?: Elements;
+  htmlElements?: Elements;
   /** callback method to handle button or element click errors*/
   errorCallback?: ErrorHandler;
 };
