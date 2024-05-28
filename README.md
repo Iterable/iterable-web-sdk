@@ -48,15 +48,15 @@ To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERV
 import { initializeWithConfig } from '@iterable/web-sdk';
 
 const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
-  'my-API-key',
-  {
+  authToken: 'my-API-key',
+  configOptions: {
     isEuIterableService: true,
   },
   /*
     _email_ will be defined if you call _setEmail_
     _userID_ will be defined if you call _setUserID_
   */
-  ({ email, userID }) =>
+  generateJWT: ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
