@@ -20,7 +20,6 @@ import {
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
   SHARED_PREFS_ANON_SESSIONS,
-  SHARED_PREF_ANON_USER_ID,
   ENDPOINT_TRACK_ANON_SESSION,
   WEB_PLATFORM,
   KEY_PREFER_USERID
@@ -34,7 +33,10 @@ import { UpdateUserParams } from 'src/users';
 import { setAnonUserId } from '..';
 import { trackSchema } from 'src/events/events.schema';
 import { updateUserSchema } from 'src/users/users.schema';
-import { trackPurchaseSchema, updateCartSchema } from 'src/commerce/commerce.schema';
+import {
+  trackPurchaseSchema,
+  updateCartSchema
+} from 'src/commerce/commerce.schema';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
