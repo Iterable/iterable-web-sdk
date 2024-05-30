@@ -16,7 +16,7 @@ function getParsedEnv() {
 }
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
   entry: './dist/index.js',
   target: 'node',
   output: {

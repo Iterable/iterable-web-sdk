@@ -180,3 +180,6 @@ export const TRACK_EVENT = 'customEvent';
 export const TRACK_PURCHASE = 'purchase';
 export const UPDATE_USER = 'updateUser';
 export const TRACK_UPDATE_CART = 'cartUpdate';
+
+export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
+export const MERGE_NOTREQUIRED = 'MERGE_NOTREQUIRED';

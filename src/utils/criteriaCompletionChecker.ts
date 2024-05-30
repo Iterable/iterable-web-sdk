@@ -165,6 +165,7 @@ class CriteriaCompletionChecker {
   }
 
   private evaluateField(node: SearchQuery, localEventData: any[]): boolean {
+    console.log('evaluateField::', node, localEventData);
     try {
       return this.evaluateFieldLogic(node, localEventData);
     } catch (e) {
@@ -181,26 +182,26 @@ class CriteriaCompletionChecker {
       const eventData = localEventData[i];
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
-      if (dataType !== trackingType) {
-        return false;
-      }
+      if (dataType === trackingType) {
+        console.log('should compare now:', node, eventData);
 
-      const field = node.field;
-      const comparatorType = node.comparatorType ? node.comparatorType : '';
-      const localDataKeys = Object.keys(eventData);
+        const field = node.field;
+        const comparatorType = node.comparatorType ? node.comparatorType : '';
+        const localDataKeys = Object.keys(eventData);
 
-      for (let j = 0; j < localDataKeys.length; j++) {
-        const key = localDataKeys[j];
-        if (field === key) {
-          const matchedCountObj = eventData[key];
-          if (
-            this.evaluateComparison(
-              comparatorType,
-              matchedCountObj,
-              node.value ? node.value : ''
-            )
-          ) {
-            return true;
+        for (let j = 0; j < localDataKeys.length; j++) {
+          const key = localDataKeys[j];
+          if (field === key) {
+            const matchedCountObj = eventData[key];
+            if (
+              this.evaluateComparison(
+                comparatorType,
+                matchedCountObj,
+                node.value ? node.value : ''
+              )
+            ) {
+              return true;
+            }
           }
         }
       }
@@ -214,15 +215,17 @@ class CriteriaCompletionChecker {
     matchObj: any,
     valueToCompare: string
   ): boolean {
+    console.log('inside evaluateComparison');
     if (!valueToCompare) {
       return false;
     }
-
     switch (comparatorType) {
       case 'Equals':
         return this.compareValueEquality(matchObj, valueToCompare);
       case 'DoesNotEquals':
         return !this.compareValueEquality(matchObj, valueToCompare);
+      case 'IsSet':
+        return matchObj !== '';
       case 'GreaterThan':
       case 'LessThan':
       case 'GreaterThanOrEqualTo':
@@ -265,7 +268,10 @@ class CriteriaCompletionChecker {
     stringValue: string,
     compareOperator: string
   ): boolean {
+    console.log('before comparision::');
+
     if (!isNaN(parseFloat(stringValue))) {
+      console.log('inside comparision::');
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
       switch (compareOperator) {
@@ -274,6 +280,7 @@ class CriteriaCompletionChecker {
         case 'LessThan':
           return sourceNumber < numericValue;
         case 'GreaterThanOrEqualTo':
+          console.log('inside GreaterThanOrEqualTo::');
           return sourceNumber >= numericValue;
         case 'LessThanOrEqualTo':
           return sourceNumber <= numericValue;

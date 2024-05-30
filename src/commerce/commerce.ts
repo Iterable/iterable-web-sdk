@@ -7,7 +7,8 @@ import config from '../utils/config';
 import { typeOfAuth } from '..';
 
 const canTrackAnonUser = (): boolean => {
-  if (config.getConfig('enableAnonTracking') && typeOfAuth !== null) {
+  console.log('typeofauth::', typeOfAuth);
+  if (config.getConfig('enableAnonTracking') && typeOfAuth === null) {
     return true;
   }
   return false;
@@ -39,6 +40,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
+    console.log('before trackPurchase for anon');
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     const errorMessage =

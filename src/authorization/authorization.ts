@@ -6,7 +6,9 @@ import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
-  SHARED_PREF_ANON_USER_ID
+  SHARED_PREF_ANON_USER_ID,
+  MERGE_NOTREQUIRED,
+  MERGE_SUCCESSFULL
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -17,7 +19,7 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-//import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
+import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { Options, config } from '../utils/config';
 
@@ -60,8 +62,7 @@ export interface WithoutJWT {
   logout: () => void;
 }
 
-export function setAnonUserId(userId: string) {
-  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+export const setAnonUserId = (userId: string) => {
   const { setUserID } = initializeWithConfig({
     authToken: process.env.API_KEY || '',
     configOptions: {
@@ -71,7 +72,14 @@ export function setAnonUserId(userId: string) {
     }
   });
   setUserID(userId);
-}
+  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+};
+
+const clearAnonymousUser = (mergeResponse: string) => {
+  if (mergeResponse === MERGE_SUCCESSFULL) {
+    localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+  }
+};
 
 const setAnonTracking = () => {
   try {
@@ -242,6 +250,31 @@ export function initialize(
     });
   };
 
+  const enableAnonymousTracking = () => {
+    const anonymousUserId = getAnonUserId();
+    if (anonymousUserId !== null) {
+      // This block will restore the anon userID from localstorage
+      typeOfAuth = 'userID';
+      authIdentifier = anonymousUserId;
+      addUserIdToRequest(anonymousUserId);
+    } else {
+      setAnonTracking();
+      // We need to do anonymoustracking only if known-user was NOT created while doing anonymous tracking
+    }
+  };
+
+  const tryMergeUser = (
+    userIdOrEmail: string,
+    isEmail: boolean
+  ): Promise<string> => {
+    if (getAnonUserId() !== null) {
+      const anonymousUserMerge = new AnonymousUserMerge();
+      return anonymousUserMerge.mergeUser(userIdOrEmail, isEmail);
+    }
+    console.log('anon user will create now');
+    return Promise.resolve(MERGE_NOTREQUIRED); // promise resolves here because merging is not needed so we setUserID passed via dev
+  };
+
   const addEmailToRequest = (email: string) => {
     userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
       /* 
@@ -312,6 +345,7 @@ export function initialize(
   };
 
   if (!generateJWT) {
+    enableAnonymousTracking();
     /* we want to set a normal non-JWT enabled API key */
     return {
       setNewAuthToken: (newToken: string) => {
@@ -334,23 +368,36 @@ export function initialize(
         }
       },
       setEmail: (email: string) => {
-        typeOfAuth = 'email';
-        authIdentifier = email;
         clearMessages();
+        tryMergeUser(email, true)
+          .then((response) => {
+            typeOfAuth = 'email';
+            authIdentifier = email;
+            addEmailToRequest(email);
+            clearAnonymousUser(response);
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error('Merge failed', error);
+          });
+
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
-
-        /* 
-          endpoints that use _currentEmail_ payload prop in POST/PUT requests 
-        */
-        addEmailToRequest(email);
       },
       setUserID: async (userId: string) => {
         clearMessages();
-        typeOfAuth = 'userID';
-        authIdentifier = userId;
-        addUserIdToRequest(userId);
+        tryMergeUser(userId, false)
+          .then((response) => {
+            typeOfAuth = 'userID';
+            authIdentifier = userId;
+            addUserIdToRequest(userId);
+            clearAnonymousUser(response);
+          })
+          .catch((error) => {
+            // eslint-disable-next-line no-console
+            console.error('Merge failed', error);
+          });
 
         const tryUser = (userId: any) => {
           let createUserAttempts = 0;
@@ -642,31 +689,31 @@ export function initialize(
       });
   };
 
-  const anonymousUserId = getAnonUserId();
-  if (anonymousUserId !== null) {
-    // This block will restore the anon userID from localstorage
-    typeOfAuth = 'userID';
-    authIdentifier = anonymousUserId;
-    addUserIdToRequest(anonymousUserId);
-  } else {
-    setAnonTracking();
-    // We need to do anonymoustracking only if known-user was NOT created while doing anonymous tracking
-  }
+  enableAnonymousTracking();
   return {
     clearRefresh: () => {
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
     setEmail: (email: string) => {
-      typeOfAuth = 'email';
-      authIdentifier = email;
       /* clear previous user */
       clearMessages();
+
+      tryMergeUser(email, true)
+        .then((response) => {
+          typeOfAuth = 'email';
+          authIdentifier = email;
+          addEmailToRequest(email);
+          clearAnonymousUser(response);
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('Merge failed', error);
+        });
+
       if (typeof userInterceptor === 'number') {
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
-
-      addEmailToRequest(email);
 
       return doRequest({ email }).catch((e) => {
         if (logLevel === 'verbose') {
@@ -678,11 +725,18 @@ export function initialize(
       });
     },
     setUserID: async (userId: string) => {
-      typeOfAuth = 'userID';
-      authIdentifier = userId;
       clearMessages();
-
-      addUserIdToRequest(userId);
+      tryMergeUser(userId, false)
+        .then((response) => {
+          typeOfAuth = 'userID';
+          authIdentifier = userId;
+          addUserIdToRequest(userId);
+          clearAnonymousUser(response);
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('Merge failed', error);
+        });
 
       const tryUser = (userID: any) => {
         let createUserAttempts = 0;

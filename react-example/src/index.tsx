@@ -41,6 +41,7 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
+  localStorage.clear();
   const initializeParams: WithoutJWTParams = {
     authToken: process.env.API_KEY || '',
     configOptions: {

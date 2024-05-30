@@ -115,7 +115,8 @@ export class AnonymousUserEventManager {
   async trackAnonUpdateUser(payload: UpdateUserParams) {
     const newDataObject = {
       [DATA_REPLACE]: payload.dataFields,
-      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
+      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER,
+      [KEY_CREATED_AT]: this.getCurrentTime()
     };
     this.storeEventListToLocalStorage(newDataObject, true);
   }
@@ -147,6 +148,7 @@ export class AnonymousUserEventManager {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    console.log('localStoredEventList::', localStoredEventList);
     try {
       if (criteriaData && localStoredEventList) {
         const checker = new CriteriaCompletionChecker(localStoredEventList);
@@ -201,11 +203,15 @@ export class AnonymousUserEventManager {
         });
         if (response && response.status === 200) {
           setAnonUserId(userId);
-          this.syncEvents();
+          setTimeout(() => {
+            this.syncEvents(); // little delay is important here to make sure anon userid is set
+          }, 300);
         }
       }, 500);
     } else {
-      this.syncEvents();
+      setTimeout(() => {
+        this.syncEvents(); // little delay is important here to make sure anon userid is set
+      }, 300);
     }
   }
 
@@ -265,6 +271,8 @@ export class AnonymousUserEventManager {
       );
       if (indexToUpdate !== -1) {
         previousDataArray[indexToUpdate] = newDataObject;
+      } else {
+        previousDataArray.push(newDataObject);
       }
     } else {
       previousDataArray.push(newDataObject);
@@ -274,8 +282,10 @@ export class AnonymousUserEventManager {
       SHARED_PREFS_EVENT_LIST_KEY,
       JSON.stringify(previousDataArray)
     );
-
+    console.log('before check criteria for anon');
     const criteriaId = await this.checkCriteriaCompletion();
+    console.log('criteriaId::', criteriaId);
+
     if (criteriaId !== null) {
       this.createKnownUser(criteriaId);
     }
