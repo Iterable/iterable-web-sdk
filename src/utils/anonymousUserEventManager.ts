@@ -20,23 +20,21 @@ import {
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
   SHARED_PREFS_ANON_SESSIONS,
-  SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL,
+  SHARED_PREF_ANON_USER_ID,
   ENDPOINT_TRACK_ANON_SESSION,
-  WEB_PLATFORM
+  WEB_PLATFORM,
+  KEY_PREFER_USERID
 } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackAnonSessionParams } from './types';
-import {
-  trackPurchaseSchema,
-  updateCartSchema
-} from 'src/commerce/commerce.schema';
-import { trackSchema } from 'src/events/events.schema';
 import { UpdateUserParams } from 'src/users';
+import { setAnonUserId } from '..';
+import { trackSchema } from 'src/events/events.schema';
 import { updateUserSchema } from 'src/users/users.schema';
+import { trackPurchaseSchema, updateCartSchema } from 'src/commerce/commerce.schema';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
@@ -135,6 +133,7 @@ export class AnonymousUserEventManager {
     const newDataObject = {
       [KEY_ITEMS]: payload.items,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
+      [KEY_PREFER_USERID]: true,
       [KEY_CREATED_AT]: this.getCurrentTime()
     };
     this.storeEventListToLocalStorage(newDataObject, false);
@@ -199,7 +198,7 @@ export class AnonymousUserEventManager {
           }
         });
         if (response && response.status === 200) {
-          this.setUserID(userId);
+          setAnonUserId(userId);
           this.syncEvents();
         }
       }, 500);
@@ -221,35 +220,23 @@ export class AnonymousUserEventManager {
 
         switch (eventType) {
           case TRACK_EVENT: {
-            await this.track(event);
+            this.track(event);
             break;
           }
           case TRACK_PURCHASE: {
-            let userDataJson = {};
-            if (this.getEmail() !== null) {
-              userDataJson = {
-                [SHARED_PREF_EMAIL]: this.getEmail()
-              };
-            } else {
-              userDataJson = {
-                [SHARED_PREF_USER_ID]: this.getUserID()
-              };
-            }
-            event.user = userDataJson;
-            await this.trackPurchase(event);
+            this.trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            await this.updateCart(event);
+            this.updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            await this.updateUser(event);
+            this.updateUser(event);
             break;
           }
-          default: {
+          default:
             break;
-          }
         }
 
         localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
@@ -362,16 +349,5 @@ export class AnonymousUserEventManager {
         data: updateUserSchema
       }
     });
-  };
-  setUserID = (userId: string) => {
-    localStorage.setItem(SHARED_PREF_USER_ID, userId);
-  };
-
-  getUserID = (): string | null => {
-    return localStorage.getItem(SHARED_PREF_USER_ID);
-  };
-
-  getEmail = (): string | null => {
-    return localStorage.getItem(SHARED_PREF_EMAIL);
   };
 }

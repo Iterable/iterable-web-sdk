@@ -1,4 +1,8 @@
-import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
+import {
+  initializeWithConfig,
+  WithJWTParams,
+  WithoutJWTParams
+} from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
@@ -12,9 +16,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
-
 import { UserProvider } from 'src/context/Users';
-import { setAnonTracking } from '@iterable/web-sdk';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,34 +41,15 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const initializeParams: WithJWTParams = {
+  const initializeParams: WithoutJWTParams = {
     authToken: process.env.API_KEY || '',
     configOptions: {
       isEuIterableService: false,
-      dangerouslyAllowJsPopups: true
-    },
-    generateJWT: ({ email }) => {
-      return axios
-        .post(
-          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response) => {
-          return response.data?.token;
-        });
+      dangerouslyAllowJsPopups: true,
+      enableAnonTracking: true
     }
   };
-  const { setEmail, logout, refreshJwtToken } =
-    initializeWithConfig(initializeParams);
+  const { setUserID, logout } = initializeWithConfig(initializeParams);
 
   ReactDOM.render(
     <BrowserRouter>
@@ -76,11 +59,7 @@ const HomeLink = styled(Link)`
             <HomeLink renderAsButton to="/">
               Home
             </HomeLink>
-            <LoginForm
-              setEmail={setEmail}
-              logout={logout}
-              refreshJwt={refreshJwtToken}
-            />
+            <LoginForm setUserId={setUserID} logout={logout} />
           </HeaderWrapper>
           <RouteWrapper>
             <Routes>

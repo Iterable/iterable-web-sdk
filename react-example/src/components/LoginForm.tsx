@@ -27,13 +27,14 @@ const Form = styled.form`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string>;
+  setUserId: (userId: string) => Promise<void>;
   logout: () => void;
-  refreshJwt: (authTypes: string) => Promise<string>;
 }
 
-export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
-  const [email, updateEmail] = useState<string>(process.env.LOGIN_EMAIL || '');
+export const LoginForm: FC<Props> = ({ setUserId, logout }) => {
+  const [userId, updateUserId] = useState<string>(
+    process.env.LOGIN_EMAIL || ''
+  );
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
@@ -42,12 +43,12 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setEmail(email)
+    setUserId(userId)
       .then(() => {
         setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: email });
+        setLoggedInUser({ type: 'user_update', data: userId });
       })
-      .catch(() => updateEmail('Something went wrong!'));
+      .catch(() => updateUserId('Something went wrong!'));
   };
 
   const handleLogout = () => {
@@ -56,16 +57,16 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
   };
 
   const handleJwtRefresh = () => {
-    refreshJwt(email);
+    //refreshJwt(userId);
   };
 
   const handleEditUser = () => {
-    updateEmail(loggedInUser);
+    updateUserId(loggedInUser);
     setEditingUser(true);
   };
 
   const handleCancelEditUser = () => {
-    updateEmail('');
+    updateUserId('');
     setEditingUser(false);
   };
 
@@ -78,10 +79,10 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
         isEditingUser ? (
           <Form onSubmit={handleSubmit}>
             <TextField
-              onChange={(e) => updateEmail(e.target.value)}
-              value={email}
+              onChange={(e) => updateUserId(e.target.value)}
+              value={userId}
               placeholder="e.g. hello@gmail.com"
-              type="email"
+              //type="email"
               required
             />
             <Button type="submit">Change</Button>
@@ -101,10 +102,10 @@ export const LoginForm: FC<Props> = ({ setEmail, logout, refreshJwt }) => {
       ) : (
         <Form onSubmit={handleSubmit} data-qa-login-form>
           <TextField
-            onChange={(e) => updateEmail(e.target.value)}
-            value={email}
+            onChange={(e) => updateUserId(e.target.value)}
+            value={userId}
             placeholder="e.g. hello@gmail.com"
-            type="email"
+            //type="email"
             required
             data-qa-login-input
           />

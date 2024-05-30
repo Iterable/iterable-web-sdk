@@ -4,25 +4,17 @@ import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import config from '../utils/config';
-import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from 'src/constants';
+import { typeOfAuth } from '..';
 
-const canTrackAnonUser = (payload: any): boolean => {
-  if (
-    (!(SHARED_PREF_USER_ID in (payload.user ?? {})) ||
-      payload.user?.userId === null ||
-      typeof payload.user?.userId === 'undefined') &&
-    (!(SHARED_PREF_EMAIL in (payload.user ?? {})) ||
-      payload.user?.email === null ||
-      typeof payload.user?.email === 'undefined') &&
-    config.getConfig('enableAnonTracking')
-  ) {
+const canTrackAnonUser = (): boolean => {
+  if (config.getConfig('enableAnonTracking') && typeOfAuth !== null) {
     return true;
   }
   return false;
 };
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
-  if (canTrackAnonUser(payload)) {
+  if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
     const errorMessage =
@@ -46,7 +38,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 };
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
-  if (canTrackAnonUser(payload)) {
+  if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     const errorMessage =

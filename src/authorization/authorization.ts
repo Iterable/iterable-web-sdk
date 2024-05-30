@@ -6,8 +6,7 @@ import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
-  SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL
+  SHARED_PREF_ANON_USER_ID
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -18,7 +17,7 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
+//import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { Options, config } from '../utils/config';
 
@@ -36,7 +35,7 @@ const MAX_TIMEOUT = ONE_DAY;
     doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
     tokens by user ID.
   */
-let typeOfAuth: null | 'email' | 'userID' = null;
+export let typeOfAuth: null | 'email' | 'userID' = null;
 /* this will be the literal user ID or email they choose to auth with */
 let authIdentifier: null | string = null;
 
@@ -61,45 +60,20 @@ export interface WithoutJWT {
   logout: () => void;
 }
 
-export function setUserID(userId: string) {
-  if (
-    userId !== null &&
-    userId !== '' &&
-    config.getConfig('enableAnonTracking')
-  ) {
-    const anonymousUserMerge = new AnonymousUserMerge();
-    anonymousUserMerge.mergeUser(userId);
-  }
-  localStorage.setItem(SHARED_PREF_USER_ID, userId);
-  typeOfAuth = 'userID';
-  authIdentifier = userId;
+export function setAnonUserId(userId: string) {
+  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+  const { setUserID } = initializeWithConfig({
+    authToken: process.env.API_KEY || '',
+    configOptions: {
+      isEuIterableService: false,
+      dangerouslyAllowJsPopups: true,
+      enableAnonTracking: true
+    }
+  });
+  setUserID(userId);
 }
 
-export function setEmail(email: string) {
-  if (
-    email !== null &&
-    email !== '' &&
-    config.getConfig('enableAnonTracking')
-  ) {
-    const anonymousUserMerge = new AnonymousUserMerge();
-    anonymousUserMerge.mergeUser(email);
-  }
-  localStorage.setItem(SHARED_PREF_EMAIL, email);
-  typeOfAuth = 'email';
-  authIdentifier = email;
-}
-
-export const getUserID = (): string | null => {
-  return localStorage.getItem(SHARED_PREF_USER_ID);
-};
-
-export const getEmail = (): string | null => {
-  return localStorage.getItem(SHARED_PREF_EMAIL);
-};
-
-export const setAnonTracking = (enableAnonTracking: boolean) => {
-  config.setConfig({ enableAnonTracking: enableAnonTracking });
-
+const setAnonTracking = () => {
   try {
     if (config.getConfig('enableAnonTracking')) {
       const anonUserManager = new AnonymousUserEventManager();
@@ -109,6 +83,11 @@ export const setAnonTracking = (enableAnonTracking: boolean) => {
   } catch (error) {
     console.warn(error);
   }
+};
+
+const getAnonUserId = () => {
+  const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
+  return anonUser;
 };
 
 export function initialize(
@@ -189,6 +168,79 @@ export function initialize(
   };
 
   const handleTokenExpiration = createTokenExpirationTimer();
+
+  const addUserIdToRequest = (userId: string) => {
+    if (typeof userInterceptor === 'number') {
+      baseAxiosRequest.interceptors.request.eject(userInterceptor);
+    }
+
+    /*
+      endpoints that use _userId_ payload prop in POST/PUT requests 
+    */
+    userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+      if (!!(config?.url || '').match(/updateEmail/gim)) {
+        return {
+          ...config,
+          data: {
+            ...(config.data || {}),
+            currentUserId: userId
+          }
+        };
+      }
+
+      /*
+          endpoints that use _userId_ payload prop in POST/PUT requests 
+        */
+      if (
+        !!(config?.url || '').match(
+          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
+        )
+      ) {
+        return {
+          ...config,
+          data: {
+            ...(config.data || {}),
+            userId
+          }
+        };
+      }
+
+      /*
+          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+        */
+      if (
+        !!(config?.url || '').match(
+          /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+        )
+      ) {
+        return {
+          ...config,
+          data: {
+            ...(config.data || {}),
+            user: {
+              ...(config.data.user || {}),
+              userId
+            }
+          }
+        };
+      }
+
+      /*
+          endpoints that use _userId_ query param in GET requests
+        */
+      if (!!(config?.url || '').match(/getMessages/gim)) {
+        return {
+          ...config,
+          params: {
+            ...(config.params || {}),
+            userId
+          }
+        };
+      }
+
+      return config;
+    });
+  };
 
   const addEmailToRequest = (email: string) => {
     userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
@@ -295,82 +347,10 @@ export function initialize(
         addEmailToRequest(email);
       },
       setUserID: async (userId: string) => {
+        clearMessages();
         typeOfAuth = 'userID';
         authIdentifier = userId;
-        clearMessages();
-
-        if (typeof userInterceptor === 'number') {
-          baseAxiosRequest.interceptors.request.eject(userInterceptor);
-        }
-
-        /*
-          endpoints that use _userId_ payload prop in POST/PUT requests 
-        */
-        userInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => {
-            if (!!(config?.url || '').match(/updateEmail/gim)) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  currentUserId: userId
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ payload prop in POST/PUT requests 
-            */
-            if (
-              !!(config?.url || '').match(
-                /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-              )
-            ) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  userId
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-            */
-            if (
-              !!(config?.url || '').match(
-                /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-              )
-            ) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  user: {
-                    ...(config.data.user || {}),
-                    userId
-                  }
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ query param in GET requests
-            */
-            if (!!(config?.url || '').match(/getMessages/gim)) {
-              return {
-                ...config,
-                params: {
-                  ...(config.params || {}),
-                  userId
-                }
-              };
-            }
-
-            return config;
-          }
-        );
+        addUserIdToRequest(userId);
 
         const tryUser = (userId: any) => {
           let createUserAttempts = 0;
@@ -662,6 +642,16 @@ export function initialize(
       });
   };
 
+  const anonymousUserId = getAnonUserId();
+  if (anonymousUserId !== null) {
+    // This block will restore the anon userID from localstorage
+    typeOfAuth = 'userID';
+    authIdentifier = anonymousUserId;
+    addUserIdToRequest(anonymousUserId);
+  } else {
+    setAnonTracking();
+    // We need to do anonymoustracking only if known-user was NOT created while doing anonymous tracking
+  }
   return {
     clearRefresh: () => {
       /* this will just clear the existing timeout */
@@ -692,76 +682,7 @@ export function initialize(
       authIdentifier = userId;
       clearMessages();
 
-      if (typeof userInterceptor === 'number') {
-        baseAxiosRequest.interceptors.request.eject(userInterceptor);
-      }
-
-      /*
-        endpoints that use _userId_ payload prop in POST/PUT requests 
-      */
-      userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-        if (!!(config?.url || '').match(/updateEmail/gim)) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              currentUserId: userId
-            }
-          };
-        }
-
-        /*
-          endpoints that use _userId_ payload prop in POST/PUT requests 
-        */
-        if (
-          !!(config?.url || '').match(
-            /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-          )
-        ) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              userId
-            }
-          };
-        }
-
-        /*
-          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-        */
-        if (
-          !!(config?.url || '').match(
-            /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-          )
-        ) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              user: {
-                ...(config.data.user || {}),
-                userId
-              }
-            }
-          };
-        }
-
-        /*
-          endpoints that use _userId_ query param in GET requests
-        */
-        if (!!(config?.url || '').match(/getMessages/gim)) {
-          return {
-            ...config,
-            params: {
-              ...(config.params || {}),
-              userId
-            }
-          };
-        }
-
-        return config;
-      });
+      addUserIdToRequest(userId);
 
       const tryUser = (userID: any) => {
         let createUserAttempts = 0;

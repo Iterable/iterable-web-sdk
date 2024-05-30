@@ -1,6 +1,6 @@
 import {
   SHARED_PREF_EMAIL,
-  SHARED_PREF_USER_ID,
+  SHARED_PREF_ANON_USER_ID,
   ENDPOINT_GET_USER_BY_USERID,
   ENDPOINT_GET_USER_BY_EMAIL,
   ENDPOINT_MERGE_USER
@@ -23,12 +23,12 @@ export class AnonymousUserMerge {
   mergeUser(user: string): void {
     const userContainsEmail = isEmail(user);
     const sourceUser = localStorage.getItem(
-      userContainsEmail ? SHARED_PREF_EMAIL : SHARED_PREF_USER_ID
+      userContainsEmail ? SHARED_PREF_EMAIL : SHARED_PREF_ANON_USER_ID
     );
 
     const mergeApiParams: MergeApiParams = {
       sourceUserId: !userContainsEmail
-        ? localStorage.getItem(SHARED_PREF_USER_ID)
+        ? localStorage.getItem(SHARED_PREF_ANON_USER_ID)
         : null,
       sourceEmail: userContainsEmail
         ? localStorage.getItem(SHARED_PREF_EMAIL)
