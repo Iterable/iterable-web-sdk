@@ -56,7 +56,7 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string) => void;
+  setEmail: (email: string) => Promise<void>;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }

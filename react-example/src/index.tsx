@@ -1,20 +1,18 @@
-import { initialize } from '@iterable/web-sdk';
+import { WithJWT, initialize, setAnonTracking } from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
+import styled from 'styled-components';
 import './styles/index.css';
 
-import Home from 'src/views/Home';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Link from 'src/components/Link';
+import LoginForm from 'src/components/LoginForm';
+import { UserProvider } from 'src/context/Users';
 import Commerce from 'src/views/Commerce';
 import Events from 'src/views/Events';
-import Users from 'src/views/Users';
+import Home from 'src/views/Home';
 import InApp from 'src/views/InApp';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
-import styled from 'styled-components';
-import LoginForm from 'src/components/LoginForm';
-
-import { UserProvider } from 'src/context/Users';
-import { setAnonTracking } from '@iterable/web-sdk';
+import Users from 'src/views/Users';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,28 +37,20 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    ({ email }) => {
-      return axios
-        .post(
-          'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response) => {
-          return response.data?.token;
-        });
-    }
-  );
+  const authToken = process.env.API_KEY || '';
+  const requiresJwt = process.env.USE_JWT === 'true'; // Need to do a string equality check bc afaik boolean cannot be saved to env variable
+
+  const { setEmail, logout, ...rest } = requiresJwt
+    ? initialize(authToken, ({ email }) =>
+        axios
+          .post(
+            'http://localhost:5000/generate',
+            { exp_minutes: 2, email, jwt_secret: process.env.JWT_SECRET },
+            { headers: { 'Content-Type': 'application/json' } }
+          )
+          .then((response) => response.data?.token)
+      )
+    : initialize(authToken);
   setAnonTracking(true);
 
   ReactDOM.render(
@@ -74,7 +64,7 @@ const HomeLink = styled(Link)`
             <LoginForm
               setEmail={setEmail}
               logout={logout}
-              refreshJwt={refreshJwtToken}
+              refreshJwt={(rest as WithJWT).refreshJwtToken}
             />
           </HeaderWrapper>
           <RouteWrapper>
