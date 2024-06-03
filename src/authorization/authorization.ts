@@ -40,7 +40,7 @@ const MAX_TIMEOUT = ONE_DAY;
 export let typeOfAuth: null | 'email' | 'userID' = null;
 /* this will be the literal user ID or email they choose to auth with */
 let authIdentifier: null | string = null;
-
+let userInterceptor: number | null = null;
 export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
@@ -117,7 +117,6 @@ export function initialize(
     }
     return;
   }
-
   /* 
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT
@@ -129,7 +128,6 @@ export function initialize(
 
         return config;
       });
-  let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
 
   /**
@@ -180,7 +178,10 @@ export function initialize(
   const addUserIdToRequest = (userId: string) => {
     if (typeof userInterceptor === 'number') {
       baseAxiosRequest.interceptors.request.eject(userInterceptor);
+      console.log('removing existing one');
     }
+
+    console.log('adding UserIdToRequest::', userId);
 
     /*
       endpoints that use _userId_ payload prop in POST/PUT requests 
@@ -379,6 +380,7 @@ export function initialize(
           .catch((error) => {
             // eslint-disable-next-line no-console
             console.error('Merge failed', error);
+            return Promise.reject(`merging failed: ${error}`);
           });
 
         if (typeof userInterceptor === 'number') {
@@ -388,15 +390,17 @@ export function initialize(
       setUserID: async (userId: string) => {
         clearMessages();
         tryMergeUser(userId, false)
-          .then((response) => {
+          .then(async (response) => {
             typeOfAuth = 'userID';
             authIdentifier = userId;
             addUserIdToRequest(userId);
-            clearAnonymousUser(response);
+            await clearAnonymousUser(response);
+            console.log('addUserIdToRequest::', userId, response);
           })
           .catch((error) => {
             // eslint-disable-next-line no-console
             console.error('Merge failed', error);
+            return Promise.reject(`merging failed: ${error}`);
           });
 
         const tryUser = (userId: any) => {
@@ -709,6 +713,7 @@ export function initialize(
         .catch((error) => {
           // eslint-disable-next-line no-console
           console.error('Merge failed', error);
+          return Promise.reject(`merging failed: ${error}`);
         });
 
       if (typeof userInterceptor === 'number') {
@@ -736,6 +741,7 @@ export function initialize(
         .catch((error) => {
           // eslint-disable-next-line no-console
           console.error('Merge failed', error);
+          return Promise.reject(`merging failed: ${error}`);
         });
 
       const tryUser = (userID: any) => {

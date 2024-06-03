@@ -15,7 +15,6 @@ import {
   KEY_ITEMS,
   KEY_TOTAL,
   TRACK_PURCHASE,
-  DATA_REPLACE,
   UPDATE_USER,
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
@@ -114,9 +113,8 @@ export class AnonymousUserEventManager {
 
   async trackAnonUpdateUser(payload: UpdateUserParams) {
     const newDataObject = {
-      [DATA_REPLACE]: payload.dataFields,
-      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER,
-      [KEY_CREATED_AT]: this.getCurrentTime()
+      ...payload.dataFields,
+      [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
     };
     this.storeEventListToLocalStorage(newDataObject, true);
   }
@@ -225,7 +223,7 @@ export class AnonymousUserEventManager {
       for (let i = 0; i < trackEventList.length; i++) {
         const event = trackEventList[i];
         const eventType = event[SHARED_PREFS_EVENT_TYPE];
-
+        delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {
             this.track(event);
@@ -240,7 +238,7 @@ export class AnonymousUserEventManager {
             break;
           }
           case UPDATE_USER: {
-            this.updateUser(event);
+            this.updateUser({ dataFields: event });
             break;
           }
           default:
@@ -270,7 +268,15 @@ export class AnonymousUserEventManager {
         (obj: any) => obj[SHARED_PREFS_EVENT_TYPE] === trackingType
       );
       if (indexToUpdate !== -1) {
-        previousDataArray[indexToUpdate] = newDataObject;
+        const dataToUpdate = previousDataArray[indexToUpdate];
+        console.log('old user data::', dataToUpdate);
+        console.log('new user data::', newDataObject);
+
+        previousDataArray[indexToUpdate] = {
+          ...dataToUpdate,
+          ...newDataObject
+        };
+        console.log('aggregated data::', previousDataArray[indexToUpdate]);
       } else {
         previousDataArray.push(newDataObject);
       }
