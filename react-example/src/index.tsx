@@ -52,6 +52,7 @@ const HomeLink = styled(Link)`
   };
   const { setUserID, logout } = initializeWithConfig(initializeParams);
 
+  // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
     <BrowserRouter>
       <Wrapper>

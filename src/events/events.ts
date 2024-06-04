@@ -7,7 +7,7 @@ import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {
-  if (canTrackAnonUser(payload)) {
+  if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
     const errorMessage =

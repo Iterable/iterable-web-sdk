@@ -3,16 +3,7 @@ import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
-import config from '../utils/config';
-import { typeOfAuth } from '..';
-
-const canTrackAnonUser = (): boolean => {
-  console.log('typeofauth::', typeOfAuth);
-  if (config.getConfig('enableAnonTracking') && typeOfAuth === null) {
-    return true;
-  }
-  return false;
-};
+import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser()) {
@@ -40,7 +31,6 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
-    console.log('before trackPurchase for anon');
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     const errorMessage =

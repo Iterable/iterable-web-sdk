@@ -22,7 +22,7 @@ export const updateUserEmail = (newEmail: string) => {
 };
 
 export const updateUser = (payload: UpdateUserParams = {}) => {
-  if (canTrackAnonUser(payload)) {
+  if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateUser(payload);
     const errorMessage =

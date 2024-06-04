@@ -10,7 +10,8 @@ import {
 import {
   updateUser,
   updateSubscriptions,
-  updateUserEmail
+  updateUserEmail,
+  UpdateUserParams
 } from '@iterable/web-sdk';
 
 import { useUser } from 'src/context/Users';
@@ -28,7 +29,9 @@ export const Users: FC<Props> = () => {
   const [updateSubscriptionsResponse, setUpdateSubscriptionsResponse] =
     useState<string>('Endpoint JSON goes here');
 
-  const [userDataField, setUserDataField] = useState<string>('');
+  const [userDataField, setUserDataField] = useState<string>(
+    ' { "dataFields": {"phone_number": "57688559" }}'
+  );
   const [email, setEmail] = useState<string>('');
   const [emailListID, setEmailListID] = useState<string>('');
 
@@ -37,24 +40,35 @@ export const Users: FC<Props> = () => {
   const [isUpdatingSubscriptions, setUpdatingSubscriptions] =
     useState<boolean>(false);
 
-  const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setUpdatingUser(true);
+  const handleParseJson = () => {
     try {
-      updateUser({
-        dataFields: { [userDataField]: 'test-data' }
-      })
-        .then((response) => {
-          setUpdateUserResponse(JSON.stringify(response.data));
-          setUpdatingUser(false);
-        })
-        .catch((e) => {
-          setUpdateUserResponse(JSON.stringify(e.response.data));
-          setUpdatingUser(false);
-        });
+      // Parse JSON and assert its type
+      const parsedObject = JSON.parse(userDataField) as UpdateUserParams;
+      return parsedObject;
     } catch (error) {
       setUpdateUserResponse(JSON.stringify(error.message));
-      setUpdatingUser(false);
+    }
+  };
+
+  const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const jsonObj = handleParseJson();
+    if (jsonObj) {
+      setUpdatingUser(true);
+      try {
+        updateUser(jsonObj)
+          .then((response) => {
+            setUpdateUserResponse(JSON.stringify(response.data));
+            setUpdatingUser(false);
+          })
+          .catch((e) => {
+            setUpdateUserResponse(JSON.stringify(e.response.data));
+            setUpdatingUser(false);
+          });
+      } catch (error) {
+        setUpdateUserResponse(JSON.stringify(error.message));
+        setUpdatingUser(false);
+      }
     }
   };
 

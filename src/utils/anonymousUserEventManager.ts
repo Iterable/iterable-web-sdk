@@ -288,7 +288,6 @@ export class AnonymousUserEventManager {
       SHARED_PREFS_EVENT_LIST_KEY,
       JSON.stringify(previousDataArray)
     );
-    console.log('before check criteria for anon');
     const criteriaId = await this.checkCriteriaCompletion();
     console.log('criteriaId::', criteriaId);
 

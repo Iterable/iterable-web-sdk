@@ -48,12 +48,12 @@ class CriteriaCompletionChecker {
 
   private findMatchedCriteria(criteriaList: Criteria[]): string | null {
     let criteriaId: string | null = null;
+    const eventsToProcess = this.prepareEventsToProcess();
     for (let i = 0; i < criteriaList.length; i++) {
       const criteria = criteriaList[i];
       if (criteria.searchQuery && criteria.criteriaId) {
         const searchQuery = criteria.searchQuery;
         const currentCriteriaId = criteria.criteriaId;
-        const eventsToProcess = this.prepareEventsToProcess();
 
         const result = this.evaluateTree(searchQuery, eventsToProcess);
         if (result) {
@@ -118,6 +118,7 @@ class CriteriaCompletionChecker {
 
   private getNonCartEvents(): any[] {
     const nonPurchaseEvents: any[] = [];
+    let updatedItem: any = {};
 
     this.localStoredEventList.forEach((localEventData) => {
       if (
@@ -125,7 +126,13 @@ class CriteriaCompletionChecker {
         localEventData[SHARED_PREFS_EVENT_TYPE] !== TRACK_PURCHASE &&
         localEventData[SHARED_PREFS_EVENT_TYPE] !== TRACK_UPDATE_CART
       ) {
-        nonPurchaseEvents.push(localEventData);
+        updatedItem = localEventData;
+        if (localEventData.dataFields) {
+          Object.keys(localEventData.dataFields).forEach((key) => {
+            updatedItem[key] = localEventData.dataFields[key];
+          });
+        }
+        nonPurchaseEvents.push(updatedItem);
       }
     });
 
@@ -215,8 +222,8 @@ class CriteriaCompletionChecker {
     matchObj: any,
     valueToCompare: string
   ): boolean {
-    console.log('inside evaluateComparison');
-    if (!valueToCompare) {
+    console.log('inside evaluateComparison', valueToCompare);
+    if (!valueToCompare && comparatorType !== 'IsSet') {
       return false;
     }
     switch (comparatorType) {
@@ -268,8 +275,6 @@ class CriteriaCompletionChecker {
     stringValue: string,
     compareOperator: string
   ): boolean {
-    console.log('before comparision::');
-
     if (!isNaN(parseFloat(stringValue))) {
       console.log('inside comparision::');
       const sourceNumber = parseFloat(sourceTo);
@@ -280,7 +285,6 @@ class CriteriaCompletionChecker {
         case 'LessThan':
           return sourceNumber < numericValue;
         case 'GreaterThanOrEqualTo':
-          console.log('inside GreaterThanOrEqualTo::');
           return sourceNumber >= numericValue;
         case 'LessThanOrEqualTo':
           return sourceNumber <= numericValue;
