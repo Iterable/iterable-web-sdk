@@ -9,27 +9,6 @@ import { trackPurchase, updateCart } from '../commerce';
 import { GETMESSAGES_PATH } from '../constants';
 
 let mockRequest: any = null;
-
-jest.mock('../utils/anonymousUserEventManager', () => {
-  return {
-    AnonymousUserEventManager: jest.fn().mockImplementation(() => ({
-      trackAnonUpdateCart: jest.fn(),
-      trackAnonPurchaseEvent: jest.fn(),
-      trackAnonEvent: jest.fn(),
-      trackAnonUpdateUser: jest.fn()
-    }))
-  };
-});
-
-jest.mock('../utils/anonymousUserMerge', () => {
-  return {
-    AnonymousUserMerge: jest.fn().mockImplementation(() => ({
-      mergeUserUsingUserId: jest.fn(),
-      mergeUserUsingEmail: jest.fn()
-    }))
-  };
-});
-
 /*
   decoded payload is:
 
@@ -54,7 +33,6 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
     mockRequest.onPost('/users/update').reply(200, {
       data: 'something'
     });
@@ -209,7 +187,7 @@ describe('API Key Interceptors', () => {
 
       try {
         await setEmail('hello@gmail.com');
-        await updateUser({ email: 'hello@gmail.com' });
+        await updateUser();
       } catch (e) {
         expect(mockGenerateJW).toHaveBeenCalledTimes(2);
       }
@@ -457,11 +435,8 @@ describe('User Identification', () => {
           deviceInfo: { appPackageName: 'my-lil-website' }
         });
         const subsResponse = await updateSubscriptions();
-        const userResponse = await updateUser({ email: 'hello@gmail.com' });
-        const trackResponse = await track({
-          eventName: 'fdsafdf',
-          email: 'hello@gmail.com'
-        });
+        const userResponse = await updateUser();
+        const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).email).toBe(
           'hello@gmail.com'
@@ -503,19 +478,8 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const cartResponse = await updateCart({
-          items: [],
-          user: {
-            email: 'hello@gmail.com'
-          }
-        });
-        const trackResponse = await trackPurchase({
-          items: [],
-          total: 100,
-          user: {
-            email: 'hello@gmail.com'
-          }
-        });
+        const cartResponse = await updateCart({ items: [] });
+        const trackResponse = await trackPurchase({ items: [], total: 100 });
         expect(JSON.parse(cartResponse.config.data).user.email).toBe(
           'hello@gmail.com'
         );
@@ -626,11 +590,8 @@ describe('User Identification', () => {
           deviceInfo: { appPackageName: 'my-lil-website' }
         });
         const subsResponse = await updateSubscriptions();
-        const userResponse = await updateUser({ userId: '999' });
-        const trackResponse = await track({
-          eventName: 'fdsafdf',
-          userId: '999'
-        });
+        const userResponse = await updateUser();
+        const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
@@ -661,19 +622,8 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const cartResponse = await updateCart({
-          items: [],
-          user: {
-            userId: '999'
-          }
-        });
-        const trackResponse = await trackPurchase({
-          items: [],
-          total: 100,
-          user: {
-            userId: '999'
-          }
-        });
+        const cartResponse = await updateCart({ items: [] });
+        const trackResponse = await trackPurchase({ items: [], total: 100 });
         expect(JSON.parse(cartResponse.config.data).user.userId).toBe('999');
         expect(JSON.parse(trackResponse.config.data).user.userId).toBe('999');
       });
@@ -828,11 +778,8 @@ describe('User Identification', () => {
           deviceInfo: { appPackageName: 'my-lil-website' }
         });
         const subsResponse = await updateSubscriptions();
-        const userResponse = await updateUser({ email: 'hello@gmail.com' });
-        const trackResponse = await track({
-          eventName: 'fdsafdf',
-          email: 'hello@gmail.com'
-        });
+        const userResponse = await updateUser();
+        const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).email).toBe(
           'hello@gmail.com'
@@ -878,19 +825,8 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const cartResponse = await updateCart({
-          items: [],
-          user: {
-            email: 'hello@gmail.com'
-          }
-        });
-        const trackResponse = await trackPurchase({
-          items: [],
-          total: 100,
-          user: {
-            email: 'hello@gmail.com'
-          }
-        });
+        const cartResponse = await updateCart({ items: [] });
+        const trackResponse = await trackPurchase({ items: [], total: 100 });
         expect(JSON.parse(cartResponse.config.data).user.email).toBe(
           'hello@gmail.com'
         );
@@ -1013,11 +949,8 @@ describe('User Identification', () => {
           deviceInfo: { appPackageName: 'my-lil-website' }
         });
         const subsResponse = await updateSubscriptions();
-        const userResponse = await updateUser({ userId: '999' });
-        const trackResponse = await track({
-          eventName: 'fdsafdf',
-          userId: '999'
-        });
+        const userResponse = await updateUser();
+        const trackResponse = await track({ eventName: 'fdsafdf' });
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
@@ -1052,19 +985,8 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const cartResponse = await updateCart({
-          items: [],
-          user: {
-            userId: '999'
-          }
-        });
-        const trackResponse = await trackPurchase({
-          items: [],
-          total: 100,
-          user: {
-            userId: '999'
-          }
-        });
+        const cartResponse = await updateCart({ items: [] });
+        const trackResponse = await trackPurchase({ items: [], total: 100 });
         expect(JSON.parse(cartResponse.config.data).user.userId).toBe('999');
         expect(JSON.parse(trackResponse.config.data).user.userId).toBe('999');
       });

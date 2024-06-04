@@ -6,6 +6,11 @@ import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  if (payload.user) {
+    delete (payload as any).user.userId;
+    delete (payload as any).user.email;
+  }
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
@@ -30,6 +35,11 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 };
 
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  if (payload.user) {
+    delete (payload as any).user.userId;
+    delete (payload as any).user.email;
+  }
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
