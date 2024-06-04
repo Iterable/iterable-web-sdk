@@ -34,10 +34,11 @@ export const EventsForm: FC<Props> = ({
     'Endpoint JSON goes here'
   );
 
-  const [trackEvent, setTrackEvent] = useState<string>(
-    '{"eventName":"button-clicked", "dataFields": {"browserVisit.website.domain":"https://mybrand.com/socks"}}'
-  );
-
+  const eventInput =
+    endpointName === 'track'
+      ? '{"eventName":"button-clicked", "dataFields": {"browserVisit.website.domain":"https://mybrand.com/socks"}}'
+      : '';
+  const [trackEvent, setTrackEvent] = useState<string>(eventInput);
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
 
   const handleParseJson = () => {

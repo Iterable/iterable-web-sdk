@@ -108,9 +108,7 @@ export const Users: FC<Props> = () => {
       <Heading>POST /users/update</Heading>
       <EndpointWrapper>
         <Form onSubmit={handleUpdateUser} data-qa-update-user-submit>
-          <label htmlFor="item-1">
-            Enter Data Field Name (value will be &quot;test-data&quot;)
-          </label>
+          <label htmlFor="item-1">Enter valid JSON here</label>
           <TextField
             value={userDataField}
             onChange={(e) => setUserDataField(e.target.value)}

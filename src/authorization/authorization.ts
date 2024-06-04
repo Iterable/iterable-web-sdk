@@ -57,7 +57,7 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string) => void;
+  setEmail: (email: string) => Promise<void>;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }
@@ -277,6 +277,9 @@ export function initialize(
   };
 
   const addEmailToRequest = (email: string) => {
+    if (typeof userInterceptor === 'number') {
+      baseAxiosRequest.interceptors.request.eject(userInterceptor);
+    }
     userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
       /* 
         endpoints that use _currentEmail_ payload prop in POST/PUT requests 
@@ -368,41 +371,25 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: (email: string) => {
+      setEmail: async (email: string) => {
         clearMessages();
-        tryMergeUser(email, true)
-          .then((response) => {
+        try {
+          const result = await tryMergeUser(email, false);
+          if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
             typeOfAuth = 'email';
             authIdentifier = email;
             addEmailToRequest(email);
-            clearAnonymousUser(response);
-          })
-          .catch((error) => {
-            // eslint-disable-next-line no-console
-            console.error('Merge failed', error);
-            return Promise.reject(`merging failed: ${error}`);
-          });
-
-        if (typeof userInterceptor === 'number') {
-          baseAxiosRequest.interceptors.request.eject(userInterceptor);
+            await clearAnonymousUser(result);
+            console.log('addEmailToRequest::', email, result);
+            return Promise.resolve();
+          }
+        } catch (error) {
+          console.error('Merge failed', error);
+          return Promise.reject(`merging failed: ${error}`);
         }
       },
       setUserID: async (userId: string) => {
         clearMessages();
-        tryMergeUser(userId, false)
-          .then(async (response) => {
-            typeOfAuth = 'userID';
-            authIdentifier = userId;
-            addUserIdToRequest(userId);
-            await clearAnonymousUser(response);
-            console.log('addUserIdToRequest::', userId, response);
-          })
-          .catch((error) => {
-            // eslint-disable-next-line no-console
-            console.error('Merge failed', error);
-            return Promise.reject(`merging failed: ${error}`);
-          });
-
         const tryUser = (userId: any) => {
           let createUserAttempts = 0;
 
@@ -423,10 +410,23 @@ export function initialize(
         };
 
         try {
-          return await tryUser(userId)();
-        } catch (e) {
-          /* failed to create a new user. Just silently resolve */
-          return Promise.resolve();
+          const result = await tryMergeUser(userId, false);
+          if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+            typeOfAuth = 'userID';
+            authIdentifier = userId;
+            addUserIdToRequest(userId);
+            await clearAnonymousUser(result);
+            console.log('addUserIdToRequest::', userId, result);
+            try {
+              return await tryUser(userId)();
+            } catch (e) {
+              /* failed to create a new user. Just silently resolve */
+              return Promise.resolve();
+            }
+          }
+        } catch (error) {
+          console.error('Merge failed', error);
+          return Promise.reject(`merging failed: ${error}`);
         }
       },
       logout: () => {
@@ -699,50 +699,39 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: (email: string) => {
+    setEmail: async (email: string) => {
       /* clear previous user */
       clearMessages();
 
-      tryMergeUser(email, true)
-        .then((response) => {
+      try {
+        const result = await tryMergeUser(email, false);
+        if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
           typeOfAuth = 'email';
           authIdentifier = email;
           addEmailToRequest(email);
-          clearAnonymousUser(response);
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error('Merge failed', error);
-          return Promise.reject(`merging failed: ${error}`);
-        });
-
-      if (typeof userInterceptor === 'number') {
-        baseAxiosRequest.interceptors.request.eject(userInterceptor);
-      }
-
-      return doRequest({ email }).catch((e) => {
-        if (logLevel === 'verbose') {
-          console.warn(
-            'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
-          );
+          await clearAnonymousUser(result);
+          console.log('addEmailToRequest::', email, result);
+          try {
+            return doRequest({ email }).catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+          } catch (e) {
+            /* failed to create a new user. Just silently resolve */
+            return Promise.resolve();
+          }
         }
-        return Promise.reject(e);
-      });
+      } catch (error) {
+        console.error('Merge failed', error);
+        return Promise.reject(`merging failed: ${error}`);
+      }
     },
     setUserID: async (userId: string) => {
       clearMessages();
-      tryMergeUser(userId, false)
-        .then((response) => {
-          typeOfAuth = 'userID';
-          authIdentifier = userId;
-          addUserIdToRequest(userId);
-          clearAnonymousUser(response);
-        })
-        .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.error('Merge failed', error);
-          return Promise.reject(`merging failed: ${error}`);
-        });
 
       const tryUser = (userID: any) => {
         let createUserAttempts = 0;
@@ -762,20 +751,37 @@ export function initialize(
           }
         };
       };
-
-      return doRequest({ userID: userId })
-        .then(async (token) => {
-          await tryUser(userId)();
-          return token;
-        })
-        .catch((e) => {
-          if (logLevel === 'verbose') {
-            console.warn(
-              'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
-            );
+      try {
+        const result = await tryMergeUser(userId, false);
+        if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+          typeOfAuth = 'userID';
+          authIdentifier = userId;
+          addUserIdToRequest(userId);
+          await clearAnonymousUser(result);
+          console.log('addUserIdToRequest::', userId, result);
+          try {
+            return doRequest({ userID: userId })
+              .then(async (token) => {
+                await tryUser(userId)();
+                return token;
+              })
+              .catch((e) => {
+                if (logLevel === 'verbose') {
+                  console.warn(
+                    'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+                  );
+                }
+                return Promise.reject(e);
+              });
+          } catch (e) {
+            /* failed to create a new user. Just silently resolve */
+            return Promise.resolve();
           }
-          return Promise.reject(e);
-        });
+        }
+      } catch (error) {
+        console.error('Merge failed', error);
+        return Promise.reject(`merging failed: ${error}`);
+      }
     },
     logout: () => {
       typeOfAuth = null;

@@ -162,16 +162,40 @@ export class AnonymousUserEventManager {
   private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     const userId = uuidv4();
+    console.log('will create known user::', userId);
+
+    /*const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
+    const trackEventList = strTrackEventList
+      ? JSON.parse(strTrackEventList)
+      : [];
+    const updateUserEvents = trackEventList.filter(
+      (item: any) => item.eventType === UPDATE_USER
+    );
+
+    const filteredEvents = trackEventList.filter(
+      (item: any) => item.eventType !== UPDATE_USER
+    );
+    localStorage.setItem(
+      SHARED_PREFS_EVENT_LIST_KEY,
+      JSON.stringify(filteredEvents)
+    );*/
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
+      /*const userDataFields = updateUserEvents
+        ? updateUserEvents.length === 1
+          ? updateUserEvents[0]
+          : {}
+        : {};*/
       const payload: TrackAnonSessionParams = {
         user: {
           userId,
           preferUserId: true,
           mergeNestedObjects: true,
           createNewFields: true
+          //dataFields: { ...userDataFields }
+          // append the dataFields for the update user here instead
         },
         createdAt: this.getCurrentTime(),
         deviceInfo: {
@@ -188,7 +212,7 @@ export class AnonymousUserEventManager {
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
         }
       };
-
+      console.log('payload useranonsession::', payload);
       setTimeout(async () => {
         const response = await baseIterableRequest<IterableResponse>({
           method: 'POST',
@@ -200,6 +224,7 @@ export class AnonymousUserEventManager {
           }
         });
         if (response && response.status === 200) {
+          console.log('known user created::', userId);
           setAnonUserId(userId);
           setTimeout(() => {
             this.syncEvents(); // little delay is important here to make sure anon userid is set

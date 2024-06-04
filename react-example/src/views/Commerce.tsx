@@ -83,7 +83,7 @@ export const Commerce: FC<Props> = () => {
 
   const handleTrackPurchase = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const jsonObj: TrackPurchaseRequestParams = handleParseJson(false);
+    const jsonObj = handleParseJson(false);
     if (jsonObj) {
       setTrackingPurchase(true);
       try {
@@ -93,7 +93,7 @@ export const Commerce: FC<Props> = () => {
         //   ],
         //   total: 200
         // })
-        trackPurchase(jsonObj)
+        trackPurchase({ ...jsonObj, total: 20 })
           .then((response) => {
             setTrackingPurchase(false);
             setTrackPurchaseResponse(JSON.stringify(response.data));
