@@ -7,6 +7,9 @@ import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
