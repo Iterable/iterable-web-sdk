@@ -81,21 +81,13 @@ const clearAnonymousUser = (mergeResponse: string) => {
   }
 };
 
-const setAnonTracking = () => {
-  try {
-    if (config.getConfig('enableAnonTracking')) {
-      const anonUserManager = new AnonymousUserEventManager();
-      anonUserManager.getAnonCriteria();
-      anonUserManager.updateAnonSession();
-    }
-  } catch (error) {
-    console.warn(error);
-  }
-};
-
 const getAnonUserId = () => {
-  const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
-  return anonUser;
+  if (config.getConfig('enableAnonTracking')) {
+    const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
+    return anonUser;
+  } else {
+    return null;
+  }
 };
 
 export function initialize(
@@ -252,15 +244,21 @@ export function initialize(
   };
 
   const enableAnonymousTracking = () => {
-    const anonymousUserId = getAnonUserId();
-    if (anonymousUserId !== null) {
-      // This block will restore the anon userID from localstorage
-      typeOfAuth = 'userID';
-      authIdentifier = anonymousUserId;
-      addUserIdToRequest(anonymousUserId);
-    } else {
-      setAnonTracking();
-      // We need to do anonymoustracking only if known-user was NOT created while doing anonymous tracking
+    try {
+      if (config.getConfig('enableAnonTracking')) {
+        const anonUserManager = new AnonymousUserEventManager();
+        anonUserManager.getAnonCriteria();
+        anonUserManager.updateAnonSession();
+        const anonymousUserId = getAnonUserId();
+        if (anonymousUserId !== null) {
+          // This block will restore the anon userID from localstorage
+          typeOfAuth = 'userID';
+          authIdentifier = anonymousUserId;
+          addUserIdToRequest(anonymousUserId);
+        }
+      }
+    } catch (error) {
+      console.warn(error);
     }
   };
 
@@ -408,7 +406,6 @@ export function initialize(
             }
           };
         };
-
         try {
           const result = await tryMergeUser(userId, false);
           if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
@@ -702,7 +699,6 @@ export function initialize(
     setEmail: async (email: string) => {
       /* clear previous user */
       clearMessages();
-
       try {
         const result = await tryMergeUser(email, false);
         if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {

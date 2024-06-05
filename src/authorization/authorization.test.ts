@@ -384,21 +384,24 @@ describe('User Identification', () => {
     describe('setEmail', () => {
       it('adds email param to endpoint that need an email as a param', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
           packageName: 'my-lil-website'
         });
-
+        console.log(
+          'vvvvv response.config.params.email',
+          response.config.params.email
+        );
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
-        setEmail('new@gmail.com');
+        await setEmail('hello@gmail.com');
+        await setEmail('new@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
@@ -415,7 +418,7 @@ describe('User Identification', () => {
 
       it('adds email body to endpoint that need an email as a body', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/events/trackInAppClose').reply(200, {
           data: 'something'
@@ -454,7 +457,7 @@ describe('User Identification', () => {
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/updateEmail').reply(200, {
           data: 'something'
@@ -469,7 +472,7 @@ describe('User Identification', () => {
 
       it('should add user.email param to endpoints that need it', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/commerce/updateCart').reply(200, {
           data: 'something'
@@ -490,7 +493,7 @@ describe('User Identification', () => {
 
       it('adds no email body or header information to unrelated endpoints', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/hello').reply(200, {
           data: 'something'
@@ -512,7 +515,7 @@ describe('User Identification', () => {
       it('should overwrite user ID set by setUserID', async () => {
         const { setEmail, setUserID } = initialize('123');
         await setUserID('999');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
