@@ -2,7 +2,10 @@ import {
   SHARED_PREFS_EVENT_TYPE,
   KEY_ITEMS,
   TRACK_PURCHASE,
-  TRACK_UPDATE_CART
+  TRACK_UPDATE_CART,
+  TRACK_EVENT,
+  UPDATE_CART,
+  KEY_EVENT_NAME
 } from '../constants';
 
 interface SearchQuery {
@@ -83,8 +86,7 @@ class CriteriaCompletionChecker {
     this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
-        (localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_PURCHASE ||
-          localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_UPDATE_CART)
+        localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_PURCHASE
       ) {
         const updatedItem: any = {};
 
@@ -93,7 +95,7 @@ class CriteriaCompletionChecker {
           const items = JSON.parse(items_str);
           items.forEach((item: any) => {
             Object.keys(item).forEach((key) => {
-              updatedItem['shoppingCartItems.' + key] = item[key];
+              updatedItem[`shoppingCartItems.${key}`] = item[key];
             });
           });
         }
@@ -107,6 +109,41 @@ class CriteriaCompletionChecker {
         Object.keys(localEventData).forEach((key) => {
           if (key !== KEY_ITEMS && key !== 'dataFields') {
             updatedItem[key] = localEventData[key];
+          }
+        });
+        processedEvents.push(updatedItem);
+      } else if (
+        localEventData[SHARED_PREFS_EVENT_TYPE] &&
+        localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_UPDATE_CART
+      ) {
+        const updatedItem: any = {};
+        processedEvents.push({
+          [KEY_EVENT_NAME]: UPDATE_CART,
+          [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
+        });
+        if (localEventData[KEY_ITEMS]) {
+          const items_str: string = JSON.stringify(localEventData[KEY_ITEMS]);
+          const items = JSON.parse(items_str);
+          items.forEach((item: any) => {
+            Object.keys(item).forEach((key) => {
+              updatedItem[`updateCart.updatedShoppingCartItems.${key}`] =
+                item[key];
+            });
+          });
+        }
+
+        if (localEventData.dataFields) {
+          Object.keys(localEventData.dataFields).forEach((key) => {
+            updatedItem[key] = localEventData.dataFields[key];
+          });
+        }
+        Object.keys(localEventData).forEach((key) => {
+          if (key !== KEY_ITEMS && key !== 'dataFields') {
+            if (key === SHARED_PREFS_EVENT_TYPE) {
+              updatedItem[key] = TRACK_EVENT;
+            } else {
+              updatedItem[key] = localEventData[key];
+            }
           }
         });
         processedEvents.push(updatedItem);
