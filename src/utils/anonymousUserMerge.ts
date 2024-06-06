@@ -18,8 +18,8 @@ export class AnonymousUserMerge {
     const sourceUserId = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
 
     const mergeApiParams: MergeApiParams = {
-      sourceUserId: isEmail ? null : sourceUserId,
-      sourceEmail: isEmail ? sourceUserId : null,
+      sourceUserId: sourceUserId,
+      sourceEmail: null,
       destinationUserId: isEmail ? null : userIdOrEmail,
       destinationEmail: isEmail ? userIdOrEmail : null
     };

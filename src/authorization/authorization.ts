@@ -372,7 +372,7 @@ export function initialize(
       setEmail: async (email: string) => {
         clearMessages();
         try {
-          const result = await tryMergeUser(email, false);
+          const result = await tryMergeUser(email, true);
           if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
             typeOfAuth = 'email';
             authIdentifier = email;
@@ -700,7 +700,7 @@ export function initialize(
       /* clear previous user */
       clearMessages();
       try {
-        const result = await tryMergeUser(email, false);
+        const result = await tryMergeUser(email, true);
         if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
           typeOfAuth = 'email';
           authIdentifier = email;
