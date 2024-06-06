@@ -182,4 +182,3 @@ export const UPDATE_USER = 'user';
 export const TRACK_UPDATE_CART = 'cartUpdate';
 
 export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
-export const MERGE_NOTREQUIRED = 'MERGE_NOTREQUIRED';

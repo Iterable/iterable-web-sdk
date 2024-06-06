@@ -6,9 +6,7 @@ import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
-  SHARED_PREF_ANON_USER_ID,
-  MERGE_NOTREQUIRED,
-  MERGE_SUCCESSFULL
+  SHARED_PREF_ANON_USER_ID
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -62,7 +60,7 @@ export interface WithoutJWT {
   logout: () => void;
 }
 
-export const setAnonUserId = (userId: string) => {
+export const setAnonUserId = async (userId: string) => {
   const { setUserID } = initializeWithConfig({
     authToken: process.env.API_KEY || '',
     configOptions: {
@@ -71,12 +69,12 @@ export const setAnonUserId = (userId: string) => {
       enableAnonTracking: true
     }
   });
-  setUserID(userId);
+  await setUserID(userId);
   localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
 };
 
-const clearAnonymousUser = (mergeResponse: string) => {
-  if (mergeResponse === MERGE_SUCCESSFULL) {
+const clearAnonymousUser = (mergeResponse: boolean) => {
+  if (mergeResponse) {
     localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
   }
 };
@@ -262,16 +260,30 @@ export function initialize(
     }
   };
 
-  const tryMergeUser = (
+  const tryMergeUser = async (
     userIdOrEmail: string,
     isEmail: boolean
-  ): Promise<string> => {
+  ): Promise<boolean> => {
+    let shouldSyncEvents = true;
     if (getAnonUserId() !== null) {
       const anonymousUserMerge = new AnonymousUserMerge();
-      return anonymousUserMerge.mergeUser(userIdOrEmail, isEmail);
+      try {
+        await anonymousUserMerge.mergeUser(userIdOrEmail, isEmail);
+      } catch (error) {
+        shouldSyncEvents = false;
+        return Promise.reject(`merging failed: ${error}`);
+      }
+    }
+    if (shouldSyncEvents) {
+      // events sync
+      setTimeout(() => {
+        console.log('sync eventssss7777');
+        const anonUserManager = new AnonymousUserEventManager();
+        anonUserManager.syncEvents();
+      }, 300);
     }
     console.log('anon user will create now');
-    return Promise.resolve(MERGE_NOTREQUIRED); // promise resolves here because merging is not needed so we setUserID passed via dev
+    return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
   };
 
   const addEmailToRequest = (email: string) => {
@@ -373,7 +385,7 @@ export function initialize(
         clearMessages();
         try {
           const result = await tryMergeUser(email, true);
-          if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+          if (result) {
             typeOfAuth = 'email';
             authIdentifier = email;
             addEmailToRequest(email);
@@ -408,12 +420,12 @@ export function initialize(
         };
         try {
           const result = await tryMergeUser(userId, false);
-          if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+          if (result) {
             typeOfAuth = 'userID';
             authIdentifier = userId;
             addUserIdToRequest(userId);
             await clearAnonymousUser(result);
-            console.log('addUserIdToRequest::', userId, result);
+            console.log('addUserIdToRequest::11', userId, result);
             try {
               return await tryUser(userId)();
             } catch (e) {
@@ -701,7 +713,7 @@ export function initialize(
       clearMessages();
       try {
         const result = await tryMergeUser(email, true);
-        if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+        if (result) {
           typeOfAuth = 'email';
           authIdentifier = email;
           addEmailToRequest(email);
@@ -749,12 +761,12 @@ export function initialize(
       };
       try {
         const result = await tryMergeUser(userId, false);
-        if (result === MERGE_SUCCESSFULL || result === MERGE_NOTREQUIRED) {
+        if (result) {
           typeOfAuth = 'userID';
           authIdentifier = userId;
           addUserIdToRequest(userId);
           await clearAnonymousUser(result);
-          console.log('addUserIdToRequest::', userId, result);
+          console.log('addUserIdToRequest::22', userId, result);
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {

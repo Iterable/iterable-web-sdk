@@ -84,6 +84,9 @@ export class AnonymousUserEventManager {
       method: 'GET',
       url: GET_CRITERIA_PATH,
       data: {},
+      headers: {
+        'API-Key': process.env.API_KEY
+      },
       validation: {}
     })
       .then((response) => {
@@ -226,15 +229,10 @@ export class AnonymousUserEventManager {
         if (response && response.status === 200) {
           console.log('known user created::', userId);
           setAnonUserId(userId);
-          setTimeout(() => {
-            this.syncEvents(); // little delay is important here to make sure anon userid is set
-          }, 300);
         }
       }, 500);
     } else {
-      setTimeout(() => {
-        this.syncEvents(); // little delay is important here to make sure anon userid is set
-      }, 300);
+      setAnonUserId(userId);
     }
   }
 
