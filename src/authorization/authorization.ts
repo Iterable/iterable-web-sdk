@@ -40,6 +40,8 @@ export let typeOfAuth: null | 'email' | 'userID' = null;
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
 let apiKey: null | string = null;
+let generateJWTGlobal: any = null;
+
 export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
@@ -62,8 +64,16 @@ export interface WithoutJWT {
 }
 
 export const setAnonUserId = async (userId: string) => {
+  let token: null | string = null;
+  if (generateJWTGlobal) {
+    token = await generateJWTGlobal({ userId: userId });
+  }
+
   baseAxiosRequest.interceptors.request.use((config) => {
     config.headers.set('Api-Key', apiKey);
+    if (token) {
+      config.headers.set('Authorization', `Bearer ${token}`);
+    }
     return config;
   });
   addUserIdToRequest(userId);
@@ -247,6 +257,7 @@ export function initialize(
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
   apiKey = authToken;
+  generateJWTGlobal = generateJWT;
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -261,13 +272,12 @@ export function initialize(
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT
   */
-  let authInterceptor: number | null = generateJWT
-    ? null
-    : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
+  let authInterceptor: number | null =
+    baseAxiosRequest.interceptors.request.use((config) => {
+      config.headers.set('Api-Key', authToken);
 
-        return config;
-      });
+      return config;
+    });
   let responseInterceptor: number | null = null;
 
   /**

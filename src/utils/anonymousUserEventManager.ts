@@ -225,7 +225,7 @@ export class AnonymousUserEventManager {
         });
         if (response && response.status === 200) {
           console.log('known user created::', userId);
-          setAnonUserId(userId);
+          await setAnonUserId(userId);
           this.syncEvents();
         }
       }, 500);
