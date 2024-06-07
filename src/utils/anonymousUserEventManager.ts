@@ -145,8 +145,6 @@ export class AnonymousUserEventManager {
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
     );
-
-    console.log('localStoredEventList::', localStoredEventList);
     try {
       if (criteriaData && localStoredEventList) {
         const checker = new CriteriaCompletionChecker(localStoredEventList);
@@ -162,40 +160,16 @@ export class AnonymousUserEventManager {
   private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     const userId = uuidv4();
-    console.log('will create known user::', userId);
-
-    /*const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
-    const trackEventList = strTrackEventList
-      ? JSON.parse(strTrackEventList)
-      : [];
-    const updateUserEvents = trackEventList.filter(
-      (item: any) => item.eventType === UPDATE_USER
-    );
-
-    const filteredEvents = trackEventList.filter(
-      (item: any) => item.eventType !== UPDATE_USER
-    );
-    localStorage.setItem(
-      SHARED_PREFS_EVENT_LIST_KEY,
-      JSON.stringify(filteredEvents)
-    );*/
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
-      /*const userDataFields = updateUserEvents
-        ? updateUserEvents.length === 1
-          ? updateUserEvents[0]
-          : {}
-        : {};*/
       const payload: TrackAnonSessionParams = {
         user: {
           userId,
           preferUserId: true,
           mergeNestedObjects: true,
           createNewFields: true
-          //dataFields: { ...userDataFields }
-          // append the dataFields for the update user here instead
         },
         createdAt: this.getCurrentTime(),
         deviceInfo: {
@@ -212,7 +186,6 @@ export class AnonymousUserEventManager {
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
         }
       };
-      console.log('payload useranonsession::', payload);
       setTimeout(async () => {
         const response = await baseIterableRequest<IterableResponse>({
           method: 'POST',
@@ -224,7 +197,6 @@ export class AnonymousUserEventManager {
           }
         });
         if (response && response.status === 200) {
-          console.log('known user created::', userId);
           await setAnonUserId(userId);
           this.syncEvents();
         }
@@ -288,14 +260,11 @@ export class AnonymousUserEventManager {
       );
       if (indexToUpdate !== -1) {
         const dataToUpdate = previousDataArray[indexToUpdate];
-        console.log('old user data::', dataToUpdate);
-        console.log('new user data::', newDataObject);
 
         previousDataArray[indexToUpdate] = {
           ...dataToUpdate,
           ...newDataObject
         };
-        console.log('aggregated data::', previousDataArray[indexToUpdate]);
       } else {
         previousDataArray.push(newDataObject);
       }
@@ -308,8 +277,6 @@ export class AnonymousUserEventManager {
       JSON.stringify(previousDataArray)
     );
     const criteriaId = await this.checkCriteriaCompletion();
-    console.log('criteriaId::', criteriaId);
-
     if (criteriaId !== null) {
       this.createKnownUser(criteriaId);
     }

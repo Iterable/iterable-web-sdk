@@ -93,17 +93,19 @@ const getAnonUserId = () => {
   }
 };
 
+const initializeUserIdAndSync = (userId: string) => {
+  addUserIdToRequest(userId);
+  clearAnonymousUser();
+  syncEvents();
+};
+
 const addUserIdToRequest = (userId: string) => {
   typeOfAuth = 'userID';
   authIdentifier = userId;
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
-    console.log('removing existing one');
   }
-
-  console.log('adding UserIdToRequest::', userId);
-
   /*
     endpoints that use _userId_ payload prop in POST/PUT requests 
   */
@@ -170,6 +172,19 @@ const addUserIdToRequest = (userId: string) => {
 
     return config;
   });
+};
+
+const initializeEmailUserAndSync = (email: string) => {
+  addEmailToRequest(email);
+  clearAnonymousUser();
+  syncEvents();
+};
+
+const syncEvents = () => {
+  if (config.getConfig('enableAnonTracking')) {
+    const anonUserManager = new AnonymousUserEventManager();
+    anonUserManager.syncEvents();
+  }
 };
 
 const addEmailToRequest = (email: string) => {
@@ -342,18 +357,11 @@ export function initialize(
     }
   };
 
-  const syncEvents = () => {
-    if (config.getConfig('enableAnonTracking')) {
-      const anonUserManager = new AnonymousUserEventManager();
-      anonUserManager.syncEvents();
-    }
-  };
-
   const tryMergeUser = async (
     userIdOrEmail: string,
     isEmail: boolean
   ): Promise<boolean> => {
-    console.log('tryMergeUser called2');
+    // This function will try to merge if anon user exists
     if (getAnonUserId() !== null) {
       const anonymousUserMerge = new AnonymousUserMerge();
       try {
@@ -362,7 +370,6 @@ export function initialize(
         return Promise.reject(`merging failed: ${error}`);
       }
     }
-    console.log('anon user will create now');
     return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
   };
 
@@ -394,14 +401,11 @@ export function initialize(
         try {
           const result = await tryMergeUser(email, true);
           if (result) {
-            addEmailToRequest(email);
-            clearAnonymousUser();
-            syncEvents();
-            console.log('addEmailToRequest::', email, result);
+            initializeEmailUserAndSync(email);
             return Promise.resolve();
           }
         } catch (error) {
-          console.error('Merge failed', error);
+          addEmailToRequest(email); // here we will not sync events but just bubble up error of merge
           return Promise.reject(`merging failed: ${error}`);
         }
       },
@@ -428,10 +432,7 @@ export function initialize(
         try {
           const result = await tryMergeUser(userId, false);
           if (result) {
-            addUserIdToRequest(userId);
-            clearAnonymousUser();
-            syncEvents();
-            console.log('addUserIdToRequest::11', userId, result);
+            initializeUserIdAndSync(userId);
             try {
               return await tryUser(userId)();
             } catch (e) {
@@ -440,7 +441,7 @@ export function initialize(
             }
           }
         } catch (error) {
-          console.error('Merge failed', error);
+          addUserIdToRequest(userId); // here we will not sync events but just bubble up error of merge
           return Promise.reject(`merging failed: ${error}`);
         }
       },
@@ -720,10 +721,7 @@ export function initialize(
       try {
         const result = await tryMergeUser(email, true);
         if (result) {
-          addEmailToRequest(email);
-          clearAnonymousUser();
-          syncEvents();
-          console.log('addEmailToRequest::', email, result);
+          initializeEmailUserAndSync(email);
           try {
             return doRequest({ email }).catch((e) => {
               if (logLevel === 'verbose') {
@@ -739,7 +737,7 @@ export function initialize(
           }
         }
       } catch (error) {
-        console.error('Merge failed', error);
+        addEmailToRequest(email); // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },
@@ -767,10 +765,7 @@ export function initialize(
       try {
         const result = await tryMergeUser(userId, false);
         if (result) {
-          addUserIdToRequest(userId);
-          clearAnonymousUser();
-          syncEvents();
-          console.log('addUserIdToRequest::22', userId, result);
+          initializeUserIdAndSync(userId);
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
@@ -791,7 +786,7 @@ export function initialize(
           }
         }
       } catch (error) {
-        console.error('Merge failed', error);
+        addUserIdToRequest(userId); // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },

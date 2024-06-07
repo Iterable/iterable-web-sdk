@@ -209,7 +209,6 @@ class CriteriaCompletionChecker {
   }
 
   private evaluateField(node: SearchQuery, localEventData: any[]): boolean {
-    console.log('evaluateField::', node, localEventData);
     try {
       return this.evaluateFieldLogic(node, localEventData);
     } catch (e) {
@@ -227,8 +226,6 @@ class CriteriaCompletionChecker {
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
       if (dataType === trackingType) {
-        console.log('should compare now:', node, eventData);
-
         const field = node.field;
         const comparatorType = node.comparatorType ? node.comparatorType : '';
         const localDataKeys = Object.keys(eventData);
@@ -259,7 +256,6 @@ class CriteriaCompletionChecker {
     matchObj: any,
     valueToCompare: string
   ): boolean {
-    console.log('inside evaluateComparison', valueToCompare);
     if (!valueToCompare && comparatorType !== 'IsSet') {
       return false;
     }
@@ -313,7 +309,6 @@ class CriteriaCompletionChecker {
     compareOperator: string
   ): boolean {
     if (!isNaN(parseFloat(stringValue))) {
-      console.log('inside comparision::');
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
       switch (compareOperator) {

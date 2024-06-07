@@ -397,10 +397,6 @@ describe('User Identification', () => {
           count: 10,
           packageName: 'my-lil-website'
         });
-        console.log(
-          'vvvvv response.config.params.email',
-          response.config.params.email
-        );
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
 
