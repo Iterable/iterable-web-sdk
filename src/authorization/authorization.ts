@@ -405,7 +405,7 @@ export function initialize(
             return Promise.resolve();
           }
         } catch (error) {
-          addEmailToRequest(email); // here we will not sync events but just bubble up error of merge
+          // here we will not sync events but just bubble up error of merge
           return Promise.reject(`merging failed: ${error}`);
         }
       },
@@ -441,7 +441,7 @@ export function initialize(
             }
           }
         } catch (error) {
-          addUserIdToRequest(userId); // here we will not sync events but just bubble up error of merge
+          // here we will not sync events but just bubble up error of merge
           return Promise.reject(`merging failed: ${error}`);
         }
       },
@@ -737,7 +737,7 @@ export function initialize(
           }
         }
       } catch (error) {
-        addEmailToRequest(email); // here we will not sync events but just bubble up error of merge
+        // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },
@@ -786,7 +786,7 @@ export function initialize(
           }
         }
       } catch (error) {
-        addUserIdToRequest(userId); // here we will not sync events but just bubble up error of merge
+        // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },
