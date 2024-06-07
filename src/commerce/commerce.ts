@@ -1,8 +1,11 @@
-import { baseIterableRequest } from '../request';
-import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
-import { IterableResponse } from '../types';
+import { baseIterableRequest } from 'src/request';
+import {
+  TrackPurchaseRequestParams,
+  UpdateCartRequestParams
+} from 'src/commerce/types';
+import { IterableResponse } from 'src/types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
-import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {

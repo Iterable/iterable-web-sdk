@@ -1,9 +1,12 @@
-import { baseIterableRequest } from '../request';
-import { InAppEventRequestParams, InAppTrackRequestParams } from './types';
-import { IterableResponse } from '../types';
-import { WEB_PLATFORM } from '../constants';
+import { baseIterableRequest } from 'src/request';
+import {
+  InAppEventRequestParams,
+  InAppTrackRequestParams
+} from 'src/events/types';
+import { IterableResponse } from 'src/types';
+import { WEB_PLATFORM } from 'src/constants';
 import { eventRequestSchema, trackSchema } from './events.schema';
-import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {

@@ -18,8 +18,8 @@ import {
   isEmail
 } from './utils';
 import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
-import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
-import { Options, config } from '../utils/config';
+import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
+import { Options, config } from 'src/utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 

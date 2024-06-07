@@ -1,8 +1,8 @@
 import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
-} from '../commerce/types';
-import { InAppTrackRequestParams } from '../events/types';
+} from 'src/commerce/types';
+import { InAppTrackRequestParams } from 'src/events/types';
 import {
   GET_CRITERIA_PATH,
   KEY_EVENT_NAME,
@@ -23,13 +23,13 @@ import {
   WEB_PLATFORM,
   KEY_PREFER_USERID
 } from 'src/constants';
-import { baseIterableRequest } from '../request';
-import { IterableResponse } from '../types';
+import { baseIterableRequest } from 'src/request';
+import { IterableResponse } from 'src/types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
-import { TrackAnonSessionParams } from './types';
+import { TrackAnonSessionParams } from 'src/utils/types';
 import { UpdateUserParams } from 'src/users';
-import { setAnonUserId } from '..';
+import { setAnonUserId } from 'src/index';
 import { trackSchema } from 'src/events/events.schema';
 import { updateUserSchema } from 'src/users/users.schema';
 import {
