@@ -8,6 +8,12 @@ import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
 import { GETMESSAGES_PATH } from '../constants';
 
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+};
+
 let mockRequest: any = null;
 /*
   decoded payload is:
@@ -24,6 +30,7 @@ const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE2Nzk0ODMyOTEsImlhdCI6MTY3OTQ4MzIzMX0.APaQAYy-lTE0o8rbR6b6-28eCICq36SQMBXmeZAvk1k';
 describe('API Key Interceptors', () => {
   beforeAll(() => {
+    (global as any).localStorage = localStorageMock;
     mockRequest = new MockAdapter(baseAxiosRequest);
     mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
       data: 'something'
@@ -358,7 +365,7 @@ describe('User Identification', () => {
     describe('logout', () => {
       it('logout method removes the email field from requests', async () => {
         const { logout, setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
         logout();
 
         const response = await getInAppMessages({
@@ -654,7 +661,7 @@ describe('User Identification', () => {
 
       it('should overwrite email set by setEmail', async () => {
         const { setEmail, setUserID } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
         await setUserID('999');
 
         const response = await getInAppMessages({

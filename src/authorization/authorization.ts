@@ -39,6 +39,7 @@ export let typeOfAuth: null | 'email' | 'userID' = null;
 /* this will be the literal user ID or email they choose to auth with */
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
+let apiKey: null | string = null;
 export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
@@ -61,22 +62,16 @@ export interface WithoutJWT {
 }
 
 export const setAnonUserId = async (userId: string) => {
-  const { setUserID } = initializeWithConfig({
-    authToken: process.env.API_KEY || '',
-    configOptions: {
-      isEuIterableService: false,
-      dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true
-    }
+  baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', apiKey);
+    return config;
   });
-  await setUserID(userId);
+  addUserIdToRequest(userId);
   localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
 };
 
-const clearAnonymousUser = (mergeResponse: boolean) => {
-  if (mergeResponse) {
-    localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-  }
+const clearAnonymousUser = () => {
+  localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
 };
 
 const getAnonUserId = () => {
@@ -88,6 +83,160 @@ const getAnonUserId = () => {
   }
 };
 
+const addUserIdToRequest = (userId: string) => {
+  typeOfAuth = 'userID';
+  authIdentifier = userId;
+
+  if (typeof userInterceptor === 'number') {
+    baseAxiosRequest.interceptors.request.eject(userInterceptor);
+    console.log('removing existing one');
+  }
+
+  console.log('adding UserIdToRequest::', userId);
+
+  /*
+    endpoints that use _userId_ payload prop in POST/PUT requests 
+  */
+  userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+    if (!!(config?.url || '').match(/updateEmail/gim)) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          currentUserId: userId
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ payload prop in POST/PUT requests 
+      */
+    if (
+      !!(config?.url || '').match(
+        /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
+      )
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          userId
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+      */
+    if (
+      !!(config?.url || '').match(
+        /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+      )
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          user: {
+            ...(config.data.user || {}),
+            userId
+          }
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ query param in GET requests
+      */
+    if (!!(config?.url || '').match(/getMessages/gim)) {
+      return {
+        ...config,
+        params: {
+          ...(config.params || {}),
+          userId
+        }
+      };
+    }
+
+    return config;
+  });
+};
+
+const addEmailToRequest = (email: string) => {
+  typeOfAuth = 'email';
+  authIdentifier = email;
+
+  if (typeof userInterceptor === 'number') {
+    baseAxiosRequest.interceptors.request.eject(userInterceptor);
+  }
+  userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+    /* 
+      endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+    */
+    if (!!(config?.url || '').match(/updateEmail/gim)) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          currentEmail: email
+        }
+      };
+    }
+
+    /*
+      endpoints that use _email_ payload prop in POST/PUT requests 
+    */
+    if (
+      !!(config?.url || '').match(
+        /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
+      )
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          email
+        }
+      };
+    }
+
+    /*
+      endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+    */
+    if (
+      !!(config?.url || '').match(
+        /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
+      )
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          user: {
+            ...(config.data.user || {}),
+            email
+          }
+        }
+      };
+    }
+
+    /*
+      endpoints that use _email_ query param in GET requests
+    */
+    if (!!(config?.url || '').match(/getMessages/gim)) {
+      return {
+        ...config,
+        params: {
+          ...(config.params || {}),
+          email
+        }
+      };
+    }
+
+    return config;
+  });
+};
+
 export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
@@ -97,6 +246,7 @@ export function initialize(
   authToken: string,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
+  apiKey = authToken;
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -165,82 +315,6 @@ export function initialize(
 
   const handleTokenExpiration = createTokenExpirationTimer();
 
-  const addUserIdToRequest = (userId: string) => {
-    if (typeof userInterceptor === 'number') {
-      baseAxiosRequest.interceptors.request.eject(userInterceptor);
-      console.log('removing existing one');
-    }
-
-    console.log('adding UserIdToRequest::', userId);
-
-    /*
-      endpoints that use _userId_ payload prop in POST/PUT requests 
-    */
-    userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-      if (!!(config?.url || '').match(/updateEmail/gim)) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            currentUserId: userId
-          }
-        };
-      }
-
-      /*
-          endpoints that use _userId_ payload prop in POST/PUT requests 
-        */
-      if (
-        !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-        )
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            userId
-          }
-        };
-      }
-
-      /*
-          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-        */
-      if (
-        !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-        )
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            user: {
-              ...(config.data.user || {}),
-              userId
-            }
-          }
-        };
-      }
-
-      /*
-          endpoints that use _userId_ query param in GET requests
-        */
-      if (!!(config?.url || '').match(/getMessages/gim)) {
-        return {
-          ...config,
-          params: {
-            ...(config.params || {}),
-            userId
-          }
-        };
-      }
-
-      return config;
-    });
-  };
-
   const enableAnonymousTracking = () => {
     try {
       if (config.getConfig('enableAnonTracking')) {
@@ -250,9 +324,7 @@ export function initialize(
         const anonymousUserId = getAnonUserId();
         if (anonymousUserId !== null) {
           // This block will restore the anon userID from localstorage
-          typeOfAuth = 'userID';
-          authIdentifier = anonymousUserId;
-          addUserIdToRequest(anonymousUserId);
+          setAnonUserId(anonymousUserId);
         }
       }
     } catch (error) {
@@ -260,102 +332,28 @@ export function initialize(
     }
   };
 
+  const syncEvents = () => {
+    if (config.getConfig('enableAnonTracking')) {
+      const anonUserManager = new AnonymousUserEventManager();
+      anonUserManager.syncEvents();
+    }
+  };
+
   const tryMergeUser = async (
     userIdOrEmail: string,
     isEmail: boolean
   ): Promise<boolean> => {
-    let shouldSyncEvents = true;
+    console.log('tryMergeUser called2');
     if (getAnonUserId() !== null) {
       const anonymousUserMerge = new AnonymousUserMerge();
       try {
         await anonymousUserMerge.mergeUser(userIdOrEmail, isEmail);
       } catch (error) {
-        shouldSyncEvents = false;
         return Promise.reject(`merging failed: ${error}`);
       }
     }
-    if (shouldSyncEvents) {
-      // events sync
-      setTimeout(() => {
-        console.log('sync eventssss7777');
-        const anonUserManager = new AnonymousUserEventManager();
-        anonUserManager.syncEvents();
-      }, 300);
-    }
     console.log('anon user will create now');
     return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
-  };
-
-  const addEmailToRequest = (email: string) => {
-    if (typeof userInterceptor === 'number') {
-      baseAxiosRequest.interceptors.request.eject(userInterceptor);
-    }
-    userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-      /* 
-        endpoints that use _currentEmail_ payload prop in POST/PUT requests 
-      */
-      if (!!(config?.url || '').match(/updateEmail/gim)) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            currentEmail: email
-          }
-        };
-      }
-
-      /*
-        endpoints that use _email_ payload prop in POST/PUT requests 
-      */
-      if (
-        !!(config?.url || '').match(
-          /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-        )
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            email
-          }
-        };
-      }
-
-      /*
-        endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-      */
-      if (
-        !!(config?.url || '').match(
-          /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-        )
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            user: {
-              ...(config.data.user || {}),
-              email
-            }
-          }
-        };
-      }
-
-      /*
-        endpoints that use _email_ query param in GET requests
-      */
-      if (!!(config?.url || '').match(/getMessages/gim)) {
-        return {
-          ...config,
-          params: {
-            ...(config.params || {}),
-            email
-          }
-        };
-      }
-
-      return config;
-    });
   };
 
   if (!generateJWT) {
@@ -386,10 +384,9 @@ export function initialize(
         try {
           const result = await tryMergeUser(email, true);
           if (result) {
-            typeOfAuth = 'email';
-            authIdentifier = email;
             addEmailToRequest(email);
-            await clearAnonymousUser(result);
+            clearAnonymousUser();
+            syncEvents();
             console.log('addEmailToRequest::', email, result);
             return Promise.resolve();
           }
@@ -421,10 +418,9 @@ export function initialize(
         try {
           const result = await tryMergeUser(userId, false);
           if (result) {
-            typeOfAuth = 'userID';
-            authIdentifier = userId;
             addUserIdToRequest(userId);
-            await clearAnonymousUser(result);
+            clearAnonymousUser();
+            syncEvents();
             console.log('addUserIdToRequest::11', userId, result);
             try {
               return await tryUser(userId)();
@@ -714,10 +710,9 @@ export function initialize(
       try {
         const result = await tryMergeUser(email, true);
         if (result) {
-          typeOfAuth = 'email';
-          authIdentifier = email;
           addEmailToRequest(email);
-          await clearAnonymousUser(result);
+          clearAnonymousUser();
+          syncEvents();
           console.log('addEmailToRequest::', email, result);
           try {
             return doRequest({ email }).catch((e) => {
@@ -762,10 +757,9 @@ export function initialize(
       try {
         const result = await tryMergeUser(userId, false);
         if (result) {
-          typeOfAuth = 'userID';
-          authIdentifier = userId;
           addUserIdToRequest(userId);
-          await clearAnonymousUser(result);
+          clearAnonymousUser();
+          syncEvents();
           console.log('addUserIdToRequest::22', userId, result);
           try {
             return doRequest({ userID: userId })

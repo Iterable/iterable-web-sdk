@@ -333,7 +333,10 @@ class CriteriaCompletionChecker {
   }
 
   private compareStringContains(sourceTo: any, stringValue: string): boolean {
-    return typeof sourceTo === 'string' && sourceTo.includes(stringValue);
+    return (
+      (typeof sourceTo === 'string' || typeof sourceTo === 'object') &&
+      sourceTo.includes(stringValue)
+    );
   }
 
   private compareStringStartsWith(sourceTo: any, stringValue: string): boolean {

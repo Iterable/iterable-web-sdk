@@ -133,7 +133,8 @@ describe('AnonymousUserEventManager', () => {
 
   it('should call createKnownUser when trackAnonEvent is called', async () => {
     const payload = {
-      eventName: 'testEvent'
+      eventName: 'testEvent',
+      eventType: 'customEvent'
     };
     const eventData = [
       {
