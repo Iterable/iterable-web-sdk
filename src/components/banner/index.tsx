@@ -1,4 +1,3 @@
-import { handleElementClick } from 'src/embedded/utils';
 import { OOTB } from '../types';
 import {
   bannerButtons,
@@ -11,7 +10,11 @@ import {
   defaultTitleStyles,
   textTitleImageDefaultStyle
 } from './styles';
-import { addButtonClickEvent, getTrimmedText } from 'src/embedded/utils';
+import {
+  addButtonClickEvent,
+  getTrimmedText,
+  handleElementClick
+} from 'src/embedded/utils';
 
 const emptyElement = {
   id: '',
@@ -99,7 +102,9 @@ export function IterableEmbeddedBanner({
   }">
         <div id="${
           htmlElements?.textTitle?.id
-        }" style="${defaultTextParentStyles}; ${htmlElements?.textTitle?.styles}">
+        }" style="${defaultTextParentStyles}; ${
+    htmlElements?.textTitle?.styles
+  }">
           ${
             trimmedTitle.length
               ? `<text id="${htmlElements?.title?.id}" style="${defaultTitleStyles}; ${htmlElements?.title?.styles}">${trimmedTitle}</text>`

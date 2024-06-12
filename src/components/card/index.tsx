@@ -96,9 +96,9 @@ export function IterableEmbeddedCard({
           src="${message?.elements?.mediaUrl}"/>`
           : ''
       }
-      <div id="${htmlElements?.textTitle?.id}" style="${defaultTextParentStyles}; ${
-    htmlElements?.textTitle?.styles
-  }">
+      <div id="${
+        htmlElements?.textTitle?.id
+      }" style="${defaultTextParentStyles}; ${htmlElements?.textTitle?.styles}">
         ${
           trimmedTitle.length
             ? `<text class="titleText" id="${htmlElements?.title?.id}" style="${defaultTitleStyles} ${htmlElements?.title?.styles}">${trimmedTitle}</text>`
