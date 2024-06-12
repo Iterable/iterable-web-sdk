@@ -1,4 +1,4 @@
-import { initialize } from '@iterable/web-sdk';
+import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
 import axios from 'axios';
 import './styles/index.css';
 
@@ -41,9 +41,13 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, setUserID, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    ({ email, userID }) => {
+  const initializeParams: WithJWTParams = {
+    authToken: process.env.API_KEY || '',
+    configOptions: {
+      isEuIterableService: false,
+      dangerouslyAllowJsPopups: true
+    },
+    generateJWT: ({ email, userID }) => {
       return axios
         .post(
           process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
@@ -63,7 +67,9 @@ const HomeLink = styled(Link)`
           return response.data?.token;
         });
     }
-  );
+  };
+  const { setEmail, setUserID, logout, refreshJwtToken } =
+    initializeWithConfig(initializeParams);
 
   const container = document.getElementById('root');
   const root = createRoot(container);
