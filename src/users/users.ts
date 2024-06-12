@@ -3,11 +3,12 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
+import { ENDPOINTS } from 'src/constants';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateEmail',
+    url: ENDPOINTS.update_email.route,
     data: {
       newEmail
     },
@@ -26,7 +27,7 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/update',
+    url: ENDPOINTS.users_update.route,
     data: {
       ...payload,
       preferUserId: true
@@ -46,7 +47,7 @@ export const updateSubscriptions = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateSubscriptions',
+    url: ENDPOINTS.users_update_subscriptions.route,
     data: payload,
     validation: {
       data: updateSubscriptionsSchema

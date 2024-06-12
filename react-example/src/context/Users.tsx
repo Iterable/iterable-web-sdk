@@ -35,7 +35,11 @@ export const UserContext = createContext<Context>({
   setLoggedInUser: () => null
 });
 
-export const UserProvider: FC = ({ children }) => {
+interface UserProviderProps {
+  children: React.ReactNode;
+}
+
+export const UserProvider: FC<UserProviderProps> = ({ children }) => {
   const [loggedInUser, setLoggedInUser] = useReducer(reducer, initialState);
 
   return (
