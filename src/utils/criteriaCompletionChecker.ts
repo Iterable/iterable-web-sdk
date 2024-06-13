@@ -5,6 +5,7 @@ import {
   TRACK_UPDATE_CART,
   TRACK_EVENT,
   UPDATE_CART,
+  UPDATE_USER,
   KEY_EVENT_NAME
 } from '../constants';
 
@@ -17,6 +18,8 @@ interface SearchQuery {
   comparatorType?: string;
   value?: string;
   fieldType?: string;
+  minMatch?: number;
+  maxMatch?: number;
 }
 
 interface Criteria {
@@ -91,13 +94,15 @@ class CriteriaCompletionChecker {
         const updatedItem: any = {};
 
         if (localEventData[KEY_ITEMS]) {
-          const items_str: string = JSON.stringify(localEventData[KEY_ITEMS]);
-          const items = JSON.parse(items_str);
-          items.forEach((item: any) => {
+          let items = localEventData[KEY_ITEMS];
+          items = items.map((item: any) => {
+            const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatedItem[`shoppingCartItems.${key}`] = item[key];
+              updatItem[`shoppingCartItems.${key}`] = item[key];
             });
+            return updatItem;
           });
+          updatedItem[KEY_ITEMS] = items;
         }
 
         if (localEventData.dataFields) {
@@ -111,25 +116,27 @@ class CriteriaCompletionChecker {
             updatedItem[key] = localEventData[key];
           }
         });
-        processedEvents.push(updatedItem);
+        processedEvents.push({
+          ...updatedItem,
+          [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
+        });
       } else if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_UPDATE_CART
       ) {
         const updatedItem: any = {};
-        processedEvents.push({
-          [KEY_EVENT_NAME]: UPDATE_CART,
-          [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
-        });
+
         if (localEventData[KEY_ITEMS]) {
-          const items_str: string = JSON.stringify(localEventData[KEY_ITEMS]);
-          const items = JSON.parse(items_str);
-          items.forEach((item: any) => {
+          let items = localEventData[KEY_ITEMS];
+          items = items.map((item: any) => {
+            const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatedItem[`updateCart.updatedShoppingCartItems.${key}`] =
+              updatItem[`updateCart.updatedShoppingCartItems.${key}`] =
                 item[key];
             });
+            return updatItem;
           });
+          updatedItem[KEY_ITEMS] = items;
         }
 
         if (localEventData.dataFields) {
@@ -146,24 +153,25 @@ class CriteriaCompletionChecker {
             }
           }
         });
-        processedEvents.push(updatedItem);
+        processedEvents.push({
+          ...updatedItem,
+          [KEY_EVENT_NAME]: UPDATE_CART,
+          [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
+        });
       }
     });
-
     return processedEvents;
   }
 
   private getNonCartEvents(): any[] {
     const nonPurchaseEvents: any[] = [];
-    let updatedItem: any = {};
-
     this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
-        localEventData[SHARED_PREFS_EVENT_TYPE] !== TRACK_PURCHASE &&
-        localEventData[SHARED_PREFS_EVENT_TYPE] !== TRACK_UPDATE_CART
+        (localEventData[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER ||
+          localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_EVENT)
       ) {
-        updatedItem = localEventData;
+        const updatedItem: any = localEventData;
         if (localEventData.dataFields) {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
@@ -172,7 +180,6 @@ class CriteriaCompletionChecker {
         nonPurchaseEvents.push(updatedItem);
       }
     });
-
     return nonPurchaseEvents;
   }
 
@@ -197,10 +204,7 @@ class CriteriaCompletionChecker {
           return false;
         }
       } else if (node.searchCombo) {
-        const searchCombo = node.searchCombo;
-        return this.evaluateTree(searchCombo, localEventData);
-      } else if (node.field) {
-        return this.evaluateField(node, localEventData);
+        return this.evaluateSearchQueries(node, localEventData);
       }
     } catch (e) {
       this.handleException(e);
@@ -208,46 +212,100 @@ class CriteriaCompletionChecker {
     return false;
   }
 
-  private evaluateField(node: SearchQuery, localEventData: any[]): boolean {
-    try {
-      return this.evaluateFieldLogic(node, localEventData);
-    } catch (e) {
-      this.handleJSONException(e);
-    }
-    return false;
-  }
-
-  private evaluateFieldLogic(
+  private evaluateSearchQueries(
     node: SearchQuery,
     localEventData: any[]
   ): boolean {
+    // this function will compare the actualy searhqueues under search combo
     for (let i = 0; i < localEventData.length; i++) {
       const eventData = localEventData[i];
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
       if (dataType === trackingType) {
-        const field = node.field;
-        const comparatorType = node.comparatorType ? node.comparatorType : '';
-        const localDataKeys = Object.keys(eventData);
+        const searchCombo = node.searchCombo;
+        const searchQueries = searchCombo?.searchQueries || [];
+        const combinator = searchCombo?.combinator || '';
+        //const minMatch = node.minMatch;
+        if (this.evaluateEvent(eventData, searchQueries, combinator)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
-        for (let j = 0; j < localDataKeys.length; j++) {
-          const key = localDataKeys[j];
-          if (field === key) {
-            const matchedCountObj = eventData[key];
-            if (
-              this.evaluateComparison(
-                comparatorType,
-                matchedCountObj,
-                node.value ? node.value : ''
-              )
-            ) {
-              return true;
+  private evaluateEvent(
+    localEvent: any,
+    searchQueries: any,
+    combinator: string
+  ): boolean {
+    if (combinator === 'And') {
+      for (let i = 0; i < searchQueries.length; i++) {
+        if (!this.evaluateFieldLogic(searchQueries[i], localEvent)) {
+          return false;
+        }
+      }
+      return true;
+    } else if (combinator === 'Or') {
+      for (let i = 0; i < searchQueries.length; i++) {
+        if (this.evaluateFieldLogic(searchQueries[i], localEvent)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    return false;
+  }
+
+  private evaluateFieldLogic(node: any, eventData: any): boolean {
+    const field = node.field;
+    const comparatorType = node.comparatorType ? node.comparatorType : '';
+    const localDataKeys = Object.keys(eventData);
+    let shouldReturn = false;
+    for (let j = 0; j < localDataKeys.length; j++) {
+      const key = localDataKeys[j];
+      if (key === KEY_ITEMS) {
+        // scenario of items inside purchase and updateCart Events
+        const items = eventData[key];
+        items.forEach((item: any) => {
+          const keys = Object.keys(item);
+          keys.forEach((keyItem: any) => {
+            if (field === keyItem) {
+              const matchedCountObj = item[keyItem];
+              if (
+                this.evaluateComparison(
+                  comparatorType,
+                  matchedCountObj,
+                  node.value ? node.value : ''
+                )
+              ) {
+                shouldReturn = true;
+                return;
+              }
             }
+          });
+          if (shouldReturn) return; // Exit outer forEach loop
+        });
+        if (shouldReturn) break; // Exit main for loop
+      } else {
+        if (field === key) {
+          const matchedCountObj = eventData[key];
+          if (
+            this.evaluateComparison(
+              comparatorType,
+              matchedCountObj,
+              node.value ? node.value : ''
+            )
+          ) {
+            return true;
           }
         }
       }
     }
 
+    if (shouldReturn) {
+      return true;
+    }
     return false;
   }
 

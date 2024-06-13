@@ -41,6 +41,7 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
+  localStorage.clear();
   // Here we are testing it using NON-JWT based project.
   //JWT based project works but we assumed that generateJWT function will take-in userId as param to generate JWT
   const initializeParams: WithoutJWTParams = {
