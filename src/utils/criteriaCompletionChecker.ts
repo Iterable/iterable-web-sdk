@@ -6,7 +6,8 @@ import {
   TRACK_EVENT,
   UPDATE_CART,
   UPDATE_USER,
-  KEY_EVENT_NAME
+  KEY_EVENT_NAME,
+  SHARED_PREFS_EVENT_LIST_KEY
 } from '../constants';
 
 interface SearchQuery {
@@ -61,7 +62,11 @@ class CriteriaCompletionChecker {
         const searchQuery = criteria.searchQuery;
         const currentCriteriaId = criteria.criteriaId;
 
-        const result = this.evaluateTree(searchQuery, eventsToProcess);
+        const result = this.evaluateTree(
+          searchQuery,
+          eventsToProcess,
+          currentCriteriaId
+        );
         if (result) {
           criteriaId = currentCriteriaId;
           break;
@@ -183,28 +188,38 @@ class CriteriaCompletionChecker {
     return nonPurchaseEvents;
   }
 
-  private evaluateTree(node: SearchQuery, localEventData: any[]): boolean {
+  private evaluateTree(
+    node: SearchQuery,
+    localEventData: any[],
+    criteriaId: string
+  ): boolean {
     try {
       if (node.searchQueries) {
         const combinator = node.combinator;
         const searchQueries: any = node.searchQueries;
         if (combinator === 'And') {
           for (let i = 0; i < searchQueries.length; i++) {
-            if (!this.evaluateTree(searchQueries[i], localEventData)) {
+            if (
+              !this.evaluateTree(searchQueries[i], localEventData, criteriaId)
+            ) {
               return false;
             }
           }
           return true;
         } else if (combinator === 'Or') {
           for (let i = 0; i < searchQueries.length; i++) {
-            if (this.evaluateTree(searchQueries[i], localEventData)) {
+            if (
+              this.evaluateTree(searchQueries[i], localEventData, criteriaId)
+            ) {
               return true;
             }
           }
           return false;
         }
       } else if (node.searchCombo) {
-        return this.evaluateSearchQueries(node, localEventData);
+        const vv = this.evaluateSearchQueries(node, localEventData, criteriaId);
+        console.log('vvvvvvvv evaluateSearchQueries result', vv);
+        return vv;
       }
     } catch (e) {
       this.handleException(e);
@@ -214,11 +229,13 @@ class CriteriaCompletionChecker {
 
   private evaluateSearchQueries(
     node: SearchQuery,
-    localEventData: any[]
+    localEventData: any[],
+    criteriaId: string
   ): boolean {
     // this function will compare the actualy searhqueues under search combo
     for (let i = 0; i < localEventData.length; i++) {
       const eventData = localEventData[i];
+      console.log('vvvv eventData', eventData);
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
       if (dataType === trackingType) {
@@ -226,8 +243,122 @@ class CriteriaCompletionChecker {
         const searchQueries = searchCombo?.searchQueries || [];
         const combinator = searchCombo?.combinator || '';
         //const minMatch = node.minMatch;
+        // const matchedCriterias = [
+        //   {
+        //     criteriaId: '6',
+        //     nodeCombo: [{searchCombo: {}, count: 1}],
+        //   },
+        // ];
+        const matchedCriteriasFromLocalStorage =
+          localStorage.getItem('matchedCriterias');
+
+        console.log(
+          'vvvv matchedCriteriasFromLocalStorage',
+          matchedCriteriasFromLocalStorage
+        );
+
+        const matchedCriterias =
+          matchedCriteriasFromLocalStorage &&
+          JSON.parse(matchedCriteriasFromLocalStorage);
+
+        console.log('vvvv matchedCriterias', matchedCriterias);
+
+        const matchedCriteria =
+          matchedCriterias &&
+          matchedCriterias.find(
+            (item: {
+              criteriaId: string;
+              nodeCombo: { searchCombo: object; count: number }[];
+            }) => item.criteriaId === criteriaId
+          );
+
+        const matchedCriteriaIndex =
+          matchedCriterias &&
+          matchedCriterias.findIndex(
+            (item: {
+              criteriaId: string;
+              nodeCombo: { searchCombo: object; count: number }[];
+            }) => item.criteriaId === criteriaId
+          );
+
+        console.log('vvvv matchedCriteria', matchedCriteria);
+
         if (this.evaluateEvent(eventData, searchQueries, combinator)) {
-          return true;
+          console.log('vvvv node', node);
+          if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
+            const matchedNode =
+              matchedCriteria &&
+              matchedCriteria.nodeCombo.filter(
+                (n: { searchCombo: object; count: number }) =>
+                  JSON.stringify(n.searchCombo) ===
+                  JSON.stringify(node.searchCombo)
+              );
+            console.log('vvvv matchedNode', matchedNode);
+            if (matchedNode && matchedNode.length > 0) {
+              // Update the count of the first node found
+              matchedNode[0].count = (matchedNode[0].count || 0) + 1;
+              // Find the index of the node in matchedCriteria.nodeCombo
+              const nodeIndex = matchedCriteria.nodeCombo.findIndex(
+                (n: { searchCombo: object; count: number }) =>
+                  JSON.stringify(n.searchCombo) ===
+                  JSON.stringify(matchedNode[0].searchCombo)
+              );
+              console.log('vvvv nodeIndex', nodeIndex);
+
+              if (nodeIndex !== -1) {
+                // Update the node in the matchedCriteria.nodeCombo array
+                matchedCriteria.nodeCombo[nodeIndex] = matchedNode[0];
+                matchedCriterias[matchedCriteriaIndex] = matchedCriteria;
+              } else {
+                // If criteriaId is not found, add a new object
+                console.log('vvvvvvv else node add condition');
+                // matchedCriterias[matchedCriteriaIndex] = matchedNode;
+                // matchedCriterias.push({
+                //   criteriaId: criteriaId,
+                //   nodeCombo: [matchedNode]
+                // });
+              }
+              // Update local storage with the new matchedCriteria
+              console.log('vvvv matchedCriterias33', matchedCriterias);
+              localStorage.setItem(
+                'matchedCriterias',
+                JSON.stringify(matchedCriterias)
+              );
+
+              console.log('vvvv matchedCritcount', matchedNode[0].count);
+              console.log('vvvv node.minMatch', node.minMatch);
+
+              if (matchedNode[0].count === node.minMatch) {
+                console.log('vvvv return true');
+                return true;
+              } else {
+                return false;
+              }
+            } else {
+              console.log('vvvv else');
+              const tempMatchedCriterias = matchedCriterias || [];
+              tempMatchedCriterias.push({
+                criteriaId: criteriaId,
+                nodeCombo: [{ searchCombo: node.searchCombo, count: 1 }]
+              });
+              console.log('vvvv matchedCriterias222', tempMatchedCriterias);
+              eventData.criteriaId = criteriaId;
+              localEventData[i] = eventData;
+              console.log('vvvv localEventData', localEventData);
+
+              localStorage.setItem(
+                SHARED_PREFS_EVENT_LIST_KEY,
+                JSON.stringify(localEventData)
+              );
+              localStorage.setItem(
+                'matchedCriterias',
+                JSON.stringify(tempMatchedCriterias)
+              );
+              return false;
+            }
+          } else {
+            return true;
+          }
         }
       }
     }
