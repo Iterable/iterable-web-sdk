@@ -12,6 +12,7 @@ import Link from 'src/components/Link';
 import styled from 'styled-components';
 import { UserProvider } from 'src/context/Users';
 import LoginFormWithoutJWT from './components/LoginFormWithoutJWT';
+import AUTTesting from './views/AUTTesting';
 
 const Wrapper = styled.div`
   display: flex;
@@ -64,6 +65,7 @@ const HomeLink = styled(Link)`
           <RouteWrapper>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/aut-testing" element={<AUTTesting />} />
               <Route path="/commerce" element={<Commerce />} />
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />

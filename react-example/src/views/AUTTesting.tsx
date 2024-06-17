@@ -39,7 +39,9 @@ export const AUTTesting: FC<Props> = () => {
 
   const [isUpdatingCart, setUpdatingCart] = useState<boolean>(false);
   const [isTrackingPurchase, setTrackingPurchase] = useState<boolean>(false);
-  const [userDataField, setUserDataField] = useState<string>('');
+  const [userDataField, setUserDataField] = useState<string>(
+    ' { "dataFields": {"phone_number": "57688559" }}'
+  );
   const [isUpdatingUser, setUpdatingUser] = useState<boolean>(false);
   const [updateUserResponse, setUpdateUserResponse] = useState<string>(
     'Endpoint JSON goes here'
@@ -85,7 +87,7 @@ export const AUTTesting: FC<Props> = () => {
             setUpdatingCart(false);
           })
           .catch((e: any) => {
-            setUpdateCartResponse(JSON.stringify(e.response.data));
+            setUpdateCartResponse(JSON.stringify(e));
             setUpdatingCart(false);
           });
       } catch (error) {
@@ -108,7 +110,7 @@ export const AUTTesting: FC<Props> = () => {
           })
           .catch((e: any) => {
             setTrackingPurchase(false);
-            setTrackPurchaseResponse(JSON.stringify(e.response.data));
+            setTrackPurchaseResponse(JSON.stringify(e));
           });
       } catch (error) {
         setTrackingPurchase(false);
@@ -129,7 +131,7 @@ export const AUTTesting: FC<Props> = () => {
             setUpdatingUser(false);
           })
           .catch((e: any) => {
-            setUpdateUserResponse(JSON.stringify(e.response.data));
+            setUpdateUserResponse(JSON.stringify(e));
             setUpdatingUser(false);
           });
       } catch (error) {

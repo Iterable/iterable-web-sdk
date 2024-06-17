@@ -16,11 +16,13 @@ describe('Users Requests', () => {
       dataFields: {}
     });
 
-    expect(JSON.parse(response.config.data).dataFields).toEqual({});
-    expect(JSON.parse(response.config.data).preferUserId).toBe(true);
+    expect(JSON.parse(response && response.config.data).dataFields).toEqual({});
+    expect(JSON.parse(response && response.config.data).preferUserId).toBe(
+      true
+    );
     // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
     // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
-    expect(response.data.msg).toBe('hello');
+    expect(response && response.data.msg).toBe('hello');
   });
 
   it('should reject updateUser on bad params', async () => {
@@ -179,8 +181,12 @@ describe('Users Requests', () => {
       userId: '1234'
     } as any);
 
-    expect(JSON.parse(updateResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(updateResponse.config.data).userId).toBeUndefined();
+    expect(
+      JSON.parse(updateResponse && updateResponse.config.data).email
+    ).toBeUndefined();
+    expect(
+      JSON.parse(updateResponse && updateResponse.config.data).userId
+    ).toBeUndefined();
     expect(JSON.parse(subsResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(subsResponse.config.data).userId).toBeUndefined();
   });

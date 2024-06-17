@@ -347,9 +347,6 @@ describe('AnonymousUserEventManager', () => {
           price: 4
         }
       ],
-      user: {
-        userId: 'user'
-      },
       total: 0
     };
     const userData = [
@@ -433,9 +430,6 @@ describe('AnonymousUserEventManager', () => {
           price: 4
         }
       ],
-      user: {
-        userId: 'user'
-      },
       total: 0
     };
     const userData = [

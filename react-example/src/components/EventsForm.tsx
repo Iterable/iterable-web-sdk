@@ -74,7 +74,11 @@ export const EventsForm: FC<Props> = ({
             setTrackingEvent(false);
           })
           .catch((e: any) => {
-            setTrackResponse(JSON.stringify(e.response.data));
+            if (e && e.response && e.response.data) {
+              setTrackResponse(JSON.stringify(e.response.data));
+            } else {
+              setTrackResponse(JSON.stringify(e));
+            }
             setTrackingEvent(false);
           });
       } catch (error) {

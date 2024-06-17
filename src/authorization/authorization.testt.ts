@@ -452,7 +452,7 @@ describe('User Identification', () => {
         expect(JSON.parse(subsResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(userResponse.config.data).email).toBe(
+        expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
         expect(JSON.parse(trackResponse.config.data).email).toBe(
@@ -603,7 +603,9 @@ describe('User Identification', () => {
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(userResponse.config.data).userId).toBe('999');
+        expect(
+          JSON.parse(userResponse && userResponse.config.data).userId
+        ).toBe('999');
         expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
@@ -795,7 +797,7 @@ describe('User Identification', () => {
         expect(JSON.parse(subsResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(userResponse.config.data).email).toBe(
+        expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
         expect(JSON.parse(trackResponse.config.data).email).toBe(
@@ -962,7 +964,9 @@ describe('User Identification', () => {
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(userResponse.config.data).userId).toBe('999');
+        expect(
+          JSON.parse(userResponse && userResponse.config.data).userId
+        ).toBe('999');
         expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
