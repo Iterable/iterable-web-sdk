@@ -56,7 +56,8 @@ class CriteriaCompletionChecker {
   private findMatchedCriteria(criteriaList: Criteria[]): string | null {
     let criteriaId: string | null = null;
     // get criteria id list
-    const eventsToProcess = this.prepareEventsToProcess();
+    const criteriaIdList = criteriaList.map((criteria) => criteria.criteriaId);
+    const eventsToProcess = this.prepareEventsToProcess(criteriaIdList);
     for (let i = 0; i < criteriaList.length; i++) {
       const criteria = criteriaList[i];
       if (criteria.searchQuery && criteria.criteriaId) {
@@ -78,9 +79,9 @@ class CriteriaCompletionChecker {
     return criteriaId;
   }
 
-  private prepareEventsToProcess(): any[] {
-    const eventsToProcess: any[] = this.getEventsWithCartItems();
-    const nonPurchaseEvents: any[] = this.getNonCartEvents();
+  private prepareEventsToProcess(criteriaIdList: string[]): any[] {
+    const eventsToProcess: any[] = this.getEventsWithCartItems(criteriaIdList);
+    const nonPurchaseEvents: any[] = this.getNonCartEvents(criteriaIdList);
 
     nonPurchaseEvents.forEach((event) => {
       eventsToProcess.push(event);
@@ -89,10 +90,20 @@ class CriteriaCompletionChecker {
     return eventsToProcess;
   }
 
-  private getEventsWithCartItems(): any[] {
+  private getEventsWithCartItems(criteriaIdList: string[]): any[] {
     const processedEvents: any[] = [];
 
-    this.localStoredEventList.forEach((localEventData) => {
+    this.localStoredEventList.forEach((localEventData, index) => {
+      if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
+        if (!criteriaIdList.includes(localEventData.criteriaid)) {
+          delete localEventData.criteriaId;
+          this.localStoredEventList[index] = localEventData;
+          localStorage.setItem(
+            SHARED_PREFS_EVENT_LIST_KEY,
+            JSON.stringify(this.localStoredEventList)
+          );
+        }
+      }
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_PURCHASE
@@ -169,9 +180,19 @@ class CriteriaCompletionChecker {
     return processedEvents;
   }
 
-  private getNonCartEvents(): any[] {
+  private getNonCartEvents(criteriaIdList: string[]): any[] {
     const nonPurchaseEvents: any[] = [];
-    this.localStoredEventList.forEach((localEventData) => {
+    this.localStoredEventList.forEach((localEventData, index) => {
+      if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
+        if (!criteriaIdList.includes(localEventData.criteriaid)) {
+          delete localEventData.criteriaid;
+          this.localStoredEventList[index] = localEventData;
+          localStorage.setItem(
+            SHARED_PREFS_EVENT_LIST_KEY,
+            JSON.stringify(this.localStoredEventList)
+          );
+        }
+      }
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         (localEventData[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER ||
