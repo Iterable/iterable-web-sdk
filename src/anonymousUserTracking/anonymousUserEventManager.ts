@@ -25,17 +25,17 @@ import {
 } from 'src/constants';
 import { baseIterableRequest } from 'src/request';
 import { IterableResponse } from 'src/types';
-import CriteriaCompletionChecker from './criteriaCompletionChecker';
+import CriteriaCompletionChecker from '../utils/criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackAnonSessionParams } from 'src/utils/types';
-import { UpdateUserParams } from 'src/users';
-import { InAppTrackRequestParams, setAnonUserId } from 'src/index';
-import { trackSchema } from 'src/events/events.schema';
-import { updateUserSchema } from 'src/users/users.schema';
+import { UpdateUserParams, updateUser } from 'src/users';
 import {
-  trackPurchaseSchema,
-  updateCartSchema
-} from 'src/commerce/commerce.schema';
+  InAppTrackRequestParams,
+  setAnonUserId,
+  track,
+  trackPurchase,
+  updateCart
+} from 'src/index';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
@@ -166,8 +166,6 @@ export class AnonymousUserEventManager {
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
       const payload: TrackAnonSessionParams = {
         user: {
-          userId,
-          preferUserId: true,
           mergeNestedObjects: true,
           createNewFields: true
         },
@@ -186,21 +184,19 @@ export class AnonymousUserEventManager {
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
         }
       };
-      setTimeout(async () => {
-        const response = await baseIterableRequest<IterableResponse>({
-          method: 'POST',
-          url: ENDPOINT_TRACK_ANON_SESSION,
-          data: payload
-        }).catch((e) => {
-          if (e?.response?.status === 409) {
-            this.getAnonCriteria();
-          }
-        });
-        if (response && response.status === 200) {
-          await setAnonUserId(userId);
-          this.syncEvents();
+      const response = await baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINT_TRACK_ANON_SESSION,
+        data: payload
+      }).catch((e) => {
+        if (e?.response?.status === 409) {
+          this.getAnonCriteria();
         }
-      }, 500);
+      });
+      if (response && response.status === 200) {
+        await setAnonUserId(userId);
+        this.syncEvents();
+      }
     }
   }
 
@@ -211,25 +207,24 @@ export class AnonymousUserEventManager {
       : [];
 
     if (trackEventList.length) {
-      for (let i = 0; i < trackEventList.length; i++) {
-        const event = trackEventList[i];
+      trackEventList.forEach((event: any) => {
         const eventType = event[SHARED_PREFS_EVENT_TYPE];
         delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {
-            this.track(event);
+            track(event);
             break;
           }
           case TRACK_PURCHASE: {
-            this.trackPurchase(event);
+            trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            this.updateCart(event);
+            updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            this.updateUser({ dataFields: event });
+            updateUser({ dataFields: event });
             break;
           }
           default:
@@ -238,12 +233,12 @@ export class AnonymousUserEventManager {
 
         localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
         localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
-      }
+      });
     }
   }
 
   private async storeEventListToLocalStorage(
-    newDataObject: any,
+    newDataObject: Record<any, any>,
     shouldOverWrite: boolean
   ) {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
@@ -295,62 +290,62 @@ export class AnonymousUserEventManager {
     }
   }
 
-  track = (payload: InAppTrackRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: '/events/track',
-      data: payload,
-      validation: {
-        data: trackSchema
-      }
-    });
-  };
+  // track = (payload: InAppTrackRequestParams) => {
+  //   return baseIterableRequest<IterableResponse>({
+  //     method: 'POST',
+  //     url: '/events/track',
+  //     data: payload,
+  //     validation: {
+  //       data: trackSchema
+  //     }
+  //   });
+  // };
 
-  updateCart = (payload: UpdateCartRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: '/commerce/updateCart',
-      data: {
-        ...payload,
-        user: {
-          ...payload.user,
-          preferUserId: true
-        }
-      },
-      validation: {
-        data: updateCartSchema
-      }
-    });
-  };
+  // updateCart = (payload: UpdateCartRequestParams) => {
+  //   return baseIterableRequest<IterableResponse>({
+  //     method: 'POST',
+  //     url: '/commerce/updateCart',
+  //     data: {
+  //       ...payload,
+  //       user: {
+  //         ...payload.user,
+  //         preferUserId: true
+  //       }
+  //     },
+  //     validation: {
+  //       data: updateCartSchema
+  //     }
+  //   });
+  // };
 
-  trackPurchase = (payload: TrackPurchaseRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: '/commerce/trackPurchase',
-      data: {
-        ...payload,
-        user: {
-          ...payload.user,
-          preferUserId: true
-        }
-      },
-      validation: {
-        data: trackPurchaseSchema
-      }
-    });
-  };
+  // trackPurchase = (payload: TrackPurchaseRequestParams) => {
+  //   return baseIterableRequest<IterableResponse>({
+  //     method: 'POST',
+  //     url: '/commerce/trackPurchase',
+  //     data: {
+  //       ...payload,
+  //       user: {
+  //         ...payload.user,
+  //         preferUserId: true
+  //       }
+  //     },
+  //     validation: {
+  //       data: trackPurchaseSchema
+  //     }
+  //   });
+  // };
 
-  updateUser = (payload: UpdateUserParams = {}) => {
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: '/users/update',
-      data: {
-        ...payload,
-        preferUserId: true
-      },
-      validation: {
-        data: updateUserSchema
-      }
-    });
-  };
+  // updateUser = (payload: UpdateUserParams = {}) => {
+  //   return baseIterableRequest<IterableResponse>({
+  //     method: 'POST',
+  //     url: '/users/update',
+  //     data: {
+  //       ...payload,
+  //       preferUserId: true
+  //     },
+  //     validation: {
+  //       data: updateUserSchema
+  //     }
+  //   });
+  // };
 }

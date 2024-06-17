@@ -5,9 +5,9 @@ import {
 } from 'src/commerce/types';
 import { IterableResponse } from 'src/types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
-import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
+import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
-import { ENDPOINTS } from 'src/constants';
+import { ANON_USER_ERROR, ENDPOINTS } from 'src/constants';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -18,9 +18,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
-    const errorMessage =
-      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
-    throw new Error(errorMessage);
+    return Promise.reject(ANON_USER_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -47,9 +45,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
-    const errorMessage =
-      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
-    throw new Error(errorMessage);
+    return Promise.reject(ANON_USER_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

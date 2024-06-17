@@ -279,8 +279,7 @@ describe('AnonymousUserEventManager', () => {
 
   it('should call createKnownUser when trackAnonUpdateUser is called', async () => {
     const payload: UpdateUserParams = {
-      userId: 'user',
-      preferUserId: true
+      dataFields: { country: 'UK' }
     };
     const userData = [
       {

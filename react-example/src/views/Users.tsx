@@ -29,9 +29,7 @@ export const Users: FC<Props> = () => {
   const [updateSubscriptionsResponse, setUpdateSubscriptionsResponse] =
     useState<string>('Endpoint JSON goes here');
 
-  const [userDataField, setUserDataField] = useState<string>(
-    ' { "dataFields": {"phone_number": "57688559" }}'
-  );
+  const [userDataField, setUserDataField] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [emailListID, setEmailListID] = useState<string>('');
 
@@ -43,8 +41,7 @@ export const Users: FC<Props> = () => {
   const handleParseJson = () => {
     try {
       // Parse JSON and assert its type
-      const parsedObject = JSON.parse(userDataField) as UpdateUserParams;
-      return parsedObject;
+      return JSON.parse(userDataField) as UpdateUserParams;
     } catch (error) {
       setUpdateUserResponse(JSON.stringify(error.message));
     }

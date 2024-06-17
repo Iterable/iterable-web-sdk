@@ -12,12 +12,16 @@ import {
   updateCart,
   trackPurchase,
   UpdateCartRequestParams,
-  TrackPurchaseRequestParams
+  TrackPurchaseRequestParams,
+  updateUser,
+  UpdateUserParams,
+  track
 } from '@iterable/web-sdk';
+import EventsForm from 'src/components/EventsForm';
 
 interface Props {}
 
-export const Commerce: FC<Props> = () => {
+export const AUTTesting: FC<Props> = () => {
   const [updateCartResponse, setUpdateCartResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -35,7 +39,11 @@ export const Commerce: FC<Props> = () => {
 
   const [isUpdatingCart, setUpdatingCart] = useState<boolean>(false);
   const [isTrackingPurchase, setTrackingPurchase] = useState<boolean>(false);
-
+  const [userDataField, setUserDataField] = useState<string>('');
+  const [isUpdatingUser, setUpdatingUser] = useState<boolean>(false);
+  const [updateUserResponse, setUpdateUserResponse] = useState<string>(
+    'Endpoint JSON goes here'
+  );
   const handleParseJson = (isUpdateCartCalled: boolean) => {
     try {
       // Parse JSON and assert its type
@@ -53,6 +61,15 @@ export const Commerce: FC<Props> = () => {
       if (isUpdateCartCalled)
         setUpdateCartResponse(JSON.stringify(error.message));
       else setTrackPurchaseResponse(JSON.stringify(error.message));
+    }
+  };
+
+  const handleParseUserJson = () => {
+    try {
+      // Parse JSON and assert its type
+      return JSON.parse(userDataField) as UpdateUserParams;
+    } catch (error) {
+      setUpdateUserResponse(JSON.stringify(error.message));
     }
   };
 
@@ -100,6 +117,28 @@ export const Commerce: FC<Props> = () => {
     }
   };
 
+  const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const jsonObj = handleParseUserJson();
+    if (jsonObj) {
+      setUpdatingUser(true);
+      try {
+        updateUser(jsonObj)
+          .then((response: any) => {
+            setUpdateUserResponse(JSON.stringify(response.data));
+            setUpdatingUser(false);
+          })
+          .catch((e: any) => {
+            setUpdateUserResponse(JSON.stringify(e.response.data));
+            setUpdatingUser(false);
+          });
+      } catch (error) {
+        setUpdateUserResponse(JSON.stringify(error.message));
+        setUpdatingUser(false);
+      }
+    }
+  };
+
   return (
     <>
       <h1>Commerce Endpoints</h1>
@@ -137,8 +176,29 @@ export const Commerce: FC<Props> = () => {
         </Form>
         <Response data-qa-purchase-response>{trackPurchaseResponse}</Response>
       </EndpointWrapper>
+      <h1>User Endpoint</h1>
+      <Heading>POST /users/update</Heading>
+      <EndpointWrapper>
+        <Form onSubmit={handleUpdateUser} data-qa-update-user-submit>
+          <label htmlFor="item-1">Enter valid JSON here</label>
+          <TextField
+            value={userDataField}
+            onChange={(e) => setUserDataField(e.target.value)}
+            id="item-1"
+            placeholder="e.g. phone_number"
+            data-qa-update-user-input
+            required
+          />
+          <Button disabled={isUpdatingUser} type="submit">
+            Submit
+          </Button>
+        </Form>
+        <Response data-qa-update-user-response>{updateUserResponse}</Response>
+      </EndpointWrapper>
+      <h1>Events Endpoint</h1>
+      <EventsForm heading="/track" endpointName="track" method={track} isAUT />
     </>
   );
 };
 
-export default Commerce;
+export default AUTTesting;

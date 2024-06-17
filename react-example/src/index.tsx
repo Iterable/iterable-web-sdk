@@ -4,6 +4,8 @@ import './styles/index.css';
 
 import Home from 'src/views/Home';
 import Commerce from 'src/views/Commerce';
+import AUTTesting from 'src/views/AUTTesting';
+
 import Events from 'src/views/Events';
 import Users from 'src/views/Users';
 import InApp from 'src/views/InApp';
@@ -91,6 +93,7 @@ const HomeLink = styled(Link)`
           <RouteWrapper>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/aut-testing" element={<AUTTesting />} />
               <Route path="/commerce" element={<Commerce />} />
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />

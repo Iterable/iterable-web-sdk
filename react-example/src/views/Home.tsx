@@ -19,6 +19,9 @@ export const Home: FC<Props> = () => {
     <>
       <h1>Namespace Selection</h1>
       <Wrapper>
+        <Link to="/aut-testing" renderAsButton>
+          AUT Testing
+        </Link>
         <Link to="/commerce" renderAsButton>
           Commerce
         </Link>

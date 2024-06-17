@@ -19,8 +19,8 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { AnonymousUserMerge } from 'src/utils/anonymousUserMerge';
-import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
+import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
+import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
@@ -466,7 +466,7 @@ export function initialize(
 
           return async function tryUserNTimes(): Promise<any> {
             try {
-              return await updateUser({ userId: userId });
+              return await updateUser();
             } catch (e) {
               if (createUserAttempts < RETRY_USER_ATTEMPTS) {
                 createUserAttempts += 1;
@@ -806,7 +806,7 @@ export function initialize(
 
         return async function tryUserNTimes(): Promise<any> {
           try {
-            return await updateUser({ userId: userID });
+            return await updateUser();
           } catch (e) {
             if (createUserAttempts < RETRY_USER_ATTEMPTS) {
               createUserAttempts += 1;

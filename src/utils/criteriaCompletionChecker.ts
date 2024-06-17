@@ -52,19 +52,19 @@ class CriteriaCompletionChecker {
   private findMatchedCriteria(criteriaList: Criteria[]): string | null {
     let criteriaId: string | null = null;
     const eventsToProcess = this.prepareEventsToProcess();
-    for (let i = 0; i < criteriaList.length; i++) {
-      const criteria = criteriaList[i];
-      if (criteria.searchQuery && criteria.criteriaId) {
+    criteriaList.forEach((criteria) => {
+      if (!criteriaId && criteria.searchQuery && criteria.criteriaId) {
+        // Check for criteriaId
         const searchQuery = criteria.searchQuery;
         const currentCriteriaId = criteria.criteriaId;
 
         const result = this.evaluateTree(searchQuery, eventsToProcess);
         if (result) {
           criteriaId = currentCriteriaId;
-          break;
+          // Since we cannot break in forEach, we use criteriaId check to stop further iterations
         }
       }
-    }
+    });
 
     return criteriaId;
   }
@@ -88,7 +88,7 @@ class CriteriaCompletionChecker {
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_PURCHASE
       ) {
-        const updatedItem: any = {};
+        const updatedItem: Record<any, any> = {};
 
         if (localEventData[KEY_ITEMS]) {
           const items_str: string = JSON.stringify(localEventData[KEY_ITEMS]);
