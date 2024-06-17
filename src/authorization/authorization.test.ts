@@ -16,10 +16,6 @@ const localStorageMock = {
 
 let mockRequest: any = null;
 
-const localStorageMock = {
-  setItem: jest.fn()
-};
-
 /*
   decoded payload is:
 
