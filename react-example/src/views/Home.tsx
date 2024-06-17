@@ -19,6 +19,9 @@ export const Home: FC<Props> = () => {
     <>
       <h1>Namespace Selection</h1>
       <Wrapper>
+        <Link to="/aut-testing" renderAsButton>
+          AUT Testing
+        </Link>
         <Link to="/commerce" renderAsButton>
           Commerce
         </Link>
@@ -30,6 +33,16 @@ export const Home: FC<Props> = () => {
         </Link>
         <Link to="/inApp" renderAsButton>
           inApp
+        </Link>
+        {/* Note: The following components (specifically Embedded Message View Types) will not be supported until a later release. */}
+        <Link to="/embedded-msgs" renderAsButton>
+          Embedded Msgs
+        </Link>
+        <Link to="/embedded" renderAsButton>
+          embedded
+        </Link>
+        <Link to="/embedded-msgs-impression-tracker" renderAsButton>
+          Embedded msgs impressions tracker
         </Link>
       </Wrapper>
     </>

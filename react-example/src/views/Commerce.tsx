@@ -62,15 +62,12 @@ export const Commerce: FC<Props> = () => {
     if (jsonObj) {
       setUpdatingCart(true);
       try {
-        // updateCart({
-        //   items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
-        // })
         updateCart(jsonObj)
-          .then((response) => {
+          .then((response: any) => {
             setUpdateCartResponse(JSON.stringify(response.data));
             setUpdatingCart(false);
           })
-          .catch((e) => {
+          .catch((e: any) => {
             setUpdateCartResponse(JSON.stringify(e.response.data));
             setUpdatingCart(false);
           });
@@ -87,18 +84,12 @@ export const Commerce: FC<Props> = () => {
     if (jsonObj) {
       setTrackingPurchase(true);
       try {
-        // trackPurchase({
-        //   items: [
-        //     { name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }
-        //   ],
-        //   total: 200
-        // })
         trackPurchase({ ...jsonObj, total: 20 })
-          .then((response) => {
+          .then((response: any) => {
             setTrackingPurchase(false);
             setTrackPurchaseResponse(JSON.stringify(response.data));
           })
-          .catch((e) => {
+          .catch((e: any) => {
             setTrackingPurchase(false);
             setTrackPurchaseResponse(JSON.stringify(e.response.data));
           });

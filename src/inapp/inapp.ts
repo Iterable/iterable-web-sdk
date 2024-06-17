@@ -7,7 +7,7 @@ import {
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
-} from 'src/constants';
+} from '../constants';
 import { throttle } from 'throttle-debounce';
 import {
   trackInAppClick,
@@ -129,7 +129,7 @@ export function getInAppMessages(
                   clickedUrl: url
                 }
               : trackPayload
-          ).catch((e) => e);
+          ).catch((e: any) => e);
 
           if (shouldAnimate) {
             const animationTimer = global.setTimeout(() => {
@@ -387,7 +387,7 @@ export function getInAppMessages(
                 ? [trackInAppConsume(trackPayload)]
                 : [])
             ];
-            Promise.all(trackRequests).catch((e) => e);
+            Promise.all(trackRequests).catch((e: any) => e);
           }
 
           /* now we'll add click tracking to _all_ anchor tags */
@@ -497,7 +497,7 @@ export function getInAppMessages(
                     */
                     isOpeningLinkInSameTab && !isIterableKeywordLink
                     /* swallow the network error */
-                  ).catch((e) => e);
+                  ).catch((e: any) => e);
 
                   if (isDismissNode || isActionLink) {
                     dismissMessage(activeIframe, clickedUrl);
@@ -589,14 +589,14 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response) => {
+          .then((response: any) => {
             trackMessagesDelivered(
               response.data.inAppMessages || [],
               dupedPayload.packageName
             );
             return response;
           })
-          .then((response) => {
+          .then((response: any) => {
             if (isDeferred)
               /*
                 if the user passed "deferred" for the second argument to _getMessages_

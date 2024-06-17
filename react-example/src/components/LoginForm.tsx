@@ -1,4 +1,4 @@
-import { FC, FormEvent, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 
 import _TextField from 'src/components/TextField';
@@ -26,15 +26,33 @@ const Form = styled.form`
   }
 `;
 
+const StyledDiv = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
+const Error = styled.div`
+  color: red;
+`;
+
 interface Props {
+  setEmail: (email: string) => Promise<string>;
   setUserId: (userId: string) => Promise<void>;
   logout: () => void;
+  refreshJwt: (authTypes: string) => Promise<string>;
 }
 
-export const LoginForm: FC<Props> = ({ setUserId, logout }) => {
-  const [userId, updateUserId] = useState<string>(
-    process.env.LOGIN_EMAIL || ''
-  );
+export const LoginForm: FC<Props> = ({
+  setEmail,
+  setUserId,
+  logout,
+  refreshJwt
+}) => {
+  const [useEmail, setUseEmail] = useState<boolean>(true);
+  const [user, updateUser] = useState<string>(process.env.LOGIN_EMAIL || '');
+
+  const [error, setError] = useState<string>('');
 
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
@@ -43,12 +61,14 @@ export const LoginForm: FC<Props> = ({ setUserId, logout }) => {
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setUserId(userId)
+    const setUser = useEmail ? setEmail : setUserId;
+
+    setUser(user)
       .then(() => {
         setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: userId });
+        setLoggedInUser({ type: 'user_update', data: user });
       })
-      .catch(() => updateUserId('Something went wrong!'));
+      .catch(() => setError('Something went wrong!'));
   };
 
   const handleLogout = () => {
@@ -57,17 +77,21 @@ export const LoginForm: FC<Props> = ({ setUserId, logout }) => {
   };
 
   const handleJwtRefresh = () => {
-    //refreshJwt(userId);
+    refreshJwt(user);
   };
 
   const handleEditUser = () => {
-    updateUserId(loggedInUser);
+    updateUser(loggedInUser);
     setEditingUser(true);
   };
 
   const handleCancelEditUser = () => {
-    updateUserId('');
+    updateUser('');
     setEditingUser(false);
+  };
+
+  const handleRadioChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setUseEmail(e.target.value === 'email');
   };
 
   const first5 = loggedInUser.substring(0, 5);
@@ -75,42 +99,55 @@ export const LoginForm: FC<Props> = ({ setUserId, logout }) => {
 
   return (
     <>
-      {loggedInUser ? (
-        isEditingUser ? (
-          <Form onSubmit={handleSubmit}>
-            <TextField
-              onChange={(e) => updateUserId(e.target.value)}
-              value={userId}
-              placeholder="e.g. hello@gmail.com"
-              //type="email"
-              required
-            />
-            <Button type="submit">Change</Button>
-            <Button onClick={handleCancelEditUser}>Cancel</Button>
-          </Form>
-        ) : (
-          <>
-            <Button onClick={handleEditUser}>
-              Logged in as {`${first5}...${last9}`} (change)
-            </Button>
-            <Button onClick={handleJwtRefresh}>
-              Manually Refresh JWT Token
-            </Button>
-            <Button onClick={handleLogout}>Logout</Button>
-          </>
-        )
+      {loggedInUser && !isEditingUser ? (
+        <>
+          <Button onClick={handleEditUser}>
+            Logged in as {`${first5}...${last9}`} (change)
+          </Button>
+          <Button onClick={handleJwtRefresh}>Manually Refresh JWT Token</Button>
+          <Button onClick={handleLogout}>Logout</Button>
+        </>
       ) : (
-        <Form onSubmit={handleSubmit} data-qa-login-form>
-          <TextField
-            onChange={(e) => updateUserId(e.target.value)}
-            value={userId}
-            placeholder="e.g. hello@gmail.com"
-            //type="email"
-            required
-            data-qa-login-input
-          />
-          <Button type="submit">Login</Button>
-        </Form>
+        <StyledDiv>
+          <Form>
+            <div>
+              <input
+                type="radio"
+                id="userId"
+                name="userId"
+                value="userId"
+                checked={!useEmail}
+                onChange={handleRadioChange}
+              />
+              <label>UserId</label>
+            </div>
+            <div>
+              <input
+                type="radio"
+                id="email"
+                name="email"
+                value="email"
+                checked={useEmail}
+                onChange={handleRadioChange}
+              />
+              <label>Email</label>
+            </div>
+          </Form>
+          <Form onSubmit={handleSubmit} data-qa-login-form>
+            <TextField
+              onChange={(e) => updateUser(e.target.value)}
+              value={user}
+              placeholder="e.g. hello@gmail.com"
+              required
+              data-qa-login-input
+            />
+            <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
+            {isEditingUser && (
+              <Button onClick={handleCancelEditUser}>Cancel</Button>
+            )}
+          </Form>
+          {error && <Error>{error}</Error>}
+        </StyledDiv>
       )}
     </>
   );

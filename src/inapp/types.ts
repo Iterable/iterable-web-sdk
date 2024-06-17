@@ -1,4 +1,4 @@
-import { IterablePromise } from 'src/types';
+import { IterablePromise } from '../types';
 
 export enum CloseButtonPosition {
   TopLeft = 'top-left',

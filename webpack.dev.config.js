@@ -2,6 +2,7 @@ const path = require('path');
 const env = require('dotenv').config({ path: './.env' });
 const webpack = require('webpack');
 const { version } = require('./package.json');
+const CopyPlugin = require('copy-webpack-plugin');
 
 function getParsedEnv() {
   if (!env.error) {
@@ -42,6 +43,12 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(getParsedEnv())
+    }),
+    new CopyPlugin({
+      patterns: [{ from: './src/assets', to: './dist/assets' }]
     })
-  ]
+  ],
+  watchOptions: {
+    ignored: /node_modules/
+  }
 };

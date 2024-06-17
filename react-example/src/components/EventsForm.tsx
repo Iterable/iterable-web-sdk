@@ -20,6 +20,7 @@ interface Props {
   endpointName: string;
   heading: string;
   needsEventName?: boolean;
+  isAUT?: boolean;
   method: (...args: any) => IterablePromise<IterableResponse>;
 }
 
@@ -27,17 +28,16 @@ export const EventsForm: FC<Props> = ({
   method,
   endpointName,
   heading,
-  needsEventName
+  isAUT
 }) => {
   const { loggedInUser, setLoggedInUser } = useUser();
   const [trackResponse, setTrackResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
 
-  const eventInput =
-    endpointName === 'track'
-      ? '{"eventName":"button-clicked", "dataFields": {"browserVisit.website.domain":"https://mybrand.com/socks"}}'
-      : '';
+  const eventInput = isAUT
+    ? '{"eventName":"button-clicked", "dataFields": {"browserVisit.website.domain":"https://mybrand.com/socks"}}'
+    : '';
   const [trackEvent, setTrackEvent] = useState<string>(eventInput);
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
 
@@ -56,13 +56,11 @@ export const EventsForm: FC<Props> = ({
     setTrackingEvent(true);
 
     let jsonObj;
-    if (needsEventName) {
+    if (isAUT) {
       jsonObj = handleParseJson();
     }
-    if ((needsEventName && jsonObj) || !needsEventName) {
-      const conditionalParams = needsEventName
-        ? jsonObj
-        : { messageId: trackEvent };
+    if ((isAUT && jsonObj) || !isAUT) {
+      const conditionalParams = isAUT ? jsonObj : { messageId: trackEvent };
 
       try {
         method({
@@ -71,12 +69,16 @@ export const EventsForm: FC<Props> = ({
             appPackageName: 'my-website'
           }
         })
-          .then((response) => {
+          .then((response: any) => {
             setTrackResponse(JSON.stringify(response.data));
             setTrackingEvent(false);
           })
-          .catch((e) => {
-            setTrackResponse(JSON.stringify(e.response.data));
+          .catch((e: any) => {
+            if (e && e.response && e.response.data) {
+              setTrackResponse(JSON.stringify(e.response.data));
+            } else {
+              setTrackResponse(JSON.stringify(e));
+            }
             setTrackingEvent(false);
           });
       } catch (error) {
@@ -96,16 +98,14 @@ export const EventsForm: FC<Props> = ({
       <EndpointWrapper>
         <Form onSubmit={handleTrack} {...formAttr}>
           <label htmlFor="item-1">
-            {needsEventName ? 'Enter valid JSON' : 'Enter Message ID'}
+            {isAUT ? 'Enter valid JSON' : 'Enter Message ID'}
           </label>
           <TextField
             value={trackEvent}
             onChange={(e) => setTrackEvent(e.target.value)}
             id="item-1"
             placeholder={
-              needsEventName
-                ? 'e.g. {"eventName":"button-clicked"}'
-                : 'e.g. df3fe3'
+              isAUT ? 'e.g. {"eventName":"button-clicked"}' : 'e.g. df3fe3'
             }
             {...inputAttr}
           />

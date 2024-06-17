@@ -3,13 +3,14 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
-import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
+import { ANON_USER_ERROR, ENDPOINTS } from 'src/constants';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateEmail',
+    url: ENDPOINTS.update_email.route,
     data: {
       newEmail
     },
@@ -26,24 +27,24 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
   delete (payload as any).userId;
   delete (payload as any).email;
 
-  if (canTrackAnonUser()) {
-    const anonymousUserEventManager = new AnonymousUserEventManager();
-    anonymousUserEventManager.trackAnonUpdateUser(payload);
-    const errorMessage =
-      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
-    throw new Error(errorMessage);
-  }
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: '/users/update',
-    data: {
-      ...payload,
-      preferUserId: true
-    },
-    validation: {
-      data: updateUserSchema
+  if (payload.dataFields) {
+    if (canTrackAnonUser()) {
+      const anonymousUserEventManager = new AnonymousUserEventManager();
+      anonymousUserEventManager.trackAnonUpdateUser(payload);
+      return Promise.reject(ANON_USER_ERROR);
     }
-  });
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: ENDPOINTS.users_update.route,
+      data: {
+        ...payload,
+        preferUserId: true
+      },
+      validation: {
+        data: updateUserSchema
+      }
+    });
+  }
 };
 
 export const updateSubscriptions = (
@@ -55,7 +56,7 @@ export const updateSubscriptions = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateSubscriptions',
+    url: ENDPOINTS.users_update_subscriptions.route,
     data: payload,
     validation: {
       data: updateSubscriptionsSchema

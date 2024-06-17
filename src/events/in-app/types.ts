@@ -1,6 +1,4 @@
 export interface InAppTrackRequestParams {
-  userId?: string;
-  email?: string;
   eventName: string;
   id?: string;
   createdAt?: number;
@@ -8,7 +6,6 @@ export interface InAppTrackRequestParams {
   campaignId?: number;
   templateId?: number;
 }
-
 export interface InAppEventRequestParams {
   messageId: string;
   clickedUrl?: string;
@@ -19,8 +16,6 @@ export interface InAppEventRequestParams {
   };
   closeAction?: string;
   deviceInfo: {
-    // deviceId?: string; forced to userAgent
-    // platform?: IterablePlatform; forced to "Web."
     appPackageName: string; // customer-defined name
   };
   inboxSessionId?: string;
