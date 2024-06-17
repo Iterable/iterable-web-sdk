@@ -27,24 +27,22 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
   delete (payload as any).userId;
   delete (payload as any).email;
 
-  if (payload.dataFields) {
-    if (canTrackAnonUser()) {
-      const anonymousUserEventManager = new AnonymousUserEventManager();
-      anonymousUserEventManager.trackAnonUpdateUser(payload);
-      return Promise.reject(ANON_USER_ERROR);
-    }
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: ENDPOINTS.users_update.route,
-      data: {
-        ...payload,
-        preferUserId: true
-      },
-      validation: {
-        data: updateUserSchema
-      }
-    });
+  if (canTrackAnonUser()) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonUpdateUser(payload);
+    return Promise.reject(ANON_USER_ERROR);
   }
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: ENDPOINTS.users_update.route,
+    data: {
+      ...payload,
+      preferUserId: true
+    },
+    validation: {
+      data: updateUserSchema
+    }
+  });
 };
 
 export const updateSubscriptions = (
