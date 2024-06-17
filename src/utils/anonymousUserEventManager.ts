@@ -214,6 +214,7 @@ export class AnonymousUserEventManager {
       for (let i = 0; i < trackEventList.length; i++) {
         const event = trackEventList[i];
         const eventType = event[SHARED_PREFS_EVENT_TYPE];
+        delete event.criteriaId;
         delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {

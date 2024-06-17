@@ -321,13 +321,14 @@ class CriteriaCompletionChecker {
                   JSON.stringify(matchedCriterias)
                 );
 
-                eventData.criteriaId = criteriaId;
-                localEventData[i] = eventData;
-                console.log('vvvv localEventData', localEventData);
+                const eventFromLocal = this.localStoredEventList[i];
+                eventFromLocal.criteriaId = criteriaId;
+                this.localStoredEventList[i] = eventFromLocal;
+                console.log('vvvv localEventData', this.localStoredEventList);
 
                 localStorage.setItem(
                   SHARED_PREFS_EVENT_LIST_KEY,
-                  JSON.stringify(localEventData)
+                  JSON.stringify(this.localStoredEventList)
                 );
 
                 console.log('vvvv matchedCritcount', matchedNode[0].count);
@@ -347,13 +348,14 @@ class CriteriaCompletionChecker {
                   nodeCombo: [{ searchCombo: node.searchCombo, count: 1 }]
                 });
                 console.log('vvvv matchedCriterias222', tempMatchedCriterias);
-                eventData.criteriaId = criteriaId;
-                localEventData[i] = eventData;
-                console.log('vvvv localEventData', localEventData);
+                const eventFromLocal = this.localStoredEventList[i];
+                eventFromLocal.criteriaId = criteriaId;
+                this.localStoredEventList[i] = eventFromLocal;
+                console.log('vvvv localEventData', this.localStoredEventList);
 
                 localStorage.setItem(
                   SHARED_PREFS_EVENT_LIST_KEY,
-                  JSON.stringify(localEventData)
+                  JSON.stringify(this.localStoredEventList)
                 );
                 localStorage.setItem(
                   'matchedCriterias',
