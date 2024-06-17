@@ -6,7 +6,9 @@ import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
-  SHARED_PREF_ANON_USER_ID
+  SHARED_PREF_ANON_USER_ID,
+  ENDPOINTS,
+  RouteConfig
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -47,6 +49,14 @@ export interface GenerateJWTPayload {
   userID?: string;
 }
 
+const doesRequestUrlContain = (routeConfig: RouteConfig) =>
+  Object.entries(ENDPOINTS).some(
+    (entry) =>
+      routeConfig.route === entry[1].route &&
+      routeConfig.body === entry[1].body &&
+      routeConfig.current === entry[1].current &&
+      routeConfig.nestedUser === entry[1].nestedUser
+  );
 export interface WithJWT {
   clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
@@ -110,7 +120,14 @@ const addUserIdToRequest = (userId: string) => {
     endpoints that use _userId_ payload prop in POST/PUT requests 
   */
   userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-    if (!!(config?.url || '').match(/updateEmail/gim)) {
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: true,
+        nestedUser: true
+      })
+    ) {
       return {
         ...config,
         data: {
@@ -124,9 +141,12 @@ const addUserIdToRequest = (userId: string) => {
         endpoints that use _userId_ payload prop in POST/PUT requests 
       */
     if (
-      !!(config?.url || '').match(
-        /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-      )
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: false
+      })
     ) {
       return {
         ...config,
@@ -141,9 +161,12 @@ const addUserIdToRequest = (userId: string) => {
         endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
       */
     if (
-      !!(config?.url || '').match(
-        /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-      )
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: true
+      })
     ) {
       return {
         ...config,
@@ -160,7 +183,14 @@ const addUserIdToRequest = (userId: string) => {
     /*
         endpoints that use _userId_ query param in GET requests
       */
-    if (!!(config?.url || '').match(/getMessages/gim)) {
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: false,
+        current: false,
+        nestedUser: false
+      })
+    ) {
       return {
         ...config,
         params: {
@@ -198,7 +228,14 @@ const addEmailToRequest = (email: string) => {
     /* 
       endpoints that use _currentEmail_ payload prop in POST/PUT requests 
     */
-    if (!!(config?.url || '').match(/updateEmail/gim)) {
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: true,
+        nestedUser: true
+      })
+    ) {
       return {
         ...config,
         data: {
@@ -212,9 +249,12 @@ const addEmailToRequest = (email: string) => {
       endpoints that use _email_ payload prop in POST/PUT requests 
     */
     if (
-      !!(config?.url || '').match(
-        /(users\/update)|(events\/trackInApp)|(events\/inAppConsume)|(events\/track)/gim
-      )
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: false
+      })
     ) {
       return {
         ...config,
@@ -229,9 +269,12 @@ const addEmailToRequest = (email: string) => {
       endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
     */
     if (
-      !!(config?.url || '').match(
-        /(commerce\/updateCart)|(commerce\/trackPurchase)/gim
-      )
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: true
+      })
     ) {
       return {
         ...config,
@@ -248,7 +291,14 @@ const addEmailToRequest = (email: string) => {
     /*
       endpoints that use _email_ query param in GET requests
     */
-    if (!!(config?.url || '').match(/getMessages/gim)) {
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: false,
+        current: false,
+        nestedUser: false
+      })
+    ) {
       return {
         ...config,
         params: {
@@ -516,7 +566,14 @@ export function initialize(
 
         responseInterceptor = baseAxiosRequest.interceptors.response.use(
           (config) => {
-            if (config.config.url?.match(/users\/updateEmail/gim)) {
+            if (
+              doesRequestUrlContain({
+                route: config?.config?.url ?? '',
+                body: true,
+                current: true,
+                nestedUser: true
+              })
+            ) {
               try {
                 /* 
                   if the customer just called the POST /users/updateEmail 
