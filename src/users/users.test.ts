@@ -181,12 +181,8 @@ describe('Users Requests', () => {
       userId: '1234'
     } as any);
 
-    expect(
-      JSON.parse(updateResponse && updateResponse.config.data).email
-    ).toBeUndefined();
-    expect(
-      JSON.parse(updateResponse && updateResponse.config.data).userId
-    ).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(updateResponse.config.data).userId).toBeUndefined();
     expect(JSON.parse(subsResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(subsResponse.config.data).userId).toBeUndefined();
   });

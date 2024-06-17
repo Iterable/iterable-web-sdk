@@ -17,6 +17,7 @@ export interface UpdateUserParams {
 
 export interface UpdateAnonymousUserParams extends UpdateUserParams {
   createNewFields?: boolean;
+  userId?: string;
 }
 
 export interface UpdateSubscriptionParams {

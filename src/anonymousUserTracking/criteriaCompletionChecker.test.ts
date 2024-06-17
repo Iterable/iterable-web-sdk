@@ -1,5 +1,5 @@
 import { SHARED_PREFS_EVENT_LIST_KEY } from '../constants';
-import CriteriaCompletionChecker from '../utils/criteriaCompletionChecker';
+import CriteriaCompletionChecker from './criteriaCompletionChecker';
 
 const localStorageMock = {
   getItem: jest.fn(),

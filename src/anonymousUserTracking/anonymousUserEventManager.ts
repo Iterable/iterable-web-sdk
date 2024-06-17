@@ -25,7 +25,7 @@ import {
 } from 'src/constants';
 import { baseIterableRequest } from 'src/request';
 import { IterableResponse } from 'src/types';
-import CriteriaCompletionChecker from '../utils/criteriaCompletionChecker';
+import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackAnonSessionParams } from 'src/utils/types';
 import { UpdateUserParams, updateUser } from 'src/users';
@@ -166,6 +166,7 @@ export class AnonymousUserEventManager {
       const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
       const payload: TrackAnonSessionParams = {
         user: {
+          userId,
           mergeNestedObjects: true,
           createNewFields: true
         },
