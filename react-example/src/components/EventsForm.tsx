@@ -71,11 +71,11 @@ export const EventsForm: FC<Props> = ({
             appPackageName: 'my-website'
           }
         })
-          .then((response) => {
+          .then((response: any) => {
             setTrackResponse(JSON.stringify(response.data));
             setTrackingEvent(false);
           })
-          .catch((e) => {
+          .catch((e: any) => {
             setTrackResponse(JSON.stringify(e.response.data));
             setTrackingEvent(false);
           });

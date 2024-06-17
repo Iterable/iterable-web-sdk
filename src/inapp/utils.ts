@@ -2,10 +2,10 @@ import { by } from '@pabra/sortby';
 import {
   ANIMATION_DURATION,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
-} from 'src/constants';
-import { WebInAppDisplaySettings } from 'src/inapp';
-import { srSpeak } from 'src/utils/srSpeak';
-import { trackInAppDelivery } from '../events';
+} from '../constants';
+import { WebInAppDisplaySettings } from '../inapp';
+import { srSpeak } from '../utils/srSpeak';
+import { trackInAppDelivery } from 'src/events/in-app/events';
 import { CloseButtonPosition, InAppMessage } from './types';
 import { config } from 'src/utils/config';
 
@@ -530,7 +530,7 @@ export const trackMessagesDelivered = (
         */
       });
     })
-  ).catch((e) => e);
+  ).catch((e: any) => e);
 };
 
 export const paintOverlay = (

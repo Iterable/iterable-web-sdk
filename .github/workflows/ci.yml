@@ -23,10 +23,7 @@ jobs:
           node-version: '16.3.0'
           cache: 'yarn'
       - run: yarn install --frozen-lockfile
-      - run: yarn typecheck
-      - run: yarn format
-      - run: yarn build
-      - run: yarn build:node
+      - run: yarn prepublishOnly
       - run: node index.node.js
       - run: yarn test
       - run: yarn check-deps

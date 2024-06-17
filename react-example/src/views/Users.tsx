@@ -57,11 +57,11 @@ export const Users: FC<Props> = () => {
       setUpdatingUser(true);
       try {
         updateUser(jsonObj)
-          .then((response) => {
+          .then((response: any) => {
             setUpdateUserResponse(JSON.stringify(response.data));
             setUpdatingUser(false);
           })
-          .catch((e) => {
+          .catch((e: any) => {
             setUpdateUserResponse(JSON.stringify(e.response.data));
             setUpdatingUser(false);
           });
@@ -76,12 +76,12 @@ export const Users: FC<Props> = () => {
     e.preventDefault();
     setUpdatingUserEmail(true);
     updateUserEmail(email)
-      .then((response) => {
+      .then((response: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(response.data));
         setLoggedInUser({ type: 'user_update', data: email });
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(e.response.data));
       });
@@ -92,11 +92,11 @@ export const Users: FC<Props> = () => {
 
     setUpdatingSubscriptions(true);
     updateSubscriptions({ emailListIds: [+emailListID] })
-      .then((response) => {
+      .then((response: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(response.data));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(e.response.data));
       });

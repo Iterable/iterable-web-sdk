@@ -7,6 +7,7 @@ import { IterableResponse } from 'src/types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from 'src/utils/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
+import { ENDPOINTS } from 'src/constants';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -23,7 +24,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/updateCart',
+    url: ENDPOINTS.commerce_update_cart.route,
     data: {
       ...payload,
       user: {
@@ -52,7 +53,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/trackPurchase',
+    url: ENDPOINTS.commerce_track_purchase.route,
     data: {
       ...payload,
       user: {
