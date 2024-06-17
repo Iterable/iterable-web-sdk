@@ -17,7 +17,7 @@ function getParsedEnv() {
 }
 
 module.exports = {
-  mode: 'development',
+  mode: 'production',
   entry: './src/index.ts',
   target: 'node',
   output: {
