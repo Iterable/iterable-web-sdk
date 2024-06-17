@@ -1,8 +1,4 @@
-import {
-  initializeWithConfig,
-  WithJWTParams,
-  WithoutJWTParams
-} from '@iterable/web-sdk';
+import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
@@ -16,6 +12,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Link from 'src/components/Link';
 import styled from 'styled-components';
 import LoginForm from 'src/components/LoginForm';
+
 import { UserProvider } from 'src/context/Users';
 
 const Wrapper = styled.div`
@@ -41,15 +38,31 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  //localStorage.clear();
-  // Here we are testing it using NON-JWT based project.
-  //JWT based project works but we assumed that generateJWT function will take-in userId as param to generate JWT
-  const initializeParams: WithoutJWTParams = {
+  const initializeParams: WithJWTParams = {
     authToken: process.env.API_KEY || '',
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
       enableAnonTracking: true
+    },
+    generateJWT: ({ userID }) => {
+      return axios
+        .post(
+          process.env.JWT_GENERATOR || 'http://localhost:3000/generate',
+          {
+            exp_minutes: 2,
+            userId: userID,
+            jwt_secret: process.env.JWT_SECRET
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
+        .then((response) => {
+          return response.data?.token;
+        });
     }
   };
   const { setUserID, logout } = initializeWithConfig(initializeParams);
@@ -63,7 +76,11 @@ const HomeLink = styled(Link)`
             <HomeLink renderAsButton to="/">
               Home
             </HomeLink>
-            <LoginForm setUserId={setUserID} logout={logout} />
+            <LoginForm
+              setUserId={setUserID}
+              logout={logout}
+              //refreshJwt={refreshJwtToken}
+            />
           </HeaderWrapper>
           <RouteWrapper>
             <Routes>

@@ -26,7 +26,7 @@ export const Commerce: FC<Props> = () => {
   );
 
   const [cartItem, setCartItem] = useState<string>(
-    '{"items":[{"name":"piano","id":"fdsafds","price":100,"quantity":2}]}'
+    '{"items":[{"name":"piano","id":"fdsafds","price":100.0,"quantity":4}, {"name":"piano","id":"fdsafds","price":50,"quantity":2}]}'
   );
 
   const [purchaseItem, setPurchaseItem] = useState<string>(
