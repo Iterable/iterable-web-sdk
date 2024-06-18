@@ -46,6 +46,16 @@ export const AUTTesting: FC<Props> = () => {
   const [updateUserResponse, setUpdateUserResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
+
+  const [trackResponse, setTrackResponse] = useState<string>(
+    'Endpoint JSON goes here'
+  );
+
+  const eventInput =
+    '{"eventName":"button-clicked", "dataFields": {"browserVisit.website.domain":"https://mybrand.com/socks"}}';
+  const [trackEvent, setTrackEvent] = useState<string>(eventInput);
+  const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
+
   const handleParseJson = (isUpdateCartCalled: boolean) => {
     try {
       // Parse JSON and assert its type
@@ -141,6 +151,54 @@ export const AUTTesting: FC<Props> = () => {
     }
   };
 
+  const handleParseTrackJson = () => {
+    try {
+      // Parse JSON and assert its type
+      const parsedObject = JSON.parse(trackEvent) as InAppTrackRequestParams;
+      return parsedObject;
+    } catch (error) {
+      setTrackResponse(JSON.stringify(error.message));
+    }
+  };
+
+  const handleTrack = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setTrackingEvent(true);
+
+    const jsonObj = handleParseTrackJson();
+    if (jsonObj) {
+      const conditionalParams = jsonObj;
+
+      try {
+        track({
+          ...conditionalParams,
+          deviceInfo: {
+            appPackageName: 'my-website'
+          }
+        })
+          .then((response: any) => {
+            setTrackResponse(JSON.stringify(response.data));
+            setTrackingEvent(false);
+          })
+          .catch((e: any) => {
+            if (e && e.response && e.response.data) {
+              setTrackResponse(JSON.stringify(e.response.data));
+            } else {
+              setTrackResponse(JSON.stringify(e));
+            }
+            setTrackingEvent(false);
+          });
+      } catch (error) {
+        setTrackResponse(JSON.stringify(error.message));
+        setTrackingEvent(false);
+      }
+    }
+  };
+
+  const formAttr = { ['data-qa-track-submit']: true };
+  const inputAttr = { ['data-qa-track-input']: true };
+  const responseAttr = { ['data-qa-track-response']: true };
+
   return (
     <>
       <h1>Commerce Endpoints</h1>
@@ -198,7 +256,23 @@ export const AUTTesting: FC<Props> = () => {
         <Response data-qa-update-user-response>{updateUserResponse}</Response>
       </EndpointWrapper>
       <h1>Events Endpoint</h1>
-      <EventsForm heading="/track" endpointName="track" method={track} isAUT />
+      <Heading>POST /track</Heading>
+      <EndpointWrapper>
+        <Form onSubmit={handleTrack} {...formAttr}>
+          <label htmlFor="item-1">{'Enter valid JSON'}</label>
+          <TextField
+            value={trackEvent}
+            onChange={(e) => setTrackEvent(e.target.value)}
+            id="item-1"
+            placeholder='e.g. {"eventName":"button-clicked"}'
+            {...inputAttr}
+          />
+          <Button disabled={isTrackingEvent} type="submit">
+            Submit
+          </Button>
+        </Form>
+        <Response {...responseAttr}>{trackResponse}</Response>
+      </EndpointWrapper>
     </>
   );
 };
