@@ -21,7 +21,8 @@ import {
   SHARED_PREFS_ANON_SESSIONS,
   ENDPOINT_TRACK_ANON_SESSION,
   WEB_PLATFORM,
-  KEY_PREFER_USERID
+  KEY_PREFER_USERID,
+  SHARED_PREF_MATCHED_CRITERIAS
 } from 'src/constants';
 import { baseIterableRequest } from 'src/request';
 import { IterableResponse } from 'src/types';
@@ -235,6 +236,7 @@ export class AnonymousUserEventManager {
 
         localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
         localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
+        localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
       });
     }
   }

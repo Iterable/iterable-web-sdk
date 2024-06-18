@@ -7,7 +7,8 @@ import {
   UPDATE_CART,
   UPDATE_USER,
   KEY_EVENT_NAME,
-  SHARED_PREFS_EVENT_LIST_KEY
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREF_MATCHED_CRITERIAS
 } from '../constants';
 
 interface SearchQuery {
@@ -239,7 +240,6 @@ class CriteriaCompletionChecker {
         }
       } else if (node.searchCombo) {
         const vv = this.evaluateSearchQueries(node, localEventData, criteriaId);
-        console.log('vvvvvvvv evaluateSearchQueries result', vv);
         return vv;
       }
     } catch (e) {
@@ -256,36 +256,27 @@ class CriteriaCompletionChecker {
     // this function will compare the actualy searhqueues under search combo
     for (let i = 0; i < localEventData.length; i++) {
       const eventData = localEventData[i];
-      console.log('vvvv eventData', eventData);
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
-      console.log('vvvv trackingType', trackingType);
       const dataType = node.dataType;
-      console.log('vvvv dataType', dataType);
       if (!Object.prototype.hasOwnProperty.call(eventData, 'criteriaId')) {
         if (dataType === trackingType) {
           const searchCombo = node.searchCombo;
           const searchQueries = searchCombo?.searchQueries || [];
           const combinator = searchCombo?.combinator || '';
-          //const minMatch = node.minMatch;
-          // const matchedCriterias = [
+          // matchedCriterias format
+          // [
           //   {
           //     criteriaId: '6',
           //     nodeCombo: [{searchCombo: {}, count: 1}],
           //   },
           // ];
-          const matchedCriteriasFromLocalStorage =
-            localStorage.getItem('matchedCriterias');
-
-          console.log(
-            'vvvv matchedCriteriasFromLocalStorage',
-            matchedCriteriasFromLocalStorage
+          const matchedCriteriasFromLocalStorage = localStorage.getItem(
+            SHARED_PREF_MATCHED_CRITERIAS
           );
 
           const matchedCriterias =
             matchedCriteriasFromLocalStorage &&
             JSON.parse(matchedCriteriasFromLocalStorage);
-
-          console.log('vvvv matchedCriterias', matchedCriterias);
 
           const matchedCriteria =
             matchedCriterias &&
@@ -305,10 +296,7 @@ class CriteriaCompletionChecker {
               }) => item.criteriaId === criteriaId
             );
 
-          console.log('vvvv matchedCriteria', matchedCriteria);
-
           if (this.evaluateEvent(eventData, searchQueries, combinator)) {
-            console.log('vvvv node', node);
             if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
               const matchedNode =
                 matchedCriteria &&
@@ -317,7 +305,6 @@ class CriteriaCompletionChecker {
                     JSON.stringify(n.searchCombo) ===
                     JSON.stringify(node.searchCombo)
                 );
-              console.log('vvvv matchedNode', matchedNode);
               if (matchedNode && matchedNode.length > 0) {
                 // Update the count of the first node found
                 matchedNode[0].count = (matchedNode[0].count || 0) + 1;
@@ -327,7 +314,6 @@ class CriteriaCompletionChecker {
                     JSON.stringify(n.searchCombo) ===
                     JSON.stringify(matchedNode[0].searchCombo)
                 );
-                console.log('vvvv nodeIndex', nodeIndex);
 
                 if (nodeIndex !== -1) {
                   // Update the node in the matchedCriteria.nodeCombo array
@@ -335,50 +321,41 @@ class CriteriaCompletionChecker {
                   matchedCriterias[matchedCriteriaIndex] = matchedCriteria;
                 }
                 // Update local storage with the new matchedCriteria
-                console.log('vvvv matchedCriterias33', matchedCriterias);
                 localStorage.setItem(
-                  'matchedCriterias',
+                  SHARED_PREF_MATCHED_CRITERIAS,
                   JSON.stringify(matchedCriterias)
                 );
 
                 const eventFromLocal = this.localStoredEventList[i];
                 eventFromLocal.criteriaId = criteriaId;
                 this.localStoredEventList[i] = eventFromLocal;
-                console.log('vvvv localEventData', this.localStoredEventList);
 
                 localStorage.setItem(
                   SHARED_PREFS_EVENT_LIST_KEY,
                   JSON.stringify(this.localStoredEventList)
                 );
 
-                console.log('vvvv matchedCritcount', matchedNode[0].count);
-                console.log('vvvv node.minMatch', node.minMatch);
-
                 if (matchedNode[0].count === node.minMatch) {
-                  console.log('vvvv return true');
                   return true;
                 } else {
                   return false;
                 }
               } else {
-                console.log('vvvv else');
                 const tempMatchedCriterias = matchedCriterias || [];
                 tempMatchedCriterias.push({
                   criteriaId: criteriaId,
                   nodeCombo: [{ searchCombo: node.searchCombo, count: 1 }]
                 });
-                console.log('vvvv matchedCriterias222', tempMatchedCriterias);
                 const eventFromLocal = this.localStoredEventList[i];
                 eventFromLocal.criteriaId = criteriaId;
                 this.localStoredEventList[i] = eventFromLocal;
-                console.log('vvvv localEventData', this.localStoredEventList);
 
                 localStorage.setItem(
                   SHARED_PREFS_EVENT_LIST_KEY,
                   JSON.stringify(this.localStoredEventList)
                 );
                 localStorage.setItem(
-                  'matchedCriterias',
+                  SHARED_PREF_MATCHED_CRITERIAS,
                   JSON.stringify(tempMatchedCriterias)
                 );
                 return false;
