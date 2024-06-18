@@ -10,8 +10,7 @@ import {
 import {
   updateUser,
   updateSubscriptions,
-  updateUserEmail,
-  UpdateUserParams
+  updateUserEmail
 } from '@iterable/web-sdk';
 
 import { useUser } from 'src/context/Users';
@@ -38,34 +37,24 @@ export const Users: FC<Props> = () => {
   const [isUpdatingSubscriptions, setUpdatingSubscriptions] =
     useState<boolean>(false);
 
-  const handleParseJson = () => {
-    try {
-      // Parse JSON and assert its type
-      return JSON.parse(userDataField) as UpdateUserParams;
-    } catch (error) {
-      setUpdateUserResponse(JSON.stringify(error.message));
-    }
-  };
-
   const handleUpdateUser = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const jsonObj = handleParseJson();
-    if (jsonObj) {
-      setUpdatingUser(true);
-      try {
-        updateUser(jsonObj)
-          .then((response: any) => {
-            setUpdateUserResponse(JSON.stringify(response.data));
-            setUpdatingUser(false);
-          })
-          .catch((e: any) => {
-            setUpdateUserResponse(JSON.stringify(e.response.data));
-            setUpdatingUser(false);
-          });
-      } catch (error) {
-        setUpdateUserResponse(JSON.stringify(error.message));
-        setUpdatingUser(false);
-      }
+    setUpdatingUser(true);
+    try {
+      updateUser({
+        dataFields: { [userDataField]: 'test-data' }
+      })
+        .then((response: any) => {
+          setUpdateUserResponse(JSON.stringify(response.data));
+          setUpdatingUser(false);
+        })
+        .catch((e: any) => {
+          setUpdateUserResponse(JSON.stringify(e.response.data));
+          setUpdatingUser(false);
+        });
+    } catch (error) {
+      setUpdateUserResponse(JSON.stringify(error.message));
+      setUpdatingUser(false);
     }
   };
 
@@ -105,7 +94,9 @@ export const Users: FC<Props> = () => {
       <Heading>POST /users/update</Heading>
       <EndpointWrapper>
         <Form onSubmit={handleUpdateUser} data-qa-update-user-submit>
-          <label htmlFor="item-1">Enter valid JSON here</label>
+          <label htmlFor="item-1">
+            Enter Data Field Name (value will be &quot;test-data&quot;)
+          </label>
           <TextField
             value={userDataField}
             onChange={(e) => setUserDataField(e.target.value)}
