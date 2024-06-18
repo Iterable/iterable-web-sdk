@@ -70,7 +70,7 @@ describe('CriteriaCompletionChecker', () => {
                   combinator: 'Or',
                   searchQueries: [
                     {
-                      dataType: 'purchase',
+                      dataType: 'customEvent',
                       searchCombo: {
                         combinator: 'And',
                         searchQueries: [
@@ -277,7 +277,7 @@ describe('CriteriaCompletionChecker', () => {
                   combinator: 'Or',
                   searchQueries: [
                     {
-                      dataType: 'purchase',
+                      dataType: 'customEvent',
                       searchCombo: {
                         combinator: 'And',
                         searchQueries: [
@@ -317,7 +317,7 @@ describe('CriteriaCompletionChecker', () => {
                   combinator: 'Or',
                   searchQueries: [
                     {
-                      dataType: 'purchase',
+                      dataType: 'customEvent',
                       searchCombo: {
                         combinator: 'And',
                         searchQueries: [
@@ -381,7 +381,7 @@ describe('CriteriaCompletionChecker', () => {
                   combinator: 'Or',
                   searchQueries: [
                     {
-                      dataType: 'purchase',
+                      dataType: 'customEvent',
                       searchCombo: {
                         combinator: 'And',
                         searchQueries: [

@@ -94,7 +94,7 @@ class CriteriaCompletionChecker {
 
     this.localStoredEventList.forEach((localEventData, index) => {
       if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
-        if (!criteriaIdList.includes(localEventData.criteriaid)) {
+        if (!criteriaIdList.includes(localEventData.criteriaId)) {
           delete localEventData.criteriaId;
           this.localStoredEventList[index] = localEventData;
           localStorage.setItem(
@@ -183,8 +183,8 @@ class CriteriaCompletionChecker {
     const nonPurchaseEvents: any[] = [];
     this.localStoredEventList.forEach((localEventData, index) => {
       if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
-        if (!criteriaIdList.includes(localEventData.criteriaid)) {
-          delete localEventData.criteriaid;
+        if (!criteriaIdList.includes(localEventData.criteriaId)) {
+          delete localEventData.criteriaId;
           this.localStoredEventList[index] = localEventData;
           localStorage.setItem(
             SHARED_PREFS_EVENT_LIST_KEY,
