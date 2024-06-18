@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { baseAxiosRequest } from '../request';
-import { updateUser } from 'src/users';
-import { clearMessages } from 'src/inapp';
+import { updateUser } from 'src/users/users';
+import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,

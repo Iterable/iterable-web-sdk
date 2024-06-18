@@ -8,12 +8,7 @@ import {
   Response
 } from './Components.styled';
 
-import {
-  updateCart,
-  trackPurchase,
-  UpdateCartRequestParams,
-  TrackPurchaseRequestParams
-} from '@iterable/web-sdk';
+import { updateCart, trackPurchase } from '@iterable/web-sdk';
 
 interface Props {}
 
