@@ -203,7 +203,7 @@ export class AnonymousUserEventManager {
           this.getAnonCriteria();
         }
       });
-      if (response && response.status === 200) {
+      if (response?.status === 200) {
         if (anonUserIdSetter !== null) {
           await anonUserIdSetter(userId);
         }

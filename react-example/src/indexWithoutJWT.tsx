@@ -40,7 +40,6 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  //localStorage.clear();
   // Here we are testing it using NON-JWT based project.
   const initializeParams: WithoutJWTParams = {
     authToken: process.env.API_KEY || '',
