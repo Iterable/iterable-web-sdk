@@ -1,4 +1,4 @@
-import { typeOfAuth } from '..';
+import { typeOfAuth } from '../authorization/authorization';
 import config from '../utils/config';
 
 export const canTrackAnonUser = (): boolean => {
