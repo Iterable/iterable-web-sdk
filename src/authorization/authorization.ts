@@ -20,7 +20,10 @@ import {
   isEmail
 } from './utils';
 import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
-import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
+import {
+  AnonymousUserEventManager,
+  registerAnonUserIdSetter
+} from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
@@ -43,6 +46,7 @@ let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
 let apiKey: null | string = null;
 let generateJWTGlobal: any = null;
+const anonUserManager = new AnonymousUserEventManager();
 
 export interface GenerateJWTPayload {
   email?: string;
@@ -89,6 +93,8 @@ export const setAnonUserId = async (userId: string) => {
   addUserIdToRequest(userId);
   localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
 };
+
+registerAnonUserIdSetter(setAnonUserId);
 
 const clearAnonymousUser = () => {
   localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
@@ -212,7 +218,6 @@ const initializeEmailUserAndSync = (email: string) => {
 
 const syncEvents = () => {
   if (config.getConfig('enableAnonTracking')) {
-    const anonUserManager = new AnonymousUserEventManager();
     anonUserManager.syncEvents();
   }
 };
@@ -393,7 +398,6 @@ export function initialize(
   const enableAnonymousTracking = () => {
     try {
       if (config.getConfig('enableAnonTracking')) {
-        const anonUserManager = new AnonymousUserEventManager();
         anonUserManager.getAnonCriteria();
         anonUserManager.updateAnonSession();
         const anonymousUserId = getAnonUserId();

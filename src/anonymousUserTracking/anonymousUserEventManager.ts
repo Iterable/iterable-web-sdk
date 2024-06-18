@@ -22,7 +22,8 @@ import {
   ENDPOINT_TRACK_ANON_SESSION,
   WEB_PLATFORM,
   KEY_PREFER_USERID,
-  SHARED_PREF_MATCHED_CRITERIAS
+  SHARED_PREF_MATCHED_CRITERIAS,
+  ENDPOINTS
 } from 'src/constants';
 import { baseIterableRequest } from 'src/request';
 import { IterableResponse } from 'src/types';
@@ -30,12 +31,21 @@ import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackAnonSessionParams } from 'src/utils/types';
 import { UpdateUserParams } from 'src/users/types';
-import { updateUser } from 'src/users/users';
 import { InAppTrackRequestParams } from 'src/events/in-app/types';
-import { setAnonUserId } from 'src/authorization/authorization';
-import { track } from 'src/events/events';
-import { trackPurchase, updateCart } from 'src/commerce/commerce';
+import { trackSchema } from 'src/events/events.schema';
+import {
+  trackPurchaseSchema,
+  updateCartSchema
+} from 'src/commerce/commerce.schema';
+import { updateUserSchema } from 'src/users/users.schema';
 
+type AnonUserFunction = (userId: string) => void;
+
+let anonUserIdSetter: AnonUserFunction | null = null;
+
+export function registerAnonUserIdSetter(setterFunction: AnonUserFunction) {
+  anonUserIdSetter = setterFunction;
+}
 export class AnonymousUserEventManager {
   updateAnonSession() {
     try {
@@ -194,7 +204,9 @@ export class AnonymousUserEventManager {
         }
       });
       if (response && response.status === 200) {
-        await setAnonUserId(userId);
+        if (anonUserIdSetter !== null) {
+          await anonUserIdSetter(userId);
+        }
         this.syncEvents();
       }
     }
@@ -213,19 +225,19 @@ export class AnonymousUserEventManager {
         delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {
-            track(event);
+            this.track(event);
             break;
           }
           case TRACK_PURCHASE: {
-            trackPurchase(event);
+            this.trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            updateCart(event);
+            this.updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            updateUser({ dataFields: event });
+            this.updateUser({ dataFields: event });
             break;
           }
           default:
@@ -291,4 +303,65 @@ export class AnonymousUserEventManager {
       return '';
     }
   }
+
+  track = (payload: InAppTrackRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: ENDPOINTS.event_track.route,
+      data: payload,
+      validation: {
+        data: trackSchema
+      }
+    });
+  };
+
+  updateCart = (payload: UpdateCartRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: ENDPOINTS.commerce_update_cart.route,
+      data: {
+        ...payload,
+        user: {
+          ...payload.user,
+          preferUserId: true
+        }
+      },
+      validation: {
+        data: updateCartSchema
+      }
+    });
+  };
+
+  trackPurchase = (payload: TrackPurchaseRequestParams) => {
+    return baseIterableRequest<IterableResponse>({
+      method: 'POST',
+      url: ENDPOINTS.commerce_track_purchase.route,
+      data: {
+        ...payload,
+        user: {
+          ...payload.user,
+          preferUserId: true
+        }
+      },
+      validation: {
+        data: trackPurchaseSchema
+      }
+    });
+  };
+
+  updateUser = (payload: UpdateUserParams = {}) => {
+    if (payload.dataFields) {
+      return baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINTS.users_update.route,
+        data: {
+          ...payload,
+          preferUserId: true
+        },
+        validation: {
+          data: updateUserSchema
+        }
+      });
+    }
+  };
 }
