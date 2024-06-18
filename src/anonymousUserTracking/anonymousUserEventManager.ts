@@ -29,14 +29,12 @@ import { IterableResponse } from 'src/types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
 import { TrackAnonSessionParams } from 'src/utils/types';
-import { UpdateUserParams, updateUser } from 'src/users';
-import {
-  InAppTrackRequestParams,
-  setAnonUserId,
-  track,
-  trackPurchase,
-  updateCart
-} from 'src/index';
+import { UpdateUserParams } from 'src/users/types';
+import { updateUser } from 'src/users/users';
+import { InAppTrackRequestParams } from 'src/events/in-app/types';
+import { setAnonUserId } from 'src/authorization/authorization';
+import { track } from 'src/events/events';
+import { trackPurchase, updateCart } from 'src/commerce/commerce';
 
 export class AnonymousUserEventManager {
   updateAnonSession() {
