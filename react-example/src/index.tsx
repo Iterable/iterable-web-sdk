@@ -93,7 +93,6 @@ const HomeLink = styled(Link)`
           <RouteWrapper>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/aut-testing" element={<AUTTesting />} />
               <Route path="/commerce" element={<Commerce />} />
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
@@ -104,6 +103,7 @@ const HomeLink = styled(Link)`
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
               />
+              <Route path="/aut-testing" element={<AUTTesting />} />
             </Routes>
           </RouteWrapper>
         </UserProvider>

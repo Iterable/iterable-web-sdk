@@ -4,7 +4,7 @@ import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUs
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
 import { InAppTrackRequestParams } from './in-app/types';
 import { trackSchema } from './events.schema';
-import { ANON_USER_ERROR, ENDPOINTS } from 'src/constants';
+import { INITIALIZE_ERROR, ENDPOINTS } from 'src/constants';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -13,7 +13,7 @@ export const track = (payload: InAppTrackRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
-    return Promise.reject(ANON_USER_ERROR);
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

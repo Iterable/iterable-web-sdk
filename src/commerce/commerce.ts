@@ -7,7 +7,7 @@ import { IterableResponse } from 'src/types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
-import { ANON_USER_ERROR, ENDPOINTS } from 'src/constants';
+import { INITIALIZE_ERROR, ENDPOINTS } from 'src/constants';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -18,7 +18,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
-    return Promise.reject(ANON_USER_ERROR);
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -45,7 +45,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
-    return Promise.reject(ANON_USER_ERROR);
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

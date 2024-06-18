@@ -15,9 +15,9 @@ import {
   TrackPurchaseRequestParams,
   updateUser,
   UpdateUserParams,
-  track
+  track,
+  InAppTrackRequestParams
 } from '@iterable/web-sdk';
-import EventsForm from 'src/components/EventsForm';
 
 interface Props {}
 

@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { updateUser } from 'src/users/users';
+import { baseAxiosRequest, baseIterableRequest } from '../request';
 import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
@@ -25,6 +24,8 @@ import {
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
+import { IterableResponse } from 'src/types';
+import { updateUserSchema } from 'src/users/users.schema';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 
@@ -98,6 +99,19 @@ registerAnonUserIdSetter(setAnonUserId);
 
 const clearAnonymousUser = () => {
   localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+};
+
+const updateUser = () => {
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: ENDPOINTS.users_update.route,
+    data: {
+      preferUserId: true
+    },
+    validation: {
+      data: updateUserSchema
+    }
+  });
 };
 
 const getAnonUserId = () => {
@@ -465,7 +479,7 @@ export function initialize(
       },
       setUserID: async (userId: string) => {
         clearMessages();
-        const tryUser = (userId: any) => {
+        const tryUser = () => {
           let createUserAttempts = 0;
 
           return async function tryUserNTimes(): Promise<any> {
@@ -488,7 +502,7 @@ export function initialize(
           if (result) {
             initializeUserIdAndSync(userId);
             try {
-              return await tryUser(userId)();
+              return await tryUser()();
             } catch (e) {
               /* failed to create a new user. Just silently resolve */
               return Promise.resolve();
@@ -805,7 +819,7 @@ export function initialize(
     setUserID: async (userId: string) => {
       clearMessages();
 
-      const tryUser = (userID: any) => {
+      const tryUser = () => {
         let createUserAttempts = 0;
 
         return async function tryUserNTimes(): Promise<any> {
@@ -830,7 +844,7 @@ export function initialize(
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
-                await tryUser(userId)();
+                await tryUser()();
                 return token;
               })
               .catch((e) => {

@@ -13,6 +13,9 @@ import styled from 'styled-components';
 import { UserProvider } from 'src/context/Users';
 import LoginFormWithoutJWT from './components/LoginFormWithoutJWT';
 import AUTTesting from './views/AUTTesting';
+import EmbeddedMsgs from './views/EmbeddedMsgs';
+import EmbeddedMessage from './views/Embedded';
+import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -39,7 +42,6 @@ const HomeLink = styled(Link)`
 ((): void => {
   //localStorage.clear();
   // Here we are testing it using NON-JWT based project.
-  //JWT based project works but we assumed that generateJWT function will take-in userId as param to generate JWT
   const initializeParams: WithoutJWTParams = {
     authToken: process.env.API_KEY || '',
     configOptions: {
@@ -49,7 +51,8 @@ const HomeLink = styled(Link)`
     }
   };
 
-  const { setUserID, logout } = initializeWithConfig(initializeParams);
+  const { setUserID, logout, setEmail } =
+    initializeWithConfig(initializeParams);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
@@ -60,16 +63,26 @@ const HomeLink = styled(Link)`
             <HomeLink renderAsButton to="/">
               Home
             </HomeLink>
-            <LoginFormWithoutJWT setUserId={setUserID} logout={logout} />
+            <LoginFormWithoutJWT
+              setEmail={setEmail}
+              setUserId={setUserID}
+              logout={logout}
+            />
           </HeaderWrapper>
           <RouteWrapper>
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/aut-testing" element={<AUTTesting />} />
               <Route path="/commerce" element={<Commerce />} />
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
               <Route path="/inApp" element={<InApp />} />
+              <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
+              <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route
+                path="/embedded-msgs-impression-tracker"
+                element={<EmbeddedMsgsImpressionTracker />}
+              />
+              <Route path="/aut-testing" element={<AUTTesting />} />
             </Routes>
           </RouteWrapper>
         </UserProvider>

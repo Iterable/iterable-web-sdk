@@ -19,9 +19,6 @@ export const Home: FC<Props> = () => {
     <>
       <h1>Namespace Selection</h1>
       <Wrapper>
-        <Link to="/aut-testing" renderAsButton>
-          AUT Testing
-        </Link>
         <Link to="/commerce" renderAsButton>
           Commerce
         </Link>
@@ -43,6 +40,9 @@ export const Home: FC<Props> = () => {
         </Link>
         <Link to="/embedded-msgs-impression-tracker" renderAsButton>
           Embedded msgs impressions tracker
+        </Link>
+        <Link to="/aut-testing" renderAsButton>
+          AUT Testing
         </Link>
       </Wrapper>
     </>
