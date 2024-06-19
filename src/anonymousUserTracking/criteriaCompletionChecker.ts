@@ -234,8 +234,12 @@ class CriteriaCompletionChecker {
           return false;
         }
       } else if (node.searchCombo) {
-        const vv = this.evaluateSearchQueries(node, localEventData, criteriaId);
-        return vv;
+        const result = this.evaluateSearchQueries(
+          node,
+          localEventData,
+          criteriaId
+        );
+        return result;
       }
     } catch (e) {
       this.handleException(e);
@@ -290,8 +294,12 @@ class CriteriaCompletionChecker {
                 nodeCombo: { searchCombo: object; count: number }[];
               }) => item.criteriaId === criteriaId
             );
-
-          if (this.evaluateEvent(eventData, searchQueries, combinator)) {
+          const result = this.evaluateEvent(
+            eventData,
+            searchQueries,
+            combinator
+          );
+          if (result) {
             if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
               const matchedNode =
                 matchedCriteria &&
@@ -353,7 +361,11 @@ class CriteriaCompletionChecker {
                   SHARED_PREF_MATCHED_CRITERIAS,
                   JSON.stringify(tempMatchedCriterias)
                 );
-                return false;
+                if (node.minMatch === 1) {
+                  return true;
+                } else {
+                  return false;
+                }
               }
             } else {
               return true;
@@ -371,73 +383,83 @@ class CriteriaCompletionChecker {
     combinator: string
   ): boolean {
     if (combinator === 'And') {
-      for (let i = 0; i < searchQueries.length; i++) {
-        if (!this.evaluateFieldLogic(searchQueries[i], localEvent)) {
-          return false;
-        }
+      if (!this.evaluateFieldLogic(searchQueries, localEvent)) {
+        return false;
       }
       return true;
     } else if (combinator === 'Or') {
-      for (let i = 0; i < searchQueries.length; i++) {
-        if (this.evaluateFieldLogic(searchQueries[i], localEvent)) {
-          return true;
-        }
+      if (this.evaluateFieldLogic(searchQueries, localEvent)) {
+        return true;
       }
       return false;
     }
     return false;
   }
 
-  private evaluateFieldLogic(node: any, eventData: any): boolean {
-    const field = node.field;
-    const comparatorType = node.comparatorType ? node.comparatorType : '';
+  private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
-    let shouldReturn = false;
-    for (let j = 0; j < localDataKeys.length; j++) {
-      const key = localDataKeys[j];
-      if (key === KEY_ITEMS) {
-        // scenario of items inside purchase and updateCart Events
-        const items = eventData[key];
-        items.forEach((item: any) => {
-          const keys = Object.keys(item);
-          keys.forEach((keyItem: any) => {
-            if (field === keyItem) {
-              const matchedCountObj = item[keyItem];
-              if (
-                this.evaluateComparison(
-                  comparatorType,
-                  matchedCountObj,
-                  node.value ? node.value : ''
-                )
-              ) {
-                shouldReturn = true;
-                return;
-              }
-            }
-          });
-          if (shouldReturn) return; // Exit outer forEach loop
-        });
-        if (shouldReturn) break; // Exit main for loop
-      } else {
+    let combinedResult = false;
+    if (localDataKeys.includes(KEY_ITEMS)) {
+      // scenario of items inside purchase and updateCart Events
+      const items = eventData[KEY_ITEMS];
+      const result = items.some((item: any) => {
+        return this.doesItemMatchQueries(item, searchQueries);
+      });
+      if (!result) {
+        return result;
+      }
+      combinedResult = result;
+    }
+    const filteredLocalDataKeys = localDataKeys.filter(
+      (item: any) => item !== KEY_ITEMS
+    );
+    const filteredSearchQueries = searchQueries.filter((searchQuery) =>
+      filteredLocalDataKeys.includes(searchQuery.field)
+    );
+    if (filteredSearchQueries.length === 0) {
+      return combinedResult;
+    }
+    for (let index = 0; index < filteredLocalDataKeys.length; index++) {
+      const key = filteredLocalDataKeys[index];
+      const result = filteredSearchQueries.some((query: any) => {
+        const field = query.field;
+
         if (field === key) {
-          const matchedCountObj = eventData[key];
-          if (
-            this.evaluateComparison(
-              comparatorType,
-              matchedCountObj,
-              node.value ? node.value : ''
-            )
-          ) {
-            return true;
+          if (Object.prototype.hasOwnProperty.call(eventData, field)) {
+            const result = this.evaluateComparison(
+              query.comparatorType,
+              eventData[field],
+              query.value ? query.value : ''
+            );
+            return result;
           }
         }
+      });
+      if (result) {
+        return result;
       }
     }
-
-    if (shouldReturn) {
-      return true;
-    }
     return false;
+  }
+
+  private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
+    const filteredSearchQueries = searchQueries.filter((searchQuery) =>
+      Object.keys(item).includes(searchQuery.field)
+    );
+    if (filteredSearchQueries.length === 0) {
+      return false;
+    }
+    return filteredSearchQueries.every((query: any) => {
+      const field = query.field;
+      if (Object.prototype.hasOwnProperty.call(item, field)) {
+        return this.evaluateComparison(
+          query.comparatorType,
+          item[field],
+          query.value ? query.value : ''
+        );
+      }
+      return false;
+    });
   }
 
   private evaluateComparison(
