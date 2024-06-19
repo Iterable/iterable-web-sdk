@@ -234,12 +234,7 @@ class CriteriaCompletionChecker {
           return false;
         }
       } else if (node.searchCombo) {
-        const result = this.evaluateSearchQueries(
-          node,
-          localEventData,
-          criteriaId
-        );
-        return result;
+        return this.evaluateSearchQueries(node, localEventData, criteriaId);
       }
     } catch (e) {
       this.handleException(e);
@@ -294,12 +289,7 @@ class CriteriaCompletionChecker {
                 nodeCombo: { searchCombo: object; count: number }[];
               }) => item.criteriaId === criteriaId
             );
-          const result = this.evaluateEvent(
-            eventData,
-            searchQueries,
-            combinator
-          );
-          if (result) {
+          if (this.evaluateEvent(eventData, searchQueries, combinator)) {
             if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
               const matchedNode =
                 matchedCriteria &&
@@ -338,11 +328,7 @@ class CriteriaCompletionChecker {
                   JSON.stringify(this.localStoredEventList)
                 );
 
-                if (matchedNode[0].count === node.minMatch) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return matchedNode[0].count === node.minMatch;
               } else {
                 const tempMatchedCriterias = matchedCriterias || [];
                 tempMatchedCriterias.push({
@@ -361,11 +347,7 @@ class CriteriaCompletionChecker {
                   SHARED_PREF_MATCHED_CRITERIAS,
                   JSON.stringify(tempMatchedCriterias)
                 );
-                if (node.minMatch === 1) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return node.minMatch === 1;
               }
             } else {
               return true;
@@ -398,7 +380,7 @@ class CriteriaCompletionChecker {
 
   private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
-    let combinedResult = false;
+    let itemMatchedResult = false;
     if (localDataKeys.includes(KEY_ITEMS)) {
       // scenario of items inside purchase and updateCart Events
       const items = eventData[KEY_ITEMS];
@@ -408,7 +390,7 @@ class CriteriaCompletionChecker {
       if (!result) {
         return result;
       }
-      combinedResult = result;
+      itemMatchedResult = result;
     }
     const filteredLocalDataKeys = localDataKeys.filter(
       (item: any) => item !== KEY_ITEMS
@@ -417,26 +399,25 @@ class CriteriaCompletionChecker {
       filteredLocalDataKeys.includes(searchQuery.field)
     );
     if (filteredSearchQueries.length === 0) {
-      return combinedResult;
+      return itemMatchedResult;
     }
     for (let index = 0; index < filteredLocalDataKeys.length; index++) {
       const key = filteredLocalDataKeys[index];
-      const result = filteredSearchQueries.some((query: any) => {
+      const filteredResult = filteredSearchQueries.some((query: any) => {
         const field = query.field;
 
         if (field === key) {
           if (Object.prototype.hasOwnProperty.call(eventData, field)) {
-            const result = this.evaluateComparison(
+            return this.evaluateComparison(
               query.comparatorType,
               eventData[field],
               query.value ? query.value : ''
             );
-            return result;
           }
         }
       });
-      if (result) {
-        return result;
+      if (filteredResult) {
+        return filteredResult;
       }
     }
     return false;
