@@ -55,28 +55,23 @@ class CriteriaCompletionChecker {
   }
 
   private findMatchedCriteria(criteriaList: Criteria[]): string | null {
-    let criteriaId: string | null = null;
     const criteriaIdList = criteriaList.map((criteria) => criteria.criteriaId);
     const eventsToProcess = this.prepareEventsToProcess(criteriaIdList);
-    criteriaList.forEach((criteria) => {
-      if (!criteriaId && criteria.searchQuery && criteria.criteriaId) {
-        // Check for criteriaId
-        const searchQuery = criteria.searchQuery;
-        const currentCriteriaId = criteria.criteriaId;
 
-        const result = this.evaluateTree(
-          searchQuery,
+    // Use find to get the first matching criteria
+    const matchingCriteria = criteriaList.find((criteria) => {
+      if (criteria.searchQuery && criteria.criteriaId) {
+        return this.evaluateTree(
+          criteria.searchQuery,
           eventsToProcess,
-          currentCriteriaId
+          criteria.criteriaId
         );
-        if (result) {
-          criteriaId = currentCriteriaId;
-          // Since we cannot break in forEach, we use criteriaId check to stop further iterations
-        }
       }
+      return false;
     });
 
-    return criteriaId;
+    // Return the criteriaId of the matching criteria or null if none found
+    return matchingCriteria ? matchingCriteria.criteriaId : null;
   }
 
   private prepareEventsToProcess(criteriaIdList: string[]): any[] {
