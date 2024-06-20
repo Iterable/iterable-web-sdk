@@ -243,12 +243,15 @@ export class AnonymousUserEventManager {
           default:
             break;
         }
-
-        localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
-        localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
-        localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
+        this.removeLocaStorageData();
       });
     }
+  }
+
+  removeLocaStorageData() {
+    localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
+    localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
+    localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
   }
 
   private async storeEventListToLocalStorage(

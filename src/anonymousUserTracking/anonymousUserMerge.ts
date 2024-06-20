@@ -1,8 +1,4 @@
-import {
-  SHARED_PREF_ANON_USER_ID,
-  ENDPOINT_MERGE_USER,
-  MERGE_SUCCESSFULL
-} from 'src/constants';
+import { ENDPOINT_MERGE_USER, MERGE_SUCCESSFULL } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 
@@ -14,14 +10,17 @@ export type MergeApiParams = {
 };
 
 export class AnonymousUserMerge {
-  mergeUser(userIdOrEmail: string, isEmail: boolean): Promise<string> {
-    const sourceUserId = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
-
+  mergeUser(
+    sourceUserId: string | null,
+    sourceEmail: string | null,
+    destinationUserId: string | null,
+    destinationEmail: string | null
+  ): Promise<string> {
     const mergeApiParams: MergeApiParams = {
       sourceUserId: sourceUserId,
-      sourceEmail: null,
-      destinationUserId: isEmail ? null : userIdOrEmail,
-      destinationEmail: isEmail ? userIdOrEmail : null
+      sourceEmail: sourceEmail,
+      destinationUserId: destinationUserId,
+      destinationEmail: destinationEmail
     };
     return this.callMergeApi(mergeApiParams);
   }
