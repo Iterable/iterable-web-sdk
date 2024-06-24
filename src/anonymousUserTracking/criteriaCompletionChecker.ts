@@ -443,6 +443,14 @@ class CriteriaCompletionChecker {
     });
   }
 
+  private formattedDoubleValue(d: number): string {
+    if (Number.isInteger(d)) {
+      return `${d}`;
+    } else {
+      return `${d}`;
+    }
+  }
+
   private evaluateComparison(
     comparatorType: string,
     matchObj: any,
@@ -451,6 +459,11 @@ class CriteriaCompletionChecker {
     if (!valueToCompare && comparatorType !== 'IsSet') {
       return false;
     }
+    if (!isNaN(parseFloat(valueToCompare))) {
+      // Convert to a formatted double value by removing trailing zeros
+      valueToCompare = this.formattedDoubleValue(parseFloat(valueToCompare));
+    }
+
     switch (comparatorType) {
       case 'Equals':
         return this.compareValueEquality(matchObj, valueToCompare);
