@@ -7,6 +7,8 @@ import {
   UPDATE_CART,
   UPDATE_USER,
   KEY_EVENT_NAME,
+  UPDATECART_ITEM_PREFIX,
+  PURCHASE_ITEM_PREFIX,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREF_MATCHED_CRITERIAS
 } from '../constants';
@@ -110,7 +112,7 @@ class CriteriaCompletionChecker {
           items = items.map((item: any) => {
             const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatItem[`shoppingCartItems.${key}`] = item[key];
+              updatItem[`${PURCHASE_ITEM_PREFIX}${key}`] = item[key];
             });
             return updatItem;
           });
@@ -143,8 +145,7 @@ class CriteriaCompletionChecker {
           items = items.map((item: any) => {
             const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatItem[`updateCart.updatedShoppingCartItems.${key}`] =
-                item[key];
+              updatItem[`${UPDATECART_ITEM_PREFIX}${key}`] = item[key];
             });
             return updatItem;
           });
@@ -155,6 +156,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          delete localEventData.dataFields;
         }
         Object.keys(localEventData).forEach((key) => {
           if (key !== KEY_ITEMS && key !== 'dataFields') {
@@ -198,6 +200,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          delete localEventData.dataFields;
         }
         nonPurchaseEvents.push(updatedItem);
       }
@@ -257,13 +260,6 @@ class CriteriaCompletionChecker {
           const searchCombo = node.searchCombo;
           const searchQueries = searchCombo?.searchQueries || [];
           const combinator = searchCombo?.combinator || '';
-          // matchedCriterias format
-          // [
-          //   {
-          //     criteriaId: '6',
-          //     nodeCombo: [{searchCombo: {}, count: 1}],
-          //   },
-          // ];
           const matchedCriteriasFromLocalStorage = localStorage.getItem(
             SHARED_PREF_MATCHED_CRITERIAS
           );
@@ -378,6 +374,15 @@ class CriteriaCompletionChecker {
     return false;
   }
 
+  private doesItemCriteriaExists(searchQueries: any[]): boolean {
+    const foundIndex = searchQueries.findIndex(
+      (item) =>
+        item.field.startsWith(UPDATECART_ITEM_PREFIX) ||
+        item.field.startsWith(PURCHASE_ITEM_PREFIX)
+    );
+    return foundIndex !== -1;
+  }
+
   private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
     let itemMatchedResult = false;
@@ -387,7 +392,8 @@ class CriteriaCompletionChecker {
       const result = items.some((item: any) => {
         return this.doesItemMatchQueries(item, searchQueries);
       });
-      if (!result) {
+      if (!result && this.doesItemCriteriaExists(searchQueries)) {
+        // items criteria existed and it did not match
         return result;
       }
       itemMatchedResult = result;
@@ -395,32 +401,31 @@ class CriteriaCompletionChecker {
     const filteredLocalDataKeys = localDataKeys.filter(
       (item: any) => item !== KEY_ITEMS
     );
-    const filteredSearchQueries = searchQueries.filter((searchQuery) =>
-      filteredLocalDataKeys.includes(searchQuery.field)
-    );
-    if (filteredSearchQueries.length === 0) {
+
+    if (filteredLocalDataKeys.length === 0) {
       return itemMatchedResult;
     }
-    for (let index = 0; index < filteredLocalDataKeys.length; index++) {
-      const key = filteredLocalDataKeys[index];
-      const filteredResult = filteredSearchQueries.some((query: any) => {
-        const field = query.field;
 
-        if (field === key) {
-          if (Object.prototype.hasOwnProperty.call(eventData, field)) {
-            return this.evaluateComparison(
-              query.comparatorType,
-              eventData[field],
-              query.value ? query.value : ''
-            );
-          }
-        }
-      });
-      if (filteredResult) {
-        return filteredResult;
+    const filteredSearchQueries = searchQueries.filter(
+      (searchQuery) =>
+        !searchQuery.field.startsWith(UPDATECART_ITEM_PREFIX) &&
+        !searchQuery.field.startsWith(PURCHASE_ITEM_PREFIX)
+    );
+    const matchResult = filteredSearchQueries.every((query: any) => {
+      const field = query.field;
+      const eventKeyItems = filteredLocalDataKeys.filter(
+        (keyItem) => keyItem === field
+      );
+      if (eventKeyItems.length) {
+        return this.evaluateComparison(
+          query.comparatorType,
+          eventData[field],
+          query.value ? query.value : ''
+        );
       }
-    }
-    return false;
+      return false;
+    });
+    return matchResult;
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
