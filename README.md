@@ -2,7 +2,10 @@
 
 # Iterable's Web SDK
 
-[Iterable](https://www.iterable.com) is a growth marketing platform that helps you to create better experiences for—and deeper relationships with—your customers. Use it to send customized email, SMS, push notification, in-app message, web push notification campaigns to your customers.
+[Iterable](https://www.iterable.com) is a growth marketing platform that helps
+you to create better experiences for—and deeper relationships with—your customers. 
+Use it to send customized email, SMS, push notification, in-app message, web push 
+notification campaigns to your customers.
 
 This SDK helps you integrate your Web apps with Iterable.
 
@@ -40,9 +43,14 @@ or with a CDN:
 
 # Iterable's European data center (EUDC)
 
-If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based API endpoints.
+If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), 
+you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based 
+API endpoints.
 
-To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` environment variable to `true`. Some customers have reported issues with setting the environment variable. If you run into this, try migrating to [`initializeWithConfig`](#initializeWithConfig). You can then turn on the EU API usage by making these changes:
+To do this, on the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` 
+environment variable to `true`. Some customers have reported issues with setting 
+the environment variable. If you run into this, try migrating to [`initializeWithConfig`](#initializeWithConfig). 
+You can then turn on the EU API usage by making these changes:
 
 ```ts
 import { initializeWithConfig } from '@iterable/web-sdk';
@@ -66,7 +74,9 @@ const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
 
 # API
 
-Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) for information on what data to pass and what payload to receive from the HTTP requests.
+Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) 
+for information on what data to pass and what payload to receive from the HTTP 
+requests.
 
 | Method Name                                            | Description                                                                                                                                                            |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -88,7 +98,10 @@ Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.it
 
 The SDK does not track `inAppDelete` events.
 
-:rotating_light: Due to a limitation in WebKit (which affects iOS web browsers, Safari included) web in-app messages displayed in an iOS web browser browser can't automatically fire trackInAppClick events or handle custom CTAs. This will impact analytics for all Safari and mobile iOS users.
+:rotating_light: Due to a limitation in WebKit (which affects iOS web browsers,
+Safari included) web in-app messages displayed in an iOS web browser browser
+can't automatically fire trackInAppClick events or handle custom CTAs. This will
+impact analytics for all Safari and mobile iOS users.
 
 # Usage
 
@@ -103,11 +116,15 @@ getInAppMessages: (
 ) => Promise<TrackConsumeData> | PaintInAppMessageData;
 ```
 
-:rotating_light: Notice: v1.0.0 of this SDK deprecates support for `showMessagesAutomatically?: boolean`. If needed, please update your getInAppMessages requests to use `options: { display: 'deferred' | 'immediate' }` instead.
+:rotating_light: Notice: v1.0.0 of this SDK deprecates support for
+`showMessagesAutomatically?: boolean`. If needed, please update your
+getInAppMessages requests to use `options: { display: 'deferred' | 'immediate'
+}` instead.
 
-SDK Specific Options:
+SDK-specific Options:
 
-Along with the API parameters, you can pass these options to the SDK method to have in-app messages behave differently.
+Along with the API parameters, you can pass these options to the SDK method to
+have in-app messages behave differently.
 
 | Property Name             | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
 | ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
@@ -135,7 +152,11 @@ Close Button Options:
 
 Example:
 
-Calling `getInAppMessages` with `options` not set returns a JSON response from Iterable. This response includes an `inAppMessages` field, and each item in the list has a `content.html` field that's an `iframe` with an embedded in-app message. The `iframe`'s `sandbox` attribute is set, isolating its render and preventing any malicious JavaScript execution.
+Calling `getInAppMessages` with `options` not set returns a JSON response from
+Iterable. This response includes an `inAppMessages` field, and each item in the
+list has a `content.html` field that's an `iframe` with an embedded in-app
+message. The `iframe`'s `sandbox` attribute is set, isolating its render and
+preventing any malicious JavaScript execution.
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk';
@@ -151,7 +172,10 @@ getInAppMessages({ count: 20, packageName: 'mySite1' })
   .catch();
 ```
 
-This code places an in-app on the page, but it won't be visible. To render it, you'll need to modify the page's CSS, setting up whatever styles you'd like. You'll also need to set up click handlers to handle closing the message and tracking events (in-app click, etc.).
+This code places an in-app on the page, but it won't be visible. To render it,
+you'll need to modify the page's CSS, setting up whatever styles you'd like.
+You'll also need to set up click handlers to handle closing the message and
+tracking events (in-app click, etc.).
 
 Or, to show messages automatically:
 
@@ -178,7 +202,8 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
 request().then().catch();
 ```
 
-or if you want to show messages with your own custom filtering/sorting and choose to display later:
+Or, if you want to show messages with your own custom filtering/sorting and
+choose to display later:
 
 ```ts
 import {
@@ -225,9 +250,16 @@ request()
   .catch();
 ```
 
-:rotating_light: PLEASE NOTE, If you choose the `deferred` option, the SDK will \_not* do any filtering or sorting on the messages internally. You will get the messages exactly as they come down from the API, untouched. This means you may (for example) show in-app messages marked `read` or show the messages in the wrong order based on `priority`.
+:rotating_light: PLEASE NOTE, If you choose the `deferred` option, the SDK will
+**not** do any filtering or sorting on the messages internally. You will get the
+messages exactly as they come down from the API, untouched. This means you may
+(for example) show in-app messages marked `read` or show the messages in the
+wrong order based on `priority`.
 
-If you want to keep the default sorting and filtering, please take advantage of the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to `filterHiddenInAppMessages` but does not filter out JSON-only messages.
+If you want to keep the default sorting and filtering, please take advantage of
+the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK
+provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to
+`filterHiddenInAppMessages` but does not filter out JSON-only messages.
 
 ## initialize
 
@@ -545,12 +577,21 @@ updateUserEmail('user@example.com').then().catch();
 
 ## How do I make API requests with the SDK?
 
-First thing you need to do is generate an API key on [the Iterable app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the _Web_ key type. This will ensure the SDK has
-access to all the necessary endpoints when communicating with the Iterable API. After you generate your key, save both the API Key and JWT Secret somewhere handy. You'll need both of them.
+First thing you need to do is generate an API key on [the Iterable
+app](https://app.iterable.com). Make sure this key is JWT-enabled and is of the
+_Web_ key type. This will ensure the SDK has access to all the necessary
+endpoints when communicating with the Iterable API. After you generate your key,
+save both the API Key and JWT Secret somewhere handy. You'll need both of them.
 
-First, you'll deal with the JWT Secret. Typically, you need some backend service that is going to use that JWT Secret to sign a JWT and return it to your client app. For the purposes of this explanation, this can be demonstrated this with a site like [jwt.io](https://jwt.io). See the [documentation on the Iterable website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-) for instructions on how to generate a JWT from your JWT secret.
+First, you'll deal with the JWT Secret. Typically, you need some backend service
+that is going to use that JWT Secret to sign a JWT and return it to your client
+app. For the purposes of this explanation, this can be demonstrated this with a
+site like [jwt.io](https://jwt.io). See the [documentation on the Iterable
+website](https://support.iterable.com/hc/en-us/articles/360050801231-JWT-Enabled-API-Keys-)
+for instructions on how to generate a JWT from your JWT secret.
 
-Once you have a JWT or a service that can generate a JWT automatically, you're ready to start making requests in the SDK. The syntax for that looks like this:
+Once you have a JWT or a service that can generate a JWT automatically, you're
+ready to start making requests in the SDK. The syntax for that looks like this:
 
 ```ts
 import { initialize } from '@iterable/web-sdk';
@@ -564,7 +605,13 @@ import { initialize } from '@iterable/web-sdk';
 })();
 ```
 
-Now that we've set our authorization logic within our app, it's time to set the user. You can identify a user by either the email or user ID. User ID is preferred because the SDK will automatically create a user in your Iterable instance. If you identify by email, the user will remain "anonymous" with no user ID attached to it. See [Iterable's updateUser endpoint](https://api.iterable.com/api/docs#users_updateUser) for more information about how users are created.
+Now that we've set our authorization logic within our app, it's time to set the
+user. You can identify a user by either the email or user ID. User ID is
+preferred because the SDK will automatically create a user in your Iterable
+instance. If you identify by email, the user will remain "anonymous" with no
+user ID attached to it. See [Iterable's updateUser
+endpoint](https://api.iterable.com/api/docs#users_updateUser) for more
+information about how users are created.
 
 The syntax for identifying a user by user ID looks like this:
 
@@ -652,17 +699,22 @@ import { initialize, track } from '@iterable/web-sdk';
 
 ## How does the SDK pass up my email / user ID?
 
-This SDK relies on a library called [Axios](https://github.com/axios/axios). For all outgoing XHR requests, the SDK utilizes [Axios interceptors](https://github.com/axios/axios#interceptors) to add your user information to the requests.
+This SDK relies on a library called [Axios](https://github.com/axios/axios). For
+all outgoing XHR requests, the SDK utilizes [Axios interceptors](https://github.com/axios/axios#interceptors) 
+to add your user information to the requests.
 
-## Ok cool. What if I want to handle this intercepting logic myself instead?
+## What if I want to handle this intercepting logic myself instead?
 
-You can do that! This SDK exposes the base Axios request instance so you can do whatever you like with it and build upon that. You can import the Axios request like so and anything in the Axios documentation is fair game to use:
+You can do that! This SDK exposes the base Axios request instance so you can do
+whatever you like with it and build upon that. You can import the Axios request
+like so and anything in the Axios documentation is fair game to use:
 
 ```ts
 import { baseAxiosRequest } from '@iterable/web-sdk';
 ```
 
-For example, if you want to set an `email` query param on every outgoing request, you would just implement the way Axios advises like so:
+For example, if you want to set an `email` query param on every outgoing
+request, you would just implement the way Axios advises like so:
 
 ```ts
 import { baseAxiosRequest } from '@iterable/web-sdk';
@@ -680,11 +732,14 @@ import { baseAxiosRequest } from '@iterable/web-sdk';
 })();
 ```
 
-:rotating_light: Please note, you won't likely need access to this Axios instance. This is reserved for advanced use cases only.
+:rotating_light: Please note, you won't likely need access to this Axios
+instance. This is reserved for advanced use cases only.
 
 ## I want to automatically show my in-app messages with a delay between each
 
-This SDK allows that. Simply call the `getInAppMessages` method but pass `{ display: 'immediate' }` as the second parameter. This will expose some methods used to make the request to show the messages and pause and resume the queue.
+This SDK allows that. Simply call the `getInAppMessages` method but pass `{
+display: 'immediate' }` as the second parameter. This will expose some methods
+used to make the request to show the messages and pause and resume the queue.
 
 Normally to request a list of in-app messages, you'd make a request like this:
 
@@ -711,7 +766,8 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 })();
 ```
 
-In order to take advantage of the SDK showing them automatically, you would implement the same method in this way:
+In order to take advantage of the SDK showing them automatically, you would
+implement the same method in this way:
 
 ```ts
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
@@ -740,7 +796,9 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 })();
 ```
 
-Optionally, you can pass arguments to fine-tune how you want the messages to appear. See the [usage section](#getInAppMessages) to see all available options and what they do.
+Optionally, you can pass arguments to fine-tune how you want the messages to
+appear. See the [usage section](#getInAppMessages) to see all available options
+and what they do.
 
 ```ts
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
@@ -817,7 +875,8 @@ import { initialize, getInAppMessages } from '@iterable/web-sdk';
 })();
 ```
 
-Finally, you can also choose to do your own manipulation to the messages before choosing to display them:
+Finally, you can also choose to do your own manipulation to the messages before
+choosing to display them:
 
 ```ts
 import {
@@ -872,7 +931,9 @@ import {
 
 ## I want my messages to look good on every device and be responsive
 
-This SDK already handles that for you. The rules for the in-app message presentation varies based on which display type you've selected. Here's a table to explain how it works:
+This SDK already handles that for you. The rules for the in-app message
+presentation varies based on which display type you've selected. Here's a table
+to explain how it works:
 
 | Message Position &#8594; <br><br> Browser Size &#8595; | Center | Full | Top-Right | Bottom-Right |
 | ------------------------------------------------------ | ------ | ---- | --------- | ------------ |
@@ -881,25 +942,39 @@ This SDK already handles that for you. The rules for the in-app message presenta
 | 976px - 1300px                                         | 50%    | 100% | 33%       | 33%          |
 | 1300px+                                                | 50%    | 100% | 25%       | 25%          |
 
-Looking at this table, you can see the browser sizes on the left, and the display positions on top. For example, if your in-app message is positioned in the top-right of the screen and your browser window is at 1000px, then your in-app message will take up 33% of the screen.
+Looking at this table, you can see the browser sizes on the left, and the
+display positions on top. For example, if your in-app message is positioned in
+the top-right of the screen and your browser window is at 1000px, then your
+in-app message will take up 33% of the screen.
 
-Another example: If your in-app is positioned in the center and your browser if at 700px, your in-app message will grow to take up 100% of the screen.
+Another example: If your in-app is positioned in the center and your browser if
+at 700px, your in-app message will grow to take up 100% of the screen.
 
-This chart also implies that your in-app message is taking 100% of its container. Your results may vary if you add, for example, a `max-width: 200px` CSS rule to your message HTML. Regardless of how you write your CSS, these rules will take effect, **so it is recommended that you stick to percentage-based CSS widths when possible when creating your message**
+This chart also implies that your in-app message is taking 100% of its
+container. Your results may vary if you add, for example, a `max-width: 200px`
+CSS rule to your message HTML. Regardless of how you write your CSS, these rules
+will take effect, **so it is recommended that you stick to percentage-based CSS
+widths when possible when creating your message**
 
 ## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
 
-No problem! Please see [the link handling section](#about-links) for more information on how to create callback methods on link clicks. There, you'll find information on how to create a seamless link-clicking experience if you're using a library such as React Router.
+No problem! Please see [the link handling section](#about-links) for more
+information on how to create callback methods on link clicks. There, you'll find
+information on how to create a seamless link-clicking experience if you're using
+a library such as React Router.
 
 ## What if my JWT expires?
 
-JWT expiration is handled for you automatically by the SDK. There are 3 points where the SDK will generate a new JWT token for you, apart from the initial call when invoking `setEmail` or `setUserID`:
+JWT expiration is handled for you automatically by the SDK. There are 3 points
+where the SDK will generate a new JWT token for you, apart from the initial call
+when invoking `setEmail` or `setUserID`:
 
 1. The JWT is within 1 minute of expiration
 2. An Iterable API request has failed with a 401 response
 3. Your code invoked the `updateUserEmail` method
 
-As previously explained, when initializing the SDK you need to pass a function that returns a Promise with the JWT, which looks something like this:
+As previously explained, when initializing the SDK you need to pass a function
+that returns a Promise with the JWT, which looks something like this:
 
 ```ts
 import { initialize } from '@iterable/web-sdk';
@@ -911,15 +986,19 @@ initialize('API_KEY_HERE', ({ email, userID }) =>
 );
 ```
 
-When the previous 3 listed events occur, the SDK will invoke the method passed as the second argument, and when the Promise resolves, attach the new JWT to any future Iterable API requests.
+When the previous three listed events occur, the SDK will invoke the method passed
+as the second argument, and when the Promise resolves, attach the new JWT to any
+future Iterable API requests.
 
-Finally, if the request to regenerate the JWT fails however, the SDK will not attempt to generate the JWT again so requests will start failing at that point.
+Finally, if the request to regenerate the JWT fails however, the SDK will not
+attempt to generate the JWT again so requests will start failing at that point.
 
 To perform a manual JWT token refresh, call [`refreshJwtToken`](#refreshjwttoken).
 
 # A note about imports
 
-This library exposes UMD modules and a single-file build for you to import from. In other words, this means that you'll be able to import methods in these ways:
+This library exposes UMD modules and a single-file build for you to import from.
+In other words, this means that you'll be able to import methods in these ways:
 
 ```ts
 import { getInAppMessages, initialize, updateUser } from '@iterable/web-sdk';
@@ -929,15 +1008,27 @@ import { getInAppMessages, initialize, updateUser } from '@iterable/web-sdk';
 import { initialize, getInAppMessages, updateUser } from '@iterable/web-sdk';
 ```
 
-For those using Webpack/Rollup/Some Other Build Tool, it is recommended to import methods with the later approach for smaller final bundles. Importing with the second method ensures your bundle will only include the code you're using and not the code you're not.
+For those using Webpack/Rollup/Some Other Build Tool, it is recommended to
+import methods with the later approach for smaller final bundles. Importing with
+the second method ensures your bundle will only include the code you're using
+and not the code you're not.
 
 # About links
 
-Since the Web SDK renders in-app messages in an iframe element on your website if you choose to render the messages automatically, the event handler that is responsible for clicking links is highjacked by the SDK code internally. To the user, this doesn't really change the experience. As expected, `<a />` tags will open the link in the same browser tab unless given the `target="_blank"` property.
+Since the Web SDK renders in-app messages in an iframe element on your website
+if you choose to render the messages automatically, the event handler that is
+responsible for clicking links is highjacked by the SDK code internally. To the
+user, this doesn't really change the experience. As expected, `<a />` tags will
+open the link in the same browser tab unless given the `target="_blank"`
+property.
 
-But there are few features which the SDK adds so that you can customize how you'd like links to behave:
+But there are few features which the SDK adds so that you can customize how
+you'd like links to behave:
 
-First, the `handleLinks` option provided by [`getInAppMessages`](#getInAppMessages) allows you to specify how the SDK opens links: in the current tab, in a new tab, or a combination (external links in a new tab, internal links in the current tab). For example, this code:
+First, the `handleLinks` option provided by [`getInAppMessages`](#getInAppMessages) 
+allows you to specify how the SDK opens links: in the current tab, in a new tab, 
+or a combination (external links in a new tab, internal links in the current tab). 
+For example, consider this code:
 
 ```ts
 import { getInAppMessages } from '@iterable/web-sdk';
@@ -949,7 +1040,8 @@ getInAppMessages({
 });
 ```
 
-will ensure the following links open in the same tab if your domain is `mydomain.com`, for example:
+This code ensures the following links open in the same tab if your domain is
+`mydomain.com`, for example:
 
 ```
 /about
@@ -957,7 +1049,7 @@ https://mydomain.com
 https://mydomain.com/about
 ```
 
-and these will open in a new tab
+And that these will open in a new tab:
 
 ```
 https://google.com
@@ -966,19 +1058,31 @@ https://hello.com
 
 ## Reserved keyword links
 
-Iterable reserves the `iterable://` and `action://` URL schemas to define custom link click actions:
+Iterable reserves the `iterable://` and `action://` URL schemas to define custom
+link click actions:
 
-1. `iterable://dismiss` - Removes the in-app message from the screen, grabs the next one to display, and invokes both [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
+1. `iterable://dismiss` - Removes the in-app message from the screen, grabs the
+   next one to display, and invokes both [trackInAppClose](#trackInAppClose) and
+   [trackInAppClick](#trackInAppClick).
 
-2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage) call with payload `{ type: 'iterable-action-link', data: '{anything}' }`, to be consumed by the parent website as needed. These links also dismiss the message and invoke [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
+2. `action://{anything}` - Makes a [`Window.prototype.postMessage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage)
+   call with payload `{ type: 'iterable-action-link', data: '{anything}' }`, to be
+   consumed by the parent website as needed. These links also dismiss the message
+   and invoke [trackInAppClose](#trackInAppClose) and [trackInAppClick](#trackInAppClick).
 
 The SDK may reserve more keywords in the future.
 
-:rotating_light: `iterable://` and `action://` links are not supported with WebKit (which affects iOS web browsers, Safari included). In these browsers, users can close an in-app message by clicking away from the message.
+:rotating_light: `iterable://` and `action://` links are not supported with
+WebKit (which affects iOS web browsers, Safari included). In these browsers,
+users can close an in-app message by clicking away from the message.
 
 ## Routing in single-page apps
 
-Knowing now the custom link schemas available, let's explain how you can leverage them to add custom routing or callback functions. If for example you want to hook into a link click and send the user to your `/about` page with a client-side routing solution, you'd do something like this if you're using React Router:
+Knowing now the custom link schemas available, let's explain how you can
+leverage them to add custom routing or callback functions. If for example you
+want to hook into a link click and send the user to your `/about` page with a
+client-side routing solution, you'd do something like this if you're using React
+Router:
 
 ```ts
 /* 
@@ -1007,11 +1111,16 @@ const SomeComponent = () => {
 
 ## Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
 
-To display an in-app message, Iterable's Web SDK uses an `iframe` on which the `sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`. On Safari, this configuration blocks JavaScript execution in tabs that open because of link clicks in the `iframe`.
+To display an in-app message, Iterable's Web SDK uses an `iframe` on which the
+`sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`. 
+On Safari, this configuration blocks JavaScript execution in tabs that open because 
+of link clicks in the `iframe`.
 
 To allow JavaScript to run in these new tabs:
 
-- You will need to migrate to the new [`initializeWithConfig`](#initializeWithConfig) method, pass in the configuration options, and set `dangerouslyAllowJsPopups` to `true`
+- You will need to migrate to the new
+  [`initializeWithConfig`](#initializeWithConfig) method, pass in the
+  configuration options, and set `dangerouslyAllowJsPopups` to `true`
 
 ```ts
 import { initializeWithConfig } from '@iterable/web-sdk';
@@ -1034,11 +1143,14 @@ const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
 );
 ```
 
-- However, use caution. Allowing JavaScript to run in new tabs opens the door to the possibility of malicious code execution.
+- However, use caution. Allowing JavaScript to run in new tabs opens the door to
+  the possibility of malicious code execution.
 
 SDK version support:
 
-- Versions [`1.0.11+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10) of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION` environment variable.
+- Versions [`1.0.11+`](https://github.com/Iterable/iterable-web-sdk/releases/tag/v1.0.10)
+  of Iterable's Web SDK support the `DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION`
+  environment variable.
 
 For more information, see:
 
@@ -1047,18 +1159,20 @@ For more information, see:
 
 # TypeScript
 
-The Iterable Web SDK includes TypeScript definitions out of the box. All SDK methods
-should be typed for you already but if you need to import specific typings, you can
-parse through each `types.d.ts` file inside of the `./dist` directory to find what you need.
-Request and response payloads should all be available.
+The Iterable Web SDK includes TypeScript definitions out of the box. All SDK
+methods should be typed for you already but if you need to import specific
+typings, you can parse through each `types.d.ts` file inside of the `./dist`
+directory to find what you need.  Request and response payloads should all be
+available.
 
 If you feel something is missing, feel free to open an issue!
 
 # Contributing
 
-Looking to contribute? Please see the [contributing instructions here](./CONTRIBUTING.md) for more
-details.
+Looking to contribute? Please see the [contributing instructions here](./CONTRIBUTING.md) 
+for more details.
 
 # License
 
-This SDK is released under the MIT License. See [LICENSE](./LICENSE.md) for more information.
+This SDK is released under the MIT License. See [LICENSE](./LICENSE.md) for more
+information.
