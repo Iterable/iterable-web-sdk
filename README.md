@@ -23,23 +23,25 @@ This SDK helps you integrate your Web apps with Iterable.
 
 # Installation
 
-To install this SDK through NPM:
+To install the SDK, use Yarn, npm, or a `script` tag:
 
-```
-$ npm install @iterable/web-sdk
-```
+- npm
 
-with yarn:
+  ```
+  npm install @iterable/web-sdk
+  ```
 
-```
-$ yarn add @iterable/web-sdk
-```
+- Yarn
 
-or with a CDN:
+  ```
+  yarn add @iterable/web-sdk
+  ```
 
-```js
-<script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
-```
+- `script` tag
+
+  ```js
+  <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
+  ```
 
 # Iterable's European data center (EUDC)
 
@@ -61,8 +63,8 @@ const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
     isEuIterableService: true,
   },
   /*
-    _email_ will be defined if you call _setEmail_
-    _userID_ will be defined if you call _setUserID_
+    email will be defined if you call setEmail,
+    userID will be defined if you call setUserID
   */
   generateJWT: ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
@@ -72,29 +74,37 @@ const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
 );
 ```
 
-# API
+# Functions
 
-Below are the methods this SDK exposes. See [Iterable's API Docs](https://api.iterable.com/api/docs) 
-for information on what data to pass and what payload to receive from the HTTP 
-requests.
+Iterable's Web SDK exposes the following functions, which you can use in your
+website code.
 
-| Method Name                                            | Description                                                                                                                                                            |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [`getInAppMessages`](#getInAppMessages)                | Either fetch and return in-app messages as a Promise or (if the `options` argument is provided) return methods to fetch, pause/resume, and/or display in-app messages. |
-| [`initialize`](#initialize)                            | Return methods for identifying users and setting a JWT                                                                                                                 |
-| [`initializeWithConfig`](#initializeWithConfig)        | Return methods for identifying users and setting a JWT while also taking a set of configuration options.                                                               |
-| [`refreshJwtToken`](#refreshJwtToken)                  | Fetch a new JWT token for the specified user and configure the SDK to use it for future requests. Only for manual token refresh.                                       |
-| [`track`](#track)                                      | Track custom events                                                                                                                                                    |
-| [`trackInAppClick`](#trackInAppClick) :rotating_light: | Track when a user clicks on a button or link within a message                                                                                                          |
-| [`trackInAppClose`](#trackInAppClose)                  | Track when an in-app message is closed                                                                                                                                 |
-| [`trackInAppConsume`](#trackInAppConsume)              | Track when a message has been consumed. Deletes the in-app message from the server so it won't be returned anymore                                                     |
-| [`trackInAppDelivery`](#trackInAppDelivery)            | Track when a message has been delivered to a user's device                                                                                                             |
-| [`trackInAppOpen`](#trackInAppOpen)                    | Track when a message is opened and marks it as read                                                                                                                    |
-| [`trackPurchase`](#trackPurchase)                      | Track purchase events                                                                                                                                                  |
-| [`updateCart`](#updateCart)                            | Update `shoppingCartItems` field on user profile                                                                                                                       |
-| [`updateSubscriptions`](#updateSubscriptions)          | Updates user's subscriptions                                                                                                                                           |
-| [`updateUser`](#updateUser)                            | Change data on a user's profile or create a user if none exists                                                                                                        |
-| [`updateUserEmail`](#updateUserEmail)                  | Change a user's email and reauthenticate user with the new email address (in other words, the SDK will call `setEmail` for you)                                        |
+For information about the data the SDK sends and receives when making calls to
+Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/204780579).
+
+| Method Name                                                     | Description |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`getInAppMessages`](#getInAppMessages)                         | Fetches and returns in-app messages (as a `Promise`). Or, if the `options` argument is provided, returns methods to fetch, pause/resume, and/or display in-app messages. |
+| [`initialize`](#initialize)                                     | Returns methods for identifying users and setting a JWT. |
+| [`initializeWithConfig`](#initializeWithConfig)                 | Returns methods for identifying users and setting a JWT, while also taking a set of configuration options. |
+| [`IterableEmbeddedCard`](#iterableembeddedcard)                 | Returns a string of the HTML for an out-of-the-box [card](https://support.iterable.com/hc/articles/23230946708244#cards) view for an embedded message. |
+| [`IterableEmbeddedBanner`](#iterableembeddedbanner)             | Returns a string of the HTML for an out-of-the-box [banner](https://support.iterable.com/hc/articles/23230946708244#banners) view for an embedded message. |
+| [`IterableEmbeddedNotification`](#iterableembeddednotification) | Returns a string of the HTML for an out-of-the-box [notification](https://support.iterable.com/hc/articles/23230946708244#notifications) view for an embedded message. |
+| [`refreshJwtToken`](#refreshJwtToken)                           | Fetches a new JWT token for the specified user and configures the SDK to use it for future requests. Only for manual token refresh. |
+| [`track`](#track)                                               | Tracks a custom event. |
+| [`trackEmbeddedClick`](#trackEmbeddedClick)                     | Tracks an [`embeddedClick`](https://support.iterable.com/hc/articles/23061677642260#embeddedclick-events) event. |
+| [`trackEmbeddedReceived`](#trackEmbeddedReceived)               | Tracks an [`embeddedReceived`](https://support.iterable.com/hc/articles/23061677642260#embeddedreceived-events) event. |
+| [`trackEmbeddedSession`](#trackEmbeddedSession)                 | Tracks an [`embeddedSession`](https://support.iterable.com/hc/articles/23061677642260#embeddedsession-events) event and related [`embeddedImpression`](https://support.iterable.com/hc/articles/23061677642260#embeddedimpression-events) events. |                                                                                            |
+| [`trackInAppClick`](#trackInAppClick) :rotating_light:          | Tracks when a user clicks on a button or link within an in-app message. |
+| [`trackInAppClose`](#trackInAppClose)                           | Tracks when an in-app message is closed. |
+| [`trackInAppConsume`](#trackInAppConsume)                       | Tracks when an in-app message has been consumed. Deletes the in-app message from the server. |
+| [`trackInAppDelivery`](#trackInAppDelivery)                     | Tracks when an in-app message has been delivered to a user's device. |
+| [`trackInAppOpen`](#trackInAppOpen)                             | Tracks when an in-app message has been opened, and marks it as read. |
+| [`trackPurchase`](#trackPurchase)                               | Tracks purchase events. |
+| [`updateCart`](#updateCart)                                     | Updates the `shoppingCartItems` field on a user's Iterable profile. |
+| [`updateSubscriptions`](#updateSubscriptions)                   | Updates the user's subscriptions. |
+| [`updateUser`](#updateUser)                                     | Changes data on a user's Iterable profile, or creates a user if necessary. |
+| [`updateUserEmail`](#updateUserEmail)                           | Change a user's email address, and then signs the user into the SDK using the new address. |
 
 The SDK does not track `inAppDelete` events.
 
@@ -103,11 +113,7 @@ Safari included) web in-app messages displayed in an iOS web browser browser
 can't automatically fire trackInAppClick events or handle custom CTAs. This will
 impact analytics for all Safari and mobile iOS users.
 
-# Usage
-
-## getInAppMessages
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#In-app_getMessages):
+## `getInAppMessages`
 
 ```ts
 getInAppMessages: (
@@ -116,39 +122,40 @@ getInAppMessages: (
 ) => Promise<TrackConsumeData> | PaintInAppMessageData;
 ```
 
-:rotating_light: Notice: v1.0.0 of this SDK deprecates support for
-`showMessagesAutomatically?: boolean`. If needed, please update your
-getInAppMessages requests to use `options: { display: 'deferred' | 'immediate'
-}` instead.
+To fetch messages, this method calls [`GET /api/inApp/getMessages`](https://support.iterable.com/hc/articles/204780579#get-api-inapp-getmessages).
 
-SDK-specific Options:
+:rotating_light: v1.0.0 of this SDK deprecates support for `showMessagesAutomatically?: boolean`. 
+If needed, please update your `getInAppMessages` requests to instead use 
+`options: { display: 'deferred' | 'immediate' }`.
+
+SDK-specific options:
 
 Along with the API parameters, you can pass these options to the SDK method to
 have in-app messages behave differently.
 
-| Property Name             | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
-| animationDuration         | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
-| bottomOffset              | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| displayInterval           | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
-| handleLinks               | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
-| onOpenScreenReaderMessage | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
-| onOpenNodeToTakeFocus     | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
-| rightOffset               | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| topOffset                 | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
-| closeButton               | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
+| Property Name               | Description                                                                                                                                                                                                                                                                                | Value                                                             | Default     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ----------- |
+| `animationDuration`         | How long (in ms) it should take messages to animate in and out                                                                                                                                                                                                                             | `number`                                                          | `400`       |
+| `bottomOffset`              | How much space (px or %) to create between the bottom of the screen and a message. Not applicable for center, top, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| `closeButton`               | Properties that define a custom close button to display on a message.                                                                                                                                                                                                                      | `CloseButtonOptions` (see below)                                  | `undefined` |
+| `displayInterval`           | How long (in ms) to wait before showing the next in-app message after closing the currently opened one                                                                                                                                                                                     | `number`                                                          | `30000`     |
+| `handleLinks`               | How to open links. If `undefined`, use browser-default behavior. `open-all-new-tab` opens all in new tab, `open-all-same-tab` opens all in same tab, `external-new-tab` opens only off-site links in new tab, otherwise same tab. Overrides the target attribute defined on link elements. | `'open-all-new-tab' \| 'open-all-same-tab' \| 'external-new-tab'` | `undefined` |
+| `onOpenNodeToTakeFocus`     | The DOM element that should receive keyboard focus when the in-app message opens. Any query selector is valid. If not specified, the first interactive element receives focus.                                                                                                             | `string`                                                          | `undefined` |
+| `onOpenScreenReaderMessage` | The text a screen reader should read when opening the message.                                                                                                                                                                                                                             | `string`                                                          | `undefined` |
+| `rightOffset`               | The amount of space (px or %) to create between the right of the screen and the message. Not applicable for center or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
+| `topOffset`                 | How much space (px or %) to create between the top of the screen and a message. Not applicable for center, bottom, or full-screen messages.                                                                                                                                                | `string`                                                          | `undefined` |
 
-Close Button Options:
+Close button options:
 
-| Property Name              | Description                                                                  | Value                      | Default       |
-| -------------------------- | ---------------------------------------------------------------------------- | -------------------------- | ------------- |
-| color                      | The button's color (does not affect custom icons)                            | `string`                   | `undefined`   |
-| iconPath                   | Custom pathname to an image or SVG to use (instead of the default "X")       | `string`                   | `undefined`   |
-| position                   | Where the button should display on an in-app message                         | `'top-right \| 'top-left'` | `'top-right'` |
-| isRequiredToDismissMessage | If `true`, users cannot dismiss in-app messages by clicking outside of them. | `boolean`                  | `undefined`   |
-| sideOffset                 | How much space to leave between the button and side of the container         | `string`                   | `'4%'`        |
-| size                       | How large to set the width, height, and font-size                            | `string \| number`         | `24`          |
-| topOffset                  | How much space to leave between the button and the top of the container      | `string`                   | `'4%'`        |
+| Property Name               | Description                                                                  | Value                      | Default       |
+| --------------------------- | ---------------------------------------------------------------------------- | -------------------------- | ------------- |
+| `color`                     | The button's color (does not affect custom icons)                            | `string`                   | `undefined`   |
+| `iconPath`                  | Custom pathname to an image or SVG to use (instead of the default "X")       | `string`                   | `undefined`   |
+| `isRequiredToDismissMessage`| If `true`, users cannot dismiss in-app messages by clicking outside of them. | `boolean`                  | `undefined`   |
+| `position`                  | Where the button should display on an in-app message                         | `'top-right' \| 'top-left'`| `'top-right'` |
+| `sideOffset`                | How much space to leave between the button and side of the container         | `string`                   | `'4%'`        |
+| `size`                      | How large to set the width, height, and font-size                            | `string \| number`         | `24`          |
+| `topOffset`                 | How much space to leave between the button and the top of the container      | `string`                   | `'4%'`        |
 
 Example:
 
@@ -261,9 +268,7 @@ the `sortInAppMessages` and `filterHiddenInAppMessages` methods the SDK
 provides. Also see `filterOnlyReadAndNeverTriggerMessages`, which is similar to
 `filterHiddenInAppMessages` but does not filter out JSON-only messages.
 
-## initialize
-
-API:
+## `initialize`
 
 ```ts
 initialize: (authToken: string, generateJWT: ({ email?: string, userID?: string }) => Promise<string>) => {
@@ -292,9 +297,7 @@ const { clearRefresh, setEmail, setUserID, logout } = initialize(
 );
 ```
 
-## initializeWithConfig
-
-API:
+## `initializeWithConfig`
 
 ```ts
 type Options = {
@@ -341,9 +344,180 @@ const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
 );
 ```
 
-## refreshJwtToken
+## `IterableEmbeddedCard`
 
-API:
+Returns a string of the HTML for an out-of-the-box [card](https://support.iterable.com/hc/articles/23230946708244#cards) 
+view for an embedded message.
+
+```ts
+const emptyElement = {
+  id: '',
+  styles: ''
+};
+
+export function IterableEmbeddedCard({
+  appPackageName,
+  message,
+  htmlElements = {
+    parent: emptyElement,
+    img: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement
+  },
+  errorCallback
+}: OOTB): string
+```
+
+Parameters:
+
+- `appPackageName` – The package name you use to identify your website to
+  Iterable's Web SDK.
+- `message` – The `IterableEmbeddedMessage` object that represents the
+  message you want to display.
+- `htmlElements` – Custom styles (type [`Elements`](#elements)) for the SDK to use 
+  when displaying the embedded message. For details, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+- `errorCallback` – A callback that the SDK calls if it encounters an error
+  when tracking [`embeddedClick`](https://support.iterable.com/hc/articles/23061677642260#embeddedclick-events) 
+  events.
+
+```js
+import { IterableEmbeddedCard } from '@iterable/web-sdk';
+
+const card = IterableEmbeddedCard({
+  packageName,
+  message,
+  htmlElements,
+  errorCallback: (error) => console.log('handleError: ', error)
+});
+```
+To display the message, set the `innerHTML` of an HTML element to the string
+returned by `IterableEmbeddedCard`.
+
+For more info, see:
+
+- [Out-of-the-Box Views](https://support.iterable.com/hc/articles/27537816889108#out-of-the-box-views).
+- For default card styles, see the [`src/components/card/styles.ts`](https://github.com/Iterable/iterable-web-sdk/blob/main/src/components/card/styles.ts)
+  in the Web SDK GitHub repository. 
+- To learn how to apply custom styles, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+
+## `IterableEmbeddedBanner`
+
+Returns a string of the HTML for an out-of-the-box [card](https://support.iterable.com/hc/articles/23230946708244#banners) 
+view for an embedded message.
+
+```ts
+export function IterableEmbeddedBanner({
+  appPackageName,
+  message,
+  htmlElements = {
+    parent: emptyElement,
+    img: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement,
+    textTitleImg: emptyElement
+  },
+  errorCallback
+}: OOTB): string 
+```
+
+Parameters:
+
+- `appPackageName` – The package name you use to identify your website to
+  Iterable's Web SDK.
+- `message` – The `IterableEmbeddedMessage` object that represents the
+  message you want to display.
+- `htmlElements` – Custom styles (type [`Elements`](#elements)) for the SDK to use 
+  when displaying the embedded message. For details, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+- `errorCallback` – A callback that the SDK calls if it encounters an error
+  when tracking [`embeddedClick`](https://support.iterable.com/hc/articles/23061677642260#embeddedclick-events) 
+  events.
+
+For example:
+
+```js
+import { IterableEmbeddedBanner } from '@iterable/web-sdk';
+
+const banner = IterableEmbeddedBanner({
+  packageName,
+  message,
+  htmlElements,
+  errorCallback: (error) => console.log('handleError: ', error)
+});
+```
+
+To display the message, set the `innerHTML` of an HTML element to the string
+returned by `IterableEmbeddedBanner`.
+
+For more info, see:
+
+- [Creating an Out-of-the-Box View](https://support.iterable.com/hc/articles/27537816889108).
+- For default banner styles, see the [`src/components/banner/styles.ts`](https://github.com/Iterable/iterable-web-sdk/blob/main/src/components/banner/styles.ts)
+  in the Web SDK GitHub repository. 
+- To learn how to apply custom styles, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+
+## `IterableEmbeddedNotification`
+
+Returns a string of the HTML for an out-of-the-box [card](https://support.iterable.com/hc/articles/23230946708244#notifications) 
+view for an embedded message.
+
+```ts
+export function IterableEmbeddedNotification({
+  appPackageName,
+  message,
+  htmlElements = {
+    parent: emptyElement,
+    title: emptyElement,
+    primaryButton: emptyElement,
+    secondaryButton: emptyElement,
+    body: emptyElement,
+    buttonsDiv: emptyElement,
+    textTitle: emptyElement
+  },
+  errorCallback
+}: OOTB): string
+```
+
+Parameters:
+
+- `appPackageName` – The package name you use to identify your website to
+  Iterable's Web SDK.
+- `message` – The `IterableEmbeddedMessage` object that represents the
+  message you want to display.
+- `htmlElements` – Custom styles (type [`Elements`](#elements)) for the SDK to use 
+  when displaying the embedded message. For details, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+- `errorCallback` – A callback that the SDK calls if it encounters an error
+  when tracking [`embeddedClick`](https://support.iterable.com/hc/articles/23061677642260#embeddedclick-events) 
+  events.
+
+```js
+import { IterableEmbeddedNotification } from '@iterable/web-sdk';
+
+const notification = IterableEmbeddedNotification({
+  packageName,
+  message,
+  htmlElements,
+  errorCallback: (error) => console.log('handleError: ', error)
+});
+```
+
+To display the message, set the `innerHTML` of an HTML element to the string
+returned by `IterableEmbeddedNotification`.
+
+For more info, see:
+
+- [Creating an Out-of-the-Box View](https://support.iterable.com/hc/articles/27537816889108).
+- For default notification styles, see the [`src/components/notification/styles.ts`](https://github.com/Iterable/iterable-web-sdk/blob/main/src/components/notification/styles.ts)
+- To learn how to apply custom styles, see [Custom Styles](https://support.iterable.com/hc/articles/27537816889108#custom-styles).
+
+## `refreshJwtToken`
 
 ```ts
 refreshJwtToken: (authTypes: string) => Promise<string>;
@@ -357,14 +531,14 @@ import { initialize } from '@iterable/web-sdk';
 refreshJwtToken('user@example.com').then().catch();
 ```
 
-## track
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_track):
+## `track`
 
 ```ts
 track: (payload: InAppTrackRequestParams) => Promise<TrackData>;
 ```
 
+To track an event, this method calls [`POST /api/events/track`](https://support.iterable.com/hc/articles/204780579#post-api-events-track).
+ 
 Example:
 
 ```ts
@@ -373,13 +547,31 @@ import { track } from '@iterable/web-sdk';
 track({ eventName: 'my-event' }).then().catch();
 ```
 
-## trackInAppClick
+## `trackEmbeddedClick`
 
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClick):
+```ts
+export const trackEmbeddedClick = (
+  payload: IterableEmbeddedClickRequestPayload
+)
+```
+
+Tracks an [`embeddedClick`](https://support.iterable.com/hc/articles/23061677642260#embeddedclick-events) event
+
+## `trackEmbeddedReceived`
+
+Tracks an [`embeddedReceived`](https://support.iterable.com/hc/articles/23061677642260#embeddedreceived-events) event.
+
+## `trackEmbeddedSession`
+
+Tracks an [`embeddedSession`](https://support.iterable.com/hc/articles/23061677642260#embeddedsession-events) event and related [`embeddedImpression`](https://support.iterable.com/hc/articles/23061677642260#embeddedimpression-events)
+
+## `trackInAppClick`
 
 ```ts
 trackInAppClick: (payload: InAppEventRequestParams) => Promise<TrackClickData>;
 ```
+
+To track an `inAppClick` event, this method calls [`POST /api/events/trackInAppClick`](https://support.iterable.com/hc/articles/204780579#post-api-events-trackinappclick).
 
 Example:
 
@@ -394,13 +586,13 @@ trackInAppClick({
   .catch();
 ```
 
-## trackInAppClose
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppClose):
+## `trackInAppClose`
 
 ```ts
 trackInAppClose: (payload: InAppEventRequestParams) => Promise<TrackCloseData>;
 ```
+
+To track an `inAppClose` event, this method calls [`POST /api/events/trackInAppClose`](https://support.iterable.com/hc/articles/204780579#post-api-events-trackinappclose).
 
 Example:
 
@@ -415,9 +607,7 @@ trackInAppClose({
   .catch();
 ```
 
-## trackInAppConsume
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_inAppConsume):
+## `trackInAppConsume`
 
 ```ts
 trackInAppConsume: (payload: InAppEventRequestParams) =>
@@ -437,14 +627,14 @@ trackInAppConsume({
   .catch();
 ```
 
-## trackInAppDelivery
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppDelivery):
+## `trackInAppDelivery`
 
 ```ts
 trackInAppDelivery: (payload: InAppEventRequestParams) =>
   Promise<TrackDeliveryData>;
 ```
+
+To track an `inAppDelivery` event, this method calls [`POST /api/events/trackInAppDelivery`](https://support.iterable.com/hc/articles/204780579#post-api-events-trackinappdelivery).
 
 Example:
 
@@ -459,13 +649,13 @@ trackInAppDelivery({
   .catch();
 ```
 
-## trackInAppOpen
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#events_trackInAppOpen):
+## `trackInAppOpen`
 
 ```ts
 trackInAppOpen: (payload: InAppEventRequestParams) => Promise<TrackOpenData>;
 ```
+
+To track an `inAppOpen` event, this method calls [`POST /api/events/trackInAppOpen`](https://support.iterable.com/hc/articles/204780579#post-api-events-trackinappopen).
 
 Example:
 
@@ -480,14 +670,14 @@ trackInAppOpen({
   .catch();
 ```
 
-## trackPurchase
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_trackPurchase):
+## `trackPurchase`
 
 ```ts
 trackPurchase: (payload: TrackPurchaseRequestParams) =>
   Promise<TrackPurchaseData>;
 ```
+
+To track an `purchase` event, this endpoint calls [`POST /api/commerce/trackPurchase`](https://support.iterable.com/hc/articles/204780579#post-api-commerce-trackpurchase).
 
 Example:
 
@@ -502,13 +692,14 @@ trackPurchase({
   .catch();
 ```
 
-## updateCart
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#commerce_updateCart):
+## `updateCart`
 
 ```ts
 updateCart: (payload: UpdateCartRequestParams) => Promise<UpdateCartData>;
 ```
+
+To update the shopping cart items on the user's Iterable profile, this method
+calls [`POST /api/commerce/updateCart`](https://support.iterable.com/hc/articles/204780579#post-api-commerce-updatecart).
 
 Example:
 
@@ -522,14 +713,14 @@ updateCart({
   .catch();
 ```
 
-## updateSubscriptions
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateSubscriptions):
+## `updateSubscriptions`
 
 ```ts
 updateSubscriptions: (payload?: UpdateSubscriptionParams) =>
   Promise<UpdateSubsData>;
 ```
+
+To update the user's subscriptions, this method calls [`POST /api/users/updateSubscriptions`](https://support.iterable.com/hc/articles/204780579#post-api-users-updatesubscriptions).
 
 Example:
 
@@ -541,13 +732,13 @@ updateSubscriptions({ emailListIds: [1, 2, 3] })
   .catch();
 ```
 
-## updateUser
-
-API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateUser):
+## `updateUser`
 
 ```ts
 updateUser: (payload?: UpdateUserParams) => Promise<UpdateUserData>;
 ```
+
+To update the data on a user's Iterable profile, this method calls [`POST /api/users/updateUser`](https://support.iterable.com/hc/articles/204780579#post-api-users-update).
 
 Example:
 
@@ -557,13 +748,15 @@ import { updateUser } from '@iterable/web-sdk';
 updateUser({ dataFields: {} }).then().catch();
 ```
 
-## updateUserEmail
+## `updateUserEmail`
 
 API [(see required API payload here)](https://api.iterable.com/api/docs#users_updateEmail):
 
 ```ts
 updateUserEmail: (newEmail: string) => Promise<UpdateEmailData>;
 ```
+
+To update the user's `email` address, this method calls [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail).
 
 Example:
 
@@ -573,7 +766,291 @@ import { updateUserEmail } from '@iterable/web-sdk';
 updateUserEmail('user@example.com').then().catch();
 ```
 
+# Classes, interfaces, and enums
+
+This section describes classes, interfaces, and enums you'll need to be aware
+of when working with Embedded Messaging in Iterable's Web SDK.
+
+| Type                                                                              | Description |
+| --------------------------------------------------------------------------------- | ----------- |
+| [`Elements`](#elements)                                                           | Custom styles to apply to `IterableEmbeddedCard`, `IterableEmbeddedBanner`, and `IterableEmbeddedNotification` views. |
+| [`IterableAction`](#iterableaction)                                               | An action associated with a click. The type of the action, and its associated URL. |
+| [`IterableActionContext`](#iterableactioncontext)                                 | Information about the context of an `IterableAction`. For example, the associated message type. |
+| [`IterableActionSource`](#iterableactionsource)                                   | An enum of possible message types to which an `IterableAction` can be associated. Currently, only `EMBEDDED` is supported. |
+| [`IterableConfig`](#iterableconfig)                                               | An class that can hold configuration information for the SDK. Currently, only `urlHandler` and `customActionHandler` are supported (static properties). |
+| [`IterableCustomActionHandler`](#iterablecustomactionhandler)                     | An interface that defines `handleIterableCustomAction`, which is called when the SDK encounters a custom action (as opposed to a standard URL). |
+| [`IterableEmbeddedButton`](#iterableembeddedbutton)                               | Payload for a button associated with an embedded message. |  
+| [`IterableEmbeddedButtonAction`](#iterableembeddedbuttonaction)                   | Payload for the action associated with an embedded message button. |
+| [`IterableEmbeddedClickRequestPayload`](#iterableembeddedclickrequestpayload)     | Data to pass to `trackEmbeddedClick`. | 
+| [`IterableEmbeddedDefaultAction`](#iterableembeddeddefaultaction)                 | The default action associated with an embedded message. Invoked when a user clicks on an embedded message, but outside of its buttons. | 
+| [`IterableEmbeddedElements`](#iterableembeddedelements)                           | All the elements associated with an embedded message — title, body, media URL, buttons, default action, and extra text fields. |
+| [`IterableEmbeddedImpression`](#iterableembeddedimpression)                       | The number of times a given embedded message appeared during a specific session, and the total duration of all those appearances. Also includes other metadata about the impression. |
+| [`IterableEmbeddedManager`](#iterableembeddedmanager)                             | Used to fetch embedded messages from Iterable, and pass them to application code as necessary. |
+| [`IterableEmbeddedMessage`](#iterableembeddedmessage)                             | A representation of a single embedded message to display. |
+| [`IterableEmbeddedMessageUpdateHandler`](#iterableembeddedmessageupdatehandler)   | An object that defines `onMessagesUpdated` and `onEmbeddedMessagingDisabled` methods. The SDK calls these methods as necessary after fetching embedded messages from the server. |
+| [`IterableEmbeddedMetadata`](#iterableembeddedmetadata)                           | For a given embedded message, contains for message ID, campaign ID, placement ID, and whether or not the message is a proof. |
+| [`IterableEmbeddedSession`](#iterableembeddedsession)                             | Represents a period of time during which a user was on a page where they could potentially view embedded messages. Contains an ID, a start tiem, and an end time. |
+| [`IterableEmbeddedSessionManager`](#iterableembeddedsessionmanager)               | Used to track sessions and impressions, and save them back to Iterable. |
+| [`IterableEmbeddedSessionRequestPayload`](#iterableembeddedsessionrequestpayload) | Data to pass to `trackEmbeddedSession`. Data about the session, its impressions, and the package name. |
+| [`IterableEmbeddedText`](#iterableembeddedtext)                                   | Extra text fields sent along with an embedded message. Like custom JSON, these can be used to pass data as part of an embedded message. |
+| [`IterableUrlHandler`](#iterableurlhandler)                                       | An interface that defines `handleIterableURL`, which is called when the SDK encounters a standard URL (as opposed to a custom action). |
+| [`OOTB`](#ootb)                                                                   | A type that defines the parameters to provide when calling `IterableEmbeddedCard`, `IterableEmbeddedBanner`, and `IterableEmbeddedNotification`. |
+| [`OutOfTheBoxButton`](#outoftheboxbutton)                                         | Custom styles to apply to buttons in an embedded message. |
+| [`OutOfTheBoxElement`](#outoftheboxelement)                                       | The custom styles to apply to a single element of an embedded message. |
+
+## `Elements`
+
+```ts
+type Elements = {
+  /** img div*/
+  img?: OutOfTheBoxElement;
+  /** title div*/
+  title?: OutOfTheBoxElement;
+  /** primary button div*/
+  primaryButton?: OutOfTheBoxButton;
+  /** secondary button div*/
+  secondaryButton?: OutOfTheBoxButton;
+  /** body button div*/
+  body?: OutOfTheBoxElement;
+  /** root OOTB div*/
+  parent?: OutOfTheBoxElement;
+  /** button wrapper div*/
+  buttonsDiv?: OutOfTheBoxElement;
+  /** title and parent wrapper div*/
+  textTitle?: OutOfTheBoxElement;
+  /** textTitleImg div*/
+  textTitleImg?: OutOfTheBoxElement;
+};
+```
+
+## `IterableAction`
+
+```ts
+export interface IterableAction {
+  type: string;
+  data: string;
+}
+```
+
+## `IterableActionContext`
+
+```ts
+export interface IterableActionContext {
+  action: IterableAction;
+  source: IterableActionSource;
+}
+```
+
+## `IterableActionSource`
+
+```ts
+export enum IterableActionSource {
+  EMBEDDED = 'EMBEDDED'
+}
+```
+
+## `IterableConfig`
+
+```ts
+export class IterableConfig {
+  public static urlHandler: IterableUrlHandler | null = null;
+  public static customActionHandler: IterableCustomActionHandler | null = null;
+}
+```
+
+## `IterableCustomActionHandler`
+
+```ts
+export interface IterableCustomActionHandler {
+  handleIterableCustomAction(
+    action: IterableAction,
+    actionContext: IterableActionContext
+  ): boolean;
+}
+```
+
+## `IterableEmbeddedButton`
+
+```ts
+export interface IterableEmbeddedButton {
+  id: string;
+  title?: string;
+  action?: IterableEmbeddedButtonAction;
+}
+```
+
+## `IterableEmbeddedButtonAction`
+
+```ts
+export interface IterableEmbeddedButtonAction {
+  type: string;
+  data?: string;
+}
+```
+
+## `IterableEmbeddedClickRequestPayload`
+
+```ts
+export interface IterableEmbeddedClickRequestPayload {
+  messageId: string;
+  buttonIdentifier: string;
+  targetUrl: string;
+  appPackageName: string;
+}
+```
+
+## `IterableEmbeddedDefaultAction`
+
+
+```ts
+export interface IterableEmbeddedDefaultAction {
+  type: string;
+  data?: string;
+}
+```
+
+## `IterableEmbeddedElements`
+
+```ts
+export interface IterableEmbeddedElements {
+  title?: string;
+  body?: string;
+  mediaUrl?: string;
+  buttons?: IterableEmbeddedButton[];
+  text?: IterableEmbeddedText[];
+  defaultAction?: IterableEmbeddedDefaultAction;
+}
+```
+
+## `IterableEmbeddedImpression`
+
+```ts
+export interface IterableEmbeddedImpression {
+  messageId: string;
+  displayCount: number;
+  displayDuration: number;
+  placementId?: number;
+}
+```
+
+## `IterableEmbeddedManager`
+
+
+## `IterableEmbeddedMessage`
+
+
+```ts
+export interface IterableEmbeddedMessage {
+  metadata: IterableEmbeddedMetadata;
+  elements?: IterableEmbeddedElements;
+  payload?: Record<string, any>;
+}
+```
+
+## `IterableEmbeddedMessageUpdateHandler`
+
+
+```ts
+export interface IterableEmbeddedMessageUpdateHandler {
+    onMessagesUpdated: () => void;
+    onEmbeddedMessagingDisabled: () => void;
+}
+```
+
+## `IterableEmbeddedMetadata`
+
+
+```ts
+export interface IterableEmbeddedMetadata {
+  messageId: string;
+  campaignId?: number;
+  isProof?: boolean;
+  placementId?: number;
+}
+```
+
+## `IterableEmbeddedSession`
+
+```ts
+export interface IterableEmbeddedSession {
+  id: string;
+  start?: number;
+  end?: number;
+}
+```
+
+## `IterableEmbeddedSessionManager`
+
+
+## `IterableEmbeddedSessionRequestPayload`
+
+```ts
+export interface IterableEmbeddedSessionRequestPayload {
+  session: IterableEmbeddedSession;
+  impressions?: IterableEmbeddedImpression[];
+  appPackageName: string;
+}
+```
+
+## `IterableEmbeddedText`
+
+```ts
+export interface IterableEmbeddedText {
+  id: string;
+  text?: string;
+}
+```
+
+## `IterableUrlHandler`
+
+```ts
+export interface IterableUrlHandler {
+  handleIterableURL(uri: string, actionContext: IterableActionContext): boolean;
+}
+```
+
+## `OOTB`
+
+```ts
+export type OOTB = {
+  appPackageName: string;
+  message: IterableEmbeddedMessage;
+  htmlElements?: Elements;
+  /** callback method to handle button or element click errors*/
+  errorCallback?: ErrorHandler;
+};
+```
+
+## `OutOfTheBoxButton`
+
+```ts
+export type OutOfTheBoxButton = OutOfTheBoxElement & {
+  /** Stringified CSS to be passed to element "style" tag.
+   * Presence of this value determines whether or not the button is in disabled.
+   */
+  disabledStyles?: string;
+};
+```
+
+## `OutOfTheBoxElement`
+
+```ts
+export type OutOfTheBoxElement = {
+  /** id of the element */
+  id?: string;
+  /** Stringified CSS to be passed to element "style" tag */
+  styles?: string;
+};
+```
+
 # FAQ
+
+## How do I use Iterable's Web SDK to fetch and display embedded messages?
+
+For detailed instructions about how to use Iterable's Web SDK SDK to fetch and
+display embedded messages, see [Embedded Messages with Iterable's Web SDK](https://support.iterable.com/hc/articles/27537816889108).
+
+For more information about Embedded Messaging, read the [Embedded Messaging Oveview](https://support.iterable.com/hc/articles/23060529977364).
 
 ## How do I make API requests with the SDK?
 
