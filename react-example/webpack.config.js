@@ -58,6 +58,17 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css'
-    })
+    }),
+    // Exit the process when built successfully
+    {
+      apply: (compiler) => {
+        compiler.hooks.done.tap('DonePlugin', (stats) => {
+          console.log('Compile is done !');
+          setTimeout(() => {
+            process.exit(0);
+          });
+        });
+      }
+    }
   ]
 };

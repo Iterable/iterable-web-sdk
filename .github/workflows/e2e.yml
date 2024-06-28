@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
       - name: Start React Sample App
-        run: yarn start:all:react
+        run: yarn install:all && yarn start:all:react
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
       - name: Run Playwright tests
