@@ -67,34 +67,48 @@ export const Commerce: FC<Props> = () => {
         <Form onSubmit={handleUpdateCart} data-qa-cart-submit>
           <label htmlFor="item-1">Enter Item Name</label>
           <TextField
+            data-test="cart-input"
             value={cartItem}
             onChange={(e) => setCartItem(e.target.value)}
             id="item-1"
             placeholder="e.g. keyboard"
             data-qa-cart-input
           />
-          <Button disabled={isUpdatingCart} type="submit">
+          <Button
+            data-test="cart-submit"
+            disabled={isUpdatingCart}
+            type="submit"
+          >
             Submit
           </Button>
         </Form>
-        <Response data-qa-cart-response>{updateCartResponse}</Response>
+        <Response data-test="cart-response" data-qa-cart-response>
+          {updateCartResponse}
+        </Response>
       </EndpointWrapper>
       <Heading>POST /trackPurchase</Heading>
       <EndpointWrapper>
         <Form onSubmit={handleTrackPurchase} data-qa-purchase-submit>
           <label htmlFor="item-2">Enter Item Name</label>
           <TextField
+            data-test="purchase-input"
             value={purchaseItem}
             onChange={(e) => setPurchaseItem(e.target.value)}
             id="item-2"
             placeholder="e.g. keyboard"
             data-qa-purchase-input
           />
-          <Button disabled={isTrackingPurchase} type="submit">
+          <Button
+            data-test="purchase-submit"
+            disabled={isTrackingPurchase}
+            type="submit"
+          >
             Submit
           </Button>
         </Form>
-        <Response data-qa-purchase-response>{trackPurchaseResponse}</Response>
+        <Response data-test="purchase-response" data-qa-purchase-response>
+          {trackPurchaseResponse}
+        </Response>
       </EndpointWrapper>
     </>
   );
