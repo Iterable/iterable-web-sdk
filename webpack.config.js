@@ -33,7 +33,17 @@ module.exports = {
     }),
     new MiniCssExtractPlugin({
       filename: 'dist/components/style.css' // Output CSS filename
-    })
+    }),
+    {
+      apply: (compiler) => {
+        compiler.hooks.done.tap('DonePlugin', (stats) => {
+          console.log('Compile is done !');
+          setTimeout(() => {
+            process.exit(0);
+          });
+        });
+      }
+    }
   ],
   module: {
     rules: [
