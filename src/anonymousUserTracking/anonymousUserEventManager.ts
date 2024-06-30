@@ -149,7 +149,7 @@ export class AnonymousUserEventManager {
     this.storeEventListToLocalStorage(newDataObject, false);
   }
 
-  private async checkCriteriaCompletion() {
+  private checkCriteriaCompletion() {
     const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
@@ -243,12 +243,12 @@ export class AnonymousUserEventManager {
           default:
             break;
         }
-        this.removeLocaStorageData();
+        this.removeAnonSessionNCriteriaData();
       });
     }
   }
 
-  removeLocaStorageData() {
+  removeAnonSessionNCriteriaData() {
     localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
     localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
     localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
@@ -288,7 +288,7 @@ export class AnonymousUserEventManager {
       SHARED_PREFS_EVENT_LIST_KEY,
       JSON.stringify(previousDataArray)
     );
-    const criteriaId = await this.checkCriteriaCompletion();
+    const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
       this.createKnownUser(criteriaId);
     }

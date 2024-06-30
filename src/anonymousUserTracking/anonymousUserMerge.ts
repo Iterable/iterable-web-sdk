@@ -1,4 +1,4 @@
-import { ENDPOINT_MERGE_USER, MERGE_SUCCESSFULL } from 'src/constants';
+import { ENDPOINT_MERGE_USER } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 
@@ -15,7 +15,7 @@ export class AnonymousUserMerge {
     sourceEmail: string | null,
     destinationUserId: string | null,
     destinationEmail: string | null
-  ): Promise<string> {
+  ): Promise<void> {
     const mergeApiParams: MergeApiParams = {
       sourceUserId: sourceUserId,
       sourceEmail: sourceEmail,
@@ -25,7 +25,7 @@ export class AnonymousUserMerge {
     return this.callMergeApi(mergeApiParams);
   }
 
-  private callMergeApi(data: MergeApiParams): Promise<string> {
+  private callMergeApi(data: MergeApiParams): Promise<void> {
     return new Promise((resolve, reject) => {
       baseIterableRequest<IterableResponse>({
         method: 'POST',
@@ -34,7 +34,7 @@ export class AnonymousUserMerge {
       })
         .then((response) => {
           if (response.status === 200) {
-            resolve(MERGE_SUCCESSFULL);
+            resolve();
           } else {
             reject(new Error(`merge error: ${response.status}`)); // Reject if status is not 200
           }

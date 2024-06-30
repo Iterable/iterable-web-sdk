@@ -25,10 +25,8 @@ export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 export const GET_CRITERIA_PATH = '/anonymoususer/list';
-export const ENDPOINT_GET_USER_BY_USERID = 'users/byUserId';
-export const ENDPOINT_GET_USER_BY_EMAIL = 'users/getByEmail';
-export const ENDPOINT_MERGE_USER = 'users/merge';
-export const ENDPOINT_TRACK_ANON_SESSION = 'anonymoususer/events/session';
+export const ENDPOINT_MERGE_USER = '/users/merge';
+export const ENDPOINT_TRACK_ANON_SESSION = '/anonymoususer/events/session';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
@@ -302,6 +300,5 @@ export const UPDATE_USER = 'user';
 export const TRACK_UPDATE_CART = 'cartUpdate';
 export const UPDATE_CART = 'updateCart';
 
-export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR =
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
