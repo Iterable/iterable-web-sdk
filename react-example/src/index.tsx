@@ -47,7 +47,8 @@ const HomeLink = styled(Link)`
     authToken: process.env.API_KEY || '',
     configOptions: {
       isEuIterableService: false,
-      dangerouslyAllowJsPopups: true
+      dangerouslyAllowJsPopups: true,
+      enableAnonTracking: true
     },
     generateJWT: ({ email, userID }) => {
       return axios
@@ -56,7 +57,7 @@ const HomeLink = styled(Link)`
           {
             exp_minutes: 2,
             email,
-            user_id: userID,
+            userId: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {

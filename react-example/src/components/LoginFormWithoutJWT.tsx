@@ -38,7 +38,7 @@ const Error = styled.div`
 
 interface Props {
   setEmail: (email: string) => Promise<void>;
-  setUserId: (userId: string) => Promise<void>;
+  setUserId: (userId: string, merge?: boolean) => Promise<void>;
   logout: () => void;
 }
 
@@ -61,7 +61,7 @@ export const LoginFormWithoutJWT: FC<Props> = ({
 
     const setUser = useEmail ? setEmail : setUserId;
 
-    setUser(user)
+    setUser(user, true)
       .then(() => {
         setEditingUser(false);
         setLoggedInUser({ type: 'user_update', data: user });

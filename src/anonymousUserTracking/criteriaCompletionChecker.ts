@@ -360,16 +360,8 @@ class CriteriaCompletionChecker {
     searchQueries: any,
     combinator: string
   ): boolean {
-    if (combinator === 'And') {
-      if (!this.evaluateFieldLogic(searchQueries, localEvent)) {
-        return false;
-      }
-      return true;
-    } else if (combinator === 'Or') {
-      if (this.evaluateFieldLogic(searchQueries, localEvent)) {
-        return true;
-      }
-      return false;
+    if (combinator === 'And' || combinator === 'Or') {
+      return this.evaluateFieldLogic(searchQueries, localEvent);
     }
     return false;
   }
