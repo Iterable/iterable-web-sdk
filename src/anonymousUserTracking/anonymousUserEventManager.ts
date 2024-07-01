@@ -1,8 +1,8 @@
 import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
-} from '../commerce/types';
-import { InAppTrackRequestParams } from '../events/types';
+} from 'src/commerce/types';
+
 import {
   GET_CRITERIA_PATH,
   KEY_EVENT_NAME,
@@ -15,29 +15,37 @@ import {
   KEY_ITEMS,
   KEY_TOTAL,
   TRACK_PURCHASE,
-  DATA_REPLACE,
   UPDATE_USER,
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
   SHARED_PREFS_ANON_SESSIONS,
-  SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL,
   ENDPOINT_TRACK_ANON_SESSION,
-  WEB_PLATFORM
+  WEB_PLATFORM,
+  KEY_PREFER_USERID,
+  SHARED_PREF_MATCHED_CRITERIAS,
+  ENDPOINTS
 } from 'src/constants';
-import { baseIterableRequest } from '../request';
-import { IterableResponse } from '../types';
+import { baseIterableRequest } from 'src/request';
+import { IterableResponse } from 'src/types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 import { v4 as uuidv4 } from 'uuid';
-import { TrackAnonSessionParams } from './types';
+import { TrackAnonSessionParams } from 'src/utils/types';
+import { UpdateUserParams } from 'src/users/types';
+import { InAppTrackRequestParams } from 'src/events/in-app/types';
+import { trackSchema } from 'src/events/events.schema';
 import {
   trackPurchaseSchema,
   updateCartSchema
 } from 'src/commerce/commerce.schema';
-import { trackSchema } from 'src/events/events.schema';
-import { UpdateUserParams } from 'src/users';
 import { updateUserSchema } from 'src/users/users.schema';
 
+type AnonUserFunction = (userId: string) => void;
+
+let anonUserIdSetter: AnonUserFunction | null = null;
+
+export function registerAnonUserIdSetter(setterFunction: AnonUserFunction) {
+  anonUserIdSetter = setterFunction;
+}
 export class AnonymousUserEventManager {
   updateAnonSession() {
     try {
@@ -114,7 +122,7 @@ export class AnonymousUserEventManager {
 
   async trackAnonUpdateUser(payload: UpdateUserParams) {
     const newDataObject = {
-      [DATA_REPLACE]: payload.dataFields,
+      ...payload.dataFields,
       [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
     };
     this.storeEventListToLocalStorage(newDataObject, true);
@@ -135,6 +143,7 @@ export class AnonymousUserEventManager {
     const newDataObject = {
       [KEY_ITEMS]: payload.items,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
+      [KEY_PREFER_USERID]: true,
       [KEY_CREATED_AT]: this.getCurrentTime()
     };
     this.storeEventListToLocalStorage(newDataObject, false);
@@ -145,7 +154,6 @@ export class AnonymousUserEventManager {
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
     );
-
     try {
       if (criteriaData && localStoredEventList) {
         const checker = new CriteriaCompletionChecker(localStoredEventList);
@@ -168,7 +176,6 @@ export class AnonymousUserEventManager {
       const payload: TrackAnonSessionParams = {
         user: {
           userId,
-          preferUserId: true,
           mergeNestedObjects: true,
           createNewFields: true
         },
@@ -187,24 +194,21 @@ export class AnonymousUserEventManager {
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
         }
       };
-
-      setTimeout(async () => {
-        const response = await baseIterableRequest<IterableResponse>({
-          method: 'POST',
-          url: ENDPOINT_TRACK_ANON_SESSION,
-          data: payload
-        }).catch((e) => {
-          if (e?.response?.status === 409) {
-            this.getAnonCriteria();
-          }
-        });
-        if (response && response.status === 200) {
-          this.setUserID(userId);
-          this.syncEvents();
+      const response = await baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINT_TRACK_ANON_SESSION,
+        data: payload
+      }).catch((e) => {
+        if (e?.response?.status === 409) {
+          this.getAnonCriteria();
         }
-      }, 500);
-    } else {
-      this.syncEvents();
+      });
+      if (response?.status === 200) {
+        if (anonUserIdSetter !== null) {
+          await anonUserIdSetter(userId);
+        }
+        this.syncEvents();
+      }
     }
   }
 
@@ -215,51 +219,40 @@ export class AnonymousUserEventManager {
       : [];
 
     if (trackEventList.length) {
-      for (let i = 0; i < trackEventList.length; i++) {
-        const event = trackEventList[i];
+      trackEventList.forEach((event: any) => {
         const eventType = event[SHARED_PREFS_EVENT_TYPE];
-
+        delete event.criteriaId;
+        delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {
-            await this.track(event);
+            this.track(event);
             break;
           }
           case TRACK_PURCHASE: {
-            let userDataJson = {};
-            if (this.getEmail() !== null) {
-              userDataJson = {
-                [SHARED_PREF_EMAIL]: this.getEmail()
-              };
-            } else {
-              userDataJson = {
-                [SHARED_PREF_USER_ID]: this.getUserID()
-              };
-            }
-            event.user = userDataJson;
-            await this.trackPurchase(event);
+            this.trackPurchase(event);
             break;
           }
           case TRACK_UPDATE_CART: {
-            await this.updateCart(event);
+            this.updateCart(event);
             break;
           }
           case UPDATE_USER: {
-            await this.updateUser(event);
+            this.updateUser({ dataFields: event });
             break;
           }
-          default: {
+          default:
             break;
-          }
         }
 
         localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
         localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
-      }
+        localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
+      });
     }
   }
 
   private async storeEventListToLocalStorage(
-    newDataObject: any,
+    newDataObject: Record<any, any>,
     shouldOverWrite: boolean
   ) {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
@@ -275,7 +268,14 @@ export class AnonymousUserEventManager {
         (obj: any) => obj[SHARED_PREFS_EVENT_TYPE] === trackingType
       );
       if (indexToUpdate !== -1) {
-        previousDataArray[indexToUpdate] = newDataObject;
+        const dataToUpdate = previousDataArray[indexToUpdate];
+
+        previousDataArray[indexToUpdate] = {
+          ...dataToUpdate,
+          ...newDataObject
+        };
+      } else {
+        previousDataArray.push(newDataObject);
       }
     } else {
       previousDataArray.push(newDataObject);
@@ -285,7 +285,6 @@ export class AnonymousUserEventManager {
       SHARED_PREFS_EVENT_LIST_KEY,
       JSON.stringify(previousDataArray)
     );
-
     const criteriaId = await this.checkCriteriaCompletion();
     if (criteriaId !== null) {
       this.createKnownUser(criteriaId);
@@ -308,7 +307,7 @@ export class AnonymousUserEventManager {
   track = (payload: InAppTrackRequestParams) => {
     return baseIterableRequest<IterableResponse>({
       method: 'POST',
-      url: '/events/track',
+      url: ENDPOINTS.event_track.route,
       data: payload,
       validation: {
         data: trackSchema
@@ -319,7 +318,7 @@ export class AnonymousUserEventManager {
   updateCart = (payload: UpdateCartRequestParams) => {
     return baseIterableRequest<IterableResponse>({
       method: 'POST',
-      url: '/commerce/updateCart',
+      url: ENDPOINTS.commerce_update_cart.route,
       data: {
         ...payload,
         user: {
@@ -336,7 +335,7 @@ export class AnonymousUserEventManager {
   trackPurchase = (payload: TrackPurchaseRequestParams) => {
     return baseIterableRequest<IterableResponse>({
       method: 'POST',
-      url: '/commerce/trackPurchase',
+      url: ENDPOINTS.commerce_track_purchase.route,
       data: {
         ...payload,
         user: {
@@ -351,27 +350,18 @@ export class AnonymousUserEventManager {
   };
 
   updateUser = (payload: UpdateUserParams = {}) => {
-    return baseIterableRequest<IterableResponse>({
-      method: 'POST',
-      url: '/users/update',
-      data: {
-        ...payload,
-        preferUserId: true
-      },
-      validation: {
-        data: updateUserSchema
-      }
-    });
-  };
-  setUserID = (userId: string) => {
-    localStorage.setItem(SHARED_PREF_USER_ID, userId);
-  };
-
-  getUserID = (): string | null => {
-    return localStorage.getItem(SHARED_PREF_USER_ID);
-  };
-
-  getEmail = (): string | null => {
-    return localStorage.getItem(SHARED_PREF_EMAIL);
+    if (payload.dataFields) {
+      return baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINTS.users_update.route,
+        data: {
+          ...payload,
+          preferUserId: true
+        },
+        validation: {
+          data: updateUserSchema
+        }
+      });
+    }
   };
 }

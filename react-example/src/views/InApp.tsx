@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import _Button from 'src/components/Button';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
 import { useUser } from 'src/context/Users';
-import { getInAppMessages } from '@iterable/web-sdk';
+import { DisplayOptions, getInAppMessages } from '@iterable/web-sdk';
 
 const Button = styled(_Button)`
   width: 100%;
@@ -35,7 +35,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
     closeButton: {},
     displayInterval: 1000
   },
-  { display: 'immediate' }
+  { display: DisplayOptions.Immediate }
 );
 
 export const InApp: FC<{}> = () => {
@@ -57,15 +57,15 @@ export const InApp: FC<{}> = () => {
 
     return getInAppMessages(
       { count: 20, packageName: 'my-website' },
-      { display: 'deferred' }
+      { display: DisplayOptions.Deferred }
     )
       .request()
-      .then((response) => {
+      .then((response: any) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(response.data, null, 2));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(e.response.data, null, 2));
       });
@@ -77,7 +77,7 @@ export const InApp: FC<{}> = () => {
     setIsGettingMessagesAuto(true);
 
     return request()
-      .then((response) => {
+      .then((response: any) => {
         setAutoMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesAuto(false);
       })

@@ -11,15 +11,13 @@ export interface GetUserResponse {
 }
 
 export interface UpdateUserParams {
-  userId?: string;
-  email?: string;
   dataFields?: Record<string, any>;
-  preferUserId?: boolean;
   mergeNestedObjects?: boolean;
 }
 
 export interface UpdateAnonymousUserParams extends UpdateUserParams {
   createNewFields?: boolean;
+  userId?: string;
 }
 
 export interface UpdateSubscriptionParams {

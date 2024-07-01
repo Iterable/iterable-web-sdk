@@ -133,7 +133,8 @@ describe('AnonymousUserEventManager', () => {
 
   it('should call createKnownUser when trackAnonEvent is called', async () => {
     const payload = {
-      eventName: 'testEvent'
+      eventName: 'testEvent',
+      eventType: 'customEvent'
     };
     const eventData = [
       {
@@ -278,8 +279,7 @@ describe('AnonymousUserEventManager', () => {
 
   it('should call createKnownUser when trackAnonUpdateUser is called', async () => {
     const payload: UpdateUserParams = {
-      userId: 'user',
-      preferUserId: true
+      dataFields: { country: 'UK' }
     };
     const userData = [
       {
@@ -347,9 +347,6 @@ describe('AnonymousUserEventManager', () => {
           price: 4
         }
       ],
-      user: {
-        userId: 'user'
-      },
       total: 0
     };
     const userData = [
@@ -433,9 +430,6 @@ describe('AnonymousUserEventManager', () => {
           price: 4
         }
       ],
-      user: {
-        userId: 'user'
-      },
       total: 0
     };
     const userData = [

@@ -1,34 +1,30 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import {
-  track,
+  trackEmbeddedReceived,
+  trackEmbeddedClick,
+  trackEmbeddedSession
+} from './embedded/events';
+import { track } from './events';
+import {
   trackInAppClick,
   trackInAppClose,
   trackInAppConsume,
   trackInAppDelivery,
   trackInAppOpen
-} from './events';
+} from './in-app/events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
-import { config } from '../utils/config';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
-
-jest.mock('../utils/anonymousUserEventManager', () => {
-  return jest.fn().mockImplementation(() => ({
-    trackAnonEvent: jest.fn()
-  }));
-});
+const localStorageMock = {
+  setItem: jest.fn(),
+  getItem: jest.fn()
+};
 
 describe('Events Requests', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-    config.setConfig({ enableAnonTracking: true });
-  });
-
   beforeAll(() => {
     mockRequest.onPost('/events/track').reply(200, {
-      userId: 'user',
       msg: 'hello'
     });
     mockRequest.onPost('/events/trackInAppClick').reply(200, {
@@ -46,37 +42,35 @@ describe('Events Requests', () => {
     mockRequest.onPost('/events/trackInAppOpen').reply(200, {
       msg: 'hello'
     });
-  });
-
-  it('should throw an error if payload is empty', () => {
-    expect(() => {
-      track({} as any);
-    }).toThrow();
-  });
-
-  it('should throw an error if payload is empty', () => {
-    expect(() => {
-      track({ eventName: 'test' });
-    }).toThrow();
-  });
-
-  it('return the correct payload for track with userId', async () => {
-    const response = await track({ userId: 'user', eventName: 'test' });
-    expect(JSON.parse(response.config.data).eventName).toBe('test');
-  });
-
-  it('return the correct payload for track with email', async () => {
-    const response = await track({
-      email: 'user@email.com',
-      eventName: 'test'
+    mockRequest.onPost('/embedded-messaging/events/received').reply(200, {
+      msg: 'hello'
     });
+    mockRequest.onPost('/embedded-messaging/events/click').reply(200, {
+      msg: 'hello'
+    });
+    mockRequest.onPost('/embedded-messaging/events/session').reply(200, {
+      msg: 'hello'
+    });
+
+    global.window = Object.create({});
+    Object.defineProperty(window, 'location', {
+      value: {
+        hostname: 'example.com'
+      }
+    });
+  });
+
+  it('return the correct payload for track', async () => {
+    const response = await track({ eventName: 'test' });
+
     expect(JSON.parse(response.config.data).eventName).toBe('test');
+    expect(response.data.msg).toBe('hello');
   });
 
   it('should reject track on bad params', async () => {
     try {
-      await track({ userId: 'user' } as any);
-    } catch (e: any) {
+      await track({} as any);
+    } catch (e) {
       expect(e).toEqual(
         createClientError([
           {
@@ -102,6 +96,8 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
     expect(response.data.msg).toBe('hello');
+    // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
+    // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
   });
 
   it('should reject trackInAppClick on bad params', async () => {
@@ -263,7 +259,87 @@ describe('Events Requests', () => {
     }
   });
 
+  it('return the correct payload for embedded message received', async () => {
+    const response = await trackEmbeddedReceived('abc123', 'packageName');
+    expect(JSON.parse(response.config.data).messageId).toBe('abc123');
+  });
+
+  it('return the correct payload for embedded message click', async () => {
+    const payload = {
+      messageId: 'abc123',
+      campaignId: 1
+    };
+
+    (global as any).localStorage = localStorageMock;
+    const buttonIdentifier = 'button-123';
+    const targetUrl = 'https://example.com';
+    const appPackageName = 'my-lil-site';
+    const response = await trackEmbeddedClick({
+      messageId: payload.messageId,
+      buttonIdentifier,
+      targetUrl,
+      appPackageName
+    });
+
+    expect(JSON.parse(response.config.data).messageId).toBe('abc123');
+  });
+
+  it('return the correct payload for embedded message received', async () => {
+    const response = await trackEmbeddedSession({
+      session: {
+        id: '123',
+        start: 18686876876876,
+        end: 1008083828723
+      },
+      impressions: [
+        {
+          messageId: 'abc123',
+          displayCount: 3,
+          displayDuration: 10,
+          placementId: 1
+        },
+        {
+          messageId: 'def456',
+          displayCount: 2,
+          displayDuration: 8,
+          placementId: 1
+        }
+      ],
+      appPackageName: 'my-lil-site'
+    });
+
+    expect(JSON.parse(response.config.data).session.id).toBe('123');
+  });
+
+  it('should reject embedded message received on bad params', async () => {
+    try {
+      await trackEmbeddedSession({} as any);
+    } catch (e) {
+      expect(e).toEqual(
+        createClientError([
+          {
+            error: 'session.id is a required field',
+            field: 'session.id'
+          },
+          {
+            error: 'session.start is a required field',
+            field: 'session.start'
+          },
+          {
+            error: 'session.end is a required field',
+            field: 'session.end'
+          },
+          {
+            error: 'deviceInfo.appPackageName is a required field',
+            field: 'deviceInfo.appPackageName'
+          }
+        ])
+      );
+    }
+  });
+
   it('should not send up passed email or userId params', async () => {
+    (global as any).localStorage = localStorageMock;
     const trackResponse = await track({
       email: 'hello@gmail.com',
       userId: '1234',
@@ -300,11 +376,43 @@ describe('Events Requests', () => {
       messageId: 'fdsafd',
       deviceInfo: { appPackageName: 'my-lil-site' }
     } as any);
-
-    expect(JSON.parse(trackResponse.config.data).email).toEqual(
-      'hello@gmail.com'
+    const trackEmMsgRecvdResponse = await trackEmbeddedReceived(
+      'abc123',
+      'packageName'
     );
-    expect(JSON.parse(trackResponse.config.data).userId).toEqual('1234');
+    const trackEmClickResponse = await trackEmbeddedClick({
+      messageId: 'abc123',
+      buttonIdentifier: 'button-123',
+      targetUrl: 'https://example.com',
+      appPackageName: 'my-lil-site'
+    });
+    const trackSessionResponse = await trackEmbeddedSession({
+      session: {
+        id: '123',
+        start: 18686876876876,
+        end: 1008083828723
+      },
+      impressions: [
+        {
+          messageId: 'abc123',
+          displayCount: 3,
+          duration: 10,
+          placementId: 1,
+          displayDuration: 10
+        },
+        {
+          messageId: 'def456',
+          displayCount: 2,
+          duration: 8,
+          placementId: 1,
+          displayDuration: 8
+        }
+      ],
+      appPackageName: 'my-lil-site'
+    } as any);
+
+    expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
     expect(
       JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
@@ -355,5 +463,18 @@ describe('Events Requests', () => {
     expect(JSON.parse(trackOpenResponse.config.data).deviceInfo.platform).toBe(
       WEB_PLATFORM
     );
+
+    expect(
+      JSON.parse(trackEmMsgRecvdResponse.config.data).email
+    ).toBeUndefined();
+    expect(
+      JSON.parse(trackEmMsgRecvdResponse.config.data).userId
+    ).toBeUndefined();
+
+    expect(JSON.parse(trackEmClickResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackEmClickResponse.config.data).userId).toBeUndefined();
+
+    expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
   });
 });

@@ -34,3 +34,7 @@ export interface IterableResponse {
   msg: string;
   params?: null | Record<string, any>;
 }
+
+export interface ErrorHandler {
+  (error: any): void;
+}

@@ -1,20 +1,26 @@
 import { BASE_URL } from '../constants';
 
-interface Options {
+export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
   enableAnonTracking: boolean;
-}
+  isEuIterableService: boolean;
+  dangerouslyAllowJsPopups: boolean;
+};
 
 const _config = () => {
   let options: Options = {
     logLevel: 'none',
     baseURL: BASE_URL,
-    enableAnonTracking: false
+    enableAnonTracking: false,
+    isEuIterableService: false,
+    dangerouslyAllowJsPopups: false
   };
 
+  const getConfig = <K extends keyof Options>(option: K) => options[option];
+
   return {
-    getConfig: <K extends keyof Options>(option: K) => options[option],
+    getConfig,
     setConfig: (newOptions: Partial<Options>) => {
       options = {
         ...options,

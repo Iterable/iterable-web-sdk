@@ -3,13 +3,14 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
-import { AnonymousUserEventManager } from '../utils/anonymousUserEventManager';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from 'src/utils/commonFunctions';
+import { INITIALIZE_ERROR, ENDPOINTS } from 'src/constants';
 
 export const updateUserEmail = (newEmail: string) => {
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateEmail',
+    url: ENDPOINTS.update_email.route,
     data: {
       newEmail
     },
@@ -22,16 +23,18 @@ export const updateUserEmail = (newEmail: string) => {
 };
 
 export const updateUser = (payload: UpdateUserParams = {}) => {
-  if (canTrackAnonUser(payload)) {
+  /* a customer could potentially send these up if they're not using TypeScript */
+  delete (payload as any).userId;
+  delete (payload as any).email;
+
+  if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateUser(payload);
-    const errorMessage =
-      'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
-    throw new Error(errorMessage);
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/update',
+    url: ENDPOINTS.users_update.route,
     data: {
       ...payload,
       preferUserId: true
@@ -51,7 +54,7 @@ export const updateSubscriptions = (
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/users/updateSubscriptions',
+    url: ENDPOINTS.users_update_subscriptions.route,
     data: payload,
     validation: {
       data: updateSubscriptionsSchema
