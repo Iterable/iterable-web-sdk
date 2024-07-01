@@ -1,16 +1,14 @@
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { updateUser } from '../users';
-import { clearMessages } from '../inapp';
+import { baseAxiosRequest, baseIterableRequest } from '../request';
+import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
-  SHARED_PREF_USER_ID,
-  SHARED_PREF_EMAIL,
+  SHARED_PREF_ANON_USER_ID,
   ENDPOINTS,
   RouteConfig
-} from '../constants';
+} from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
@@ -20,74 +18,17 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { Options, config } from '../utils/config';
+import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
+import {
+  AnonymousUserEventManager,
+  registerAnonUserIdSetter
+} from 'src/anonymousUserTracking/anonymousUserEventManager';
+import { Options, config } from 'src/utils/config';
+import { IterableResponse } from 'src/types';
+import { updateUserSchema } from 'src/users/users.schema';
 
 const MAX_TIMEOUT = ONE_DAY;
-
-export interface GenerateJWTPayload {
-  email?: string;
-  userID?: string;
-}
-
-export interface WithJWT {
-  clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
-  logout: () => void;
-  refreshJwtToken: (authTypes: string) => Promise<string>;
-}
-
-export interface WithoutJWT {
-  setNewAuthToken: (newToken?: string) => void;
-  clearAuthToken: () => void;
-  setEmail: (email: string) => void;
-  setUserID: (userId: string) => Promise<void>;
-  logout: () => void;
-}
-
-const doesRequestUrlContain = (routeConfig: RouteConfig) =>
-  Object.entries(ENDPOINTS).some(
-    (entry) =>
-      routeConfig.route === entry[1].route &&
-      routeConfig.body === entry[1].body &&
-      routeConfig.current === entry[1].current &&
-      routeConfig.nestedUser === entry[1].nestedUser
-  );
-
-export function initialize(
-  authToken: string,
-  generateJWT: (payload: GenerateJWTPayload) => Promise<string>
-): WithJWT;
-export function initialize(authToken: string): WithoutJWT;
-export function initialize(
-  authToken: string,
-  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
-) {
-  const logLevel = config.getConfig('logLevel');
-  if (!generateJWT && IS_PRODUCTION) {
-    /* only let people use non-JWT mode if running the app locally */
-    if (logLevel === 'verbose') {
-      return console.error(
-        'Please provide a Promise method for generating a JWT token.'
-      );
-    }
-    return;
-  }
-
-  /* 
-    only set token interceptor if we're using a non-JWT key.
-    Otherwise, we'll set it later once we generate the JWT
-  */
-  let authInterceptor: number | null = generateJWT
-    ? null
-    : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
-
-        return config;
-      });
-  let userInterceptor: number | null = null;
-  let responseInterceptor: number | null = null;
-  /* 
+/* 
     AKA did the user auth with their email (setEmail) or user ID (setUserID) 
 
     we're going to use this variable for one circumstance - when calling _updateUserEmail_.
@@ -100,9 +41,328 @@ export function initialize(
     doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
     tokens by user ID.
   */
-  let typeOfAuth: null | 'email' | 'userID' = null;
-  /* this will be the literal user ID or email they choose to auth with */
-  let authIdentifier: null | string = null;
+export let typeOfAuth: null | 'email' | 'userID' = null;
+/* this will be the literal user ID or email they choose to auth with */
+let authIdentifier: null | string = null;
+let userInterceptor: number | null = null;
+let apiKey: null | string = null;
+let generateJWTGlobal: any = null;
+const anonUserManager = new AnonymousUserEventManager();
+
+export interface GenerateJWTPayload {
+  email?: string;
+  userID?: string;
+}
+
+const doesRequestUrlContain = (routeConfig: RouteConfig) =>
+  Object.entries(ENDPOINTS).some(
+    (entry) =>
+      routeConfig.route === entry[1].route &&
+      routeConfig.body === entry[1].body &&
+      routeConfig.current === entry[1].current &&
+      routeConfig.nestedUser === entry[1].nestedUser
+  );
+export interface WithJWT {
+  clearRefresh: () => void;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
+  logout: () => void;
+  refreshJwtToken: (authTypes: string) => Promise<string>;
+}
+
+export interface WithoutJWT {
+  setNewAuthToken: (newToken?: string) => void;
+  clearAuthToken: () => void;
+  setEmail: (email: string) => Promise<void>;
+  setUserID: (userId: string) => Promise<void>;
+  logout: () => void;
+}
+
+export const setAnonUserId = async (userId: string) => {
+  let token: null | string = null;
+  if (generateJWTGlobal) {
+    token = await generateJWTGlobal({ userId: userId });
+  }
+
+  baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', apiKey);
+    if (token) {
+      config.headers.set('Authorization', `Bearer ${token}`);
+    }
+    return config;
+  });
+  addUserIdToRequest(userId);
+  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+};
+
+registerAnonUserIdSetter(setAnonUserId);
+
+const clearAnonymousUser = () => {
+  localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+};
+
+const updateUser = () => {
+  return baseIterableRequest<IterableResponse>({
+    method: 'POST',
+    url: ENDPOINTS.users_update.route,
+    data: {
+      preferUserId: true
+    },
+    validation: {
+      data: updateUserSchema
+    }
+  });
+};
+
+const getAnonUserId = () => {
+  if (config.getConfig('enableAnonTracking')) {
+    const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
+    return anonUser;
+  } else {
+    return null;
+  }
+};
+
+const initializeUserIdAndSync = (userId: string) => {
+  addUserIdToRequest(userId);
+  clearAnonymousUser();
+  syncEvents();
+};
+
+const addUserIdToRequest = (userId: string) => {
+  typeOfAuth = 'userID';
+  authIdentifier = userId;
+
+  if (typeof userInterceptor === 'number') {
+    baseAxiosRequest.interceptors.request.eject(userInterceptor);
+  }
+  /*
+    endpoints that use _userId_ payload prop in POST/PUT requests 
+  */
+  userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: true,
+        nestedUser: true
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          currentUserId: userId
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ payload prop in POST/PUT requests 
+      */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: false
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          userId
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+      */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: true
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          user: {
+            ...(config.data.user || {}),
+            userId
+          }
+        }
+      };
+    }
+
+    /*
+        endpoints that use _userId_ query param in GET requests
+      */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: false,
+        current: false,
+        nestedUser: false
+      })
+    ) {
+      return {
+        ...config,
+        params: {
+          ...(config.params || {}),
+          userId
+        }
+      };
+    }
+
+    return config;
+  });
+};
+
+const initializeEmailUserAndSync = (email: string) => {
+  addEmailToRequest(email);
+  clearAnonymousUser();
+  syncEvents();
+};
+
+const syncEvents = () => {
+  if (config.getConfig('enableAnonTracking')) {
+    anonUserManager.syncEvents();
+  }
+};
+
+const addEmailToRequest = (email: string) => {
+  typeOfAuth = 'email';
+  authIdentifier = email;
+
+  if (typeof userInterceptor === 'number') {
+    baseAxiosRequest.interceptors.request.eject(userInterceptor);
+  }
+  userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+    /* 
+      endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+    */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: true,
+        nestedUser: true
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          currentEmail: email
+        }
+      };
+    }
+
+    /*
+      endpoints that use _email_ payload prop in POST/PUT requests 
+    */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: false
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          email
+        }
+      };
+    }
+
+    /*
+      endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
+    */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: true,
+        current: false,
+        nestedUser: true
+      })
+    ) {
+      return {
+        ...config,
+        data: {
+          ...(config.data || {}),
+          user: {
+            ...(config.data.user || {}),
+            email
+          }
+        }
+      };
+    }
+
+    /*
+      endpoints that use _email_ query param in GET requests
+    */
+    if (
+      doesRequestUrlContain({
+        route: config?.url ?? '',
+        body: false,
+        current: false,
+        nestedUser: false
+      })
+    ) {
+      return {
+        ...config,
+        params: {
+          ...(config.params || {}),
+          email
+        }
+      };
+    }
+
+    return config;
+  });
+};
+
+export function initialize(
+  authToken: string,
+  generateJWT: (payload: GenerateJWTPayload) => Promise<string>
+): WithJWT;
+export function initialize(authToken: string): WithoutJWT;
+export function initialize(
+  authToken: string,
+  generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
+) {
+  apiKey = authToken;
+  generateJWTGlobal = generateJWT;
+  const logLevel = config.getConfig('logLevel');
+  if (!generateJWT && IS_PRODUCTION) {
+    /* only let people use non-JWT mode if running the app locally */
+    if (logLevel === 'verbose') {
+      return console.error(
+        'Please provide a Promise method for generating a JWT token.'
+      );
+    }
+    return;
+  }
+  /* 
+    only set token interceptor if we're using a non-JWT key.
+    Otherwise, we'll set it later once we generate the JWT
+  */
+  let authInterceptor: number | null =
+    baseAxiosRequest.interceptors.request.use((config) => {
+      config.headers.set('Api-Key', authToken);
+
+      return config;
+    });
+  let responseInterceptor: number | null = null;
 
   /**
     method that sets a timer one minute before JWT expiration
@@ -134,7 +394,7 @@ export function initialize(
         if (millisecondsToExpired < MAX_TIMEOUT) {
           timer = setTimeout(() => {
             /* get new token */
-            return callback().catch((e: any) => {
+            return callback().catch((e) => {
               console.warn(e);
               console.warn(
                 'Could not refresh JWT. Try identifying the user again.'
@@ -149,97 +409,40 @@ export function initialize(
 
   const handleTokenExpiration = createTokenExpirationTimer();
 
-  const addEmailToRequest = (email: string) => {
-    userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-      /* 
-        endpoints that use _currentEmail_ payload prop in POST/PUT requests 
-      */
-      if (
-        doesRequestUrlContain({
-          route: config?.url ?? '',
-          body: true,
-          current: true,
-          nestedUser: true
-        })
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            currentEmail: email
-          }
-        };
+  const enableAnonymousTracking = () => {
+    try {
+      if (config.getConfig('enableAnonTracking')) {
+        anonUserManager.getAnonCriteria();
+        anonUserManager.updateAnonSession();
+        const anonymousUserId = getAnonUserId();
+        if (anonymousUserId !== null) {
+          // This block will restore the anon userID from localstorage
+          setAnonUserId(anonymousUserId);
+        }
       }
+    } catch (error) {
+      console.warn(error);
+    }
+  };
 
-      /*
-        endpoints that use _email_ payload prop in POST/PUT requests 
-      */
-      if (
-        doesRequestUrlContain({
-          route: config?.url ?? '',
-          body: true,
-          current: false,
-          nestedUser: false
-        })
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            email
-          }
-        };
+  const tryMergeUser = async (
+    userIdOrEmail: string,
+    isEmail: boolean
+  ): Promise<boolean> => {
+    // This function will try to merge if anon user exists
+    if (getAnonUserId() !== null) {
+      const anonymousUserMerge = new AnonymousUserMerge();
+      try {
+        await anonymousUserMerge.mergeUser(userIdOrEmail, isEmail);
+      } catch (error) {
+        return Promise.reject(`merging failed: ${error}`);
       }
-
-      /*
-        endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-      */
-      if (
-        doesRequestUrlContain({
-          route: config?.url ?? '',
-          body: true,
-          current: false,
-          nestedUser: true
-        })
-      ) {
-        return {
-          ...config,
-          data: {
-            ...(config.data || {}),
-            user: {
-              ...(config.data.user || {}),
-              email
-            }
-          }
-        };
-      }
-
-      /*
-        endpoints that use _email_ query param in GET requests
-      */
-
-      if (
-        doesRequestUrlContain({
-          route: config?.url ?? '',
-          body: false,
-          current: false,
-          nestedUser: false
-        })
-      ) {
-        return {
-          ...config,
-          params: {
-            ...(config.params || {}),
-            email
-          }
-        };
-      }
-
-      return config;
-    });
+    }
+    return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
   };
 
   if (!generateJWT) {
+    enableAnonymousTracking();
     /* we want to set a normal non-JWT enabled API key */
     return {
       setNewAuthToken: (newToken: string) => {
@@ -261,125 +464,27 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: (email: string) => {
-        typeOfAuth = 'email';
-        authIdentifier = email;
-        localStorage.setItem(SHARED_PREF_EMAIL, email);
+      setEmail: async (email: string) => {
         clearMessages();
-        if (typeof userInterceptor === 'number') {
-          baseAxiosRequest.interceptors.request.eject(userInterceptor);
+        try {
+          const result = await tryMergeUser(email, true);
+          if (result) {
+            initializeEmailUserAndSync(email);
+            return Promise.resolve();
+          }
+        } catch (error) {
+          // here we will not sync events but just bubble up error of merge
+          return Promise.reject(`merging failed: ${error}`);
         }
-
-        /* 
-          endpoints that use _currentEmail_ payload prop in POST/PUT requests 
-        */
-        addEmailToRequest(email);
       },
       setUserID: async (userId: string) => {
-        typeOfAuth = 'userID';
-        authIdentifier = userId;
-        localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
-
-        if (typeof userInterceptor === 'number') {
-          baseAxiosRequest.interceptors.request.eject(userInterceptor);
-        }
-
-        /*
-          endpoints that use _currentUserId payload prop in POST/PUT requests nested in { user: {} }
-        */
-        userInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => {
-            if (
-              doesRequestUrlContain({
-                route: config?.url ?? '',
-                body: true,
-                current: true,
-                nestedUser: true
-              })
-            ) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  currentUserId: userId
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ payload prop in POST/PUT requests 
-            */
-            if (
-              doesRequestUrlContain({
-                route: config?.url ?? '',
-                body: true,
-                current: false,
-                nestedUser: false
-              })
-            ) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  userId
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-            */
-            if (
-              doesRequestUrlContain({
-                route: config?.url ?? '',
-                body: true,
-                current: false,
-                nestedUser: true
-              })
-            ) {
-              return {
-                ...config,
-                data: {
-                  ...(config.data || {}),
-                  user: {
-                    ...(config.data.user || {}),
-                    userId
-                  }
-                }
-              };
-            }
-
-            /*
-              endpoints that use _userId_ query param in GET requests
-            */
-            if (
-              doesRequestUrlContain({
-                route: config?.url ?? '',
-                body: false,
-                current: false,
-                nestedUser: false
-              })
-            ) {
-              return {
-                ...config,
-                params: {
-                  ...(config.params || {}),
-                  userId
-                }
-              };
-            }
-
-            return config;
-          }
-        );
-
         const tryUser = () => {
           let createUserAttempts = 0;
 
           return async function tryUserNTimes(): Promise<any> {
             try {
-              return await updateUser({});
+              return await updateUser();
             } catch (e) {
               if (createUserAttempts < RETRY_USER_ATTEMPTS) {
                 createUserAttempts += 1;
@@ -392,12 +497,20 @@ export function initialize(
             }
           };
         };
-
         try {
-          return await tryUser()();
-        } catch (e) {
-          /* failed to create a new user. Just silently resolve */
-          return Promise.resolve();
+          const result = await tryMergeUser(userId, false);
+          if (result) {
+            initializeUserIdAndSync(userId);
+            try {
+              return await tryUser()();
+            } catch (e) {
+              /* failed to create a new user. Just silently resolve */
+              return Promise.resolve();
+            }
+          }
+        } catch (error) {
+          // here we will not sync events but just bubble up error of merge
+          return Promise.reject(`merging failed: ${error}`);
         }
       },
       logout: () => {
@@ -561,7 +674,7 @@ export function initialize(
                   */
                   handleTokenExpiration(newToken, () => {
                     /* re-run the JWT generation */
-                    return doRequest(payloadToPass).catch((e: any) => {
+                    return doRequest(payloadToPass).catch((e) => {
                       console.warn(e);
                       console.warn(
                         'Could not refresh JWT. Try identifying the user again.'
@@ -637,7 +750,7 @@ export function initialize(
                     }
                   });
                 })
-                .catch((e: any) => {
+                .catch((e) => {
                   /*
                     if the JWT generation failed, 
                     just abort with a Promise rejection.
@@ -651,7 +764,7 @@ export function initialize(
         );
         handleTokenExpiration(token, () => {
           /* re-run the JWT generation */
-          return doRequest(payload).catch((e: any) => {
+          return doRequest(payload).catch((e) => {
             if (logLevel === 'verbose') {
               console.warn(e);
               console.warn(
@@ -662,7 +775,7 @@ export function initialize(
         });
         return token;
       })
-      .catch((error: any) => {
+      .catch((error) => {
         /* clear interceptor */
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -670,135 +783,48 @@ export function initialize(
         return Promise.reject(error);
       });
   };
+
+  enableAnonymousTracking();
   return {
     clearRefresh: () => {
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: (email: string) => {
-      typeOfAuth = 'email';
-      authIdentifier = email;
-      localStorage.setItem(SHARED_PREF_EMAIL, email);
+    setEmail: async (email: string) => {
       /* clear previous user */
       clearMessages();
-      if (typeof userInterceptor === 'number') {
-        baseAxiosRequest.interceptors.request.eject(userInterceptor);
-      }
-
-      addEmailToRequest(email);
-
-      return doRequest({ email }).catch((e: any) => {
-        if (logLevel === 'verbose') {
-          console.warn(
-            'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
-          );
+      try {
+        const result = await tryMergeUser(email, true);
+        if (result) {
+          initializeEmailUserAndSync(email);
+          try {
+            return doRequest({ email }).catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+          } catch (e) {
+            /* failed to create a new user. Just silently resolve */
+            return Promise.resolve();
+          }
         }
-        return Promise.reject(e);
-      });
+      } catch (error) {
+        // here we will not sync events but just bubble up error of merge
+        return Promise.reject(`merging failed: ${error}`);
+      }
     },
     setUserID: async (userId: string) => {
-      typeOfAuth = 'userID';
-      authIdentifier = userId;
-      localStorage.setItem(SHARED_PREF_USER_ID, userId);
       clearMessages();
-
-      if (typeof userInterceptor === 'number') {
-        baseAxiosRequest.interceptors.request.eject(userInterceptor);
-      }
-
-      /*
-        endpoints that use _currentUserId_ payload prop in POST/PUT requests nested in user object
-      */
-      userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-        if (
-          doesRequestUrlContain({
-            route: config?.url ?? '',
-            body: true,
-            current: true,
-            nestedUser: true
-          })
-        ) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              currentUserId: userId
-            }
-          };
-        }
-
-        /*
-          endpoints that use _serId_ payload prop in POST/PUT requests 
-        */
-        if (
-          doesRequestUrlContain({
-            route: config?.url ?? '',
-            body: true,
-            current: false,
-            nestedUser: false
-          })
-        ) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              userId
-            }
-          };
-        }
-
-        /*
-          endpoints that use _userId_ payload prop in POST/PUT requests nested in { user: {} }
-        */
-        if (
-          doesRequestUrlContain({
-            route: config?.url ?? '',
-            body: true,
-            current: false,
-            nestedUser: true
-          })
-        ) {
-          return {
-            ...config,
-            data: {
-              ...(config.data || {}),
-              user: {
-                ...(config.data.user || {}),
-                userId
-              }
-            }
-          };
-        }
-
-        /*
-          endpoints that use _userId_ query param in GET requests
-        */
-        if (
-          doesRequestUrlContain({
-            route: config?.url ?? '',
-            body: false,
-            current: false,
-            nestedUser: false
-          })
-        ) {
-          return {
-            ...config,
-            params: {
-              ...(config.params || {}),
-              userId
-            }
-          };
-        }
-
-        return config;
-      });
 
       const tryUser = () => {
         let createUserAttempts = 0;
 
         return async function tryUserNTimes(): Promise<any> {
           try {
-            return await updateUser({});
+            return await updateUser();
           } catch (e) {
             if (createUserAttempts < RETRY_USER_ATTEMPTS) {
               createUserAttempts += 1;
@@ -811,20 +837,33 @@ export function initialize(
           }
         };
       };
-
-      return doRequest({ userID: userId })
-        .then(async (token) => {
-          await tryUser()();
-          return token;
-        })
-        .catch((e: any) => {
-          if (logLevel === 'verbose') {
-            console.warn(
-              'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
-            );
+      try {
+        const result = await tryMergeUser(userId, false);
+        if (result) {
+          initializeUserIdAndSync(userId);
+          try {
+            return doRequest({ userID: userId })
+              .then(async (token) => {
+                await tryUser()();
+                return token;
+              })
+              .catch((e) => {
+                if (logLevel === 'verbose') {
+                  console.warn(
+                    'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+                  );
+                }
+                return Promise.reject(e);
+              });
+          } catch (e) {
+            /* failed to create a new user. Just silently resolve */
+            return Promise.resolve();
           }
-          return Promise.reject(e);
-        });
+        }
+      } catch (error) {
+        // here we will not sync events but just bubble up error of merge
+        return Promise.reject(`merging failed: ${error}`);
+      }
     },
     logout: () => {
       typeOfAuth = null;
@@ -849,7 +888,7 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
       const payloadToPass = { [isEmail(user) ? 'email' : 'userID']: user };
-      return doRequest(payloadToPass).catch((e: any) => {
+      return doRequest(payloadToPass).catch((e) => {
         if (logLevel === 'verbose') {
           console.warn(e);
           console.warn('Could not refresh JWT. Try Refresh the JWT again.');

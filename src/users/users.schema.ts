@@ -1,6 +1,7 @@
-import { array, boolean, number, object } from 'yup';
+import { array, boolean, number, object, string } from 'yup';
 
 export const updateUserSchema = object().shape({
+  userId: string(),
   dataFields: object(),
   preferUserId: boolean(),
   mergeNestedObjects: boolean()

@@ -41,6 +41,9 @@ export const Home: FC<Props> = () => {
         <Link to="/embedded-msgs-impression-tracker" renderAsButton>
           Embedded msgs impressions tracker
         </Link>
+        <Link to="/aut-testing" renderAsButton>
+          AUT Testing
+        </Link>
       </Wrapper>
     </>
   );

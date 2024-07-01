@@ -27,10 +27,9 @@ export const EventsForm: FC<Props> = ({
   );
 
   const [trackEvent, setTrackEvent] = useState<string>('');
-
   const [isTrackingEvent, setTrackingEvent] = useState<boolean>(false);
 
-  const handleTrack = (e: FormEvent<HTMLFormElement>) => {
+  const handleTrack = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingEvent(true);
 
@@ -49,7 +48,6 @@ export const EventsForm: FC<Props> = ({
       })
       .catch((e: any) => {
         setTrackResponse(JSON.stringify(e.response.data));
-        setTrackingEvent(false);
       });
   };
 
