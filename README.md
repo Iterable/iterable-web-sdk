@@ -11,19 +11,20 @@ This SDK helps you integrate your web apps with Iterable.
 
 # Table of contents
 
+- [Other documentation](#other-documentation)
 - [Installation](#installation)
-- [API](#api)
-- [Usage](#usage)
+- [Functions](#functions)
+- [Classes, interfaces, types, and enums](#classes-interfaces-types-and-enums)
 - [FAQ](#faq)
-- [About in-app message links](#about-in-app-message-links)
+- [Link handling](#link-handling)
 - [TypeScript](#typescript)
 - [Contributing](#contributing)
 - [License](#license)
 
 # Other documentation
 
-This document primarily contains reference information about the Web SDK. For
-other information, please see:
+This document contains reference information about the Web SDK. For other
+information, please see:
 
 - [In-Browser Messaging Overview](https://support.iterable.com/hc/articles/4418166649748)
 - [Embedded Messaging Overview](https://support.iterable.com/hc/articles/23060529977364)
@@ -2312,10 +2313,9 @@ your message HTML.
 Regardless of how you write your CSS, these rules take effect. So, when creating
 an in-app message, it is best to stick with percentage-based CSS widths.
 
-## Clicking links breaks the experience of my single-page app (or how you add a custom callback to link clicks)
+## How do I add custom callbacks to handle link clicks on in-app and embedded messages?
 
-See [About In-App Message Links](#about-in-app-message-links) for more information 
-about how to create callback methods on link clicks. 
+See [Link handling](#link-handling).
 
 ## What if the user's JWT expires?
 
@@ -2365,19 +2365,28 @@ To do this, you have two options:
   });
   ```
 
-# About in-app message links
+# Link handling
 
-The Web SDK renders in-app messages in an `iframe` element. If you choose to 
-render the messages automatically, the event handler responsible for handling 
-link clicks is hijacked by internal SDK code. To the user, this doesn't change 
-the experience — links open the link in the same browser tab unless given the
+The SDK allows you to write your own callbacks to implement custom link-handling
+behavior. However, you'll do this in different ways for embedded messages and
+in-app messages.
+
+## Embedded messaging
+
+To learn how to handle clicks on links found in embededd messages, read
+[Embedded Messages with Iterable's Web SDK](https://support.iterable.com/hc/articles/27537816889108#step-8-2-handle-urls-and-custom-actions).
+
+## In-app messages
+
+In-app messages render in an `iframe` element. If you choose to have the SDK 
+render messages automatically, the event handler responsible for handling link
+clicks gets hijacked by internal SDK code. To the user, this doesn't change the
+experience — links open the link in the same browser tab unless given the
 `target="_blank"` property.
 
-However, you can customize how the SDK handles links.
-
-The `handleLinks` option you can provide to [`getInAppMessages`](#getInAppMessages) 
-allows you to specify how the SDK opens links: in the current tab, in a new tab, 
-or a combination (external links in a new tab, internal links in the current tab). 
+However, the `handleLinks` option that you can provide to [`getInAppMessages`](#getInAppMessages) 
+allows you to specify how the SDK opens in-app message links: in the current tab, 
+in a new tab, or a combination (external links in a new tab, internal links in the current tab). 
 For example, consider this code:
 
 ```ts
@@ -2406,10 +2415,10 @@ https://google.com
 https://hello.com
 ```
 
-## Reserved keyword links
+### Reserved URL schemes
 
-Iterable reserves the `iterable://` and `action://` URL schemas to define custom
-link click actions:
+For in-app messages, the SDK reserves the `iterable://` and `action://` URL 
+schemes for custom purposes.
 
 1. `iterable://dismiss` - Removes an in-app message from the screen, grabs the
    next one to display, and invokes both [trackInAppClose](#trackInAppClose) and
@@ -2426,13 +2435,14 @@ The SDK may reserve more keywords in the future.
 WebKit (which affects iOS web browsers, Safari included). In these browsers,
 users can close an in-app message by clicking away from the message.
 
-## Routing in single-page apps, for in-app messages
+### Routing in single-page apps
 
-Knowing now thecustom link schemas available, let's explain how you can
-leverage them to add custom routing or callback functions. If, for example, you
-want to hook into a link click and send the user to your `/about` page with a
-client-side routing solution, you'd do something like this if you're using React
-Router:
+You can add custom routing or callback functions for link clicks on in-app
+messages.
+
+For example, if you want to intercept a link click and use a client-side routing
+solution to send the user to your `/about` page, you could so something like this
+(this example assumes that you're using React Router):
 
 ```ts
 // This example assumes a click on this link: 
@@ -2441,7 +2451,6 @@ import { useHistory } from 'react-router-dom';
 
 const SomeComponent = () => {
   const history = useHistory();
-
   React.useEffect(() => {
     global.addEventListener('message', (event) => {
       if (event.data.type && event.data.type === 'iterable-action-link') {
@@ -2455,7 +2464,7 @@ const SomeComponent = () => {
 };
 ```
 
-## Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
+### Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
 
 To display an in-app message, Iterable's Web SDK uses an `iframe` on which the
 `sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`. 
@@ -2502,13 +2511,12 @@ For more information, see:
 
 # TypeScript
 
-The Iterable Web SDK includes TypeScript definitions out of the box. All SDK
-methods should be typed for you already but if you need to import specific
-typings, you can parse through each `types.d.ts` file inside of the `./dist`
-directory to find what you need.  Request and response payloads should all be
-available.
+Iterable's Web SDK includes TypeScript definitions. All SDK methods should be
+typed for you, but if you need to import specific typings, you can parse through
+each `types.d.ts` file inside of the `./dist` directory to find what you need.
+Request and response payloads should all be available.
 
-If something is missing, please open an issue!
+If something is missing, please let us know.
 
 # Contributing
 
