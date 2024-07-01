@@ -386,6 +386,10 @@ class CriteriaCompletionChecker {
         return true;
       }
       return false;
+    } else if (combinator === 'Not') {
+      if (!this.evaluateFieldLogic(searchQueries, localEvent)) {
+        return true;
+      }
     }
     return false;
   }
