@@ -318,7 +318,7 @@ Example:
 import { initialize } from '@iterable/web-sdk';
 
 const { clearRefresh, setEmail, setUserID, logout } = initialize(
-  'my-API-key',
+  '<YOUR_API_KEY>',
   // email will be defined if you call setEmail 
   // userID_ will be defined if you call setUserID
   ({ email, userID }) =>
@@ -353,7 +353,7 @@ Example:
 import { initializeWithConfig } from '@iterable/web-sdk';
 
 const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
-  authToken: 'my-API-key',
+  authToken: '<YOUR_API_KEY>',
   configOptions: {
     isEuIterableService: false,
     dangerouslyAllowJsPopups: true,
