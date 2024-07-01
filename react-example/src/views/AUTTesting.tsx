@@ -30,7 +30,7 @@ export const AUTTesting: FC<Props> = () => {
   );
 
   const [cartItem, setCartItem] = useState<string>(
-    '{"items":[{"name":"piano","id":"fdsafds","price":100,"quantity":2}]}'
+    '{"items":[{"name":"piano","id":"fdsafds","price":100,"quantity":2}, {"name":"piano2","id":"fdsafds2","price":100,"quantity":5}]}'
   );
 
   const [purchaseItem, setPurchaseItem] = useState<string>(
@@ -59,7 +59,6 @@ export const AUTTesting: FC<Props> = () => {
   const handleParseJson = (isUpdateCartCalled: boolean) => {
     try {
       // Parse JSON and assert its type
-      // {"items":[{"name":"piano","id":"fdsafds","price":100,"quantity":2}]}
       if (isUpdateCartCalled) {
         const parsedObject = JSON.parse(cartItem) as UpdateCartRequestParams;
         return parsedObject;
@@ -109,11 +108,11 @@ export const AUTTesting: FC<Props> = () => {
 
   const handleTrackPurchase = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const jsonObj = handleParseJson(false);
+    const jsonObj: TrackPurchaseRequestParams = handleParseJson(false);
     if (jsonObj) {
       setTrackingPurchase(true);
       try {
-        trackPurchase({ ...jsonObj, total: 20 })
+        trackPurchase(jsonObj)
           .then((response: any) => {
             setTrackingPurchase(false);
             setTrackPurchaseResponse(JSON.stringify(response.data));

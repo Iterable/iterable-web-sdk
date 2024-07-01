@@ -7,6 +7,8 @@ import {
   UPDATE_CART,
   UPDATE_USER,
   KEY_EVENT_NAME,
+  UPDATECART_ITEM_PREFIX,
+  PURCHASE_ITEM_PREFIX,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREF_MATCHED_CRITERIAS
 } from '../constants';
@@ -110,7 +112,7 @@ class CriteriaCompletionChecker {
           items = items.map((item: any) => {
             const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatItem[`shoppingCartItems.${key}`] = item[key];
+              updatItem[`${PURCHASE_ITEM_PREFIX}${key}`] = item[key];
             });
             return updatItem;
           });
@@ -143,8 +145,7 @@ class CriteriaCompletionChecker {
           items = items.map((item: any) => {
             const updatItem: any = {};
             Object.keys(item).forEach((key) => {
-              updatItem[`updateCart.updatedShoppingCartItems.${key}`] =
-                item[key];
+              updatItem[`${UPDATECART_ITEM_PREFIX}${key}`] = item[key];
             });
             return updatItem;
           });
@@ -155,6 +156,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          delete localEventData.dataFields;
         }
         Object.keys(localEventData).forEach((key) => {
           if (key !== KEY_ITEMS && key !== 'dataFields') {
@@ -198,6 +200,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          delete localEventData.dataFields;
         }
         nonPurchaseEvents.push(updatedItem);
       }
@@ -234,8 +237,7 @@ class CriteriaCompletionChecker {
           return false;
         }
       } else if (node.searchCombo) {
-        const vv = this.evaluateSearchQueries(node, localEventData, criteriaId);
-        return vv;
+        return this.evaluateSearchQueries(node, localEventData, criteriaId);
       }
     } catch (e) {
       this.handleException(e);
@@ -258,13 +260,6 @@ class CriteriaCompletionChecker {
           const searchCombo = node.searchCombo;
           const searchQueries = searchCombo?.searchQueries || [];
           const combinator = searchCombo?.combinator || '';
-          // matchedCriterias format
-          // [
-          //   {
-          //     criteriaId: '6',
-          //     nodeCombo: [{searchCombo: {}, count: 1}],
-          //   },
-          // ];
           const matchedCriteriasFromLocalStorage = localStorage.getItem(
             SHARED_PREF_MATCHED_CRITERIAS
           );
@@ -290,7 +285,6 @@ class CriteriaCompletionChecker {
                 nodeCombo: { searchCombo: object; count: number }[];
               }) => item.criteriaId === criteriaId
             );
-
           if (this.evaluateEvent(eventData, searchQueries, combinator)) {
             if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
               const matchedNode =
@@ -330,11 +324,7 @@ class CriteriaCompletionChecker {
                   JSON.stringify(this.localStoredEventList)
                 );
 
-                if (matchedNode[0].count === node.minMatch) {
-                  return true;
-                } else {
-                  return false;
-                }
+                return matchedNode[0].count === node.minMatch;
               } else {
                 const tempMatchedCriterias = matchedCriterias || [];
                 tempMatchedCriterias.push({
@@ -353,7 +343,7 @@ class CriteriaCompletionChecker {
                   SHARED_PREF_MATCHED_CRITERIAS,
                   JSON.stringify(tempMatchedCriterias)
                 );
-                return false;
+                return node.minMatch === 1;
               }
             } else {
               return true;
@@ -371,73 +361,91 @@ class CriteriaCompletionChecker {
     combinator: string
   ): boolean {
     if (combinator === 'And') {
-      for (let i = 0; i < searchQueries.length; i++) {
-        if (!this.evaluateFieldLogic(searchQueries[i], localEvent)) {
-          return false;
-        }
+      if (!this.evaluateFieldLogic(searchQueries, localEvent)) {
+        return false;
       }
       return true;
     } else if (combinator === 'Or') {
-      for (let i = 0; i < searchQueries.length; i++) {
-        if (this.evaluateFieldLogic(searchQueries[i], localEvent)) {
-          return true;
-        }
+      if (this.evaluateFieldLogic(searchQueries, localEvent)) {
+        return true;
       }
       return false;
     }
     return false;
   }
 
-  private evaluateFieldLogic(node: any, eventData: any): boolean {
-    const field = node.field;
-    const comparatorType = node.comparatorType ? node.comparatorType : '';
+  private doesItemCriteriaExists(searchQueries: any[]): boolean {
+    const foundIndex = searchQueries.findIndex(
+      (item) =>
+        item.field.startsWith(UPDATECART_ITEM_PREFIX) ||
+        item.field.startsWith(PURCHASE_ITEM_PREFIX)
+    );
+    return foundIndex !== -1;
+  }
+
+  private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
-    let shouldReturn = false;
-    for (let j = 0; j < localDataKeys.length; j++) {
-      const key = localDataKeys[j];
-      if (key === KEY_ITEMS) {
-        // scenario of items inside purchase and updateCart Events
-        const items = eventData[key];
-        items.forEach((item: any) => {
-          const keys = Object.keys(item);
-          keys.forEach((keyItem: any) => {
-            if (field === keyItem) {
-              const matchedCountObj = item[keyItem];
-              if (
-                this.evaluateComparison(
-                  comparatorType,
-                  matchedCountObj,
-                  node.value ? node.value : ''
-                )
-              ) {
-                shouldReturn = true;
-                return;
-              }
-            }
-          });
-          if (shouldReturn) return; // Exit outer forEach loop
-        });
-        if (shouldReturn) break; // Exit main for loop
-      } else {
-        if (field === key) {
-          const matchedCountObj = eventData[key];
-          if (
-            this.evaluateComparison(
-              comparatorType,
-              matchedCountObj,
-              node.value ? node.value : ''
-            )
-          ) {
-            return true;
-          }
-        }
+    let itemMatchedResult = false;
+    if (localDataKeys.includes(KEY_ITEMS)) {
+      // scenario of items inside purchase and updateCart Events
+      const items = eventData[KEY_ITEMS];
+      const result = items.some((item: any) => {
+        return this.doesItemMatchQueries(item, searchQueries);
+      });
+      if (!result && this.doesItemCriteriaExists(searchQueries)) {
+        // items criteria existed and it did not match
+        return result;
       }
+      itemMatchedResult = result;
+    }
+    const filteredLocalDataKeys = localDataKeys.filter(
+      (item: any) => item !== KEY_ITEMS
+    );
+
+    if (filteredLocalDataKeys.length === 0) {
+      return itemMatchedResult;
     }
 
-    if (shouldReturn) {
-      return true;
+    const filteredSearchQueries = searchQueries.filter(
+      (searchQuery) =>
+        !searchQuery.field.startsWith(UPDATECART_ITEM_PREFIX) &&
+        !searchQuery.field.startsWith(PURCHASE_ITEM_PREFIX)
+    );
+    const matchResult = filteredSearchQueries.every((query: any) => {
+      const field = query.field;
+      const eventKeyItems = filteredLocalDataKeys.filter(
+        (keyItem) => keyItem === field
+      );
+      if (eventKeyItems.length) {
+        return this.evaluateComparison(
+          query.comparatorType,
+          eventData[field],
+          query.value ? query.value : ''
+        );
+      }
+      return false;
+    });
+    return matchResult;
+  }
+
+  private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
+    const filteredSearchQueries = searchQueries.filter((searchQuery) =>
+      Object.keys(item).includes(searchQuery.field)
+    );
+    if (filteredSearchQueries.length === 0) {
+      return false;
     }
-    return false;
+    return filteredSearchQueries.every((query: any) => {
+      const field = query.field;
+      if (Object.prototype.hasOwnProperty.call(item, field)) {
+        return this.evaluateComparison(
+          query.comparatorType,
+          item[field],
+          query.value ? query.value : ''
+        );
+      }
+      return false;
+    });
   }
 
   private evaluateComparison(

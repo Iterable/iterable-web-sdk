@@ -31,14 +31,14 @@ describe('CriteriaCompletionChecker', () => {
     expect(result).toBeNull();
   });
 
-  it('should return criteriaId if criteriaData condition is matched', () => {
+  it('should return criteriaId if customEvent is matched', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
             eventName: 'testEvent',
             createdAt: 1708494757530,
-            dataFields: undefined,
+            dataFields: { 'browserVisit.website.domain': 'google.com' },
             createNewFields: true,
             eventType: 'customEvent'
           }
@@ -80,6 +80,13 @@ describe('CriteriaCompletionChecker', () => {
                             comparatorType: 'Equals',
                             value: 'testEvent',
                             fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'browserVisit.website.domain',
+                            comparatorType: 'Equals',
+                            value: 'google.com',
+                            fieldType: 'string'
                           }
                         ]
                       }
@@ -95,16 +102,90 @@ describe('CriteriaCompletionChecker', () => {
     expect(result).toEqual('6');
   });
 
-  it('should return null if criteriaData condition is matched', () => {
+  it('should return criteriaId if customEvent is matched when minMatch present', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
-            eventName: 'Event',
+            eventName: 'testEvent',
             createdAt: 1708494757530,
-            dataFields: undefined,
+            dataFields: { 'browserVisit.website.domain': 'google.com' },
             createNewFields: true,
             eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '6',
+            name: 'EventCriteria',
+            createdAt: 1704754280210,
+            updatedAt: 1704754280210,
+            searchQuery: {
+              combinator: 'Or',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      minMatch: 1,
+                      maxMatch: 2,
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'eventName',
+                            comparatorType: 'Equals',
+                            value: 'testEvent',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'browserVisit.website.domain',
+                            comparatorType: 'Equals',
+                            value: 'google.com',
+                            fieldType: 'string'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('6');
+  });
+
+  it('should return criteriaId if purchase event is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            createdAt: 1708494757530,
+            items: [
+              { name: 'keyboard', id: 'fdsafds', price: 10, quantity: 2 }
+            ],
+            total: 10,
+            eventType: 'purchase'
           }
         ]);
       }
@@ -139,11 +220,176 @@ describe('CriteriaCompletionChecker', () => {
                         combinator: 'And',
                         searchQueries: [
                           {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.name',
+                            comparatorType: 'Equals',
+                            value: 'keyboard',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '10',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('6');
+  });
+
+  it('should return null if updateCart event with all props in item is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            createdAt: 1708494757530,
+            items: [
+              { name: 'keyboard', id: 'fdsafds', price: 10, quantity: 2 },
+              { name: 'Cofee', id: 'fdsafds', price: 10, quantity: 2 }
+            ],
+            eventType: 'cartUpdate'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '6',
+            name: 'EventCriteria',
+            createdAt: 1704754280210,
+            updatedAt: 1704754280210,
+            searchQuery: {
+              combinator: 'Or',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
                             dataType: 'customEvent',
                             field: 'eventName',
                             comparatorType: 'Equals',
-                            value: 'testEvent',
+                            value: 'updateCart',
                             fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.name',
+                            comparatorType: 'Equals',
+                            value: 'keyboard',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '10',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('6');
+  });
+
+  it('should return null if updateCart event with items is NOT matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            createdAt: 1708494757530,
+            items: [
+              { name: 'keyboard', id: 'fdsafds', price: 9, quantity: 2 },
+              { name: 'Cofee', id: 'fdsafds', price: 10, quantity: 2 }
+            ],
+            eventType: 'cartUpdate'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '6',
+            name: 'EventCriteria',
+            createdAt: 1704754280210,
+            updatedAt: 1704754280210,
+            searchQuery: {
+              combinator: 'Or',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'eventName',
+                            comparatorType: 'Equals',
+                            value: 'updateCart',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.name',
+                            comparatorType: 'Equals',
+                            value: 'keyboard',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '10',
+                            fieldType: 'double'
                           }
                         ]
                       }
@@ -157,6 +403,77 @@ describe('CriteriaCompletionChecker', () => {
       })
     );
     expect(result).toBeNull();
+  });
+
+  it('should return criteriaId if updateCart event is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            createdAt: 1708494757530,
+            items: [
+              { name: 'keyboard', id: 'fdsafds', price: 10, quantity: 2 }
+            ],
+            eventType: 'cartUpdate'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '6',
+            name: 'EventCriteria',
+            createdAt: 1704754280210,
+            updatedAt: 1704754280210,
+            searchQuery: {
+              combinator: 'Or',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'eventName',
+                            comparatorType: 'Equals',
+                            value: 'updateCart',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '10',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('6');
   });
 
   it('should return criteriaId if criteriaData condition with numeric is matched', () => {

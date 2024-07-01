@@ -302,6 +302,9 @@ export const UPDATE_USER = 'user';
 export const TRACK_UPDATE_CART = 'cartUpdate';
 export const UPDATE_CART = 'updateCart';
 
+export const UPDATECART_ITEM_PREFIX = 'updateCart.updatedShoppingCartItems.';
+export const PURCHASE_ITEM_PREFIX = 'shoppingCartItems.';
+
 export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR =
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
