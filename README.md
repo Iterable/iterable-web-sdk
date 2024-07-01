@@ -1006,7 +1006,7 @@ with Embedded Messaging in Iterable's Web SDK.
 | [`CloseButton`](#closebutton)                                                     | Specifies how the SDK should display a close button a fetched in-app message.  Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams). |
 | [`CloseButtonPosition`](#closebuttonposition)                                     | Specifies the position of a close button on an in-app message. |
 | [`CommerceItem`](#commerceitem)                                                   | An item being purchased or added to a shopping cart. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
-| [`CommerceUser`](#commerceuser)                                                   | Information about the user associated with a purchase or cart. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
+| [`CommerceUser`](#commerceuser)                                                   | Information about the user associated with a purchase or cart update. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
 | [`DisplayOptions`](#displayoptions)                                               | Display options to pass to [`getInAppMessages`](#getinappmessages) to indicate whether messages should be displayed immediately or later. |
 | [`DisplayPosition`](#displayposition)                                             | Describes where an in-app message should be displayed. Part of [`WebInAppDisplaySettings`](#webinappdisplaysettings). |
 | [`Elements`](#elements)                                                           | Custom styles to apply to `IterableEmbeddedCard`, `IterableEmbeddedBanner`, and `IterableEmbeddedNotification` views for embedded messages. |
@@ -1112,8 +1112,8 @@ interface CommerceItem {
 
 ## `CommerceUser`
 
-Information about the user associated with a purchase or cart. Include when 
-calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart).
+Information about the user associated with a purchase or cart update. Include
+when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart).
 
 ```ts
 interface CommerceUser {
@@ -1969,6 +1969,10 @@ interface WebInAppDisplaySettings {
 }
 ```
 
+See also:
+
+- [`DisplayPosition`](#displayposition)
+
 ## `WithJWT`
 
 Return value from [`initialize`](#initialize) and [`initializeWithConfig`](#initializeWithConfig).
@@ -2086,7 +2090,7 @@ import { baseAxiosRequest } from '@iterable/web-sdk';
 })();
 ```
 
-:rotating_light: You most likely will not need to do anything with the underlying
+:rotating_light: You probably won't need to do anything with the underlying
 Axios request. This is only for advanced use cases.
 
 ## How do I add a delay between the display of multiple in-app messages?
