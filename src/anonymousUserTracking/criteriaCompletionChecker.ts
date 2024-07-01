@@ -235,6 +235,16 @@ class CriteriaCompletionChecker {
             }
           }
           return false;
+        } else if (combinator === 'Not') {
+          for (let i = 0; i < searchQueries.length; i++) {
+            searchQueries[i]['isNot'] = true;
+            if (
+              this.evaluateTree(searchQueries[i], localEventData, criteriaId)
+            ) {
+              return false;
+            }
+          }
+          return true;
         }
       } else if (node.searchCombo) {
         return this.evaluateSearchQueries(node, localEventData, criteriaId);
@@ -255,6 +265,7 @@ class CriteriaCompletionChecker {
       const eventData = localEventData[i];
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
+      const isNot = Object.prototype.hasOwnProperty.call(node, 'isNot');
       if (!Object.prototype.hasOwnProperty.call(eventData, 'criteriaId')) {
         if (dataType === trackingType) {
           const searchCombo = node.searchCombo;
@@ -346,8 +357,13 @@ class CriteriaCompletionChecker {
                 return node.minMatch === 1;
               }
             } else {
+              if (isNot && !(i + 1 === localEventData.length)) {
+                continue;
+              }
               return true;
             }
+          } else if (isNot) {
+            return false;
           }
         }
       }
