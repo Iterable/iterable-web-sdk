@@ -2110,7 +2110,7 @@ them:
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+  const { setUserID } = initialize('<YOUR_API_KEY>', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -2135,7 +2135,7 @@ This code fetches in-app messages and displays them automatically:
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+  const { setUserID } = initialize('<YOUR_API_KEY>', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -2165,7 +2165,7 @@ the object passed as the first parameter to [`getInAppmessages`](#getinappmessag
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+  const { setUserID } = initialize('<YOUR_API_KEY>', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -2203,7 +2203,7 @@ This code pauses the display of messages, and then resumes:
 import { initialize, getInAppMessages } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+  const { setUserID } = initialize('<API_KEY_HERE>', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -2245,7 +2245,7 @@ import {
 } from '@iterable/web-sdk';
 
 (() => {
-  const { setUserID } = initialize('YOUR_API_KEY_HERE', ({ email, userID }) =>
+  const { setUserID } = initialize('<YOUR_API_KEY>', ({ email, userID }) =>
     yourAsyncJWTGeneratorMethod({ email, userID }).then(
       ({ jwt_token }) => jwt_token
     )
@@ -2480,7 +2480,7 @@ For example:
 import { initializeWithConfig } from '@iterable/web-sdk';
 
 const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
-  authToken: '<YOUR_API_KEY_HERE>',
+  authToken: '<<YOUR_API_KEY>>',
   configOptions: {
     isEuIterableService: false,
     dangerouslyAllowJsPopups: true,
