@@ -200,6 +200,14 @@ class CriteriaCompletionChecker {
             }
           }
           return false;
+        } else if (combinator === 'Not') {
+          for (let i = 0; i < searchQueries.length; i++) {
+            searchQueries[i]['isNot'] = true;
+            if (this.evaluateTree(searchQueries[i], localEventData)) {
+              return false;
+            }
+          }
+          return true;
         }
       } else if (node.searchCombo) {
         return this.evaluateSearchQueries(node, localEventData);
@@ -223,6 +231,7 @@ class CriteriaCompletionChecker {
         const searchCombo = node.searchCombo;
         const searchQueries = searchCombo?.searchQueries || [];
         const combinator = searchCombo?.combinator || '';
+        const isNot = Object.prototype.hasOwnProperty.call(node, 'isNot');
         if (this.evaluateEvent(eventData, searchQueries, combinator)) {
           if (node.minMatch) {
             const minMatch = node.minMatch - 1;
@@ -231,7 +240,12 @@ class CriteriaCompletionChecker {
               continue;
             }
           }
+          if (isNot && !(i + 1 === localEventData.length)) {
+            continue;
+          }
           return true;
+        } else if (isNot) {
+          return false;
         }
       }
     }
@@ -298,6 +312,9 @@ class CriteriaCompletionChecker {
         !searchQuery.field.startsWith(UPDATECART_ITEM_PREFIX) &&
         !searchQuery.field.startsWith(PURCHASE_ITEM_PREFIX)
     );
+    if (filteredSearchQueries.length === 0) {
+      return itemMatchedResult;
+    }
     const matchResult = filteredSearchQueries.every((query: any) => {
       const field = query.field;
       const eventKeyItems = filteredLocalDataKeys.filter(
