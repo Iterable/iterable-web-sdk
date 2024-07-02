@@ -8,9 +8,7 @@ import {
   UPDATE_USER,
   KEY_EVENT_NAME,
   UPDATECART_ITEM_PREFIX,
-  PURCHASE_ITEM_PREFIX,
-  SHARED_PREFS_EVENT_LIST_KEY,
-  SHARED_PREF_MATCHED_CRITERIAS
+  PURCHASE_ITEM_PREFIX
 } from '../constants';
 
 interface SearchQuery {
@@ -57,17 +55,12 @@ class CriteriaCompletionChecker {
   }
 
   private findMatchedCriteria(criteriaList: Criteria[]): string | null {
-    const criteriaIdList = criteriaList.map((criteria) => criteria.criteriaId);
-    const eventsToProcess = this.prepareEventsToProcess(criteriaIdList);
+    const eventsToProcess = this.prepareEventsToProcess();
 
     // Use find to get the first matching criteria
     const matchingCriteria = criteriaList.find((criteria) => {
       if (criteria.searchQuery && criteria.criteriaId) {
-        return this.evaluateTree(
-          criteria.searchQuery,
-          eventsToProcess,
-          criteria.criteriaId
-        );
+        return this.evaluateTree(criteria.searchQuery, eventsToProcess);
       }
       return false;
     });
@@ -76,9 +69,9 @@ class CriteriaCompletionChecker {
     return matchingCriteria ? matchingCriteria.criteriaId : null;
   }
 
-  private prepareEventsToProcess(criteriaIdList: string[]): any[] {
-    const eventsToProcess: any[] = this.getEventsWithCartItems(criteriaIdList);
-    const nonPurchaseEvents: any[] = this.getNonCartEvents(criteriaIdList);
+  private prepareEventsToProcess(): any[] {
+    const eventsToProcess: any[] = this.getEventsWithCartItems();
+    const nonPurchaseEvents: any[] = this.getNonCartEvents();
 
     nonPurchaseEvents.forEach((event) => {
       eventsToProcess.push(event);
@@ -87,20 +80,10 @@ class CriteriaCompletionChecker {
     return eventsToProcess;
   }
 
-  private getEventsWithCartItems(criteriaIdList: string[]): any[] {
+  private getEventsWithCartItems(): any[] {
     const processedEvents: any[] = [];
 
-    this.localStoredEventList.forEach((localEventData, index) => {
-      if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
-        if (!criteriaIdList.includes(localEventData.criteriaId)) {
-          delete localEventData.criteriaId;
-          this.localStoredEventList[index] = localEventData;
-          localStorage.setItem(
-            SHARED_PREFS_EVENT_LIST_KEY,
-            JSON.stringify(this.localStoredEventList)
-          );
-        }
-      }
+    this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_PURCHASE
@@ -177,19 +160,9 @@ class CriteriaCompletionChecker {
     return processedEvents;
   }
 
-  private getNonCartEvents(criteriaIdList: string[]): any[] {
+  private getNonCartEvents(): any[] {
     const nonPurchaseEvents: any[] = [];
-    this.localStoredEventList.forEach((localEventData, index) => {
-      if (Object.prototype.hasOwnProperty.call(localEventData, 'criteriaId')) {
-        if (!criteriaIdList.includes(localEventData.criteriaId)) {
-          delete localEventData.criteriaId;
-          this.localStoredEventList[index] = localEventData;
-          localStorage.setItem(
-            SHARED_PREFS_EVENT_LIST_KEY,
-            JSON.stringify(this.localStoredEventList)
-          );
-        }
-      }
+    this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
         (localEventData[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER ||
@@ -208,36 +181,28 @@ class CriteriaCompletionChecker {
     return nonPurchaseEvents;
   }
 
-  private evaluateTree(
-    node: SearchQuery,
-    localEventData: any[],
-    criteriaId: string
-  ): boolean {
+  private evaluateTree(node: SearchQuery, localEventData: any[]): boolean {
     try {
       if (node.searchQueries) {
         const combinator = node.combinator;
         const searchQueries: any = node.searchQueries;
         if (combinator === 'And') {
           for (let i = 0; i < searchQueries.length; i++) {
-            if (
-              !this.evaluateTree(searchQueries[i], localEventData, criteriaId)
-            ) {
+            if (!this.evaluateTree(searchQueries[i], localEventData)) {
               return false;
             }
           }
           return true;
         } else if (combinator === 'Or') {
           for (let i = 0; i < searchQueries.length; i++) {
-            if (
-              this.evaluateTree(searchQueries[i], localEventData, criteriaId)
-            ) {
+            if (this.evaluateTree(searchQueries[i], localEventData)) {
               return true;
             }
           }
           return false;
         }
       } else if (node.searchCombo) {
-        return this.evaluateSearchQueries(node, localEventData, criteriaId);
+        return this.evaluateSearchQueries(node, localEventData);
       }
     } catch (e) {
       this.handleException(e);
@@ -247,108 +212,19 @@ class CriteriaCompletionChecker {
 
   private evaluateSearchQueries(
     node: SearchQuery,
-    localEventData: any[],
-    criteriaId: string
+    localEventData: any[]
   ): boolean {
     // this function will compare the actualy searhqueues under search combo
     for (let i = 0; i < localEventData.length; i++) {
       const eventData = localEventData[i];
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
       const dataType = node.dataType;
-      if (!Object.prototype.hasOwnProperty.call(eventData, 'criteriaId')) {
-        if (dataType === trackingType) {
-          const searchCombo = node.searchCombo;
-          const searchQueries = searchCombo?.searchQueries || [];
-          const combinator = searchCombo?.combinator || '';
-          const matchedCriteriasFromLocalStorage = localStorage.getItem(
-            SHARED_PREF_MATCHED_CRITERIAS
-          );
-
-          const matchedCriterias =
-            matchedCriteriasFromLocalStorage &&
-            JSON.parse(matchedCriteriasFromLocalStorage);
-
-          const matchedCriteria =
-            matchedCriterias &&
-            matchedCriterias.find(
-              (item: {
-                criteriaId: string;
-                nodeCombo: { searchCombo: object; count: number }[];
-              }) => item.criteriaId === criteriaId
-            );
-
-          const matchedCriteriaIndex =
-            matchedCriterias &&
-            matchedCriterias.findIndex(
-              (item: {
-                criteriaId: string;
-                nodeCombo: { searchCombo: object; count: number }[];
-              }) => item.criteriaId === criteriaId
-            );
-          if (this.evaluateEvent(eventData, searchQueries, combinator)) {
-            if (Object.prototype.hasOwnProperty.call(node, 'minMatch')) {
-              const matchedNode =
-                matchedCriteria &&
-                matchedCriteria.nodeCombo.filter(
-                  (n: { searchCombo: object; count: number }) =>
-                    JSON.stringify(n.searchCombo) ===
-                    JSON.stringify(node.searchCombo)
-                );
-              if (matchedNode && matchedNode.length > 0) {
-                // Update the count of the first node found
-                matchedNode[0].count = (matchedNode[0].count || 0) + 1;
-                // Find the index of the node in matchedCriteria.nodeCombo
-                const nodeIndex = matchedCriteria.nodeCombo.findIndex(
-                  (n: { searchCombo: object; count: number }) =>
-                    JSON.stringify(n.searchCombo) ===
-                    JSON.stringify(matchedNode[0].searchCombo)
-                );
-
-                if (nodeIndex !== -1) {
-                  // Update the node in the matchedCriteria.nodeCombo array
-                  matchedCriteria.nodeCombo[nodeIndex] = matchedNode[0];
-                  matchedCriterias[matchedCriteriaIndex] = matchedCriteria;
-                }
-                // Update local storage with the new matchedCriteria
-                localStorage.setItem(
-                  SHARED_PREF_MATCHED_CRITERIAS,
-                  JSON.stringify(matchedCriterias)
-                );
-
-                const eventFromLocal = this.localStoredEventList[i];
-                eventFromLocal.criteriaId = criteriaId;
-                this.localStoredEventList[i] = eventFromLocal;
-
-                localStorage.setItem(
-                  SHARED_PREFS_EVENT_LIST_KEY,
-                  JSON.stringify(this.localStoredEventList)
-                );
-
-                return matchedNode[0].count === node.minMatch;
-              } else {
-                const tempMatchedCriterias = matchedCriterias || [];
-                tempMatchedCriterias.push({
-                  criteriaId: criteriaId,
-                  nodeCombo: [{ searchCombo: node.searchCombo, count: 1 }]
-                });
-                const eventFromLocal = this.localStoredEventList[i];
-                eventFromLocal.criteriaId = criteriaId;
-                this.localStoredEventList[i] = eventFromLocal;
-
-                localStorage.setItem(
-                  SHARED_PREFS_EVENT_LIST_KEY,
-                  JSON.stringify(this.localStoredEventList)
-                );
-                localStorage.setItem(
-                  SHARED_PREF_MATCHED_CRITERIAS,
-                  JSON.stringify(tempMatchedCriterias)
-                );
-                return node.minMatch === 1;
-              }
-            } else {
-              return true;
-            }
-          }
+      if (dataType === trackingType) {
+        const searchCombo = node.searchCombo;
+        const searchQueries = searchCombo?.searchQueries || [];
+        const combinator = searchCombo?.combinator || '';
+        if (this.evaluateEvent(eventData, searchQueries, combinator)) {
+          return true;
         }
       }
     }
