@@ -224,6 +224,13 @@ class CriteriaCompletionChecker {
         const searchQueries = searchCombo?.searchQueries || [];
         const combinator = searchCombo?.combinator || '';
         if (this.evaluateEvent(eventData, searchQueries, combinator)) {
+          if (node.minMatch) {
+            const minMatch = node.minMatch - 1;
+            node.minMatch = minMatch;
+            if (minMatch > 0) {
+              continue;
+            }
+          }
           return true;
         }
       }
