@@ -149,7 +149,7 @@ export class AnonymousUserEventManager {
     this.storeEventListToLocalStorage(newDataObject, false);
   }
 
-  private checkCriteriaCompletion() {
+  private checkCriteriaCompletion(): string | null {
     const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
@@ -243,12 +243,12 @@ export class AnonymousUserEventManager {
           default:
             break;
         }
-        this.removeAnonSessionNCriteriaData();
+        this.removeAnonSessionCriteriaData();
       });
     }
   }
 
-  removeAnonSessionNCriteriaData() {
+  removeAnonSessionCriteriaData() {
     localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
     localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
     localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
