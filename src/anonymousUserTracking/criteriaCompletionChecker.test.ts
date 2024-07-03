@@ -722,4 +722,285 @@ describe('CriteriaCompletionChecker', () => {
     );
     expect(result).toEqual('6');
   });
+
+  // isSet criteria
+  it('should return criteriaId 97 if isset user criteria is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              country: 'UK',
+              eventTimeStamp: 10,
+              phoneNumberDetails: '99999999',
+              'shoppingCartItems.price': 50.5
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '97',
+            name: 'User',
+            createdAt: 1716560453973,
+            updatedAt: 1716560453973,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            field: 'country',
+                            fieldType: 'string',
+                            comparatorType: 'IsSet',
+                            dataType: 'user',
+                            id: 25,
+                            value: ''
+                          },
+                          {
+                            field: 'eventTimeStamp',
+                            fieldType: 'long',
+                            comparatorType: 'IsSet',
+                            dataType: 'user',
+                            id: 26,
+                            valueLong: null,
+                            value: ''
+                          },
+                          {
+                            field: 'phoneNumberDetails',
+                            fieldType: 'object',
+                            comparatorType: 'IsSet',
+                            dataType: 'user',
+                            id: 28,
+                            value: ''
+                          },
+                          {
+                            field: 'shoppingCartItems.price',
+                            fieldType: 'double',
+                            comparatorType: 'IsSet',
+                            dataType: 'user',
+                            id: 30,
+                            value: ''
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('97');
+  });
+
+  it('should return criteriaId 94 if isset customEvent criteria is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              'button-clicked': 'signup page',
+              'button-clicked.animal': 'test page',
+              'button-clicked.clickCount': '2',
+              total: 3
+            },
+            createdAt: 1700071052507,
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '94',
+            name: 'Custom Event',
+            createdAt: 1716560453973,
+            updatedAt: 1716560453973,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            field: 'button-clicked',
+                            fieldType: 'object',
+                            comparatorType: 'IsSet',
+                            dataType: 'customEvent',
+                            id: 2,
+                            value: ''
+                          },
+                          {
+                            field: 'button-clicked.animal',
+                            fieldType: 'string',
+                            comparatorType: 'IsSet',
+                            dataType: 'customEvent',
+                            id: 4,
+                            value: ''
+                          },
+                          {
+                            field: 'button-clicked.clickCount',
+                            fieldType: 'long',
+                            comparatorType: 'IsSet',
+                            dataType: 'customEvent',
+                            id: 5,
+                            valueLong: null,
+                            value: ''
+                          },
+                          {
+                            field: 'total',
+                            fieldType: 'double',
+                            comparatorType: 'IsSet',
+                            dataType: 'customEvent',
+                            id: 9,
+                            value: ''
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('94');
+  });
+
+  it('should return criteriaId 96 if isset purchase criteria is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [
+              {
+                id: '12',
+                name: 'monitor',
+                price: 10,
+                quantity: 10
+              }
+            ],
+            total: 50,
+            eventType: 'purchase'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '96',
+            name: 'Purchase',
+            createdAt: 1716560453973,
+            updatedAt: 1716560453973,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            field: 'shoppingCartItems',
+                            fieldType: 'object',
+                            comparatorType: 'IsSet',
+                            dataType: 'purchase',
+                            id: 1,
+                            value: ''
+                          },
+                          {
+                            field: 'shoppingCartItems.price',
+                            fieldType: 'double',
+                            comparatorType: 'IsSet',
+                            dataType: 'purchase',
+                            id: 3,
+                            value: ''
+                          },
+                          {
+                            field: 'shoppingCartItems.name',
+                            fieldType: 'string',
+                            comparatorType: 'IsSet',
+                            dataType: 'purchase',
+                            id: 5,
+                            value: ''
+                          },
+                          {
+                            field: 'total',
+                            fieldType: 'double',
+                            comparatorType: 'IsSet',
+                            dataType: 'purchase',
+                            id: 7,
+                            value: ''
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('96');
+  });
 });

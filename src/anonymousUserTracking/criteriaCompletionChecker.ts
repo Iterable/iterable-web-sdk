@@ -8,7 +8,8 @@ import {
   UPDATE_USER,
   KEY_EVENT_NAME,
   UPDATECART_ITEM_PREFIX,
-  PURCHASE_ITEM_PREFIX
+  PURCHASE_ITEM_PREFIX,
+  PURCHASE_ITEM
 } from '../constants';
 
 interface SearchQuery {
@@ -99,7 +100,7 @@ class CriteriaCompletionChecker {
             });
             return updatItem;
           });
-          updatedItem[KEY_ITEMS] = items;
+          updatedItem[PURCHASE_ITEM] = items;
         }
 
         if (localEventData.dataFields) {
@@ -287,9 +288,16 @@ class CriteriaCompletionChecker {
   private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
     let itemMatchedResult = false;
+    let key_item = null;
     if (localDataKeys.includes(KEY_ITEMS)) {
+      key_item = KEY_ITEMS;
+    } else if (localDataKeys.includes(PURCHASE_ITEM)) {
+      key_item = PURCHASE_ITEM;
+    }
+
+    if (key_item !== null) {
       // scenario of items inside purchase and updateCart Events
-      const items = eventData[KEY_ITEMS];
+      const items = eventData[key_item];
       const result = items.some((item: any) => {
         return this.doesItemMatchQueries(item, searchQueries);
       });
@@ -299,11 +307,11 @@ class CriteriaCompletionChecker {
       }
       itemMatchedResult = result;
     }
-    const filteredLocalDataKeys = localDataKeys.filter(
-      (item: any) => item !== KEY_ITEMS
-    );
+    // const filteredLocalDataKeys = localDataKeys.filter(
+    //   (item: any) => item !== KEY_ITEMS
+    // );
 
-    if (filteredLocalDataKeys.length === 0) {
+    if (localDataKeys.length === 0) {
       return itemMatchedResult;
     }
 
@@ -317,7 +325,7 @@ class CriteriaCompletionChecker {
     }
     const matchResult = filteredSearchQueries.every((query: any) => {
       const field = query.field;
-      const eventKeyItems = filteredLocalDataKeys.filter(
+      const eventKeyItems = localDataKeys.filter(
         (keyItem) => keyItem === field
       );
       if (eventKeyItems.length) {
@@ -366,7 +374,7 @@ class CriteriaCompletionChecker {
       case 'DoesNotEquals':
         return !this.compareValueEquality(matchObj, valueToCompare);
       case 'IsSet':
-        return matchObj !== '';
+        return this.issetCheck(matchObj);
       case 'GreaterThan':
       case 'LessThan':
       case 'GreaterThanOrEqualTo':
@@ -446,6 +454,16 @@ class CriteriaCompletionChecker {
     } catch (e) {
       console.error(e);
       return false;
+    }
+  }
+
+  private issetCheck(matchObj: any): boolean {
+    if (Array.isArray(matchObj)) {
+      return matchObj.length > 0;
+    } else if (typeof matchObj === 'object' && matchObj !== null) {
+      return Object.keys(matchObj).length > 0;
+    } else {
+      return matchObj !== '';
     }
   }
 

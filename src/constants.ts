@@ -301,8 +301,9 @@ export const UPDATE_USER = 'user';
 export const TRACK_UPDATE_CART = 'cartUpdate';
 export const UPDATE_CART = 'updateCart';
 
+export const PURCHASE_ITEM = 'shoppingCartItems';
 export const UPDATECART_ITEM_PREFIX = 'updateCart.updatedShoppingCartItems.';
-export const PURCHASE_ITEM_PREFIX = 'shoppingCartItems.';
+export const PURCHASE_ITEM_PREFIX = PURCHASE_ITEM + '.';
 
 export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR =
