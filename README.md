@@ -32,6 +32,36 @@ information, please see:
 - [Setting up Iterable's Web SDK](https://support.iterable.com/hc/articles/4419628585364)
 - [Embedded Messages with Iterable's Web SDK](https://support.iterable.com/hc/articles/27537816889108)
 
+# Using the SDK
+
+In general, to use the SDK, you'll need to follow these steps:
+
+1. In Iterable, [create a JWT-enabled, web API key](https://support.iterable.com/hc/articles/360043464871). 
+   The SDK can use this key to authenticate with Iterable's API endpoints. This
+   will ensure the SDK has access to all the necessary. Save the API key and
+   its associated JWT secret, since you'll need them both.
+
+2. Work with your Engineering team to create a web service the SDK can call
+   to fetch a valid JWT token for the signed-in user. To learn more about how
+   to do this, read [JWT-Enabled API Keys](https://support.iterable.com/hc/articles/360050801231).
+
+3. [Install](#installation) the SDK in your web app.
+
+4. Use the API key to initialize the SDK, as described in [`initialize`](#initialize) 
+   and [`initializeWithConfig`](#initializewithconfig). When you initialize the 
+   SDK, pass in a method that can call the web service (created in step 2)
+   to fetch a valid JWT token for the signed-in user.
+
+5. To identify the user to the SDK, call `setEmail` or `setUserID` (returned by 
+   [`initialize`](#initialize) or [`initializeWithConfig`](#initializewithconfig)). 
+   The SDK uses the user's `email` or `userId` to fetch a valid JWT token from 
+   your server. 
+
+6. After the SDK successfully sets the user's `email` or `userId` and the SDK
+   fetches a JWT token, you can make API requests to Iterable. For example, you
+   can call [`track`](#track) to track events, or [`getInAppMessages`](#getinappmessages) 
+   to fetch in-app messages, etc. Other methods are described [below](#functions).
+
 # Installation
 
 To install the SDK, use Yarn, npm, or a `script` tag:
@@ -64,7 +94,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 
 | Method Name                                                                       | Description |
 | --------------------------------------------------------------------------------- | ----------- |
-| [`filterHiddenInAppMessages`](#filterhiddeninappmessages)                         | From an array of passed-in in-app messages, filters out messages that have been already been read and messages that should not be displayed. |
+| [`filterHiddenInAppMessages`](#filterhiddeninappmessages)                         | From an array of passed-in in-app messages, filters out messages that have already been read, messages that should not be displayed, and messages that only contain JSON data. |
 | [`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages) | From an array of passed-in in-app messages, filters out messages that have already been read and messages that should not be displayed. |
 | [`getInAppMessages`](#getInAppMessages)                                           | Fetches in-app messages by calling [`GET /api/inApp/getMessages`](https://support.iterable.com/hc/articles/204780579#get-api-inapp-getmessages). |
 | [`initialize`](#initialize)                                                       | Initializes the SDK with an API key and a JWT refresh method. Returns methods you can use to identify the current user, work with JWT tokens, and log the user out (see [`WithJWT`](#withjwt)). |
@@ -99,8 +129,9 @@ Notes:
 
 ## `filterHiddenInAppMessages`
 
-From an array of passed-in in-app messages, filters out messages that have been
-already been read and messages that should not be displayed.
+From an array of passed-in in-app messages, filters out messages that have
+already been read, messages that should not be displayed, and messages that only
+contain JSON data.
 
 ```ts
 const filterHiddenInAppMessages = (
@@ -2029,34 +2060,6 @@ display embedded messages, see [Embedded Messages with Iterable's Web SDK](https
 
 For more information about Embedded Messaging, read the [Embedded Messaging Oveview](https://support.iterable.com/hc/articles/23060529977364).
 
-## How do I make API requests with the SDK?
-
-Follow these steps:
-
-1. In Iterable, [create a JWT-enabled, web API key](https://support.iterable.com/hc/articles/360043464871). 
-   The SDK will use this key to authenticate with Iterable's API endpoints. This
-   will ensure the SDK has access to all the necessary.  Save the API key and
-   its associated JWT secret, since you'll need them both.
-
-2. Work with your Engineering team to create a web service the SDK can call
-   to fetch a valid JWT token for the signed-in user. To learn more about how
-   to do this, read [JWT-Enabled API Keys](https://support.iterable.com/hc/articles/360050801231).
-
-3. Use the API key to initialize the SDK, as described in [`initialize`](#initialize) 
-   and [`initializeWithConfig`](#initializewithconfig). When you initialize the 
-   SDK, to pass in a method that can call the web service (created in step 2)
-   to fetch a valid JWT token for the signed-in user.
-
-4. To identify the user to the SDK, call `setEmail` or `setUserID` (returned by 
-   [`initialize`](#initialize) or [`initializeWithConfig`](#initializewithconfig)). 
-   The SDK uses the user's `email` or `userId` to fetch a valid JWT token from 
-   your server. 
-
-5. After the SDK successfully sets the user's `email` or `userId`, you can make 
-   API requests to Iterable. For example, you can call [`track`](#track) to track 
-   events, or [`getInAppMessages`](#getinappmessages) to fetch in-app messages.
-    
-    
 ## How does SDK add the user's `email` or `userId` to the requests it makes to Iterable?
 
 The SDK uses a library called [Axios](https://github.com/axios/axios). To add
