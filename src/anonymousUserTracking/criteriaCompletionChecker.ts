@@ -334,7 +334,7 @@ class CriteriaCompletionChecker {
         if (eventName === UPDATE_CART && field === eventName) {
           return true;
         }
-        if (eventName !== UPDATE_CART && field === eventName) {
+        if (field === eventName) {
           return true;
         }
       }
