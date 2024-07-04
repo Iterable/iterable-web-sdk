@@ -1,8 +1,4 @@
-import {
-  SHARED_PREF_ANON_USER_ID,
-  ENDPOINT_MERGE_USER,
-  MERGE_SUCCESSFULL
-} from 'src/constants';
+import { ENDPOINT_MERGE_USER } from 'src/constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 
@@ -14,19 +10,22 @@ export type MergeApiParams = {
 };
 
 export class AnonymousUserMerge {
-  mergeUser(userIdOrEmail: string, isEmail: boolean): Promise<string> {
-    const sourceUserId = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
-
+  mergeUser(
+    sourceUserId: string | null,
+    sourceEmail: string | null,
+    destinationUserId: string | null,
+    destinationEmail: string | null
+  ): Promise<void> {
     const mergeApiParams: MergeApiParams = {
       sourceUserId: sourceUserId,
-      sourceEmail: null,
-      destinationUserId: isEmail ? null : userIdOrEmail,
-      destinationEmail: isEmail ? userIdOrEmail : null
+      sourceEmail: sourceEmail,
+      destinationUserId: destinationUserId,
+      destinationEmail: destinationEmail
     };
     return this.callMergeApi(mergeApiParams);
   }
 
-  private callMergeApi(data: MergeApiParams): Promise<string> {
+  private callMergeApi(data: MergeApiParams): Promise<void> {
     return new Promise((resolve, reject) => {
       baseIterableRequest<IterableResponse>({
         method: 'POST',
@@ -35,7 +34,7 @@ export class AnonymousUserMerge {
       })
         .then((response) => {
           if (response.status === 200) {
-            resolve(MERGE_SUCCESSFULL);
+            resolve();
           } else {
             reject(new Error(`merge error: ${response.status}`)); // Reject if status is not 200
           }
