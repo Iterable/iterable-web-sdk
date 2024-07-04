@@ -1003,4 +1003,87 @@ describe('CriteriaCompletionChecker', () => {
     );
     expect(result).toEqual('96');
   });
+
+  it('should return criteriaId 95 if isset updateCart criteria is matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [{ id: '12', name: 'Mocha', price: 50, quantity: 50 }],
+            eventType: 'cartUpdate'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '95',
+            name: 'UpdateCart: isSet Comparator',
+            createdAt: 1719328291857,
+            updatedAt: 1719328291857,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart',
+                            comparatorType: 'IsSet',
+                            value: '',
+                            fieldType: 'object'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.name',
+                            comparatorType: 'IsSet',
+                            value: '',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'IsSet',
+                            value: '',
+                            fieldType: 'double'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field:
+                              'updateCart.updatedShoppingCartItems.quantity',
+                            comparatorType: 'IsSet',
+                            value: '',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('95');
+  });
 });

@@ -325,6 +325,19 @@ class CriteriaCompletionChecker {
     }
     const matchResult = filteredSearchQueries.every((query: any) => {
       const field = query.field;
+      if (
+        query.dataType === TRACK_EVENT &&
+        query.fieldType === 'object' &&
+        query.comparatorType === 'IsSet'
+      ) {
+        const eventName = eventData[KEY_EVENT_NAME];
+        if (eventName === UPDATE_CART && field === eventName) {
+          return true;
+        }
+        if (eventName !== UPDATE_CART && field === eventName) {
+          return true;
+        }
+      }
       const eventKeyItems = localDataKeys.filter(
         (keyItem) => keyItem === field
       );
