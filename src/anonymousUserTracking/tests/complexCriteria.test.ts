@@ -1,5 +1,5 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../constants';
-import CriteriaCompletionChecker from './criteriaCompletionChecker';
+import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
+import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -1213,5 +1213,93 @@ describe('complexCriteria', () => {
       })
     );
     expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 134 (Min-Max 2)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [{ id: '12', name: 'Mocha', price: 50, quantity: 50 }],
+            eventType: 'cartUpdate'
+          },
+          {
+            items: [{ id: '12', name: 'Mocha', price: 50.0, quantity: 50 }],
+            eventType: 'cartUpdate'
+          },
+          {
+            dataFields: {
+              preferred_car_models: 'Honda'
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '134',
+            name: 'Min-Max 2',
+            createdAt: 1719336370734,
+            updatedAt: 1719337067199,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'Equals',
+                            value: '50.0',
+                            fieldType: 'double'
+                          }
+                        ]
+                      },
+                      minMatch: 2,
+                      maxMatch: 3
+                    },
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'user',
+                            field: 'preferred_car_models',
+                            comparatorType: 'Equals',
+                            value: 'Honda',
+                            fieldType: 'string'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('134');
   });
 });
