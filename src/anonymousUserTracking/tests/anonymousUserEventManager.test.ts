@@ -1,12 +1,12 @@
-import { AnonymousUserEventManager } from './anonymousUserEventManager';
-import { baseIterableRequest } from '../request';
+import { AnonymousUserEventManager } from '../anonymousUserEventManager';
+import { baseIterableRequest } from '../../request';
 import {
   SHARED_PREFS_ANON_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA
-} from '../constants';
-import { UpdateUserParams } from '../users';
-import { TrackPurchaseRequestParams } from '../commerce';
+} from '../../constants';
+import { UpdateUserParams } from '../../users';
+import { TrackPurchaseRequestParams } from '../../commerce';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -14,13 +14,13 @@ const localStorageMock = {
   removeItem: jest.fn()
 };
 
-jest.mock('./criteriaCompletionChecker', () => {
+jest.mock('../criteriaCompletionChecker', () => {
   return jest.fn().mockImplementation(() => ({
     getMatchedCriteria: jest.fn()
   }));
 });
 
-jest.mock('../request', () => ({
+jest.mock('../../request', () => ({
   baseIterableRequest: jest.fn()
 }));
 
