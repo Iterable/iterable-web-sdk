@@ -1035,8 +1035,8 @@ with Embedded Messaging in Iterable's Web SDK.
 
 | Type                                                                              | Description |
 | --------------------------------------------------------------------------------- | ----------- |
-| [`CloseButton`](#closebutton)                                                     | Specifies how the SDK should display a close button in a fetched in-app message.  Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams). |
-| [`CloseButtonPosition`](#closebuttonposition)                                     | Specifies the position of a close button on an in-app message. |
+| [`CloseButton`](#closebutton)                                                     | Specifies how the SDK should display a close button on the associated in-app message. Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams). |
+| [`CloseButtonPosition`](#closebuttonposition)                                     | Specifies the position of the close button on the associated in-app message. |
 | [`CommerceItem`](#commerceitem)                                                   | An item being purchased or added to a shopping cart. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
 | [`CommerceUser`](#commerceuser)                                                   | Information about the user associated with a purchase or cart update. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
 | [`DisplayOptions`](#displayoptions)                                               | Display options to pass to [`getInAppMessages`](#getinappmessages) to indicate whether messages should be displayed immediately or later. |
@@ -1090,7 +1090,7 @@ with Embedded Messaging in Iterable's Web SDK.
 
 ## `CloseButton`
 
-Specifies how the SDK should display a close button a fetched in-app message.
+Specifies how the SDK should display a close button on the associated in-app message. 
 Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams).
 
 ```ts
@@ -1113,7 +1113,7 @@ See also:
 
 ## `CloseButtonPosition`
 
-Specifies the position of a close button on an in-app message.
+Specifies the position of the close button on the associated in-app message.
 
 ```ts
 declare enum CloseButtonPosition {
