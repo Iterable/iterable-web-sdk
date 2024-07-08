@@ -303,12 +303,13 @@ request()
 
 :rotating_light: With the `deferred` option, the SDK does **not** filter or sort
 the messages. The messages come back exactly as retrieved from the API, without
-modification. This means you may, for example, show in- app messages marked as
-`read`, or show the messages in the wrong order (based on `priority`).
+modification. This means that you may (for example) show in-app messages marked as
+`read`, or show messages in the default order (based on `priority`), rather
+than a custom order that you control.
 
-To retain the default sorting and filtering, use the SDK's [`sortInAppMessages`](#sortinappmessages) 
-and [`filterHiddenInAppMessages`](#filterhiddeninappmessages) methods. Also, see 
-[`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages), 
+In this case, to apply the SDK's default sorting and filtering, use the 
+[`sortInAppMessages`](#sortinappmessages) and [`filterHiddenInAppMessages`](#filterhiddeninappmessages) 
+methods. Also, see [`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages), 
 which is similar to `filterHiddenInAppMessages` but does not filter out 
 JSON-only messages.
 
