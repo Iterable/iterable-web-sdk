@@ -2381,7 +2381,7 @@ in-app messages.
 
 ## Embedded messaging
 
-To learn how to handle clicks on links found in embededd messages, read
+To learn how to handle clicks on links found in embedded messages, read
 [Embedded Messages with Iterable's Web SDK](https://support.iterable.com/hc/articles/27537816889108#step-8-2-handle-urls-and-custom-actions).
 
 ## In-app messages
