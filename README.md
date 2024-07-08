@@ -1034,7 +1034,7 @@ with Embedded Messaging in Iterable's Web SDK.
 
 | Type                                                                              | Description |
 | --------------------------------------------------------------------------------- | ----------- |
-| [`CloseButton`](#closebutton)                                                     | Specifies how the SDK should display a close button a fetched in-app message.  Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams). |
+| [`CloseButton`](#closebutton)                                                     | Specifies how the SDK should display a close button in a fetched in-app message.  Passed as part of [`InAppMessagesRequestParams`](#inappmessagesrequestparams). |
 | [`CloseButtonPosition`](#closebuttonposition)                                     | Specifies the position of a close button on an in-app message. |
 | [`CommerceItem`](#commerceitem)                                                   | An item being purchased or added to a shopping cart. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
 | [`CommerceUser`](#commerceuser)                                                   | Information about the user associated with a purchase or cart update. Include when calling [`trackPurchase`](#trackpurchase) or [`updateCart`](#updatecart). |
