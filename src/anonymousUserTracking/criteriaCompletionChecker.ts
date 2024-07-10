@@ -344,20 +344,21 @@ class CriteriaCompletionChecker {
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
-    const filteredSearchQueries = [];
-    for (let i = 0; i < searchQueries.length; i++) {
-      const searchQuery = searchQueries[i];
+    let shouldReturn = false;
+    const filteredSearchQueries = searchQueries.filter((searchQuery) => {
       if (
         searchQuery.field.startsWith(UPDATECART_ITEM_PREFIX) ||
         searchQuery.field.startsWith(PURCHASE_ITEM_PREFIX)
       ) {
         if (!Object.keys(item).includes(searchQuery.field)) {
+          shouldReturn = true;
           return false;
         }
-        filteredSearchQueries.push(searchQuery);
+        return true;
       }
-    }
-    if (filteredSearchQueries.length === 0) {
+      return false;
+    });
+    if (filteredSearchQueries.length === 0 || shouldReturn) {
       return false;
     }
     return filteredSearchQueries.every((query: any) => {
