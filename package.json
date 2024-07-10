@@ -46,6 +46,7 @@
     "install:all": "yarn && cd example && yarn && cd ../react-example && yarn",
     "start:all": "concurrently \"yarn start\" \"cd example && yarn start\" -n 'module,website' -k",
     "start:all:react": "concurrently \"yarn start\" \"cd react-example && yarn start\" -n 'module,website' -k",
+    "start:all:react-start-without-watch": "concurrently \"yarn start\" \"cd react-example && yarn start-without-watch\" -n 'module,website' -k",
     "build": "ttsc && babel src --out-dir ./dist --extensions '.ts,.tsx' && webpack",
     "build:node": "yarn build --config webpack.node.config.js",
     "test": "jest --config jest.config.js --collectCoverage",
