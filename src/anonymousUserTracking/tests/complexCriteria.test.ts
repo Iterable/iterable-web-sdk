@@ -1302,4 +1302,298 @@ describe('complexCriteria', () => {
     );
     expect(result).toEqual('134');
   });
+
+  it('should return criteriaId 151 (sampleTest1)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              'animal-found.type': 'cat',
+              'animal-found.count': 4
+            },
+            eventType: 'customEvent'
+          },
+          {
+            items: [{ id: '12', name: 'Caramel', price: 3, quantity: 5 }],
+            total: 2,
+            eventType: 'purchase'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '151',
+            name: 'test criteria',
+            createdAt: 1719336370734,
+            updatedAt: 1719337067199,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'animal-found.type',
+                            comparatorType: 'Equals',
+                            value: 'cat',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'animal-found.count',
+                            comparatorType: 'LessThan',
+                            value: '5',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '500',
+                            fieldType: 'double'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'LessThan',
+                            value: '20',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.name',
+                            comparatorType: 'Equals',
+                            value: 'Caramel',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.quantity',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '2',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'user',
+                            field: 'country',
+                            comparatorType: 'Equals',
+                            value: 'UK',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'user',
+                            field: 'likes_boba',
+                            comparatorType: 'Equals',
+                            value: 'false',
+                            fieldType: 'boolean'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('151');
+  });
+
+  it('should return null (sampleTest1 fail)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              'animal-found.type': 'dog',
+              'animal-found.count': 4
+            },
+            eventType: 'customEvent'
+          },
+          {
+            items: [{ id: '12', name: 'Caramel', price: 3, quantity: 5 }],
+            total: 2,
+            eventType: 'purchase'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '151',
+            name: 'test criteria',
+            createdAt: 1719336370734,
+            updatedAt: 1719337067199,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'animal-found.type',
+                            comparatorType: 'Equals',
+                            value: 'cat',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'animal-found.count',
+                            comparatorType: 'LessThan',
+                            value: '5',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      dataType: 'customEvent',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '500',
+                            fieldType: 'double'
+                          },
+                          {
+                            dataType: 'customEvent',
+                            field: 'updateCart.updatedShoppingCartItems.price',
+                            comparatorType: 'LessThan',
+                            value: '20',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  combinator: 'Or',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.name',
+                            comparatorType: 'Equals',
+                            value: 'Caramel',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.quantity',
+                            comparatorType: 'GreaterThanOrEqualTo',
+                            value: '2',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'user',
+                            field: 'country',
+                            comparatorType: 'Equals',
+                            value: 'UK',
+                            fieldType: 'string'
+                          },
+                          {
+                            dataType: 'user',
+                            field: 'likes_boba',
+                            comparatorType: 'Equals',
+                            value: 'false',
+                            fieldType: 'boolean'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual(null);
+  });
 });
