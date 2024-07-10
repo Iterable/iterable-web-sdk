@@ -12,6 +12,7 @@ module.exports = {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist')
   },
+  watch: process.argv.indexOf('--watch') > -1,
   module: {
     rules: [
       {
