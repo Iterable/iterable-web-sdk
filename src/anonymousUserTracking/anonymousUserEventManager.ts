@@ -22,7 +22,6 @@ import {
   ENDPOINT_TRACK_ANON_SESSION,
   WEB_PLATFORM,
   KEY_PREFER_USERID,
-  SHARED_PREF_MATCHED_CRITERIAS,
   ENDPOINTS
 } from 'src/constants';
 import { baseIterableRequest } from 'src/request';
@@ -221,7 +220,6 @@ export class AnonymousUserEventManager {
     if (trackEventList.length) {
       trackEventList.forEach((event: any) => {
         const eventType = event[SHARED_PREFS_EVENT_TYPE];
-        delete event.criteriaId;
         delete event.eventType;
         switch (eventType) {
           case TRACK_EVENT: {
@@ -251,7 +249,6 @@ export class AnonymousUserEventManager {
   removeAnonSessionCriteriaData() {
     localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
     localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
-    localStorage.removeItem(SHARED_PREF_MATCHED_CRITERIAS);
   }
 
   private async storeEventListToLocalStorage(
