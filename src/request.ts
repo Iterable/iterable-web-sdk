@@ -1,4 +1,5 @@
 import Axios, { AxiosRequestConfig } from 'axios';
+import qs from 'qs';
 import { BASE_URL, STATIC_HEADERS, EU_ITERABLE_API } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { AnySchema, ValidationError } from 'yup';
@@ -46,6 +47,9 @@ export const baseIterableRequest = <T = any>(
       headers: {
         ...payload.headers,
         ...STATIC_HEADERS
+      },
+      paramsSerializer: (params) => {
+        return qs.stringify(params, { arrayFormat: 'repeat' });
       }
     });
   } catch (error) {

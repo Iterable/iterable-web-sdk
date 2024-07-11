@@ -33,21 +33,11 @@ export class IterableEmbeddedManager {
     placementIds: number[]
   ) {
     try {
-      const params: any = {};
-      if (placementIds.length > 0) {
-        params.placementIds = placementIds[0];
-        if (placementIds.length > 1) {
-          params.placementIds += placementIds
-            .slice(1)
-            .map((id) => `&placementIds=${id}`)
-            .join('');
-        }
-      }
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: ENDPOINTS.get_embedded_messages.route,
         params: {
-          ...params,
+          placementIds,
           platform: WEB_PLATFORM,
           sdkVersion: SDK_VERSION,
           packageName: packageName
