@@ -27,7 +27,7 @@ jobs:
           rm -rf node_modules && rm -rf ./react-example/node_modules
           yarn install --frozen-lockfile && yarn --cwd ./react-example install --frozen-lockfile
       - name: Start React Sample App
-        run: yarn start:all:react-start-without-watch
+        run: yarn start-without-watch:all:react
       - name: Run Playwright tests
         run: yarn playwright test
       - uses: actions/upload-artifact@v4
