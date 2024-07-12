@@ -471,7 +471,7 @@ class CriteriaCompletionChecker {
     }
   }
 
-  private issetCheck(matchObj: any): boolean {
+  private issetCheck(matchObj: string | object | any[]): boolean {
     if (Array.isArray(matchObj)) {
       return matchObj.length > 0;
     } else if (typeof matchObj === 'object' && matchObj !== null) {
