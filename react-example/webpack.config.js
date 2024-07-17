@@ -7,7 +7,7 @@ const webpack = require('webpack');
 
 module.exports = {
   mode: 'development',
-  entry: './src/index.tsx',
+  entry: './src/indexWithoutJWT.tsx',
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'dist')
