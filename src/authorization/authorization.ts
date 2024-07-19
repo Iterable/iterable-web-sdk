@@ -45,13 +45,11 @@ export interface WithoutJWT {
   logout: () => void;
 }
 
-const doesRequestUrlContain = (routeConfig: RouteConfig) =>
-  Object.entries(ENDPOINTS).some(
-    (entry) =>
-      routeConfig.route === entry[1].route &&
-      routeConfig.body === entry[1].body &&
-      routeConfig.current === entry[1].current &&
-      routeConfig.nestedUser === entry[1].nestedUser
+const doesRequestUrlContain = (routeConfig: RouteConfig) => Object.entries(ENDPOINTS).some(
+    (entry) => routeConfig.route === entry[1].route
+      && routeConfig.body === entry[1].body
+      && routeConfig.current === entry[1].current
+      && routeConfig.nestedUser === entry[1].nestedUser
   );
 
 export function initialize(
@@ -74,21 +72,21 @@ export function initialize(
     return;
   }
 
-  /* 
+  /*
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT
   */
   let authInterceptor: number | null = generateJWT
     ? null
     : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
+      config.headers.set('Api-Key', authToken);
 
-        return config;
-      });
+      return config;
+    });
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
-  /* 
-    AKA did the user auth with their email (setEmail) or user ID (setUserID) 
+  /*
+    AKA did the user auth with their email (setEmail) or user ID (setUserID)
 
     we're going to use this variable for one circumstance - when calling _updateUserEmail_.
     Essentially, when we call the Iterable API to update a user's email address and we get a
@@ -126,22 +124,25 @@ export function initialize(
           Date.now(),
           expTime
         );
-        if (validateTokenTime(millisecondsToExpired))
-          return console.warn(
-            'Could not refresh JWT. Try generating the token again.'
-          );
+        if (validateTokenTime(millisecondsToExpired)) {
+        { return console.warn(
+          'Could not refresh JWT. Try generating the token again.'
+        );
+        }
 
         if (millisecondsToExpired < MAX_TIMEOUT) {
-          timer = setTimeout(() => {
-            /* get new token */
-            return callback().catch((e: any) => {
-              console.warn(e);
-              console.warn(
-                'Could not refresh JWT. Try identifying the user again.'
-              );
-            });
+          timer = setTimeout(
+            () =>
+              /* get new token */
+              callback().catch((e: any) => {
+                console.warn(e);
+                console.warn(
+                  'Could not refresh JWT. Try identifying the user again.'
+                );
+              }),
             /* try to refresh one minute until expiry */
-          }, millisecondsToExpired - ONE_MINUTE);
+            millisecondsToExpired - ONE_MINUTE
+          );
         }
       }
     };
@@ -151,8 +152,8 @@ export function initialize(
 
   const addEmailToRequest = (email: string) => {
     userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-      /* 
-        endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+      /*
+        endpoints that use _currentEmail_ payload prop in POST/PUT requests
       */
       if (
         doesRequestUrlContain({
@@ -172,7 +173,7 @@ export function initialize(
       }
 
       /*
-        endpoints that use _email_ payload prop in POST/PUT requests 
+        endpoints that use _email_ payload prop in POST/PUT requests
       */
       if (
         doesRequestUrlContain({
@@ -270,8 +271,8 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
 
-        /* 
-          endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+        /*
+          endpoints that use _currentEmail_ payload prop in POST/PUT requests
         */
         addEmailToRequest(email);
       },
@@ -308,7 +309,7 @@ export function initialize(
             }
 
             /*
-              endpoints that use _userId_ payload prop in POST/PUT requests 
+              endpoints that use _userId_ payload prop in POST/PUT requests
             */
             if (
               doesRequestUrlContain({
@@ -419,9 +420,9 @@ export function initialize(
     };
   }
 
-  /* 
+  /*
     We're using a JWT enabled API key
-    callback is assumed to be some sort of GET /api/generate-jwt 
+    callback is assumed to be some sort of GET /api/generate-jwt
   */
   const doRequest = (payload: { email?: string; userID?: string }) => {
     /* clear any token interceptor if any exists */
@@ -439,7 +440,7 @@ export function initialize(
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
             if ((config as any)?.sendBeacon) {
-              /* 
+              /*
                 send fetch request instead solely so we can use the "keepalive" flag.
                 This is used purely for one use-case only - when the user clicks a link
                 that is going to navigate the browser tab to a new page/site and we need
@@ -480,22 +481,21 @@ export function initialize(
               })
             ) {
               try {
-                /* 
-                  if the customer just called the POST /users/updateEmail 
+                /*
+                  if the customer just called the POST /users/updateEmail
                   that means their JWT needs to be updated to include this new
                   email as well, so we run their JWT generation method and
                   set a new token on the axios interceptor
                 */
                 const newEmail = JSON.parse(config.config.data)?.newEmail;
 
-                const payloadToPass =
-                  typeOfAuth === 'email'
+                const payloadToPass =                  typeOfAuth === 'email'
                     ? { email: newEmail }
                     : { userID: authIdentifier! };
 
                 return generateJWT(payloadToPass).then((newToken) => {
-                  /* 
-                    clear any existing interceptors that are adding user info 
+                  /*
+                    clear any existing interceptors that are adding user info
                     or API keys
                   */
                   if (typeof authInterceptor === 'number') {
@@ -516,18 +516,18 @@ export function initialize(
                   authInterceptor = baseAxiosRequest.interceptors.request.use(
                     (config) => {
                       if ((config as any)?.sendBeacon) {
-                        /* 
+                        /*
                           send fetch request instead solely so we can use the "keepalive" flag.
                           This is used purely for one use-case only - when the user clicks a link
                           that is going to navigate the browser tab to a new page/site and we need
                           to still call POST /trackInAppClick.
-          
-                          Normally, since the page is going somewhere new, the browser would just 
-                          navigate away and cancel any in-flight requests and not fulfill them, 
-                          but with the fetch API's "keepalive" flag, it will continue the request 
+
+                          Normally, since the page is going somewhere new, the browser would just
+                          navigate away and cancel any in-flight requests and not fulfill them,
+                          but with the fetch API's "keepalive" flag, it will continue the request
                           without blocking the main thread.
-          
-                          We can't do this with Axios because it's built upon XHR and that 
+
+                          We can't do this with Axios because it's built upon XHR and that
                           doesn't support "keepalive" so we fall back to the fetch API
                         */
                         return cancelAxiosRequestAndMakeFetch(
@@ -548,26 +548,26 @@ export function initialize(
                   /* add the new email to all outgoing requests  */
                   addEmailToRequest(newEmail);
 
-                  /* 
-                    set up a new timer for when the JWT expires to regenerate 
+                  /*
+                    set up a new timer for when the JWT expires to regenerate
                     a new one encoded with the new email address.
                   */
 
-                  /* 
-                    important here to clear the timer first since there was one set up 
+                  /*
+                    important here to clear the timer first since there was one set up
                     previously the first time the JWT was generated.
 
                     handleTokenExpiration will clear the timeout for us.
                   */
-                  handleTokenExpiration(newToken, () => {
+                  handleTokenExpiration(newToken, () =>
                     /* re-run the JWT generation */
-                    return doRequest(payloadToPass).catch((e: any) => {
+                    doRequest(payloadToPass).catch((e: any) => {
                       console.warn(e);
                       console.warn(
                         'Could not refresh JWT. Try identifying the user again.'
                       );
-                    });
-                  });
+                    })
+                  );
 
                   return config;
                 });
@@ -594,18 +594,18 @@ export function initialize(
                   authInterceptor = baseAxiosRequest.interceptors.request.use(
                     (config) => {
                       if ((config as any)?.sendBeacon) {
-                        /* 
+                        /*
                           send fetch request instead solely so we can use the "keepalive" flag.
                           This is used purely for one use-case only - when the user clicks a link
                           that is going to navigate the browser tab to a new page/site and we need
                           to still call POST /trackInAppClick.
-          
-                          Normally, since the page is going somewhere new, the browser would just 
-                          navigate away and cancel any in-flight requests and not fulfill 
-                          them, but with the fetch API's "keepalive" flag, it will continue 
+
+                          Normally, since the page is going somewhere new, the browser would just
+                          navigate away and cancel any in-flight requests and not fulfill
+                          them, but with the fetch API's "keepalive" flag, it will continue
                           the request without blocking the main thread.
-          
-                          We can't do this with Axios because it's built upon XHR and that 
+
+                          We can't do this with Axios because it's built upon XHR and that
                           doesn't support "keepalive" so we fall back to the fetch API
                         */
                         return cancelAxiosRequestAndMakeFetch(
@@ -637,29 +637,29 @@ export function initialize(
                     }
                   });
                 })
-                .catch((e: any) => {
+                .catch((e: any) =>
                   /*
-                    if the JWT generation failed, 
+                    if the JWT generation failed,
                     just abort with a Promise rejection.
                   */
-                  return Promise.reject(e);
-                });
+                  Promise.reject(e)
+                );
             }
 
             return Promise.reject(error);
           }
         );
-        handleTokenExpiration(token, () => {
+        handleTokenExpiration(token, () =>
           /* re-run the JWT generation */
-          return doRequest(payload).catch((e: any) => {
+          doRequest(payload).catch((e: any) => {
             if (logLevel === 'verbose') {
               console.warn(e);
               console.warn(
                 'Could not refresh JWT. Try identifying the user again.'
               );
             }
-          });
-        });
+          })
+        );
         return token;
       })
       .catch((error: any) => {
@@ -728,7 +728,7 @@ export function initialize(
         }
 
         /*
-          endpoints that use _serId_ payload prop in POST/PUT requests 
+          endpoints that use _serId_ payload prop in POST/PUT requests
         */
         if (
           doesRequestUrlContain({

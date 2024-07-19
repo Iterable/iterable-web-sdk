@@ -18,8 +18,7 @@ type RequestInAppMessagesProps = {
 export const requestInAppMessages = ({
   latestCachedMessageId,
   payload
-}: RequestInAppMessagesProps) =>
-  baseIterableRequest<InAppMessageResponse>({
+}: RequestInAppMessagesProps) => baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     /** @note TBD: Parameter will be enabled once new endpoint is ready */
     // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
@@ -92,11 +91,12 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
         if (cachedMessage) allMessages.push(cachedMessage[1]);
       } else {
         allMessages.push(inAppMessage);
-        if (inAppMessage.messageId)
-          newMessages.push({
-            messageId: inAppMessage.messageId,
-            message: inAppMessage as InAppMessage
-          });
+        if (inAppMessage.messageId) {
+        { newMessages.push({
+          messageId: inAppMessage.messageId,
+          message: inAppMessage as InAppMessage
+        });
+        }
       }
     });
 

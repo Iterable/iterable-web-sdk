@@ -8,7 +8,8 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "airbnb-base"
   ],
   "ignorePatterns": [
     "webpack.*.js"
@@ -17,8 +18,11 @@
     "no-console": 1,
     "no-duplicate-imports": 2,
     "no-extra-boolean-cast": "off",
+    "comma-dangle": "off",
+    "no-undefined": "error",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/comma-spacing": 2,
+    "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/array-type": [
       2,

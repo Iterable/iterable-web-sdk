@@ -1,13 +1,13 @@
 import { by } from '@pabra/sortby';
+import { trackInAppDelivery } from 'src/events/in-app/events';
+import { config } from 'src/utils/config';
 import {
   ANIMATION_DURATION,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
 } from '../constants';
 import { WebInAppDisplaySettings } from '../inapp';
 import { srSpeak } from '../utils/srSpeak';
-import { trackInAppDelivery } from 'src/events/in-app/events';
 import { CloseButtonPosition, InAppMessage } from './types';
-import { config } from 'src/utils/config';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -17,12 +17,14 @@ interface Breakpoints {
 }
 
 export const generateWidth = (
-  { smMatches, mdMatches, lgMatches, xlMatches }: Breakpoints,
+  {
+ smMatches, mdMatches, lgMatches, xlMatches 
+}: Breakpoints,
   position: WebInAppDisplaySettings['position']
 ): string => {
-  /* 
+  /*
     breakpoint widths are as follows:
-    
+
     1. TopRight, BottomRight (100% at SM; 45% at MD; 33% at LG; 25% at XL)
     2. Center (100% at SM, MD; 50% at LG, XL)
     3. Full (100% all the time)
@@ -33,7 +35,7 @@ export const generateWidth = (
 
   if (mdMatches) {
     if (position === 'TopRight' || position === 'BottomRight') {
-      /* 
+      /*
         in-app messages is being initially painted, but we're on mobile
         breakpoints so remove any offsets the user provided in the config object.
       */
@@ -57,8 +59,8 @@ export const generateWidth = (
     return '50%';
   }
 
-  /* 
-    this line will never run. One of those breakpoints has to return true 
+  /*
+    this line will never run. One of those breakpoints has to return true
     but this is just to appease typescript.
   */
   return '100%';
@@ -82,7 +84,7 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
     images[i].src = imageLinks[i];
     images[i].loading = 'eager';
     images[i].onload = () => {
-      /* 
+      /*
         track the amount of images we preloaded. If this is the last image
         that's been preloaded, it's time to invoke the callback function we passed.
       */
@@ -106,27 +108,20 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
 
 export const filterHiddenInAppMessages = (
   messages: Partial<InAppMessage>[] = []
-) => {
-  return messages.filter((eachMessage) => {
-    return (
-      !eachMessage.read &&
-      eachMessage.trigger?.type !== 'never' &&
-      !!eachMessage.content?.html
-    );
-  });
-};
+) => messages.filter(
+    (eachMessage) =>
+    !eachMessage.read
+      && eachMessage.trigger?.type !== 'never'
+      && !!eachMessage.content?.html
+  ));
 
 export const filterOnlyReadAndNeverTriggerMessages = (
   messages: Partial<InAppMessage>[] = []
-) => {
-  return messages.filter(
+) => messages.filter(
     (eachMessage) => !eachMessage.read && eachMessage.trigger?.type !== 'never'
   );
-};
 
-export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
-  return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
-};
+export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 
 export const generateCloseButton = (
   id: string,
@@ -160,8 +155,7 @@ export const generateCloseButton = (
     z-index: 1000000;
   `;
   const button = doc.createElement('button');
-  button.style.cssText =
-    position === CloseButtonPosition.TopLeft
+  button.style.cssText =    position === CloseButtonPosition.TopLeft
       ? `
     ${sharedStyles}
     left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
@@ -355,20 +349,18 @@ export const paintIFrame = (
   topOffset?: string,
   bottomOffset?: string,
   rightOffset?: string
-): Promise<HTMLIFrameElement> =>
-  new Promise((resolve: (value: HTMLIFrameElement) => void) => {
+): Promise<HTMLIFrameElement> => new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
 
-    /* 
-      find all the images in the in-app message, preload them, and 
+    /*
+      find all the images in the in-app message, preload them, and
       only then set the height because we need to know how tall the images
       are before we set the height of the iframe.
-      
+
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
     */
-    const imageUrls: string[] =
-      html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
+    const imageUrls: string[] =      html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
 
     const imageTags = Array.from(
       new DOMParser()
@@ -386,7 +378,7 @@ export const paintIFrame = (
     const imageLinks = [...imageUrls, ...imageTagUrls];
 
     return preloadImages(imageLinks, () => {
-      /* 
+      /*
         set the scroll height to the content inside, but since images
         are going to take some time to load, we opt to preload them, THEN
         set the inner HTML of the iframe
@@ -400,12 +392,12 @@ export const paintIFrame = (
 
       const timeout = setTimeout(() => {
         /**
-          even though we preloaded the images before setting the height, we add an extra 100MS 
-          here to handle for the case where the user needs to download custom fonts. As 
+          even though we preloaded the images before setting the height, we add an extra 100MS
+          here to handle for the case where the user needs to download custom fonts. As
           of 07/27/2021, the preloading fonts API is still in a draft state
-            
+
           @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-          
+
           but even if we did preload the fonts, it would still take a non-trivial amount
           of computational time to apply the font to the text, so this setTimeout is acting more
           as a failsafe just incase the new font causes the line-height to grow and create a
@@ -413,8 +405,8 @@ export const paintIFrame = (
         */
         const setCSS = (width: string) => {
           iframe.style.cssText = generateLayoutCSS(
-            shouldAnimate &&
-              (position === 'TopRight' || position === 'BottomRight')
+            shouldAnimate
+              && (position === 'TopRight' || position === 'BottomRight')
               ? `
               position: fixed;
               border: none;
@@ -444,8 +436,7 @@ export const paintIFrame = (
         };
 
         if (shouldAnimate) {
-          iframe.className =
-            position === 'Center' || position === 'Full'
+          iframe.className =            position === 'Center' || position === 'Full'
               ? 'fade-in'
               : 'slide-in';
         }
@@ -483,7 +474,7 @@ export const paintIFrame = (
           };
 
           const iframeHeight = iframe.contentDocument?.body?.scrollHeight;
-          if (iframeHeight) iframe.style.height = iframeHeight + 'px';
+          if (iframeHeight) iframe.style.height = `${iframeHeight}px`;
         }
 
         clearTimeout(timeout);
@@ -499,7 +490,7 @@ export const paintIFrame = (
     iframe.onload = () => {
       if (position !== 'Full') {
         const scrollHeight = iframe.contentDocument?.body.scrollHeight ?? 0;
-        if (scrollHeight) iframe.style.height = scrollHeight + 'px';
+        if (scrollHeight) iframe.style.height = `${scrollHeight}px`;
       }
     };
 
@@ -516,22 +507,19 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
 export const trackMessagesDelivered = (
   messages: Partial<InAppMessage>[] = [],
   packageName: string
-) => {
-  return Promise.all(
-    messages?.map((eachMessage) => {
-      return trackInAppDelivery({
-        messageId: eachMessage.messageId as string,
-        deviceInfo: {
-          appPackageName: packageName
-        }
-        /* 
-          swallow any network failures. 
-          If it fails, there's nothing really we can do here. 
+) => Promise.all(
+    messages?.map((eachMessage) => trackInAppDelivery({
+      messageId: eachMessage.messageId as string,
+      deviceInfo: {
+        appPackageName: packageName
+      }
+      /*
+          swallow any network failures.
+          If it fails, there's nothing really we can do here.
         */
-      });
     })
+    )
   ).catch((e: any) => e);
-};
 
 export const paintOverlay = (
   color = '#fff',
@@ -623,12 +611,11 @@ export const setCloseButtonPosition = (
     ? `calc(${iframeRect.top}px + ${topOffset})`
     : `${iframeRect.top + defaultTop}px`;
 
-  if (position === CloseButtonPosition.TopLeft)
-    closeButton.style.left = sideOffset
-      ? `calc(${iframeRect.left}px + ${sideOffset})`
-      : `${iframeRect.left + defaultSide}px`;
-  else
-    closeButton.style.left = sideOffset
-      ? `calc(${iframeRightEdge}px - ${sideOffset})`
-      : `${iframeRightEdge - defaultSide}px`;
+  if (position === CloseButtonPosition.TopLeft) {
+  { closeButton.style.left = sideOffset
+    ? `calc(${iframeRect.left}px + ${sideOffset})`
+    : `${iframeRect.left + defaultSide}px`; } else { closeButton.style.left = sideOffset
+    ? `calc(${iframeRightEdge}px - ${sideOffset})`
+    : `${iframeRightEdge - defaultSide}px`;
+  }
 };

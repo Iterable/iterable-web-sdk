@@ -1,8 +1,8 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
+import { AnySchema, ValidationError } from 'yup';
 import { BASE_URL, STATIC_HEADERS, EU_ITERABLE_API } from './constants';
 import { IterablePromise, IterableResponse } from './types';
-import { AnySchema, ValidationError } from 'yup';
 import { config } from './utils/config';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
@@ -48,9 +48,8 @@ export const baseIterableRequest = <T = any>(
         ...payload.headers,
         ...STATIC_HEADERS
       },
-      paramsSerializer: (params) => {
-        return qs.stringify(params, { arrayFormat: 'repeat' });
-      }
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: 'repeat' })
     });
   } catch (error) {
     /* match Iterable's API error schema and add client errors as a new key */

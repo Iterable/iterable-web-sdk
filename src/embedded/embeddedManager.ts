@@ -12,7 +12,9 @@ import { handleEmbeddedClick } from './utils';
 
 export class IterableEmbeddedManager {
   public appPackageName: string;
+
   private messages: IterableEmbeddedMessage[] = [];
+
   private updateListeners: IterableEmbeddedMessageUpdateHandler[] = [];
 
   constructor(appPackageName: string) {
@@ -40,7 +42,7 @@ export class IterableEmbeddedManager {
           placementIds,
           platform: WEB_PLATFORM,
           sdkVersion: SDK_VERSION,
-          packageName: packageName
+          packageName
         }
       });
       const embeddedMessages = this.getEmbeddedMessages(
@@ -89,9 +91,9 @@ export class IterableEmbeddedManager {
   public getMessagesForPlacement(
     placementId: number
   ): IterableEmbeddedMessage[] {
-    return this.messages.filter((message) => {
-      return message.metadata.placementId === placementId;
-    });
+    return this.messages.filter(
+      (message) => message.metadata.placementId === placementId
+    );
   }
 
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
@@ -125,7 +127,7 @@ export class IterableEmbeddedManager {
     );
   }
 
-  //Get the list of updateHandlers
+  // Get the list of updateHandlers
   public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }

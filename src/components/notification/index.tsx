@@ -1,3 +1,8 @@
+import {
+  addButtonClickEvent,
+  getTrimmedText,
+  handleElementClick
+} from 'src/embedded/utils';
 import { OOTB } from '../types';
 import {
   defaultNotificationStyles,
@@ -8,11 +13,6 @@ import {
   defaultPrimaryButtonStyle,
   defaultButtonsDiv
 } from './styles';
-import {
-  addButtonClickEvent,
-  getTrimmedText,
-  handleElementClick
-} from 'src/embedded/utils';
 
 const emptyElement = {
   id: '',

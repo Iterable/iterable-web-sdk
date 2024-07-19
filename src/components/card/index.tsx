@@ -1,9 +1,9 @@
-import { OOTB } from '../types';
 import {
   addButtonClickEvent,
   getTrimmedText,
   handleElementClick
 } from 'src/embedded/utils';
+import { OOTB } from '../types';
 import {
   defaultCardStyles,
   defaultImageStyles,

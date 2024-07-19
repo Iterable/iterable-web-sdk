@@ -11,8 +11,8 @@ export const determineRemainingStorageQuota = async () => {
 
     const storage: BrowserStorageEstimate | undefined =
       'storage' in navigator && 'estimate' in navigator.storage
-        ? await navigator.storage.estimate()
-        : undefined;
+      ? await navigator.storage.estimate()
+      : undefined;
 
     /** 50 MB is the lower common denominator on modern mobile browser caches. */
     const mobileBrowserQuota = 52428800;
@@ -22,8 +22,7 @@ export const determineRemainingStorageQuota = async () => {
      * Determine lower max quota that can be used for message cache, set to
      * 60% of quota to leave space for other caching needs on that domain.
      */
-    const messageQuota =
-      ((estimatedBrowserQuota &&
+    const messageQuota = ((estimatedBrowserQuota
         Math.min(estimatedBrowserQuota, mobileBrowserQuota)) ??
         mobileBrowserQuota) * 0.6;
 
@@ -31,7 +30,7 @@ export const determineRemainingStorageQuota = async () => {
     const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
     const remainingQuota = usage && messageQuota - usage;
 
-    return remainingQuota ? remainingQuota : 0;
+    return remainingQuota || 0;
   } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -53,17 +52,17 @@ export const getCachedMessagesToDelete = (
   fetchedMessages: Partial<InAppMessage>[]
 ) =>
   cachedMessages.reduce((deleteQueue: string[], [cachedMessageId]) => {
-    const isCachedMessageInFetch = fetchedMessages.reduce(
-      (isFound, { messageId }) => {
-        if (messageId === cachedMessageId) isFound = true;
-        return isFound;
-      },
-      false
-    );
+  const isCachedMessageInFetch = fetchedMessages.reduce(
+    (isFound, { messageId }) => {
+      if (messageId === cachedMessageId) isFound = true;
+      return isFound;
+    },
+    false
+  );
 
-    if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
-    return deleteQueue;
-  }, []);
+  if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
+  return deleteQueue;
+}, []);
 
 /**
  * Adds messages to cache only if they fit within the quota, starting with

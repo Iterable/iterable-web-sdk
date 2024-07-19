@@ -4,8 +4,11 @@ import { IterableEmbeddedSessionRequestPayload } from '..';
 
 class EmbeddedSession {
   public start?: Date;
+
   public end?: Date;
+
   public impressions?: EmbeddedImpression[];
+
   public id: string;
 
   constructor(start?: Date, end?: Date) {
@@ -17,9 +20,13 @@ class EmbeddedSession {
 
 class EmbeddedImpression {
   public messageId: string;
+
   public displayCount: number;
+
   public displayDuration: number;
+
   public start?: Date = undefined;
+
   public placementId: number;
 
   constructor(
@@ -29,15 +36,17 @@ class EmbeddedImpression {
     duration?: number
   ) {
     this.messageId = messageId;
-    this.displayCount = displayCount ? displayCount : 0;
-    this.displayDuration = duration ? duration : 0.0;
+    this.displayCount = displayCount || 0;
+    this.displayDuration = duration || 0.0;
     this.placementId = placementId;
   }
 }
 
 export class IterableEmbeddedSessionManager {
   public appPackageName: string;
+
   private impressions: Map<string, EmbeddedImpression> = new Map();
+
   public session: EmbeddedSession = new EmbeddedSession();
 
   constructor(appPackageName: string) {
@@ -77,7 +86,7 @@ export class IterableEmbeddedSessionManager {
 
       await trackEmbeddedSession(sessionPayload);
 
-      //reset session for next session start
+      // reset session for next session start
       this.session = new EmbeddedSession();
       this.impressions = new Map();
     }
@@ -129,10 +138,9 @@ export class IterableEmbeddedSessionManager {
 
   private updateDisplayCountAndDuration(impressionData: EmbeddedImpression) {
     if (impressionData.start) {
-      impressionData.displayCount = impressionData.displayCount + 1;
-      impressionData.displayDuration =
-        impressionData.displayDuration +
-        (new Date().getTime() - impressionData.start.getTime()) / 1000.0;
+      impressionData.displayCount += 1;
+      impressionData.displayDuration
+        += (new Date().getTime() - impressionData.start.getTime()) / 1000.0;
       impressionData.start = undefined;
     }
 

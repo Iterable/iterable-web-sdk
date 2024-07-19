@@ -1,3 +1,4 @@
+import { WEB_PLATFORM, ENDPOINTS } from 'src/constants';
 import { baseIterableRequest } from '../../request';
 import {
   IterableEmbeddedDismissRequestPayload,
@@ -11,27 +12,26 @@ import {
   embeddedDismissSchema,
   embeddedSessionSchema
 } from './events.schema';
-import { WEB_PLATFORM, ENDPOINTS } from 'src/constants';
 
 export const trackEmbeddedReceived = (
   messageId: string,
   appPackageName: string
 ) =>
   baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: ENDPOINTS.msg_received_event_track.route,
-    data: {
-      messageId,
-      deviceInfo: {
-        platform: WEB_PLATFORM,
-        deviceId: global.navigator.userAgent || '',
-        appPackageName
-      }
-    },
-    validation: {
-      data: trackEmbeddedSchema
+  method: 'POST',
+  url: ENDPOINTS.msg_received_event_track.route,
+  data: {
+    messageId,
+    deviceInfo: {
+      platform: WEB_PLATFORM,
+      deviceId: global.navigator.userAgent || '',
+      appPackageName
     }
-  });
+  },
+  validation: {
+    data: trackEmbeddedSchema
+  }
+});
 
 export const trackEmbeddedClick = (
   payload: IterableEmbeddedClickRequestPayload

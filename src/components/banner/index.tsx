@@ -1,3 +1,8 @@
+import {
+  addButtonClickEvent,
+  getTrimmedText,
+  handleElementClick
+} from 'src/embedded/utils';
 import { OOTB } from '../types';
 import {
   bannerButtons,
@@ -10,11 +15,6 @@ import {
   defaultTitleStyles,
   textTitleImageDefaultStyle
 } from './styles';
-import {
-  addButtonClickEvent,
-  getTrimmedText,
-  handleElementClick
-} from 'src/embedded/utils';
 
 const emptyElement = {
   id: '',

@@ -1,10 +1,10 @@
 import { IterableConfig } from 'src/utils/IterableConfig';
+import { URL_SCHEME_OPEN } from 'src/constants';
 import {
   IterableAction,
   IterableActionContext,
   IterableActionSource
 } from '../embedded/types';
-import { URL_SCHEME_OPEN } from 'src/constants';
 
 class IterableActionRunnerImpl {
   static executeAction(
@@ -19,12 +19,11 @@ class IterableActionRunnerImpl {
     const actionContext: IterableActionContext = { action, source };
     if (action.type === URL_SCHEME_OPEN) {
       return IterableActionRunnerImpl.openUri(action.data, actionContext);
-    } else {
-      return IterableActionRunnerImpl.callCustomActionIfSpecified(
-        action,
-        actionContext
-      );
     }
+    return IterableActionRunnerImpl.callCustomActionIfSpecified(
+      action,
+      actionContext
+    );
   }
 
   private static openUri(

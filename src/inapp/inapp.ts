@@ -1,4 +1,5 @@
 import _set from 'lodash/set';
+import { throttle } from 'throttle-debounce';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
   ANIMATION_DURATION,
@@ -8,7 +9,6 @@ import {
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
 } from '../constants';
-import { throttle } from 'throttle-debounce';
 import {
   trackInAppClick,
   trackInAppClose,
@@ -113,8 +113,8 @@ export function getInAppMessages(
           if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
             activeIframe.className =
               messagePosition === 'Center' || messagePosition === 'Full'
-                ? 'fade-out'
-                : 'slide-out';
+              ? 'fade-out'
+              : 'slide-out';
           }
 
           const trackPayload = {
@@ -169,11 +169,10 @@ export function getInAppMessages(
 
           const throttledResize =
             messagePosition !== 'Full'
-              ? throttle(750, () => {
-                  activeIframe.style.height =
-                    (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
+            ? throttle(750, () => {
+              activeIframe.style.height = (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
                 })
-              : () => null;
+            : () => null;
           global.addEventListener('resize', throttledResize);
 
           try {
@@ -187,8 +186,8 @@ export function getInAppMessages(
             /* otherwise, find the first focusable element and focus on that */
             const firstFocusableElement =
               activeIframeDocument?.body?.querySelector(
-                'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
-              );
+              'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            );
 
             if (firstFocusableElement) {
               (firstFocusableElement as HTMLElement).focus();
@@ -204,10 +203,10 @@ export function getInAppMessages(
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', documentEventHandler);
               if (activeIframeDocument && !!iframeEventHandler)
-                activeIframeDocument.removeEventListener(
+                {activeIframeDocument.removeEventListener(
                   'keydown',
                   iframeEventHandler
-                );
+                );}
               global.removeEventListener('resize', throttledResize);
             }
           };
@@ -227,7 +226,7 @@ export function getInAppMessages(
 
             document.addEventListener('keydown', () => // do stuff)
 
-            this example code adds a new event listener each time and never gets cleaned up 
+            this example code adds a new event listener each time and never gets cleaned up
             because there's no reference that to "() => // do stuff" that can be re-used in the
             _removeEventListener_ call.
           */
@@ -236,18 +235,18 @@ export function getInAppMessages(
 
           const handleIFrameEscPress = (event: KeyboardEvent) =>
             handleEscKeypress(
-              event,
-              handleDocumentEscPress,
-              handleIFrameEscPress
-            );
+            event,
+            handleDocumentEscPress,
+            handleIFrameEscPress
+          );
 
           document.addEventListener('keydown', handleDocumentEscPress);
 
           if (activeIframeDocument)
-            activeIframeDocument.addEventListener(
+            {activeIframeDocument.addEventListener(
               'keydown',
               handleIFrameEscPress
-            );
+            );}
 
           const ua = navigator.userAgent;
           const isSafari =
@@ -268,10 +267,10 @@ export function getInAppMessages(
               document.getElementById(CLOSE_X_BUTTON_ID)?.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
               if (activeIframeDocument)
-                activeIframeDocument.removeEventListener(
+                {activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
-                );
+                );}
               global.removeEventListener('resize', throttledResize);
             });
           }
@@ -297,10 +296,10 @@ export function getInAppMessages(
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', handleDocumentEscPress);
               if (activeIframeDocument)
-                activeIframeDocument.removeEventListener(
+                {activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
-                );
+                );}
               global.removeEventListener('resize', throttledResize);
 
               const closeXButtonElement =
@@ -342,12 +341,12 @@ export function getInAppMessages(
               if (isSafari) {
                 const setPosition = () =>
                   setCloseButtonPosition(
-                    activeIframe,
-                    closeXButton,
-                    position,
-                    sideOffset,
-                    topOffset
-                  );
+                  activeIframe,
+                  closeXButton,
+                  position,
+                  sideOffset,
+                  topOffset
+                );
 
                 /**
                  * Due to DOM manipulations made in other timeouts when painting the iframe,
@@ -360,7 +359,7 @@ export function getInAppMessages(
                 }, 100);
 
                 const repositionCloseButton = () =>
-                  messagePosition !== 'Full' ? setPosition() : null;
+                  (messagePosition !== 'Full' ? setPosition() : null);
                 global.addEventListener('resize', repositionCloseButton);
               } else {
                 activeIframeDocument?.body.appendChild(closeXButton);
@@ -368,8 +367,8 @@ export function getInAppMessages(
             }
           }
 
-          /* 
-            track in-app consumes only when _saveToInbox_ 
+          /*
+            track in-app consumes only when _saveToInbox_
             is falsy or undefined and always track in-app opens
 
             Also swallow any 400+ response errors. We don't care about them.
@@ -408,8 +407,8 @@ export function getInAppMessages(
               clickedHostname === global.location.host || !clickedHostname;
             const { handleLinks } = payload;
 
-            /* 
-              If the _handleLinks_ option is set, we need to open links 
+            /*
+              If the _handleLinks_ option is set, we need to open links
               according to that enum and override their target attributes.
 
               1. If _open-all-same-tab_, then open every link in the same tab
@@ -436,8 +435,8 @@ export function getInAppMessages(
             };
 
             if (isDismissNode || isActionLink) {
-              /* 
-                give the close anchor tag properties that make it 
+              /*
+                give the close anchor tag properties that make it
                 behave more like a button with a logical aria label
               */
               addButtonAttrsToAnchorTag(link, 'close modal');
@@ -470,15 +469,14 @@ export function getInAppMessages(
               }
             } else {
               link.addEventListener('click', (event) => {
-                /* 
-                  remove default linking behavior because we're in an iframe 
+                /*
+                  remove default linking behavior because we're in an iframe
                   so we need to link the user programatically
                 */
                 event.preventDefault();
 
                 if (clickedUrl) {
-                  const isOpeningLinkInSameTab =
-                    (!handleLinks && !openInNewTab) ||
+                  const isOpeningLinkInSameTab = (!handleLinks && !openInNewTab)
                     handleLinks === HandleLinks.OpenAllSameTab ||
                     (isInternalLink &&
                       handleLinks === HandleLinks.ExternalNewTab);
@@ -491,8 +489,8 @@ export function getInAppMessages(
                         appPackageName: dupedPayload.packageName
                       }
                     },
-                    /* 
-                      only call with the fetch API if we're linking in the 
+                    /*
+                      only call with the fetch API if we're linking in the
                       same tab and it's not a reserved keyword link.
                     */
                     isOpeningLinkInSameTab && !isIterableKeywordLink
@@ -506,10 +504,10 @@ export function getInAppMessages(
                       handleDocumentEscPress
                     );
                     if (activeIframeDocument)
-                      activeIframeDocument.removeEventListener(
+                      {activeIframeDocument.removeEventListener(
                         'keydown',
                         handleIFrameEscPress
-                      );
+                      );}
                     global.removeEventListener('resize', throttledResize);
                   }
 
@@ -518,8 +516,8 @@ export function getInAppMessages(
                       /^.*action:\/\/(.*)$/,
                       'gmi'
                     )?.exec(clickedUrl) || [])?.[1];
-                    /* 
-                      just post the message to the window when clicking 
+                    /*
+                      just post the message to the window when clicking
                       action:// links and early return
                     */
                     return global.postMessage(
@@ -545,19 +543,18 @@ export function getInAppMessages(
                       }
                     );
                     if (!handleLinks) {
-                      if (openInNewTab)
-                        /**
+                      if (openInNewTab) {
+                      /**
                           Using target="_blank" without rel="noreferrer" and rel="noopener"
                           makes the website vulnerable to window.opener API exploitation attacks
-  
+
                           @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                         */
-                        global.open(
-                          clickedUrl,
-                          '_blank',
-                          'noopener,noreferrer'
-                        );
-                      else global.location.assign(clickedUrl);
+                      { global.open(
+                        clickedUrl,
+                        '_blank',
+                        'noopener,noreferrer'
+                      ); } else global.location.assign(clickedUrl);
                     }
                   }
                 }
@@ -589,51 +586,49 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response: any) => {
-            trackMessagesDelivered(
-              response.data.inAppMessages || [],
-              dupedPayload.packageName
-            );
-            return response;
-          })
-          .then((response: any) => {
-            if (isDeferred)
-              /*
+        .then((response: any) => {
+          trackMessagesDelivered(
+            response.data.inAppMessages || [],
+            dupedPayload.packageName
+          );
+          return response;
+        })
+        .then((response: any) => {
+          if (isDeferred) {
+          /*
                 if the user passed "deferred" for the second argument to _getMessages_
                 then they're going to choose to display the in-app messages when they want
                 with the returned, _triggerDisplayMessages_ function. So early return here
                 with no filtering or sorting.
               */
-              return response;
+          { return response; }
 
-            /* otherwise, they're choosing to show the messages automatically */
+          /* otherwise, they're choosing to show the messages automatically */
 
-            /* 
+          /*
               if the user passed the flag to automatically paint the in-app messages
               to the DOM, start a timer and show each in-app message upon close + timer countdown
-              
+
               However there are 3 conditions in which to not show a message:
-              
+
               1. _read_ key is truthy
               2. _trigger.type_ key is "never" (deliver silently is checked)
               3. HTML body is blank
 
               so first filter out unwanted messages and sort them
             */
-            clearMessages();
-            parsedMessages = sortInAppMessages(
-              filterHiddenInAppMessages(response.data.inAppMessages)
-            ) as InAppMessage[];
+          clearMessages();
+          parsedMessages = sortInAppMessages(
+            filterHiddenInAppMessages(response.data.inAppMessages)
+          ) as InAppMessage[];
 
-            return paintMessageToDOM().then(() => {
-              return {
-                ...response,
-                data: {
-                  inAppMessages: parsedMessages
-                }
-              };
-            });
-          }),
+          return paintMessageToDOM().then(() => ({
+            ...response,
+            data: {
+                inAppMessages: parsedMessages
+            }
+            }));
+        }),
       pauseMessageStream: () => {
         if (timer) {
           isPaused = true;
@@ -650,7 +645,7 @@ export function getInAppMessages(
     };
   }
 
-  /* 
+  /*
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
