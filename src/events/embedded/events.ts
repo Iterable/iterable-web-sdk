@@ -18,20 +18,20 @@ export const trackEmbeddedReceived = (
   appPackageName: string
 ) =>
   baseIterableRequest<IterableResponse>({
-  method: 'POST',
-  url: ENDPOINTS.msg_received_event_track.route,
-  data: {
-    messageId,
-    deviceInfo: {
-      platform: WEB_PLATFORM,
-      deviceId: global.navigator.userAgent || '',
-      appPackageName
+    method: 'POST',
+    url: ENDPOINTS.msg_received_event_track.route,
+    data: {
+      messageId,
+      deviceInfo: {
+        platform: WEB_PLATFORM,
+        deviceId: global.navigator.userAgent || '',
+        appPackageName
+      }
+    },
+    validation: {
+      data: trackEmbeddedSchema
     }
-  },
-  validation: {
-    data: trackEmbeddedSchema
-  }
-});
+  });
 
 export const trackEmbeddedClick = (
   payload: IterableEmbeddedClickRequestPayload

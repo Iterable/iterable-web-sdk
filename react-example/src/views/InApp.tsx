@@ -3,7 +3,13 @@ import styled from 'styled-components';
 import _Button from 'src/components/Button';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
 import { useUser } from 'src/context/Users';
-import { DisplayOptions, getInAppMessages } from '@iterable/web-sdk';
+import {
+  DisplayOptions,
+  getInAppMessages,
+  InAppMessageResponse,
+  IterablePromiseRejection
+} from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
 
 const Button = styled(_Button)`
   width: 100%;
@@ -60,14 +66,14 @@ export const InApp: FC<{}> = () => {
       { display: DisplayOptions.Deferred }
     )
       .request()
-      .then((response: any) => {
+      .then((response: AxiosResponse<InAppMessageResponse>) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(response.data, null, 2));
       })
-      .catch((e: any) => {
+      .catch((error: AxiosError<IterablePromiseRejection>) => {
         setIsGettingMessagesRaw(false);
-        setGetMessagesResponse(JSON.stringify(e.response.data, null, 2));
+        setGetMessagesResponse(JSON.stringify(error.response.data, null, 2));
       });
   };
 
@@ -77,7 +83,7 @@ export const InApp: FC<{}> = () => {
     setIsGettingMessagesAuto(true);
 
     return request()
-      .then((response: any) => {
+      .then((response: AxiosResponse<InAppMessageResponse>) => {
         setAutoMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesAuto(false);
       })

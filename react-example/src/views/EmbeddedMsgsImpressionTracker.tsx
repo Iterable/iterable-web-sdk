@@ -50,7 +50,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
     );
   };
 
-  let observersCard: any[] = [];
+  let observersCard: IntersectionObserver[] = [];
 
   useEffect(() => {
     observersCard = getCardObserver();
@@ -63,7 +63,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
       });
     };
 
-    messages.forEach((message, index) => {
+    messages.forEach((_, index) => {
       if (elementCardRef.current[index]) {
         observersCard[index].observe(elementCardRef.current[index]);
       }
@@ -92,6 +92,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
       await embeddedManager.syncMessages('my-website', () => {
         console.log('messages', JSON.stringify(embeddedManager.getMessages()));
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.log('error', error);
     }

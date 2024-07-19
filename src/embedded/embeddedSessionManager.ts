@@ -139,8 +139,8 @@ export class IterableEmbeddedSessionManager {
   private updateDisplayCountAndDuration(impressionData: EmbeddedImpression) {
     if (impressionData.start) {
       impressionData.displayCount += 1;
-      impressionData.displayDuration
-        += (new Date().getTime() - impressionData.start.getTime()) / 1000.0;
+      impressionData.displayDuration +=
+        (new Date().getTime() - impressionData.start.getTime()) / 1000.0;
       impressionData.start = undefined;
     }
 

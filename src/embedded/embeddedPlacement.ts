@@ -189,7 +189,8 @@ export class EmbeddedMessageElements {
       elementsJson.mediaUrl = elements?.mediaURL;
 
       if (elements?.defaultAction) {
-        elementsJson.defaultAction =          EmbeddedMessageElementsDefaultAction.toJSONObject(
+        elementsJson.defaultAction =
+          EmbeddedMessageElementsDefaultAction.toJSONObject(
             elements.defaultAction
           );
       }

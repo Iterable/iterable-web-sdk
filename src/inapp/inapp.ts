@@ -113,8 +113,8 @@ export function getInAppMessages(
           if (activeMessage?.content?.inAppDisplaySettings?.shouldAnimate) {
             activeIframe.className =
               messagePosition === 'Center' || messagePosition === 'Full'
-              ? 'fade-out'
-              : 'slide-out';
+                ? 'fade-out'
+                : 'slide-out';
           }
 
           const trackPayload = {
@@ -169,10 +169,11 @@ export function getInAppMessages(
 
           const throttledResize =
             messagePosition !== 'Full'
-            ? throttle(750, () => {
-              activeIframe.style.height = (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
+              ? throttle(750, () => {
+                  activeIframe.style.height =
+                    (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
                 })
-            : () => null;
+              : () => null;
           global.addEventListener('resize', throttledResize);
 
           try {
@@ -186,8 +187,8 @@ export function getInAppMessages(
             /* otherwise, find the first focusable element and focus on that */
             const firstFocusableElement =
               activeIframeDocument?.body?.querySelector(
-              'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
-            );
+                'button, a:not([tabindex="-1"]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+              );
 
             if (firstFocusableElement) {
               (firstFocusableElement as HTMLElement).focus();
@@ -202,11 +203,12 @@ export function getInAppMessages(
             if (event.key === 'Escape') {
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', documentEventHandler);
-              if (activeIframeDocument && !!iframeEventHandler)
-                {activeIframeDocument.removeEventListener(
+              if (activeIframeDocument && !!iframeEventHandler) {
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   iframeEventHandler
-                );}
+                );
+              }
               global.removeEventListener('resize', throttledResize);
             }
           };
@@ -235,18 +237,19 @@ export function getInAppMessages(
 
           const handleIFrameEscPress = (event: KeyboardEvent) =>
             handleEscKeypress(
-            event,
-            handleDocumentEscPress,
-            handleIFrameEscPress
-          );
+              event,
+              handleDocumentEscPress,
+              handleIFrameEscPress
+            );
 
           document.addEventListener('keydown', handleDocumentEscPress);
 
-          if (activeIframeDocument)
-            {activeIframeDocument.addEventListener(
+          if (activeIframeDocument) {
+            activeIframeDocument.addEventListener(
               'keydown',
               handleIFrameEscPress
-            );}
+            );
+          }
 
           const ua = navigator.userAgent;
           const isSafari =
@@ -266,11 +269,12 @@ export function getInAppMessages(
               dismissMessage(activeIframe);
               document.getElementById(CLOSE_X_BUTTON_ID)?.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframeDocument)
-                {activeIframeDocument.removeEventListener(
+              if (activeIframeDocument) {
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
-                );}
+                );
+              }
               global.removeEventListener('resize', throttledResize);
             });
           }
@@ -295,11 +299,12 @@ export function getInAppMessages(
             const triggerClose = () => {
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframeDocument)
-                {activeIframeDocument.removeEventListener(
+              if (activeIframeDocument) {
+                activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
-                );}
+                );
+              }
               global.removeEventListener('resize', throttledResize);
 
               const closeXButtonElement =
@@ -341,12 +346,12 @@ export function getInAppMessages(
               if (isSafari) {
                 const setPosition = () =>
                   setCloseButtonPosition(
-                  activeIframe,
-                  closeXButton,
-                  position,
-                  sideOffset,
-                  topOffset
-                );
+                    activeIframe,
+                    closeXButton,
+                    position,
+                    sideOffset,
+                    topOffset
+                  );
 
                 /**
                  * Due to DOM manipulations made in other timeouts when painting the iframe,
@@ -359,7 +364,7 @@ export function getInAppMessages(
                 }, 100);
 
                 const repositionCloseButton = () =>
-                  (messagePosition !== 'Full' ? setPosition() : null);
+                  messagePosition !== 'Full' ? setPosition() : null;
                 global.addEventListener('resize', repositionCloseButton);
               } else {
                 activeIframeDocument?.body.appendChild(closeXButton);
@@ -476,8 +481,8 @@ export function getInAppMessages(
                 event.preventDefault();
 
                 if (clickedUrl) {
-                  const isOpeningLinkInSameTab = (!handleLinks && !openInNewTab)
-                    handleLinks === HandleLinks.OpenAllSameTab ||
+                  const isOpeningLinkInSameTab = !handleLinks && !openInNewTab;
+                  handleLinks === HandleLinks.OpenAllSameTab ||
                     (isInternalLink &&
                       handleLinks === HandleLinks.ExternalNewTab);
 
@@ -503,11 +508,12 @@ export function getInAppMessages(
                       'keydown',
                       handleDocumentEscPress
                     );
-                    if (activeIframeDocument)
-                      {activeIframeDocument.removeEventListener(
+                    if (activeIframeDocument) {
+                      activeIframeDocument.removeEventListener(
                         'keydown',
                         handleIFrameEscPress
-                      );}
+                      );
+                    }
                     global.removeEventListener('resize', throttledResize);
                   }
 
@@ -544,17 +550,18 @@ export function getInAppMessages(
                     );
                     if (!handleLinks) {
                       if (openInNewTab) {
-                      /**
+                        /**
                           Using target="_blank" without rel="noreferrer" and rel="noopener"
                           makes the website vulnerable to window.opener API exploitation attacks
 
                           @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                         */
-                      { global.open(
-                        clickedUrl,
-                        '_blank',
-                        'noopener,noreferrer'
-                      ); } else global.location.assign(clickedUrl);
+                        global.open(
+                          clickedUrl,
+                          '_blank',
+                          'noopener,noreferrer'
+                        );
+                      } else global.location.assign(clickedUrl);
                     }
                   }
                 }
@@ -586,26 +593,26 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-        .then((response: any) => {
-          trackMessagesDelivered(
-            response.data.inAppMessages || [],
-            dupedPayload.packageName
-          );
-          return response;
-        })
-        .then((response: any) => {
-          if (isDeferred) {
-          /*
+          .then((response: any) => {
+            trackMessagesDelivered(
+              response.data.inAppMessages || [],
+              dupedPayload.packageName
+            );
+            return response;
+          })
+          .then((response: any) => {
+            if (isDeferred) {
+              /*
                 if the user passed "deferred" for the second argument to _getMessages_
                 then they're going to choose to display the in-app messages when they want
                 with the returned, _triggerDisplayMessages_ function. So early return here
                 with no filtering or sorting.
               */
-          { return response; }
+              return response;
 
-          /* otherwise, they're choosing to show the messages automatically */
+              /* otherwise, they're choosing to show the messages automatically */
 
-          /*
+              /*
               if the user passed the flag to automatically paint the in-app messages
               to the DOM, start a timer and show each in-app message upon close + timer countdown
 
@@ -617,18 +624,19 @@ export function getInAppMessages(
 
               so first filter out unwanted messages and sort them
             */
-          clearMessages();
-          parsedMessages = sortInAppMessages(
-            filterHiddenInAppMessages(response.data.inAppMessages)
-          ) as InAppMessage[];
+              clearMessages();
+              parsedMessages = sortInAppMessages(
+                filterHiddenInAppMessages(response.data.inAppMessages)
+              ) as InAppMessage[];
 
-          return paintMessageToDOM().then(() => ({
-            ...response,
-            data: {
-                inAppMessages: parsedMessages
+              return paintMessageToDOM().then(() => ({
+                ...response,
+                data: {
+                  inAppMessages: parsedMessages
+                }
+              }));
             }
-            }));
-        }),
+          }),
       pauseMessageStream: () => {
         if (timer) {
           isPaused = true;

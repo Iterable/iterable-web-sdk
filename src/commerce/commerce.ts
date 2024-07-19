@@ -7,8 +7,8 @@ import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   if (payload.user) {
-    delete (payload as any).user.userId;
-    delete (payload as any).user.email;
+    delete payload.user?.dataFields?.userId;
+    delete payload.user?.dataFields?.email;
   }
 
   return baseIterableRequest<IterableResponse>({
@@ -30,8 +30,8 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   if (payload.user) {
-    delete (payload as any).user.userId;
-    delete (payload as any).user.email;
+    delete payload.user?.dataFields?.userId;
+    delete payload.user?.dataFields?.email;
   }
 
   return baseIterableRequest<IterableResponse>({

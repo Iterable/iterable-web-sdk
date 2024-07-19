@@ -7,17 +7,17 @@ import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 
 export const updateUserEmail = (newEmail: string) =>
   baseIterableRequest<IterableResponse>({
-  method: 'POST',
-  url: ENDPOINTS.update_email.route,
-  data: {
-    newEmail
-  },
-  validation: {
-    data: object().shape({
-      newEmail: string().required()
-    })
-  }
-});
+    method: 'POST',
+    url: ENDPOINTS.update_email.route,
+    data: {
+      newEmail
+    },
+    validation: {
+      data: object().shape({
+        newEmail: string().required()
+      })
+    }
+  });
 
 export const updateUser = (payload: UpdateUserParams = {}) => {
   /* a customer could potentially send these up if they're not using TypeScript */

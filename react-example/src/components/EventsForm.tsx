@@ -6,13 +6,19 @@ import {
   Heading,
   Response
 } from '../views/Components.styled';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
+import {
+  IterablePromiseRejection,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
 import TextField from 'src/components/TextField';
+import { AxiosError, AxiosResponse } from 'axios';
 
 interface Props {
   endpointName: string;
   heading: string;
   needsEventName?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   method: (...args: any) => IterablePromise<IterableResponse>;
 }
 
@@ -43,12 +49,12 @@ export const EventsForm: FC<Props> = ({
         appPackageName: 'my-website'
       }
     })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((e: any) => {
-        setTrackResponse(JSON.stringify(e.response.data));
+      .catch((error: AxiosError<IterablePromiseRejection>) => {
+        setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
   };

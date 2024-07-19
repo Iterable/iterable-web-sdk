@@ -113,7 +113,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
       await embeddedManager.syncMessages('my-website', () => {
         console.log('messages', JSON.stringify(embeddedManager.getMessages()));
       });
-    } catch (error: any) {
+    } catch (error) {
       console.log('error', error);
     }
   };

@@ -1,5 +1,9 @@
-import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
-import axios from 'axios';
+import {
+  GenerateJWTPayload,
+  initializeWithConfig,
+  WithJWTParams
+} from '@iterable/web-sdk';
+import axios, { AxiosResponse } from 'axios';
 import './styles/index.css';
 
 import Home from 'src/views/Home';
@@ -17,6 +21,7 @@ import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
 import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
 import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
+import { string } from 'yup';
 
 const Wrapper = styled.div`
   display: flex;
@@ -47,25 +52,28 @@ const HomeLink = styled(Link)`
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true
     },
-    generateJWT: ({ email, userID }) => {
-      return axios
-        .post(
-          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            user_id: userID,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
+    generateJWT: ({ email, userID }: GenerateJWTPayload) => {
+      return (
+        axios
+          .post(
+            process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
+            {
+              exp_minutes: 2,
+              email,
+              user_id: userID,
+              jwt_secret: process.env.JWT_SECRET
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json'
+              }
             }
-          }
-        )
-        .then((response: any) => {
-          return response.data?.token;
-        });
+          )
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .then((response: AxiosResponse<Record<any, any>>) => {
+            return response.data?.token;
+          })
+      );
     }
   };
   const { setEmail, setUserID, logout, refreshJwtToken } =
