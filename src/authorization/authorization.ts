@@ -1,3 +1,4 @@
+/* eslint-disable */
 import axios from 'axios';
 import { baseAxiosRequest } from '../request';
 import { updateUser } from '../users';

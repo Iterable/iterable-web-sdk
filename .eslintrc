@@ -15,6 +15,11 @@
   "ignorePatterns": [
     "webpack.*.js"
   ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {} // this loads <rootdir>/tsconfig.json to eslint
+    },
+  },
   "rules": {
     "no-console": 1,
     "no-duplicate-imports": 2,

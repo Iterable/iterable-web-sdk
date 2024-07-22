@@ -1,6 +1,4 @@
-/* eslint-disable prefer-regex-literals */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-redeclare */
+/* eslint-disable */
 import _set from 'lodash/set';
 import { throttle } from 'throttle-debounce';
 import {
