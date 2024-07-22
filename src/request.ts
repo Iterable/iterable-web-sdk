@@ -24,7 +24,7 @@ export const baseAxiosRequest = Axios.create({
   baseURL: BASE_URL
 });
 
-export const baseIterableRequest = <T>(
+export const baseIterableRequest = <T = any>(
   payload: ExtendedRequestConfig
 ): IterablePromise<T> => {
   try {

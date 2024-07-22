@@ -45,7 +45,6 @@
       { "vars": "all", "args": "after-used", "ignoreRestSiblings": true, "varsIgnorePattern": "React" },
     ],
     "no-shadow": "off",
-    "@typescript-eslint/no-shadow": "warn",
     "no-param-reassign": "warn",
     "import/prefer-default-export": "off",
     // really need to remove this one but embedded brought in a lot of dep cycles.

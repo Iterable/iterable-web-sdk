@@ -6,9 +6,9 @@ import { AxiosError, AxiosPromise } from 'axios';
 */
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
 
-export type IterablePromise<T> = AxiosPromise<T>;
+export type IterablePromise<T = any> = AxiosPromise<T>;
 
-export type IterablePromiseRejection<T> = AxiosError<T>;
+export type IterablePromiseRejection<T = any> = AxiosError<T>;
 
 export type IterableErrorStatus =
   | 'Success'
