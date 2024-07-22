@@ -1,5 +1,0 @@
-import { jsx as _jsx, Fragment as _Fragment, jsxs as _jsxs } from "react/jsx-runtime";
-import { track, trackInAppClick, trackInAppClose, trackInAppConsume, trackInAppDelivery, trackInAppOpen } from '@iterable/web-sdk';
-import EventsForm from '../components/EventsForm';
-export var Events = function () { return (_jsxs(_Fragment, { children: [_jsx("h1", { children: "Events Endpoints" }), _jsx(EventsForm, { heading: "/track", endpointName: "track", method: track, needsEventName: true }), _jsx(EventsForm, { heading: "/trackInAppClick", endpointName: "track-click", method: trackInAppClick }), _jsx(EventsForm, { heading: "/trackInAppClose", endpointName: "track-close", method: trackInAppClose }), _jsx(EventsForm, { heading: "/inAppConsume", endpointName: "track-consume", method: trackInAppConsume }), _jsx(EventsForm, { heading: "/trackInAppDelivery", endpointName: "track-delivery", method: trackInAppDelivery }), _jsx(EventsForm, { heading: "/trackInAppOpen", endpointName: "track-open", method: trackInAppOpen })] })); };
-export default Events;
