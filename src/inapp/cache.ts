@@ -1,6 +1,3 @@
-import { setMany } from 'idb-keyval';
-import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
-
 /**
  * Detect amount of local storage remaining (quota) and used (usage).
  * If usageDetails exist (not supported in Safari), use this instead of usage.

@@ -6,7 +6,6 @@
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:import/typescript",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
@@ -16,15 +15,6 @@
   "ignorePatterns": [
     "webpack.*.js"
   ],
-  "settings": {
-    "import/resolver": {
-      "typescript": {},
-      "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"],
-        "moduleDirectory": ["src/"]
-      }
-    }
-  },
   "rules": {
     "no-console": 1,
     "no-duplicate-imports": 2,

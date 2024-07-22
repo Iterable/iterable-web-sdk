@@ -38,7 +38,6 @@ import {
   paintIFrame,
   paintOverlay,
   setCloseButtonPosition,
-  sortInAppMessages,
   trackMessagesDelivered,
   wrapWithIFrame
 } from './utils';
