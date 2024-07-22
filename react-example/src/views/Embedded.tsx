@@ -1,13 +1,13 @@
 import { FC, useEffect, useState } from 'react';
 import { initialize } from '@iterable/web-sdk';
-import TextField from 'src/components/TextField';
 import EmbeddedForm, {
   TYPE_CLICK,
   TYPE_DISMISS,
   TYPE_GET_RECEIVED,
   TYPE_POST_RECEIVED,
   TYPE_SESSION
-} from 'src/components/EmbeddedForm';
+} from '../components/EmbeddedForm';
+import TextField from '../components/TextField';
 
 interface Props {}
 
@@ -35,14 +35,12 @@ export const EmbeddedMessage: FC<Props> = () => {
         heading="GET /embedded-messaging/events/received"
         endpointName="received-get"
         type={TYPE_GET_RECEIVED}
-        userId={userId}
       />
       <br />
       <EmbeddedForm
         heading="POST /embedded-messaging/events/received"
         endpointName="received-post"
         type={TYPE_POST_RECEIVED}
-        userId={userId}
         needsInputField={true}
       />
       <br />
@@ -50,7 +48,6 @@ export const EmbeddedMessage: FC<Props> = () => {
         heading="POST /embedded-messaging/events/click"
         endpointName="click"
         type={TYPE_CLICK}
-        userId={userId}
         needsInputField={true}
       />
       <br />
@@ -59,7 +56,6 @@ export const EmbeddedMessage: FC<Props> = () => {
         endpointName="dismiss"
         needsInputField={true}
         type={TYPE_DISMISS}
-        userId={userId}
       />
       <br />
       <EmbeddedForm
@@ -67,7 +63,6 @@ export const EmbeddedMessage: FC<Props> = () => {
         endpointName="session"
         needsInputField={true}
         type={TYPE_SESSION}
-        userId={userId}
       />
       <br />
     </>

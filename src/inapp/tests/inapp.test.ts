@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import MockAdapter from 'axios-mock-adapter';
-import { messages } from '../../__data__/inAppMessages';
+import messages from '../../__data__/inAppMessages';
 import { initialize } from '../../authorization';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';

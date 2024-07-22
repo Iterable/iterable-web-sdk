@@ -11,8 +11,8 @@ import {
   IterableAction,
   IterableConfig
 } from '@iterable/web-sdk';
-import Button from 'src/components/Button';
-import { useUser } from 'src/context/Users';
+import Button from '../components/Button';
+import { useUser } from '../context/Users';
 
 const StyleOverrides = {
   parent: {
@@ -79,7 +79,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
 
   useEffect(() => {
     const urlHandler: IterableUrlHandler = {
-      handleIterableURL: function (uri: string): boolean {
+      handleIterableURL(uri: string): boolean {
         window.open(uri, '_blank');
         return true;
       }
@@ -87,7 +87,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
     IterableConfig.urlHandler = urlHandler;
 
     const customActionHandler: IterableCustomActionHandler = {
-      handleIterableCustomAction: function (action: IterableAction): boolean {
+      handleIterableCustomAction(action: IterableAction): boolean {
         if (action.data === 'news') {
           // handle the custom action here and navigate based on action data
           return true;
@@ -101,11 +101,11 @@ export const EmbeddedMsgs: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const updateListener: IterableEmbeddedMessageUpdateHandler = {
-        onMessagesUpdated: function (): void {
+        onMessagesUpdated(): void {
           // this callback gets called when messages are fetched/updated
           setMessages(embeddedManager.getMessages());
         },
-        onEmbeddedMessagingDisabled: function (): void {
+        onEmbeddedMessagingDisabled(): void {
           setMessages([]);
         }
       };

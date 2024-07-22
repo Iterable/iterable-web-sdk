@@ -13,7 +13,7 @@ import {
   embeddedSessionSchema
 } from './events.schema';
 
-export const trackEmbeddedReceived = (
+export const trackEmbeddedReceived = async (
   messageId: string,
   appPackageName: string
 ) =>
@@ -33,7 +33,7 @@ export const trackEmbeddedReceived = (
     }
   });
 
-export const trackEmbeddedClick = (
+export const trackEmbeddedClick = async (
   payload: IterableEmbeddedClickRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
@@ -56,7 +56,7 @@ export const trackEmbeddedClick = (
   });
 };
 
-export const trackEmbeddedDismiss = (
+export const trackEmbeddedDismiss = async (
   payload: IterableEmbeddedDismissRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
@@ -79,7 +79,7 @@ export const trackEmbeddedDismiss = (
   });
 };
 
-export const trackEmbeddedSession = (
+export const trackEmbeddedSession = async (
   payload: IterableEmbeddedSessionRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;

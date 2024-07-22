@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+/* eslint-disable no-script-url */
 /**
  * @jest-environment jsdom
  */

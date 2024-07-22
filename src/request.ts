@@ -24,7 +24,7 @@ export const baseAxiosRequest = Axios.create({
   baseURL: BASE_URL
 });
 
-export const baseIterableRequest = <T = any>(
+export const baseIterableRequest = <T>(
   payload: ExtendedRequestConfig
 ): IterablePromise<T> => {
   try {
@@ -62,6 +62,7 @@ export const baseIterableRequest = <T = any>(
       }))
     };
     /* match Axios' Error object schema and reject */
+    // eslint-disable-next-line prefer-promise-reject-errors
     return Promise.reject({
       response: {
         data: newError,

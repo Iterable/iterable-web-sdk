@@ -1,3 +1,5 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-loop-func */
 import { by } from '@pabra/sortby';
 import { trackInAppDelivery } from 'src/events/in-app/events';
 import { config } from 'src/utils/config';
@@ -5,7 +7,7 @@ import {
   ANIMATION_DURATION,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
 } from '../constants';
-import { WebInAppDisplaySettings } from '../inapp';
+import { WebInAppDisplaySettings } from '.';
 import { srSpeak } from '../utils/srSpeak';
 import { CloseButtonPosition, InAppMessage } from './types';
 
@@ -17,9 +19,7 @@ interface Breakpoints {
 }
 
 export const generateWidth = (
-  {
- smMatches, mdMatches, lgMatches, xlMatches 
-}: Breakpoints,
+  { smMatches, mdMatches, lgMatches, xlMatches }: Breakpoints,
   position: WebInAppDisplaySettings['position']
 ): string => {
   /*
@@ -79,6 +79,7 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
 
   const images: HTMLImageElement[] = [];
   let loadedImages = 0;
+  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < imageLinks.length; i++) {
     images[i] = new Image();
     images[i].src = imageLinks[i];
@@ -108,20 +109,23 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
 
 export const filterHiddenInAppMessages = (
   messages: Partial<InAppMessage>[] = []
-) => messages.filter(
+) =>
+  messages.filter(
     (eachMessage) =>
-    !eachMessage.read
-      && eachMessage.trigger?.type !== 'never'
-      && !!eachMessage.content?.html
-  ));
+      !eachMessage.read &&
+      eachMessage.trigger?.type !== 'never' &&
+      !!eachMessage.content?.html
+  );
 
 export const filterOnlyReadAndNeverTriggerMessages = (
   messages: Partial<InAppMessage>[] = []
-) => messages.filter(
+) =>
+  messages.filter(
     (eachMessage) => !eachMessage.read && eachMessage.trigger?.type !== 'never'
   );
 
-export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
+export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) =>
+  messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 
 export const generateCloseButton = (
   id: string,
@@ -155,7 +159,8 @@ export const generateCloseButton = (
     z-index: 1000000;
   `;
   const button = doc.createElement('button');
-  button.style.cssText =    position === CloseButtonPosition.TopLeft
+  button.style.cssText =
+    position === CloseButtonPosition.TopLeft
       ? `
     ${sharedStyles}
     left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
@@ -272,7 +277,8 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 
 /**
  *
- * @returns { HTMLIFrameElement } iframe with sandbox and hidden styling applied for of an inapp message to render with
+ * @returns { HTMLIFrameElement } iframe with sandbox and hidden styling
+ * applied for of an inapp message to render with
  */
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
@@ -336,7 +342,8 @@ const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
  * @param shouldAnimate if the in-app should animate in/out
  * @param srMessage The message you want the screen reader to read when popping up the message
  * @param topOffset how many px or % buffer between the in-app message and the top of the screen
- * @param bottomOffset how many px or % buffer between the in-app message and the bottom of the screen
+ * @param bottomOffset how many px or % buffer between the
+ * in-app message and the bottom of the screen
  * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
  *
  * @returns { HTMLIFrameElement }
@@ -349,7 +356,8 @@ export const paintIFrame = (
   topOffset?: string,
   bottomOffset?: string,
   rightOffset?: string
-): Promise<HTMLIFrameElement> => new Promise((resolve: (value: HTMLIFrameElement) => void) => {
+): Promise<HTMLIFrameElement> =>
+  new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
 
     /*
@@ -360,7 +368,8 @@ export const paintIFrame = (
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
     */
-    const imageUrls: string[] =      html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
+    const imageUrls: string[] =
+      html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
 
     const imageTags = Array.from(
       new DOMParser()
@@ -377,6 +386,7 @@ export const paintIFrame = (
 
     const imageLinks = [...imageUrls, ...imageTagUrls];
 
+    // eslint-disable-next-line no-promise-executor-return
     return preloadImages(imageLinks, () => {
       /*
         set the scroll height to the content inside, but since images
@@ -405,8 +415,8 @@ export const paintIFrame = (
         */
         const setCSS = (width: string) => {
           iframe.style.cssText = generateLayoutCSS(
-            shouldAnimate
-              && (position === 'TopRight' || position === 'BottomRight')
+            shouldAnimate &&
+              (position === 'TopRight' || position === 'BottomRight')
               ? `
               position: fixed;
               border: none;
@@ -436,7 +446,8 @@ export const paintIFrame = (
         };
 
         if (shouldAnimate) {
-          iframe.className =            position === 'Center' || position === 'Full'
+          iframe.className =
+            position === 'Center' || position === 'Full'
               ? 'fade-in'
               : 'slide-in';
         }
@@ -501,23 +512,27 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
   node.setAttribute('aria-label', ariaLabel);
   node.setAttribute('role', 'button');
   node.setAttribute('data-qa-original-link', node.getAttribute('href') || '');
+  // eslint-disable-next-line no-script-url
   node.setAttribute('href', 'javascript:undefined');
 };
 
 export const trackMessagesDelivered = (
+  // eslint-disable-next-line default-param-last
   messages: Partial<InAppMessage>[] = [],
   packageName: string
-) => Promise.all(
-    messages?.map((eachMessage) => trackInAppDelivery({
-      messageId: eachMessage.messageId as string,
-      deviceInfo: {
-        appPackageName: packageName
-      }
-      /*
+) =>
+  Promise.all(
+    messages?.map((eachMessage) =>
+      trackInAppDelivery({
+        messageId: eachMessage.messageId as string,
+        deviceInfo: {
+          appPackageName: packageName
+        }
+        /*
           swallow any network failures.
           If it fails, there's nothing really we can do here.
         */
-    })
+      })
     )
   ).catch((e: any) => e);
 
@@ -612,10 +627,15 @@ export const setCloseButtonPosition = (
     : `${iframeRect.top + defaultTop}px`;
 
   if (position === CloseButtonPosition.TopLeft) {
-  { closeButton.style.left = sideOffset
-    ? `calc(${iframeRect.left}px + ${sideOffset})`
-    : `${iframeRect.left + defaultSide}px`; } else { closeButton.style.left = sideOffset
-    ? `calc(${iframeRightEdge}px - ${sideOffset})`
-    : `${iframeRightEdge - defaultSide}px`;
+    // eslint-disable-next-line no-lone-blocks
+    {
+      closeButton.style.left = sideOffset
+        ? `calc(${iframeRect.left}px + ${sideOffset})`
+        : `${iframeRect.left + defaultSide}px`;
+    }
+  } else {
+    closeButton.style.left = sideOffset
+      ? `calc(${iframeRightEdge}px - ${sideOffset})`
+      : `${iframeRightEdge - defaultSide}px`;
   }
 };

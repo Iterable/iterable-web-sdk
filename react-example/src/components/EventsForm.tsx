@@ -1,24 +1,24 @@
 import { FC, FormEvent, useState } from 'react';
 import {
+  IterablePromiseRejection,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
+import TextField from './TextField';
+import {
   Button,
   EndpointWrapper,
   Form,
   Heading,
   Response
 } from '../views/Components.styled';
-import {
-  IterablePromiseRejection,
-  IterablePromise,
-  IterableResponse
-} from '@iterable/web-sdk';
-import TextField from 'src/components/TextField';
-import { AxiosError, AxiosResponse } from 'axios';
 
 interface Props {
   endpointName: string;
   heading: string;
   needsEventName?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, no-unused-vars
   method: (...args: any) => IterablePromise<IterableResponse>;
 }
 

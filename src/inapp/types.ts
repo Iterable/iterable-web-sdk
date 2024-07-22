@@ -63,17 +63,6 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
-export interface GetInAppMessagesResponse {
-  pauseMessageStream: () => void;
-  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
-  request: () => IterablePromise<InAppMessageResponse>;
-  triggerDisplayMessages: (
-    messages: Partial<InAppMessage>[]
-  ) => Promise<HTMLIFrameElement | ''>;
-}
-
-export type CachedMessage = [string, InAppMessage];
-
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;
@@ -82,11 +71,6 @@ export interface InAppDisplaySetting {
 export interface WebInAppDisplaySettings {
   position: DisplayPosition;
 }
-
-export type BrowserStorageEstimate = StorageEstimate & {
-  /** usageDetails not supported in Safari */
-  usageDetails?: { indexedDB?: number };
-};
 
 export interface InAppMessage {
   messageId: string;
@@ -126,3 +110,19 @@ export interface InAppMessage {
 export interface InAppMessageResponse {
   inAppMessages: Partial<InAppMessage>[];
 }
+
+export interface GetInAppMessagesResponse {
+  pauseMessageStream: () => void;
+  resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
+  request: () => IterablePromise<InAppMessageResponse>;
+  triggerDisplayMessages: (
+    messages: Partial<InAppMessage>[]
+  ) => Promise<HTMLIFrameElement | ''>;
+}
+
+export type CachedMessage = [string, InAppMessage];
+
+export type BrowserStorageEstimate = StorageEstimate & {
+  /** usageDetails not supported in Safari */
+  usageDetails?: { indexedDB?: number };
+};

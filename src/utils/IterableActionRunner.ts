@@ -1,5 +1,6 @@
-import { IterableConfig } from 'src/utils/IterableConfig';
-import { URL_SCHEME_OPEN } from 'src/constants';
+/* eslint-disable max-classes-per-file */
+import { IterableConfig } from './IterableConfig';
+import { URL_SCHEME_OPEN } from '../constants';
 import {
   IterableAction,
   IterableActionContext,

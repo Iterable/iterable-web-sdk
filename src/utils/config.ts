@@ -7,6 +7,7 @@ export type Options = {
   dangerouslyAllowJsPopups: boolean;
 };
 
+// eslint-disable-next-line no-underscore-dangle
 const _config = () => {
   let options: Options = {
     logLevel: 'none',

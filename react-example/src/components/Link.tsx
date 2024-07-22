@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { Link as _Link, LinkProps } from 'react-router-dom';
+import { Link as ReactRouterLink, LinkProps } from 'react-router-dom';
 import styled from 'styled-components';
 
-const _ButtonLink = styled(_Link)`
+const ButtonLink = styled(ReactRouterLink)`
   font-family: sans-serif;
   text-align: center;
   text-decoration: none;
@@ -35,7 +35,7 @@ const _ButtonLink = styled(_Link)`
   }
 `;
 
-const DisabledButtonLink = styled(_ButtonLink)`
+const DisabledButtonLink = styled(ButtonLink)`
   background-color: gray;
   color: #c7c7c7;
   -webkit-box-shadow: 0 7px 0 0 #4d4d4d;
@@ -67,10 +67,10 @@ export const Link: FC<Props> = (props) => {
   }
 
   if (renderAsButton) {
-    return <_ButtonLink {...rest}>{children}</_ButtonLink>;
+    return <ButtonLink {...rest}>{children}</ButtonLink>;
   }
 
-  return <_Link {...rest}>{children}</_Link>;
+  return <ReactRouterLink {...rest}>{children}</ReactRouterLink>;
 };
 
 export default Link;

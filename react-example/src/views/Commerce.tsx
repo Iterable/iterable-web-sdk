@@ -1,12 +1,4 @@
 import { FC, FormEvent, useState } from 'react';
-import TextField from 'src/components/TextField';
-import {
-  Button,
-  EndpointWrapper,
-  Form,
-  Heading,
-  Response
-} from './Components.styled';
 
 import {
   updateCart,
@@ -15,6 +7,14 @@ import {
   IterablePromiseRejection
 } from '@iterable/web-sdk';
 import { AxiosError, AxiosResponse } from 'axios';
+import TextField from '../components/TextField';
+import {
+  Button,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from './Components.styled';
 
 interface Props {}
 

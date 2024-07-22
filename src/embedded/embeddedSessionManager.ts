@@ -1,3 +1,5 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable max-classes-per-file */
 import { v4 as uuidv4 } from 'uuid';
 import { trackEmbeddedSession } from '../events/embedded/events';
 import { IterableEmbeddedSessionRequestPayload } from '..';
@@ -136,6 +138,7 @@ export class IterableEmbeddedSessionManager {
     return impressionList;
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private updateDisplayCountAndDuration(impressionData: EmbeddedImpression) {
     if (impressionData.start) {
       impressionData.displayCount += 1;

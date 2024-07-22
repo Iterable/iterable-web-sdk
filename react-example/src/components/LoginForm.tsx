@@ -1,10 +1,10 @@
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 
-import _TextField from 'src/components/TextField';
-import _Button from 'src/components/Button';
+import _TextField from './TextField';
+import _Button from './Button';
 
-import { useUser } from 'src/context/Users';
+import { useUser } from '../context/Users';
 
 const TextField = styled(_TextField)``;
 

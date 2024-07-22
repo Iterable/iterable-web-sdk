@@ -4,24 +4,23 @@ import {
   WithJWTParams
 } from '@iterable/web-sdk';
 import axios, { AxiosResponse } from 'axios';
-import './styles/index.css';
-
-import Home from 'src/views/Home';
-import Commerce from 'src/views/Commerce';
-import Events from 'src/views/Events';
-import Users from 'src/views/Users';
-import InApp from 'src/views/InApp';
-import EmbeddedMessage from 'src/views/Embedded';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
 import styled from 'styled-components';
-import LoginForm from 'src/components/LoginForm';
-import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
-
-import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
+import Home from './views/Home';
+import Commerce from './views/Commerce';
+import Events from './views/Events';
+import Users from './views/Users';
+import InApp from './views/InApp';
+import EmbeddedMessage from './views/Embedded';
+import Link from './components/Link';
+import LoginForm from './components/LoginForm';
+import EmbeddedMsgs from './views/EmbeddedMsgs';
+
+import { UserProvider } from './context/Users';
 import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
-import { string } from 'yup';
+
+import './styles/index.css';
 
 const Wrapper = styled.div`
   display: flex;
@@ -52,29 +51,27 @@ const HomeLink = styled(Link)`
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true
     },
-    generateJWT: ({ email, userID }: GenerateJWTPayload) => {
-      return (
-        axios
-          .post(
-            process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
-            {
-              exp_minutes: 2,
-              email,
-              user_id: userID,
-              jwt_secret: process.env.JWT_SECRET
-            },
-            {
-              headers: {
-                'Content-Type': 'application/json'
-              }
+    generateJWT: ({ email, userID }: GenerateJWTPayload) =>
+      axios
+        .post(
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
+          {
+            exp_minutes: 2,
+            email,
+            user_id: userID,
+            jwt_secret: process.env.JWT_SECRET
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
             }
-          )
+          }
+        )
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .then(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          .then((response: AxiosResponse<Record<any, any>>) => {
-            return response.data?.token;
-          })
-      );
-    }
+          (response: AxiosResponse<Record<any, any>>) => response.data?.token
+        )
   };
   const { setEmail, setUserID, logout, refreshJwtToken } =
     initializeWithConfig(initializeParams);

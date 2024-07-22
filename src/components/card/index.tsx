@@ -80,8 +80,9 @@ export function IterableEmbeddedCard({
       message?.elements?.buttons?.length ||
       message?.elements?.mediaUrl
     )
-  )
+  ) {
     return '';
+  }
   return `
     <div 
       id="${htmlElements?.parent?.id}"

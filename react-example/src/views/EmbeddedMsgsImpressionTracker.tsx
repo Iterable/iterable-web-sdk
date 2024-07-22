@@ -6,13 +6,13 @@ import {
   IterableEmbeddedMessageUpdateHandler,
   IterableEmbeddedSessionManager
 } from '@iterable/web-sdk';
-import { useUser } from 'src/context/Users';
+import { useUser } from '../context/Users';
 
 interface Props {}
 
 export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const elementCardRef = useRef([]);
-  const { loggedInUser, setLoggedInUser } = useUser();
+  const { loggedInUser } = useUser();
   const appPackageName = 'my-website';
   const [messages, setMessages] = useState([]);
   const [embeddedManager] = useState<IterableEmbeddedManager>(
@@ -24,7 +24,8 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   );
 
   const getCardObserver = () => {
-    const visibilityStatus = messages.map(() => false); // Initialize visibility status for each message
+    // Initialize visibility status for each message
+    const visibilityStatus = messages.map(() => false);
     return messages.map(
       (msg: IterableEmbeddedMessage, index) =>
         new IntersectionObserver(
@@ -81,10 +82,10 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
   const handleFetchEmbeddedMessages = async () => {
     try {
       const updateListener: IterableEmbeddedMessageUpdateHandler = {
-        onMessagesUpdated: function (): void {
+        onMessagesUpdated(): void {
           setMessages(embeddedManager.getMessages());
         },
-        onEmbeddedMessagingDisabled: function (): void {
+        onEmbeddedMessagingDisabled(): void {
           setMessages([]);
         }
       };
@@ -126,6 +127,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
             return (
               <div
                 key={index}
+                // eslint-disable-next-line no-return-assign
                 ref={(el) => (elementCardRef.current[index] = el)}
                 dangerouslySetInnerHTML={{ __html: card }}
               />

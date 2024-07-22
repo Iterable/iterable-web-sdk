@@ -1,12 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
-import TextField from 'src/components/TextField';
-import {
-  Button,
-  EndpointWrapper,
-  Form,
-  Heading,
-  Response
-} from './Components.styled';
+import { AxiosError, AxiosResponse } from 'axios';
 import {
   updateUser,
   updateSubscriptions,
@@ -14,9 +7,15 @@ import {
   IterableResponse,
   IterablePromiseRejection
 } from '@iterable/web-sdk';
-
-import { useUser } from 'src/context/Users';
-import { AxiosError, AxiosResponse } from 'axios';
+import TextField from '../components/TextField';
+import { useUser } from '../context/Users';
+import {
+  Button,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from './Components.styled';
 
 interface Props {}
 

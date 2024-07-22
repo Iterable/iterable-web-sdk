@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { baseIterableRequest } from '../request';
 import {
   IterableEmbeddedMessageUpdateHandler,
@@ -99,9 +100,8 @@ export class IterableEmbeddedManager {
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
     this.notifyUpdateDelegates();
-    msgsList.forEach(
-      async (msg) =>
-        await trackEmbeddedReceived(msg.metadata.messageId, this.appPackageName)
+    msgsList.forEach(async (msg) =>
+      trackEmbeddedReceived(msg.metadata.messageId, this.appPackageName)
     );
   }
 

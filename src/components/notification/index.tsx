@@ -81,8 +81,9 @@ export function IterableEmbeddedNotification({
       message?.elements?.buttons?.length ||
       message?.elements?.mediaUrl
     )
-  )
+  ) {
     return '';
+  }
 
   return `
     <div 

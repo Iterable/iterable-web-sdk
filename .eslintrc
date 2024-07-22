@@ -6,29 +6,55 @@
   ],
   "extends": [
     "eslint:recommended",
+    "plugin:import/typescript",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended",
+    "prettier",
+    "airbnb-base"
   ],
   "ignorePatterns": [
     "webpack.*.js"
   ],
+  "settings": {
+    "import/resolver": {
+      "typescript": {},
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"],
+        "moduleDirectory": ["src/"]
+      }
+    }
+  },
   "rules": {
     "no-console": 1,
     "no-duplicate-imports": 2,
-    "no-extra-boolean-cast": "off",
+    "no-extra-boolean-cast": "warn",
     "comma-dangle": "off",
-    "no-undefined": "error",
-    "@typescript-eslint/camelcase": "off",
-    "@typescript-eslint/comma-spacing": 2,
-    "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/array-type": [
-      2,
+    "no-undef": "warn",
+    "import/extensions": "off",
+    "import/no-named-as-default": 0,
+    "indent": "off",
+    "prettier/prettier": [
+      "error",
       {
-        "default": "array"
+        "endOfLine": "auto"
       }
     ],
+    "no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": true, "varsIgnorePattern": "React" },
+    ],
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn",
+    "no-param-reassign": "warn",
+    "import/prefer-default-export": "off",
+    // really need to remove this one but embedded brought in a lot of dep cycles.
+    "import/no-cycle": "off",
+    "object-curly-newline": "off",
+    "operator-linebreak": "off",
+    "function-paren-newline": "off",
+    "implicit-arrow-linebreak": "off",
+    "no-confusing-arrow": "off",
     "eqeqeq": 2,
     "quotes": [
       2,

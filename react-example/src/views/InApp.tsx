@@ -1,8 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
-import _Button from 'src/components/Button';
-import { EndpointWrapper, Heading, Response } from './Components.styled';
-import { useUser } from 'src/context/Users';
 import {
   DisplayOptions,
   getInAppMessages,
@@ -10,6 +7,9 @@ import {
   IterablePromiseRejection
 } from '@iterable/web-sdk';
 import { AxiosError, AxiosResponse } from 'axios';
+import _Button from '../components/Button';
+import { useUser } from '../context/Users';
+import { EndpointWrapper, Heading, Response } from './Components.styled';
 
 const Button = styled(_Button)`
   width: 100%;

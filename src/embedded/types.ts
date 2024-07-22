@@ -3,16 +3,6 @@ export interface IterableEmbeddedButtonAction {
   data?: string;
 }
 
-export interface IterableEmbeddedElements {
-  title?: string;
-  body?: string;
-  mediaUrl?: string;
-
-  buttons?: IterableEmbeddedButton[];
-  text?: IterableEmbeddedText[];
-  defaultAction?: IterableEmbeddedDefaultAction;
-}
-
 export interface IterableEmbeddedText {
   id: string;
   text?: string;
@@ -23,17 +13,27 @@ export interface IterableEmbeddedDefaultAction {
   data?: string;
 }
 
+export interface IterableEmbeddedButton {
+  id: string;
+  title?: string;
+  action?: IterableEmbeddedButtonAction;
+}
+
+export interface IterableEmbeddedElements {
+  title?: string;
+  body?: string;
+  mediaUrl?: string;
+
+  buttons?: IterableEmbeddedButton[];
+  text?: IterableEmbeddedText[];
+  defaultAction?: IterableEmbeddedDefaultAction;
+}
+
 export interface IterableEmbeddedMetadata {
   messageId: string;
   campaignId?: number;
   isProof?: boolean;
   placementId?: number;
-}
-
-export interface IterableEmbeddedButton {
-  id: string;
-  title?: string;
-  action?: IterableEmbeddedButtonAction;
 }
 
 export interface IterableEmbeddedMessage {

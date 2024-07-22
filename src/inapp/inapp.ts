@@ -1,3 +1,6 @@
+/* eslint-disable prefer-regex-literals */
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-redeclare */
 import _set from 'lodash/set';
 import { throttle } from 'throttle-debounce';
 import {
@@ -170,8 +173,9 @@ export function getInAppMessages(
           const throttledResize =
             messagePosition !== 'Full'
               ? throttle(750, () => {
-                  activeIframe.style.height =
-                    (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
+                  activeIframe.style.height = `${
+                    activeIframeDocument?.body?.scrollHeight || 0
+                  }px`;
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
@@ -223,7 +227,8 @@ export function getInAppMessages(
             to add the listener needs to know about both of these _addEventListener_ abstracted
             callbacks so the code can properly remove the same listener that was added.
 
-            In other words, it solves for the issue where you're adding an event listener as a lambda
+            In other words, it solves for the issue where you're adding an event
+            listener as a lambda
             like so and and you get a unique event listener each time:
 
             document.addEventListener('keydown', () => // do stuff)
@@ -473,6 +478,7 @@ export function getInAppMessages(
                 }
               }
             } else {
+              // eslint-disable-next-line consistent-return
               link.addEventListener('click', (event) => {
                 /*
                   remove default linking behavior because we're in an iframe
@@ -600,6 +606,7 @@ export function getInAppMessages(
             );
             return response;
           })
+          // eslint-disable-next-line consistent-return
           .then((response: any) => {
             if (isDeferred) {
               /*
@@ -609,32 +616,6 @@ export function getInAppMessages(
                 with no filtering or sorting.
               */
               return response;
-
-              /* otherwise, they're choosing to show the messages automatically */
-
-              /*
-              if the user passed the flag to automatically paint the in-app messages
-              to the DOM, start a timer and show each in-app message upon close + timer countdown
-
-              However there are 3 conditions in which to not show a message:
-
-              1. _read_ key is truthy
-              2. _trigger.type_ key is "never" (deliver silently is checked)
-              3. HTML body is blank
-
-              so first filter out unwanted messages and sort them
-            */
-              clearMessages();
-              parsedMessages = sortInAppMessages(
-                filterHiddenInAppMessages(response.data.inAppMessages)
-              ) as InAppMessage[];
-
-              return paintMessageToDOM().then(() => ({
-                ...response,
-                data: {
-                  inAppMessages: parsedMessages
-                }
-              }));
             }
           }),
       pauseMessageStream: () => {
@@ -643,6 +624,7 @@ export function getInAppMessages(
           clearTimeout(timer);
         }
       },
+      // eslint-disable-next-line consistent-return
       resumeMessageStream: () => {
         if (isPaused) {
           isPaused = false;

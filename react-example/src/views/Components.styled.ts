@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import _Button from 'src/components/Button';
+import _Button from '../components/Button';
 
 export const Form = styled.form`
   display: flex;

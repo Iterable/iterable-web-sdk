@@ -23,6 +23,35 @@ function getTargetUrl(action?: IterableEmbeddedDefaultAction): string {
   return action.type;
 }
 
+export const handleEmbeddedClick = (clickedUrl: string | null) => {
+  if (clickedUrl && clickedUrl.trim() !== '') {
+    let actionType: string;
+    let actionName: string;
+
+    if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
+      actionName = '';
+      actionType = clickedUrl;
+    } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
+      actionName = '';
+      actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
+    } else {
+      actionType = URL_SCHEME_OPEN;
+      actionName = clickedUrl;
+    }
+
+    const iterableAction: IterableAction = {
+      type: actionType,
+      data: actionName
+    };
+
+    IterableActionRunner.executeAction(
+      null,
+      iterableAction,
+      IterableActionSource.EMBEDDED
+    );
+  }
+};
+
 export const handleElementClick = (
   message: IterableEmbeddedMessage,
   appPackageName: string,
@@ -81,7 +110,7 @@ export const addButtonClickEvent = (
     if (!message?.elements?.buttons) {
       return '';
     }
-    handleButtonClick(
+    return handleButtonClick(
       message?.elements?.buttons[index],
       message,
       appPackageName,
@@ -90,45 +119,15 @@ export const addButtonClickEvent = (
   });
 };
 
-export const handleEmbeddedClick = (clickedUrl: string | null) => {
-  if (clickedUrl && clickedUrl.trim() !== '') {
-    let actionType: string;
-    let actionName: string;
-
-    if (clickedUrl.startsWith(URL_SCHEME_ACTION)) {
-      actionName = '';
-      actionType = clickedUrl;
-    } else if (clickedUrl.startsWith(URL_SCHEME_ITBL)) {
-      actionName = '';
-      actionType = clickedUrl.replace(URL_SCHEME_ITBL, '');
-    } else {
-      actionType = URL_SCHEME_OPEN;
-      actionName = clickedUrl;
-    }
-
-    const iterableAction: IterableAction = {
-      type: actionType,
-      data: actionName
-    };
-
-    IterableActionRunner.executeAction(
-      null,
-      iterableAction,
-      IterableActionSource.EMBEDDED
-    );
-  }
-};
-
-export function getTrimmedText(text: string | undefined) {
-  const unsafeText = text && typeof text === 'string' ? text.trim() : '';
-  return escapeHtml(unsafeText);
-}
-
-function escapeHtml(unsafe: string) {
-  return unsafe
+const escapeHtml = (unsafe: string) =>
+  unsafe
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+
+export function getTrimmedText(text: string | undefined) {
+  const unsafeText = text && typeof text === 'string' ? text.trim() : '';
+  return escapeHtml(unsafeText);
 }
