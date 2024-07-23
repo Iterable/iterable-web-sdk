@@ -1,8 +1,9 @@
+/* eslint-disable no-param-reassign */
+import { ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
-import { InAppTrackRequestParams } from './in-app/types';
+import { InAppTrackRequestParams } from './inapp/types';
 import { IterableResponse } from '../types';
 import { trackSchema } from './events.schema';
-import { ENDPOINTS } from 'src/constants';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */

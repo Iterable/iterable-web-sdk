@@ -1,12 +1,13 @@
+// eslint-disable @typescript-eslint/no-explicit-any
 import { object, string } from 'yup';
+import { ENDPOINTS } from '../constants';
 import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
-import { ENDPOINTS } from 'src/constants';
 
-export const updateUserEmail = (newEmail: string) => {
-  return baseIterableRequest<IterableResponse>({
+export const updateUserEmail = (newEmail: string) =>
+  baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.update_email.route,
     data: {
@@ -18,10 +19,10 @@ export const updateUserEmail = (newEmail: string) => {
       })
     }
   });
-};
 
-export const updateUser = (payload: UpdateUserParams = {}) => {
+export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   /* a customer could potentially send these up if they're not using TypeScript */
+  const payload = payloadParam;
   delete (payload as any).userId;
   delete (payload as any).email;
 
@@ -39,9 +40,10 @@ export const updateUser = (payload: UpdateUserParams = {}) => {
 };
 
 export const updateSubscriptions = (
-  payload: Partial<UpdateSubscriptionParams> = {}
+  payloadParam: Partial<UpdateSubscriptionParams> = {}
 ) => {
   /* a customer could potentially send these up if they're not using TypeScript */
+  const payload = payloadParam;
   delete (payload as any).userId;
   delete (payload as any).email;
 

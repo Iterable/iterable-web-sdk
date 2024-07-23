@@ -12,7 +12,7 @@ import {
   trackInAppConsume,
   trackInAppDelivery,
   trackInAppOpen
-} from './in-app/events';
+} from './inapp/events';
 import { WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
 

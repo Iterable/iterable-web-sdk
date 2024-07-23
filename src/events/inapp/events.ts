@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { baseIterableRequest } from '../../request';
 import { InAppEventRequestParams } from './types';
 import { IterableResponse } from '../../types';

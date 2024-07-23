@@ -1,18 +1,19 @@
-import { FC, FormEvent, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
+import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
 import {
-  Button,
+  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
   Response
 } from '../views/Components.styled';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
-import TextField from 'src/components/TextField';
+import { TextField } from './TextField';
 
 interface Props {
   endpointName: string;
   heading: string;
   needsEventName?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   method: (...args: any) => IterablePromise<IterableResponse>;
 }
 
@@ -67,19 +68,19 @@ export const EventsForm: FC<Props> = ({
           </label>
           <TextField
             value={trackEvent}
-            onChange={(e) => setTrackEvent(e.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setTrackEvent(event.target.value);
+            }}
             id="item-1"
             placeholder={needsEventName ? 'e.g. button-clicked' : 'e.g. df3fe3'}
             {...inputAttr}
           />
-          <Button disabled={isTrackingEvent} type="submit">
+          <StyledButton disabled={isTrackingEvent} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response {...responseAttr}>{trackResponse}</Response>
       </EndpointWrapper>
     </>
   );
 };
-
-export default EventsForm;

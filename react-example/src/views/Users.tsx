@@ -1,19 +1,19 @@
 import { FC, FormEvent, useState } from 'react';
-import TextField from 'src/components/TextField';
-import {
-  Button,
-  EndpointWrapper,
-  Form,
-  Heading,
-  Response
-} from './Components.styled';
 import {
   updateUser,
   updateSubscriptions,
   updateUserEmail
 } from '@iterable/web-sdk';
+import { TextField } from '../components/TextField';
 
-import { useUser } from 'src/context/Users';
+import { useUser } from '../context/Users';
+import {
+  StyledButton,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from './Components.styled';
 
 interface Props {}
 
@@ -100,9 +100,9 @@ export const Users: FC<Props> = () => {
             data-qa-update-user-input
             required
           />
-          <Button disabled={isUpdatingUser} type="submit">
+          <StyledButton disabled={isUpdatingUser} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response data-qa-update-user-response>{updateUserResponse}</Response>
       </EndpointWrapper>
@@ -121,9 +121,9 @@ export const Users: FC<Props> = () => {
             type="email"
             required
           />
-          <Button disabled={isUpdatingUserEmail} type="submit">
+          <StyledButton disabled={isUpdatingUserEmail} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response data-qa-update-user-email-response>
           {updateUserEmailResponse}
@@ -145,9 +145,9 @@ export const Users: FC<Props> = () => {
             type="tel"
             required
           />
-          <Button disabled={isUpdatingSubscriptions} type="submit">
+          <StyledButton disabled={isUpdatingSubscriptions} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response data-qa-update-subscriptions-response>
           {updateSubscriptionsResponse}
@@ -156,5 +156,3 @@ export const Users: FC<Props> = () => {
     </>
   );
 };
-
-export default Users;

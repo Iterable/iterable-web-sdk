@@ -72,5 +72,3 @@ export const Link: FC<Props> = (props) => {
 
   return <_Link {...rest}>{children}</_Link>;
 };
-
-export default Link;

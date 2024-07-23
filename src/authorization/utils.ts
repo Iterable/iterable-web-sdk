@@ -20,7 +20,7 @@ export const getEpochExpiryTimeInMS = (jwt: string) => {
         .split('')
         .map(
           (character) =>
-            '%' + ('00' + character.charCodeAt(0).toString(16)).slice(-2)
+            `%${`00${character.charCodeAt(0).toString(16)}`.slice(-2)}`
         )
         .join('')
     );
@@ -34,7 +34,7 @@ export const getEpochExpiryTimeInMS = (jwt: string) => {
 
 /*
   take two epoch timestamps and diff them and return them in MS.
-  Also tries to convert seconds to MS if needed (since some server languages like 
+  Also tries to convert seconds to MS if needed (since some server languages like
   python deal with time in seconds).
 */
 export const getEpochDifferenceInMS = (
@@ -60,21 +60,21 @@ export const cancelAxiosRequestAndMakeFetch = (
   jwtToken: string,
   authToken: string
 ) => {
-  /* 
+  /*
     send fetch request instead solely so we can use the "keepalive" flag.
     This is used purely for one use-case only - when the user clicks a link
     that is going to navigate the browser tab to a new page/site and we need
     to still call POST /trackInAppClick.
 
-    Normally, since the page is going somewhere new, the browser would just 
-    navigate away and cancel any in-flight requests and not fulfill them, 
-    but with the fetch API's "keepalive" flag, it will continue the request 
+    Normally, since the page is going somewhere new, the browser would just
+    navigate away and cancel any in-flight requests and not fulfill them,
+    but with the fetch API's "keepalive" flag, it will continue the request
     without blocking the main thread.
 
-    We can't do this with Axios because it's built upon XHR and that 
+    We can't do this with Axios because it's built upon XHR and that
     doesn't support "keepalive" so we fall back to the fetch API
   */
-  const additionalData = email ? { email: email } : { userId: userID };
+  const additionalData = email ? { email } : { userId: userID };
   fetch(`${config.baseURL}${config.url}`, {
     method: 'POST',
     headers: {
@@ -87,6 +87,7 @@ export const cancelAxiosRequestAndMakeFetch = (
   }).catch();
 
   /* cancel the axios request */
+  // eslint-disable-next-line no-param-reassign
   config.cancelToken = new axios.CancelToken((cancel) => {
     cancel('Cancel repeated request');
   });
@@ -98,6 +99,4 @@ export const validateTokenTime = (expTime: number): boolean => {
   const isValid = expTime < ONE_MINUTE;
   return isValid;
 };
-export const isEmail = (email: string): boolean => {
-  return EMAIL_REGEX.test(email);
-};
+export const isEmail = (email: string): boolean => EMAIL_REGEX.test(email);

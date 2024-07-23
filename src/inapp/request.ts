@@ -1,6 +1,7 @@
+/* eslint-disable no-unreachable */
 import { delMany, entries } from 'idb-keyval';
-import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from 'src/constants';
-import { baseIterableRequest } from 'src/request';
+import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../constants';
+import { baseIterableRequest } from '../request';
 import { addNewMessagesToCache, getCachedMessagesToDelete } from './cache';
 import schema from './inapp.schema';
 import {
@@ -38,10 +39,11 @@ type RequestMessagesProps = {
 };
 
 export const requestMessages = async ({ payload }: RequestMessagesProps) => {
-  /** @note TBD: Caching implementation and associated parameter will be enabled once new endpoint is ready */
+  /** @note TBD: Caching implementation and associated parameter
+  // will be enabled once new endpoint is ready */
   // if (!options?.useLocalCache) return await requestInAppMessages({});
   /** @note Always early return until then */
-  return await requestInAppMessages({ payload });
+  return requestInAppMessages({ payload });
 
   try {
     const cachedMessages: CachedMessage[] = await entries();
@@ -92,11 +94,12 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
         if (cachedMessage) allMessages.push(cachedMessage[1]);
       } else {
         allMessages.push(inAppMessage);
-        if (inAppMessage.messageId)
+        if (inAppMessage.messageId) {
           newMessages.push({
             messageId: inAppMessage.messageId,
             message: inAppMessage as InAppMessage
           });
+        }
       }
     });
 
@@ -132,5 +135,5 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
       err?.response?.data?.clientErrors ?? err
     );
   }
-  return await requestInAppMessages({ payload });
+  return requestInAppMessages({ payload });
 };

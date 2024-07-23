@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, FC } from 'react';
 import styled from 'styled-components';
 
-const _Button = styled.button`
+const StyledButton = styled.button`
   text-align: center;
   text-decoration: none;
   width: 60%;
@@ -33,7 +33,7 @@ const _Button = styled.button`
   }
 `;
 
-const DisabledButton = styled(_Button)`
+const DisabledButton = styled(StyledButton)`
   background-color: gray;
   color: #c7c7c7;
   -webkit-box-shadow: 0 5px 0 0 #4d4d4d;
@@ -64,7 +64,5 @@ export const Button: FC<Props> = (props) => {
       </DisabledButton>
     );
   }
-  return <_Button {...rest}>{children}</_Button>;
+  return <StyledButton {...rest}>{children}</StyledButton>;
 };
-
-export default Button;
