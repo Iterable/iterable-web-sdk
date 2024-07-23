@@ -6,7 +6,7 @@ import { messages } from '../../__data__/inAppMessages';
 import { initialize } from '../../authorization';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
-import createClientError from '../../utils/testUtils';
+import { createClientError } from '../../utils/testUtils';
 import { getInAppMessages } from '../inapp';
 import { DisplayOptions, HandleLinks } from '../types';
 
