@@ -138,9 +138,9 @@ export const LoginForm: FC<Props> = ({
           </Form>
           <Form onSubmit={handleSubmit} data-qa-login-form>
             <StyledTextField
-              onChange={(e: { target: { value: SetStateAction<string> } }) =>
-                updateUser(e.target.value)
-              }
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                updateUser(event.target.value);
+              }}
               value={user}
               placeholder="e.g. hello@gmail.com"
               required

@@ -1,4 +1,4 @@
-import { FC, FormEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
 import {
   StyledButton,
@@ -68,9 +68,9 @@ export const EventsForm: FC<Props> = ({
           </label>
           <TextField
             value={trackEvent}
-            onChange={(e: { target: { value: SetStateAction<string> } }) =>
-              setTrackEvent(e.target.value)
-            }
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setTrackEvent(event.target.value);
+            }}
             id="item-1"
             placeholder={needsEventName ? 'e.g. button-clicked' : 'e.g. df3fe3'}
             {...inputAttr}

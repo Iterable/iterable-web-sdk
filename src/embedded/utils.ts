@@ -75,19 +75,18 @@ export const addButtonClickEvent = (
   message: IterableEmbeddedMessage,
   appPackageName: string,
   errorCallback?: ErrorHandler
-) => {
+): void => {
   button.addEventListener('click', (event) => {
     // Prevent the click event from bubbling up to the div
     event.stopPropagation();
-    if (!message?.elements?.buttons) {
-      return '';
+    if (message?.elements?.buttons) {
+      handleButtonClick(
+        message?.elements?.buttons[index],
+        message,
+        appPackageName,
+        errorCallback
+      );
     }
-    return handleButtonClick(
-      message?.elements?.buttons[index],
-      message,
-      appPackageName,
-      errorCallback
-    );
   });
 };
 
