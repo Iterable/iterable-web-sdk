@@ -1,4 +1,6 @@
-export default (clientErrors: { error: string; field?: string }[]) => ({
+export const createClientError = (
+  clientErrors: { error: string; field?: string }[]
+) => ({
   response: {
     data: {
       code: 'GenericError',
