@@ -38,6 +38,7 @@ import {
   paintIFrame,
   paintOverlay,
   setCloseButtonPosition,
+  sortInAppMessages,
   trackMessagesDelivered,
   wrapWithIFrame
 } from './utils';
@@ -616,6 +617,30 @@ export function getInAppMessages(
               */
               return response;
             }
+            /* otherwise, they're choosing to show the messages automatically */
+
+            /*
+              if the user passed the flag to automatically paint the in-app messages
+              to the DOM, start a timer and show each in-app message upon close + timer countdown
+
+              However there are 3 conditions in which to not show a message:
+
+              1. _read_ key is truthy
+              2. _trigger.type_ key is "never" (deliver silently is checked)
+              3. HTML body is blank
+              so first filter out unwanted messages and sort them
+            */
+            clearMessages();
+            parsedMessages = sortInAppMessages(
+              filterHiddenInAppMessages(response.data.inAppMessages)
+            ) as InAppMessage[];
+
+            return paintMessageToDOM().then(() => ({
+              ...response,
+              data: {
+                inAppMessages: parsedMessages
+              }
+            }));
           }),
       pauseMessageStream: () => {
         if (timer) {
