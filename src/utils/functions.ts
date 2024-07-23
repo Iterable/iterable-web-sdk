@@ -1,23 +1,24 @@
-import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from 'src/constants';
+import { SHARED_PREF_EMAIL, SHARED_PREF_USER_ID } from '../constants';
 
-export class functions {
+export default class {
   private static emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   public static checkEmailValidation(email: string): boolean {
-    return functions.emailRegex.test(email);
+    return this.emailRegex.test(email);
   }
 
   public static addEmailOrUserIdToJson(
     jsonParams: any,
     localStorage: Storage
   ): any {
+    const store = jsonParams;
     const userId = localStorage.getItem(SHARED_PREF_USER_ID);
     const email = localStorage.getItem(SHARED_PREF_EMAIL);
     if (userId) {
-      jsonParams.userId = userId;
+      store.userId = userId;
     } else if (email) {
-      jsonParams.email = email;
+      store.email = email;
     }
-    return jsonParams;
+    return store;
   }
 }

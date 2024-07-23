@@ -1,14 +1,15 @@
-import { ChangeEvent, FC, FormEvent, useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { ChangeEvent, FC, FormEvent, SetStateAction, useState } from 'react';
 import styled from 'styled-components';
 
-import _TextField from 'src/components/TextField';
-import _Button from 'src/components/Button';
+import { TextField } from './TextField';
+import { Button } from './Button';
 
-import { useUser } from 'src/context/Users';
+import { useUser } from '../context/Users';
 
-const TextField = styled(_TextField)``;
+const StyledTextField = styled(TextField)``;
 
-const Button = styled(_Button)`
+const StyledButton = styled(Button)`
   margin-left: 0.4em;
   max-width: 425px;
 `;
@@ -20,7 +21,7 @@ const Form = styled.form`
   justify-content: flex-end;
   height: 100%;
 
-  ${TextField} {
+  ${StyledTextField} {
     align-self: stretch;
     margin-top: 5px;
   }
@@ -101,11 +102,13 @@ export const LoginForm: FC<Props> = ({
     <>
       {loggedInUser && !isEditingUser ? (
         <>
-          <Button onClick={handleEditUser}>
+          <StyledButton onClick={handleEditUser}>
             Logged in as {`${first5}...${last9}`} (change)
-          </Button>
-          <Button onClick={handleJwtRefresh}>Manually Refresh JWT Token</Button>
-          <Button onClick={handleLogout}>Logout</Button>
+          </StyledButton>
+          <StyledButton onClick={handleJwtRefresh}>
+            Manually Refresh JWT Token
+          </StyledButton>
+          <StyledButton onClick={handleLogout}>Logout</StyledButton>
         </>
       ) : (
         <StyledDiv>
@@ -134,8 +137,10 @@ export const LoginForm: FC<Props> = ({
             </div>
           </Form>
           <Form onSubmit={handleSubmit} data-qa-login-form>
-            <TextField
-              onChange={(e) => updateUser(e.target.value)}
+            <StyledTextField
+              onChange={(e: { target: { value: SetStateAction<string> } }) =>
+                updateUser(e.target.value)
+              }
               value={user}
               placeholder="e.g. hello@gmail.com"
               required
@@ -152,5 +157,3 @@ export const LoginForm: FC<Props> = ({
     </>
   );
 };
-
-export default LoginForm;

@@ -1,11 +1,11 @@
 import { FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
-import _Button from 'src/components/Button';
-import { EndpointWrapper, Heading, Response } from './Components.styled';
-import { useUser } from 'src/context/Users';
 import { DisplayOptions, getInAppMessages } from '@iterable/web-sdk';
+import { Button } from '../components/Button';
+import { useUser } from '../context/Users';
+import { EndpointWrapper, Heading, Response } from './Components.styled';
 
-const Button = styled(_Button)`
+const StyledButton = styled(Button)`
   width: 100%;
   margin-bottom: 1em;
 `;
@@ -101,7 +101,7 @@ export const InApp: FC<{}> = () => {
       <h1>inApp Endpoints</h1>
       <Heading>POST /inApp/web/getMessages (auto-display)</Heading>
       <AutoDisplayContainer>
-        <Button
+        <StyledButton
           disabled={!loggedInUser || isGettingMessagesAuto}
           onClick={getMessagesAutoDisplay}
           data-qa-auto-display-messages
@@ -109,8 +109,8 @@ export const InApp: FC<{}> = () => {
           {typeof autoMessageCount === 'number'
             ? `Retrieved ${autoMessageCount} messages (try again)`
             : 'Get Messages (auto-display)'}
-        </Button>
-        <Button
+        </StyledButton>
+        <StyledButton
           disabled={
             !loggedInUser ||
             isGettingMessagesAuto ||
@@ -121,8 +121,8 @@ export const InApp: FC<{}> = () => {
           data-qa-pause-messages
         >
           {isPaused ? 'Paused' : 'Pause Message Stream'}
-        </Button>
-        <Button
+        </StyledButton>
+        <StyledButton
           disabled={
             !loggedInUser ||
             isGettingMessagesAuto ||
@@ -133,7 +133,7 @@ export const InApp: FC<{}> = () => {
           data-qa-resume-messages
         >
           Resume Message Stream
-        </Button>
+        </StyledButton>
       </AutoDisplayContainer>
       <Heading>POST /inApp/web/getMessages</Heading>
       <EndpointWrapper>
@@ -153,5 +153,3 @@ export const InApp: FC<{}> = () => {
     </>
   );
 };
-
-export default InApp;

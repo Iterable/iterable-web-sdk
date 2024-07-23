@@ -69,7 +69,7 @@ describe('EmbeddedManager', () => {
       const message = placement.messages[0];
 
       const payload: any = {};
-      payload['someKey'] = 'someValue';
+      payload.someKey = 'someValue';
 
       // THEN we get appropriate embedded message object and associated placement id
       expect(placement).not.toBeNull();
@@ -245,7 +245,7 @@ describe('EmbeddedManager', () => {
       const message = placement.messages[0];
 
       const payload: any = {};
-      payload['someKey'] = 'someValue';
+      payload.someKey = 'someValue';
 
       // THEN we get appropriate embedded message object and associated placement id
       expect(placement).not.toBeNull();
@@ -354,7 +354,7 @@ describe('EmbeddedManager', () => {
     );
 
     const customPayload: any = {};
-    customPayload['someKey'] = 'someValue';
+    customPayload.someKey = 'someValue';
 
     const embeddedMessage = new IterableEmbeddedMessage(
       embeddedMessageMetadata,
@@ -451,7 +451,7 @@ describe('EmbeddedManager', () => {
     );
 
     const customPayload: any = {};
-    customPayload['someKey'] = 'someValue';
+    customPayload.someKey = 'someValue';
 
     const embeddedMessage = new IterableEmbeddedMessage(
       embeddedMessageMetadata,

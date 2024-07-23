@@ -1,3 +1,9 @@
+/* eslint-disable no-use-before-define */
+import {
+  URL_SCHEME_ACTION,
+  URL_SCHEME_ITBL,
+  URL_SCHEME_OPEN
+} from '../constants';
 import { trackEmbeddedClick } from '../events/embedded/events';
 import {
   IterableEmbeddedButton,
@@ -8,20 +14,14 @@ import {
 } from './types';
 import { IterableActionRunner } from '../utils/IterableActionRunner';
 import { ErrorHandler } from '../types';
-import {
-  URL_SCHEME_ACTION,
-  URL_SCHEME_ITBL,
-  URL_SCHEME_OPEN
-} from 'src/constants';
 
 function getTargetUrl(action?: IterableEmbeddedDefaultAction): string {
   if (!action) return '';
 
   if (action.type === URL_SCHEME_OPEN) {
     return action?.data || '';
-  } else {
-    return action.type;
   }
+  return action.type;
 }
 
 export const handleElementClick = (
@@ -82,7 +82,7 @@ export const addButtonClickEvent = (
     if (!message?.elements?.buttons) {
       return '';
     }
-    handleButtonClick(
+    return handleButtonClick(
       message?.elements?.buttons[index],
       message,
       appPackageName,
