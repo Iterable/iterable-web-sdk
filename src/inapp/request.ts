@@ -135,5 +135,5 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
       err?.response?.data?.clientErrors ?? err
     );
   }
-  return await requestInAppMessages({ payload });
+  return requestInAppMessages({ payload });
 };
