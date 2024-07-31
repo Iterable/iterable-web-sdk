@@ -200,22 +200,19 @@ export class EmbeddedMessageElements {
       if (elements?.buttons) {
         const buttonsJson: any = [];
 
-        for (let i = 0; i < elements.buttons.length; i++) {
-          buttonsJson.push(
-            EmbeddedMessageElementsButton.toJSONObject(elements.buttons[i])
-          );
-        }
+        elements.buttons?.forEach((button) =>
+          buttonsJson.push(EmbeddedMessageElementsButton.toJSONObject(button))
+        );
+
         elementsJson.buttons = buttonsJson;
       }
 
       if (elements?.text) {
         const textJson: any = [];
 
-        for (let i = 0; i < elements.text.length; i++) {
-          textJson.push(
-            EmbeddedMessageElementsText.toJSONObject(elements.text[i])
-          );
-        }
+        elements.text?.forEach((text) =>
+          textJson.push(EmbeddedMessageElementsText.toJSONObject(text))
+        );
 
         elementsJson.text = textJson;
       }
@@ -250,12 +247,11 @@ export class EmbeddedMessageElements {
     let buttons: EmbeddedMessageElementsButton[] | null = [];
 
     if (buttonsJson) {
-      for (let i = 0; i < buttonsJson.length; i++) {
-        const buttonJson: any = buttonsJson[i];
-        const button: EmbeddedMessageElementsButton =
-          EmbeddedMessageElementsButton.fromJSONObject(buttonJson);
-        buttons?.push(button);
-      }
+      buttonsJson.forEach((button) => {
+        const buttonFromJson: EmbeddedMessageElementsButton =
+          EmbeddedMessageElementsButton.fromJSONObject(button);
+        buttons?.push(buttonFromJson);
+      });
     } else {
       buttons = null;
     }
@@ -264,12 +260,11 @@ export class EmbeddedMessageElements {
     let texts: EmbeddedMessageElementsText[] | null = [];
 
     if (textsJson) {
-      for (let i = 0; i < textsJson.length; i++) {
-        const textJson: any = textsJson[i];
-        const text: EmbeddedMessageElementsText =
-          EmbeddedMessageElementsText.fromJSONObject(textJson);
-        texts?.push(text);
-      }
+      textsJson.forEach((text) => {
+        const textFromJson: EmbeddedMessageElementsText =
+          EmbeddedMessageElementsText.fromJSONObject(text);
+        texts?.push(textFromJson);
+      });
     } else {
       texts = null;
     }
