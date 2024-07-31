@@ -40,7 +40,7 @@ export const AUTTesting: FC<Props> = () => {
   const [isUpdatingCart, setUpdatingCart] = useState<boolean>(false);
   const [isTrackingPurchase, setTrackingPurchase] = useState<boolean>(false);
   const [userDataField, setUserDataField] = useState<string>(
-    ' { "dataFields": {"phone_number": "57688559" }}'
+    ' { "dataFields": {"phone_number": "57688559", "subscribed": true }}'
   );
   const [isUpdatingUser, setUpdatingUser] = useState<boolean>(false);
   const [updateUserResponse, setUpdateUserResponse] = useState<string>(

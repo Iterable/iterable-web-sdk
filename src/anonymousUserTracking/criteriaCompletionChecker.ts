@@ -412,13 +412,14 @@ class CriteriaCompletionChecker {
   private compareValueEquality(sourceTo: any, stringValue: string): boolean {
     if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
-      stringValue !== '' &&
-      !isNaN(parseFloat(stringValue))
+      stringValue !== ''
     ) {
-      if (typeof sourceTo === 'number') {
+      if (typeof sourceTo === 'number' && !isNaN(parseFloat(stringValue))) {
         return sourceTo === parseFloat(stringValue);
       } else if (typeof sourceTo === 'boolean') {
         return sourceTo === (stringValue === 'true');
+      } else {
+        return false;
       }
     } else if (typeof sourceTo === 'string') {
       return sourceTo === stringValue;
