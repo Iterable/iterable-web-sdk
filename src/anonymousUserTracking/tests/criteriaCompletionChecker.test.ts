@@ -1445,4 +1445,77 @@ describe('CriteriaCompletionChecker', () => {
     );
     expect(result).toEqual(null);
   });
+
+  it('should return criteriaId 100 (boolean test)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              subscribed: true,
+              phoneNumber: '99999999'
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '100',
+            name: 'User',
+            createdAt: 1716560453973,
+            updatedAt: 1716560453973,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            field: 'subscribed',
+                            fieldType: 'boolean',
+                            comparatorType: 'Equals',
+                            dataType: 'user',
+                            id: 25,
+                            value: 'true'
+                          },
+                          {
+                            field: 'phoneNumber',
+                            fieldType: 'String',
+                            comparatorType: 'IsSet',
+                            dataType: 'user',
+                            id: 28,
+                            value: ''
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('100');
+  });
 });
