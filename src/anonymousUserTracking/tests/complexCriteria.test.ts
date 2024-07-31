@@ -694,7 +694,7 @@ describe('complexCriteria', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              'button-clicked.lastPageViewed': 'welcome page'
+              'button-clicked': { lastPageViewed: 'welcome page' }
             },
             eventType: 'customEvent'
           },
@@ -1309,8 +1309,10 @@ describe('complexCriteria', () => {
         return JSON.stringify([
           {
             dataFields: {
-              'animal-found.type': 'cat',
-              'animal-found.count': 4
+              'animal-found': {
+                type: 'cat',
+                count: 4
+              }
             },
             eventType: 'customEvent'
           },
