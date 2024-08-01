@@ -358,10 +358,9 @@ class CriteriaCompletionChecker {
   private getValueFromNestedObject(eventData: any, field: string): any {
     const valueFromObj = this.getFieldValue(eventData, field);
     if (typeof valueFromObj === 'object') {
-      const keys = Object.keys(valueFromObj);
-      for (let i = 0; i < keys.length; i++) {
-        return this.getValueFromNestedObject(valueFromObj, keys[i]);
-      }
+      return Object.keys(valueFromObj).map((key) =>
+        this.getValueFromNestedObject(valueFromObj, key)
+      );
     } else {
       return valueFromObj;
     }
@@ -369,13 +368,7 @@ class CriteriaCompletionChecker {
 
   private getFieldValue(data: any, field: string): any {
     const fields = field.split('.');
-    let value = data;
-    for (let i = 0; i < fields.length; i++) {
-      if (value[fields[i]] !== undefined) {
-        value = value[fields[i]];
-      }
-    }
-    return value;
+    return fields.reduce((acc, field) => acc?.[field], data);
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
