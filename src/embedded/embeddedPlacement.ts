@@ -198,23 +198,15 @@ export class EmbeddedMessageElements {
       }
 
       if (elements?.buttons) {
-        const buttonsJson: any = [];
-
-        elements.buttons?.forEach((button) =>
-          buttonsJson.push(EmbeddedMessageElementsButton.toJSONObject(button))
+        elementsJson.buttons = elements.buttons?.map((button) =>
+          EmbeddedMessageElementsButton.toJSONObject(button)
         );
-
-        elementsJson.buttons = buttonsJson;
       }
 
       if (elements?.text) {
-        const textJson: any = [];
-
-        elements.text?.forEach((text) =>
-          textJson.push(EmbeddedMessageElementsText.toJSONObject(text))
+        elementsJson.text = elements.text?.map((text) =>
+          EmbeddedMessageElementsText.toJSONObject(text)
         );
-
-        elementsJson.text = textJson;
       }
     } catch (e: any) {
       console.log('Error while serializing flex elements', e);
@@ -236,38 +228,27 @@ export class EmbeddedMessageElements {
     const mediaURL: string | null = parsedJson.mediaUrl;
 
     const defaultActionJson: any | null = parsedJson.defaultAction;
-    let defaultAction: EmbeddedMessageElementsDefaultAction | null = null;
 
-    if (defaultActionJson !== null) {
-      defaultAction =
-        EmbeddedMessageElementsDefaultAction.fromJSONObject(defaultActionJson);
-    }
+    const defaultAction: EmbeddedMessageElementsDefaultAction | null =
+      defaultActionJson
+        ? EmbeddedMessageElementsDefaultAction.fromJSONObject(defaultActionJson)
+        : null;
 
     const buttonsJson: [] | null = parsedJson.buttons;
-    let buttons: EmbeddedMessageElementsButton[] | null = [];
 
-    if (buttonsJson) {
-      buttonsJson.forEach((button) => {
-        const buttonFromJson: EmbeddedMessageElementsButton =
-          EmbeddedMessageElementsButton.fromJSONObject(button);
-        buttons?.push(buttonFromJson);
-      });
-    } else {
-      buttons = null;
-    }
+    const buttons: EmbeddedMessageElementsButton[] | null = buttonsJson
+      ? buttonsJson.map((button) =>
+          EmbeddedMessageElementsButton.fromJSONObject(button)
+        )
+      : null;
 
     const textsJson: [] | null = elementsJson.text;
-    let texts: EmbeddedMessageElementsText[] | null = [];
 
-    if (textsJson) {
-      textsJson.forEach((text) => {
-        const textFromJson: EmbeddedMessageElementsText =
-          EmbeddedMessageElementsText.fromJSONObject(text);
-        texts?.push(textFromJson);
-      });
-    } else {
-      texts = null;
-    }
+    const texts: EmbeddedMessageElementsText[] | null = textsJson
+      ? textsJson.map((text) =>
+          EmbeddedMessageElementsText.fromJSONObject(text)
+        )
+      : null;
 
     return new EmbeddedMessageElements(
       title,
