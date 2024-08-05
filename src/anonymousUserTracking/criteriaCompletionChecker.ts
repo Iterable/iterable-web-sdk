@@ -328,9 +328,21 @@ class CriteriaCompletionChecker {
           return true;
         }
       }
+
+      if (field.includes('.') && query.comparatorType !== 'IsSet') {
+        const valueFromObj = this.getValueFromNestedObject(eventData, field);
+        if (valueFromObj) {
+          return this.evaluateComparison(
+            query.comparatorType,
+            valueFromObj,
+            query.value ? query.value : ''
+          );
+        }
+      }
       const eventKeyItems = filteredLocalDataKeys.filter(
         (keyItem) => keyItem === field
       );
+
       if (eventKeyItems.length) {
         return this.evaluateComparison(
           query.comparatorType,
@@ -341,6 +353,22 @@ class CriteriaCompletionChecker {
       return false;
     });
     return matchResult;
+  }
+
+  private getValueFromNestedObject(eventData: any, field: string): any {
+    const valueFromObj = this.getFieldValue(eventData, field);
+    if (typeof valueFromObj === 'object') {
+      return Object.keys(valueFromObj).map((key) =>
+        this.getValueFromNestedObject(valueFromObj, key)
+      );
+    } else {
+      return valueFromObj;
+    }
+  }
+
+  private getFieldValue(data: any, field: string): any {
+    const fields = field.split('.');
+    return fields.reduce((acc, field) => acc?.[field], data);
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {

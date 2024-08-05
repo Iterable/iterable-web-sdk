@@ -38,7 +38,13 @@ describe('CriteriaCompletionChecker', () => {
           {
             eventName: 'testEvent',
             createdAt: 1708494757530,
-            dataFields: { 'browserVisit.website.domain': 'google.com' },
+            dataFields: {
+              browserVisit: {
+                website: {
+                  domain: 'google.com'
+                }
+              }
+            },
             createNewFields: true,
             eventType: 'customEvent'
           }
@@ -109,7 +115,7 @@ describe('CriteriaCompletionChecker', () => {
           {
             eventName: 'testEvent',
             createdAt: 1708494757530,
-            dataFields: { 'browserVisit.website.domain': 'google.com' },
+            dataFields: { browserVisit: { website: { domain: 'google.com' } } },
             createNewFields: true,
             eventType: 'customEvent'
           }
@@ -1008,7 +1014,7 @@ describe('CriteriaCompletionChecker', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              'button-clicked.animal': 'test page',
+              'button-clicked': { animal: 'test page' },
               total: 3
             },
             createdAt: 1700071052507,
