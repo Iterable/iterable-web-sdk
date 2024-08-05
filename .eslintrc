@@ -36,6 +36,8 @@
     "max-classes-per-file": "off",
     "object-curly-newline": "off",
     "no-shadow": "off",
+    "prefer-const": "error",
+    "@typescript-eslint/prefer-for-of": "error",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/comma-spacing": 2,
     "@typescript-eslint/explicit-function-return-type": "off",
