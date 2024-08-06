@@ -328,9 +328,21 @@ class CriteriaCompletionChecker {
           return true;
         }
       }
+
+      if (field.includes('.') && query.comparatorType !== 'IsSet') {
+        const valueFromObj = this.getValueFromNestedObject(eventData, field);
+        if (valueFromObj) {
+          return this.evaluateComparison(
+            query.comparatorType,
+            valueFromObj,
+            query.value ? query.value : ''
+          );
+        }
+      }
       const eventKeyItems = filteredLocalDataKeys.filter(
         (keyItem) => keyItem === field
       );
+
       if (eventKeyItems.length) {
         return this.evaluateComparison(
           query.comparatorType,
@@ -341,6 +353,22 @@ class CriteriaCompletionChecker {
       return false;
     });
     return matchResult;
+  }
+
+  private getValueFromNestedObject(eventData: any, field: string): any {
+    const valueFromObj = this.getFieldValue(eventData, field);
+    if (typeof valueFromObj === 'object') {
+      return Object.keys(valueFromObj).map((key) =>
+        this.getValueFromNestedObject(valueFromObj, key)
+      );
+    } else {
+      return valueFromObj;
+    }
+  }
+
+  private getFieldValue(data: any, field: string): any {
+    const fields = field.split('.');
+    return fields.reduce((acc, field) => acc?.[field], data);
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
@@ -385,7 +413,7 @@ class CriteriaCompletionChecker {
     switch (comparatorType) {
       case 'Equals':
         return this.compareValueEquality(matchObj, valueToCompare);
-      case 'DoesNotEquals':
+      case 'DoesNotEqual':
         return !this.compareValueEquality(matchObj, valueToCompare);
       case 'IsSet':
         return this.issetCheck(matchObj);
@@ -412,13 +440,14 @@ class CriteriaCompletionChecker {
   private compareValueEquality(sourceTo: any, stringValue: string): boolean {
     if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
-      stringValue !== '' &&
-      !isNaN(parseFloat(stringValue))
+      stringValue !== ''
     ) {
-      if (typeof sourceTo === 'number') {
+      if (typeof sourceTo === 'number' && !isNaN(parseFloat(stringValue))) {
         return sourceTo === parseFloat(stringValue);
       } else if (typeof sourceTo === 'boolean') {
         return sourceTo === (stringValue === 'true');
+      } else {
+        return false;
       }
     } else if (typeof sourceTo === 'string') {
       return sourceTo === stringValue;
