@@ -413,7 +413,7 @@ class CriteriaCompletionChecker {
     switch (comparatorType) {
       case 'Equals':
         return this.compareValueEquality(matchObj, valueToCompare);
-      case 'DoesNotEquals':
+      case 'DoesNotEqual':
         return !this.compareValueEquality(matchObj, valueToCompare);
       case 'IsSet':
         return this.issetCheck(matchObj);

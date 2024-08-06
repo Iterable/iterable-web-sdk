@@ -1524,4 +1524,270 @@ describe('CriteriaCompletionChecker', () => {
     );
     expect(result).toEqual('100');
   });
+
+  it('should return criteriaId 194 if Contact: Phone Number != 57688559', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              subscribed: true,
+              phoneNumber: '123685748641'
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '194',
+            name: 'Contact: Phone Number != 57688559',
+            createdAt: 1721337331194,
+            updatedAt: 1722338525737,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'user',
+                            field: 'phoneNumber',
+                            comparatorType: 'DoesNotEqual',
+                            value: '57688559',
+                            fieldType: 'string'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('194');
+  });
+
+  it('should return criteriaId 293 if Contact: subscribed != false', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              subscribed: true,
+              phoneNumber: '123685748641'
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '293',
+            name: 'Contact: subscribed != false',
+            createdAt: 1722605666776,
+            updatedAt: 1722606283109,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'user',
+                            field: 'subscribed',
+                            comparatorType: 'DoesNotEqual',
+                            value: 'false',
+                            fieldType: 'boolean'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('293');
+  });
+
+  it('should return criteriaId 297 if Purchase: shoppingCartItems.quantity != 12345678', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [
+              {
+                id: '12',
+                name: 'monitor',
+                price: 50,
+                quantity: 10
+              }
+            ],
+            total: 50,
+            eventType: 'purchase'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '297',
+            name: 'Purchase: shoppingCartItems.quantity != 12345678',
+            createdAt: 1722667099444,
+            updatedAt: 1722667361286,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.quantity',
+                            comparatorType: 'DoesNotEqual',
+                            value: '12345678',
+                            fieldType: 'long'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('297');
+  });
+
+  it('should return criteriaId 298 if Purchase: shoppingCartItems.price != 105', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [
+              {
+                id: '12',
+                name: 'monitor',
+                price: 50.5,
+                quantity: 10
+              }
+            ],
+            total: 50,
+            eventType: 'purchase'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify({
+        count: 1,
+        criterias: [
+          {
+            criteriaId: '298',
+            name: 'Purchase: shoppingCartItems.price != 105',
+            createdAt: 1722606251607,
+            updatedAt: 1722606295791,
+            searchQuery: {
+              combinator: 'And',
+              searchQueries: [
+                {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      searchCombo: {
+                        combinator: 'And',
+                        searchQueries: [
+                          {
+                            dataType: 'purchase',
+                            field: 'shoppingCartItems.price',
+                            comparatorType: 'DoesNotEqual',
+                            value: '105',
+                            fieldType: 'double'
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      })
+    );
+    expect(result).toEqual('298');
+  });
 });
