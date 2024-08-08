@@ -329,8 +329,8 @@ class CriteriaCompletionChecker {
         }
       }
 
-      if (field.includes('.') && query.comparatorType !== 'IsSet') {
-        const valueFromObj = this.getValueFromNestedObject(eventData, field);
+      if (field.includes('.')) {
+        const valueFromObj = this.getFieldValue(eventData, field);
         if (valueFromObj) {
           return this.evaluateComparison(
             query.comparatorType,
@@ -355,20 +355,13 @@ class CriteriaCompletionChecker {
     return matchResult;
   }
 
-  private getValueFromNestedObject(eventData: any, field: string): any {
-    const valueFromObj = this.getFieldValue(eventData, field);
-    if (typeof valueFromObj === 'object') {
-      return Object.keys(valueFromObj).map((key) =>
-        this.getValueFromNestedObject(valueFromObj, key)
-      );
-    } else {
-      return valueFromObj;
-    }
-  }
-
   private getFieldValue(data: any, field: string): any {
     const fields = field.split('.');
-    return fields.reduce((acc, field) => acc?.[field], data);
+    return fields.reduce((value, currentField) => {
+      return value && value[currentField] !== undefined
+        ? value[currentField]
+        : undefined;
+    }, data);
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
