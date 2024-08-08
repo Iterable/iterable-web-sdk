@@ -330,7 +330,7 @@ class CriteriaCompletionChecker {
       }
 
       if (field.includes('.')) {
-        const valueFromObj = this.getValueFromNestedObject(eventData, field);
+        const valueFromObj = this.getFieldValue(eventData, field);
         if (valueFromObj) {
           return this.evaluateComparison(
             query.comparatorType,
@@ -353,21 +353,6 @@ class CriteriaCompletionChecker {
       return false;
     });
     return matchResult;
-  }
-
-  private getValueFromNestedObject(eventData: any, field: string): any {
-    const valueFromObj = this.getFieldValue(eventData, field);
-    if (typeof valueFromObj === 'object' && valueFromObj !== null) {
-      const keys = Object.keys(valueFromObj);
-      return keys.reduce((acc, key) => {
-        if (acc === undefined) {
-          return this.getValueFromNestedObject(valueFromObj, key);
-        }
-        return acc;
-      }, undefined);
-    } else {
-      return valueFromObj;
-    }
   }
 
   private getFieldValue(data: any, field: string): any {
