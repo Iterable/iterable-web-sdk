@@ -43,7 +43,7 @@
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-unused-vars": "error",
     // come back and make this an error
-    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/array-type": [
       2,
       {
