@@ -1,9 +1,9 @@
-import { OOTB } from '../types';
 import {
   addButtonClickEvent,
   getTrimmedText,
   handleElementClick
-} from 'src/embedded/utils';
+} from '../../embedded/utils';
+import { OOTB } from '../types';
 import {
   defaultCardStyles,
   defaultImageStyles,
@@ -80,8 +80,9 @@ export function IterableEmbeddedCard({
       message?.elements?.buttons?.length ||
       message?.elements?.mediaUrl
     )
-  )
+  ) {
     return '';
+  }
   return `
     <div 
       id="${htmlElements?.parent?.id}"

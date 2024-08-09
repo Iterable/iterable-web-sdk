@@ -1,6 +1,5 @@
 import { typeOfAuth } from '../authorization/authorization';
-import config from '../utils/config';
+import config from './config';
 
-export const canTrackAnonUser = (): boolean => {
-  return config.getConfig('enableAnonTracking') && typeOfAuth === null;
-};
+export const canTrackAnonUser = (): boolean =>
+  config.getConfig('enableAnonTracking') && typeOfAuth === null;

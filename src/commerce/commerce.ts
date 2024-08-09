@@ -1,13 +1,11 @@
-import { baseIterableRequest } from 'src/request';
-import {
-  TrackPurchaseRequestParams,
-  UpdateCartRequestParams
-} from 'src/commerce/types';
-import { IterableResponse } from 'src/types';
+/* eslint-disable no-param-reassign */
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
+import { baseIterableRequest } from '../request';
+import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
+import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
-import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
-import { canTrackAnonUser } from 'src/utils/commonFunctions';
-import { INITIALIZE_ERROR, ENDPOINTS } from 'src/constants';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
+import { canTrackAnonUser } from '../utils/commonFunctions';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */

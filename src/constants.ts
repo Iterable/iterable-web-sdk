@@ -4,11 +4,10 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 /* how many times we try to create a new user when _setUserID_ is invoked */
 export const RETRY_USER_ATTEMPTS = 0;
 
-const IS_EU_ITERABLE_SERVICE =
-  process.env.IS_EU_ITERABLE_SERVICE === 'true' ? true : false;
+const IS_EU_ITERABLE_SERVICE = process.env.IS_EU_ITERABLE_SERVICE === 'true';
 
 export const dangerouslyAllowJsPopupExecution =
-  process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION === 'true' ? true : false;
+  process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION === 'true';
 
 const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
@@ -42,9 +41,9 @@ export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 export const SDK_VERSION = process.env.VERSION;
 
-/* 
-  API payload _platform_ param which is send up automatically 
-  with tracking and getMessage requests 
+/*
+  API payload _platform_ param which is send up automatically
+  with tracking and getMessage requests
 */
 export const WEB_PLATFORM = 'Web';
 
@@ -301,7 +300,7 @@ export const UPDATE_CART = 'updateCart';
 
 export const PURCHASE_ITEM = 'shoppingCartItems';
 export const UPDATECART_ITEM_PREFIX = 'updateCart.updatedShoppingCartItems.';
-export const PURCHASE_ITEM_PREFIX = PURCHASE_ITEM + '.';
+export const PURCHASE_ITEM_PREFIX = `${PURCHASE_ITEM}.`;
 
 export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR =

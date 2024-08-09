@@ -8,18 +8,42 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "plugin:prettier/recommended",
+    "airbnb-base"
   ],
   "ignorePatterns": [
     "webpack.*.js"
   ],
+  "globals": {
+    "window": true,
+    "document": true
+  },
   "rules": {
+    "comma-dangle": "off",
+    "implicit-arrow-linebreak": "off",
     "no-console": 1,
+    "no-underscore-dangle": "off",
     "no-duplicate-imports": 2,
+    "indent": "off",
+    "function-paren-newline": "off",
+    "no-confusing-arrow": "off",
     "no-extra-boolean-cast": "off",
+    "no-undef": "off",
+    "no-unused-vars": "off",
+    "operator-linebreak": "off",
+    "import/extensions": "off",
+    "import/prefer-default-export": "off",
+    "max-classes-per-file": "off",
+    "object-curly-newline": "off",
+    "no-shadow": "off",
+    "prefer-const": "error",
+    "@typescript-eslint/prefer-for-of": "error",
     "@typescript-eslint/camelcase": "off",
     "@typescript-eslint/comma-spacing": 2,
     "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-unused-vars": "error",
+    // come back and make this an error
+    "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/array-type": [
       2,
       {
@@ -31,5 +55,17 @@
       2,
       "single"
     ]
-  }
+  },
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
+      }
+    }
+  },
 }

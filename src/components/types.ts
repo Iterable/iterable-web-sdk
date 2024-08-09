@@ -16,23 +16,23 @@ export type OutOfTheBoxButton = OutOfTheBoxElement & {
 };
 
 type Elements = {
-  /** img div*/
+  /** img div */
   img?: OutOfTheBoxElement;
-  /** title div*/
+  /** title div */
   title?: OutOfTheBoxElement;
-  /** primary button div*/
+  /** primary button div */
   primaryButton?: OutOfTheBoxButton;
-  /** secondary button div*/
+  /** secondary button div */
   secondaryButton?: OutOfTheBoxButton;
-  /** body button div*/
+  /** body button div */
   body?: OutOfTheBoxElement;
-  /** root OOTB div*/
+  /** root OOTB div */
   parent?: OutOfTheBoxElement;
-  /** button wrapper div*/
+  /** button wrapper div */
   buttonsDiv?: OutOfTheBoxElement;
-  /** title and parent wrapper div*/
+  /** title and parent wrapper div */
   textTitle?: OutOfTheBoxElement;
-  /** textTitleImg div*/
+  /** textTitleImg div */
   textTitleImg?: OutOfTheBoxElement;
 };
 
@@ -40,6 +40,6 @@ export type OOTB = {
   appPackageName: string;
   message: IterableEmbeddedMessage;
   htmlElements?: Elements;
-  /** callback method to handle button or element click errors*/
+  /** callback method to handle button or element click errors */
   errorCallback?: ErrorHandler;
 };
