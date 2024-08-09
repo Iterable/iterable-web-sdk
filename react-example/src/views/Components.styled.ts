@@ -40,3 +40,5 @@ export const Heading = styled.h2`
 export const StyledButton = styled(Button)`
   margin-top: 1em;
 `;
+
+export { Button };
