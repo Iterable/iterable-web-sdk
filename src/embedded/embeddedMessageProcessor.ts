@@ -2,6 +2,7 @@ import { IterableEmbeddedMessage } from './types';
 
 export class EmbeddedMessagingProcessor {
   private currentMessages: IterableEmbeddedMessage[];
+
   private fetchedMessages: IterableEmbeddedMessage[];
 
   constructor(

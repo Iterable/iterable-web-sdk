@@ -168,5 +168,4 @@ export const messages: InAppMessage[] = [
   normalMessage,
   expiredMessage,
   previouslyCachedMessage
-  // { messageId: 'previouslyCachedMessage!' }
 ];

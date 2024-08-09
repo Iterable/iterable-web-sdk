@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import {
   SHARED_PREFS_EVENT_TYPE,
   KEY_ITEMS,
@@ -14,6 +15,7 @@ import {
 
 interface SearchQuery {
   combinator: string;
+  /* eslint-disable-next-line no-use-before-define */
   searchQueries: SearchQuery[] | Criteria[];
   dataType?: string;
   searchCombo?: SearchQuery;
@@ -140,6 +142,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          // eslint-disable-next-line no-param-reassign
           delete localEventData.dataFields;
         }
         Object.keys(localEventData).forEach((key) => {
@@ -174,6 +177,7 @@ class CriteriaCompletionChecker {
           Object.keys(localEventData.dataFields).forEach((key) => {
             updatedItem[key] = localEventData.dataFields[key];
           });
+          // eslint-disable-next-line no-param-reassign
           delete localEventData.dataFields;
         }
         nonPurchaseEvents.push(updatedItem);
@@ -182,36 +186,44 @@ class CriteriaCompletionChecker {
     return nonPurchaseEvents;
   }
 
-  private evaluateTree(node: SearchQuery, localEventData: any[]): boolean {
+  private evaluateTree(
+    node: SearchQuery | Criteria,
+    localEventData: any[]
+  ): boolean {
     try {
-      if (node.searchQueries) {
-        const combinator = node.combinator;
-        const searchQueries: any = node.searchQueries;
+      if ((node as SearchQuery).searchQueries) {
+        const { combinator } = node as SearchQuery;
+        const { searchQueries } = node as SearchQuery;
         if (combinator === 'And') {
-          for (let i = 0; i < searchQueries.length; i++) {
+          /* eslint-disable-next-line @typescript-eslint/prefer-for-of */
+          for (let i = 0; i < searchQueries.length; i += 1) {
             if (!this.evaluateTree(searchQueries[i], localEventData)) {
               return false;
             }
           }
           return true;
-        } else if (combinator === 'Or') {
-          for (let i = 0; i < searchQueries.length; i++) {
+        }
+        if (combinator === 'Or') {
+          /* eslint-disable-next-line @typescript-eslint/prefer-for-of */
+          for (let i = 0; i < searchQueries.length; i += 1) {
             if (this.evaluateTree(searchQueries[i], localEventData)) {
               return true;
             }
           }
           return false;
-        } else if (combinator === 'Not') {
-          for (let i = 0; i < searchQueries.length; i++) {
-            searchQueries[i]['isNot'] = true;
+        }
+        if (combinator === 'Not') {
+          /* eslint-disable-next-line @typescript-eslint/prefer-for-of */
+          for (let i = 0; i < searchQueries.length; i += 1) {
+            (searchQueries[i] as any).isNot = true;
             if (this.evaluateTree(searchQueries[i], localEventData)) {
               return false;
             }
           }
           return true;
         }
-      } else if (node.searchCombo) {
-        return this.evaluateSearchQueries(node, localEventData);
+      } else if ((node as SearchQuery).searchCombo) {
+        return this.evaluateSearchQueries(node as SearchQuery, localEventData);
       }
     } catch (e) {
       this.handleException(e);
@@ -219,23 +231,25 @@ class CriteriaCompletionChecker {
     return false;
   }
 
+  /* eslint-disable no-continue */
   private evaluateSearchQueries(
     node: SearchQuery,
     localEventData: any[]
   ): boolean {
     // this function will compare the actualy searhqueues under search combo
-    for (let i = 0; i < localEventData.length; i++) {
+    for (let i = 0; i < localEventData.length; i += 1) {
       const eventData = localEventData[i];
       const trackingType = eventData[SHARED_PREFS_EVENT_TYPE];
-      const dataType = node.dataType;
+      const { dataType } = node;
       if (dataType === trackingType) {
-        const searchCombo = node.searchCombo;
+        const { searchCombo } = node;
         const searchQueries = searchCombo?.searchQueries || [];
         const combinator = searchCombo?.combinator || '';
         const isNot = Object.prototype.hasOwnProperty.call(node, 'isNot');
         if (this.evaluateEvent(eventData, searchQueries, combinator)) {
           if (node.minMatch) {
             const minMatch = node.minMatch - 1;
+            // eslint-disable-next-line no-param-reassign
             node.minMatch = minMatch;
             if (minMatch > 0) {
               continue;
@@ -245,7 +259,8 @@ class CriteriaCompletionChecker {
             continue;
           }
           return true;
-        } else if (isNot) {
+        }
+        if (isNot) {
           return false;
         }
       }
@@ -260,7 +275,8 @@ class CriteriaCompletionChecker {
   ): boolean {
     if (combinator === 'And' || combinator === 'Or') {
       return this.evaluateFieldLogic(searchQueries, localEvent);
-    } else if (combinator === 'Not') {
+    }
+    if (combinator === 'Not') {
       return !this.evaluateFieldLogic(searchQueries, localEvent);
     }
     return false;
@@ -278,19 +294,19 @@ class CriteriaCompletionChecker {
   private evaluateFieldLogic(searchQueries: any[], eventData: any): boolean {
     const localDataKeys = Object.keys(eventData);
     let itemMatchedResult = false;
-    let key_item = null;
+    let keyItem = null;
     if (localDataKeys.includes(KEY_ITEMS)) {
-      key_item = KEY_ITEMS;
+      keyItem = KEY_ITEMS;
     } else if (localDataKeys.includes(PURCHASE_ITEM)) {
-      key_item = PURCHASE_ITEM;
+      keyItem = PURCHASE_ITEM;
     }
 
-    if (key_item !== null) {
+    if (keyItem !== null) {
       // scenario of items inside purchase and updateCart Events
-      const items = eventData[key_item];
-      const result = items.some((item: any) => {
-        return this.doesItemMatchQueries(item, searchQueries);
-      });
+      const items = eventData[keyItem];
+      const result = items.some((item: any) =>
+        this.doesItemMatchQueries(item, searchQueries)
+      );
       if (!result && this.doesItemCriteriaExists(searchQueries)) {
         // items criteria existed and it did not match
         return result;
@@ -314,7 +330,7 @@ class CriteriaCompletionChecker {
       return itemMatchedResult;
     }
     const matchResult = filteredSearchQueries.every((query: any) => {
-      const field = query.field;
+      const { field } = query;
       if (
         query.dataType === TRACK_EVENT &&
         query.fieldType === 'object' &&
@@ -329,7 +345,7 @@ class CriteriaCompletionChecker {
         }
       }
 
-      if (field.includes('.') && query.comparatorType !== 'IsSet') {
+      if (field.includes('.')) {
         const valueFromObj = this.getValueFromNestedObject(eventData, field);
         if (valueFromObj) {
           return this.evaluateComparison(
@@ -357,18 +373,27 @@ class CriteriaCompletionChecker {
 
   private getValueFromNestedObject(eventData: any, field: string): any {
     const valueFromObj = this.getFieldValue(eventData, field);
-    if (typeof valueFromObj === 'object') {
-      return Object.keys(valueFromObj).map((key) =>
-        this.getValueFromNestedObject(valueFromObj, key)
-      );
-    } else {
-      return valueFromObj;
+    if (typeof valueFromObj === 'object' && valueFromObj !== null) {
+      const keys = Object.keys(valueFromObj);
+      return keys.reduce((acc, key) => {
+        if (acc === undefined) {
+          return this.getValueFromNestedObject(valueFromObj, key);
+        }
+        return acc;
+      }, undefined);
     }
+    return valueFromObj;
   }
 
   private getFieldValue(data: any, field: string): any {
     const fields = field.split('.');
-    return fields.reduce((acc, field) => acc?.[field], data);
+    return fields.reduce(
+      (value, currentField) =>
+        value && value[currentField] !== undefined
+          ? value[currentField]
+          : undefined,
+      data
+    );
   }
 
   private doesItemMatchQueries(item: any, searchQueries: any[]): boolean {
@@ -390,7 +415,7 @@ class CriteriaCompletionChecker {
       return false;
     }
     return filteredSearchQueries.every((query: any) => {
-      const field = query.field;
+      const { field } = query;
       if (Object.prototype.hasOwnProperty.call(item, field)) {
         return this.evaluateComparison(
           query.comparatorType,
@@ -442,12 +467,12 @@ class CriteriaCompletionChecker {
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
       stringValue !== ''
     ) {
+      // eslint-disable-next-line no-restricted-globals
       if (typeof sourceTo === 'number' && !isNaN(parseFloat(stringValue))) {
         return sourceTo === parseFloat(stringValue);
-      } else if (typeof sourceTo === 'boolean') {
+      }
+      if (typeof sourceTo === 'boolean') {
         return sourceTo === (stringValue === 'true');
-      } else {
-        return false;
       }
     } else if (typeof sourceTo === 'string') {
       return sourceTo === stringValue;
@@ -460,6 +485,7 @@ class CriteriaCompletionChecker {
     stringValue: string,
     compareOperator: string
   ): boolean {
+    // eslint-disable-next-line no-restricted-globals
     if (!isNaN(parseFloat(stringValue))) {
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
@@ -503,11 +529,11 @@ class CriteriaCompletionChecker {
   private issetCheck(matchObj: string | object | any[]): boolean {
     if (Array.isArray(matchObj)) {
       return matchObj.length > 0;
-    } else if (typeof matchObj === 'object' && matchObj !== null) {
-      return Object.keys(matchObj).length > 0;
-    } else {
-      return matchObj !== '';
     }
+    if (typeof matchObj === 'object' && matchObj !== null) {
+      return Object.keys(matchObj).length > 0;
+    }
+    return matchObj !== '';
   }
 
   private handleException(e: any) {

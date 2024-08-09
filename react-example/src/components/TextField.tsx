@@ -13,5 +13,3 @@ export const TextField: FC<Props> = (props) => {
   const { ...rest } = props;
   return <Input type="text" {...rest} />;
 };
-
-export default TextField;

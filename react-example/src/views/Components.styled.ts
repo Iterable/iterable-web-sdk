@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import _Button from 'src/components/Button';
+import { Button } from '../components/Button';
 
 export const Form = styled.form`
   display: flex;
@@ -37,6 +37,8 @@ export const Heading = styled.h2`
   margin-top: 3em;
 `;
 
-export const Button = styled(_Button)`
+export const StyledButton = styled(Button)`
   margin-top: 1em;
 `;
+
+export { Button };

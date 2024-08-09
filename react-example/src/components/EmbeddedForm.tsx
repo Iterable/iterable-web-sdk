@@ -1,12 +1,5 @@
 import { FC, FormEvent, useState } from 'react';
 import {
-  Button,
-  EndpointWrapper,
-  Form,
-  Heading,
-  Response
-} from '../views/Components.styled';
-import {
   IterableEmbeddedManager,
   IterableEmbeddedMessageUpdateHandler,
   trackEmbeddedSession,
@@ -14,11 +7,17 @@ import {
   trackEmbeddedClick,
   trackEmbeddedDismiss
 } from '@iterable/web-sdk';
-import TextField from 'src/components/TextField';
 import { v4 as uuidv4 } from 'uuid';
+import { TextField } from './TextField';
+import {
+  StyledButton,
+  EndpointWrapper,
+  Form,
+  Heading,
+  Response
+} from '../views/Components.styled';
 
 interface Props {
-  userId: string;
   endpointName: string;
   heading: string;
   needsInputField?: boolean;
@@ -32,7 +31,6 @@ export const TYPE_DISMISS = 3;
 export const TYPE_SESSION = 4;
 
 export const EmbeddedForm: FC<Props> = ({
-  userId,
   endpointName,
   heading,
   needsInputField,
@@ -77,7 +75,7 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const receivedMessage = {
-      messageId: messageId,
+      messageId,
       appPackageName: 'my-lil-site'
     };
 
@@ -99,7 +97,7 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const payload = {
-      messageId: messageId,
+      messageId,
       campaignId: 1
     };
 
@@ -130,7 +128,7 @@ export const EmbeddedForm: FC<Props> = ({
     setTrackingEvent(true);
 
     const sessionData = {
-      messageId: messageId,
+      messageId,
       buttonIdentifier: '123',
       deviceInfo: {
         deviceId: '123',
@@ -163,7 +161,7 @@ export const EmbeddedForm: FC<Props> = ({
       },
       impressions: [
         {
-          messageId: messageId,
+          messageId,
           displayCount: 1,
           displayDuration: 1000
         }
@@ -224,14 +222,12 @@ export const EmbeddedForm: FC<Props> = ({
               />
             </>
           )}
-          <Button disabled={isTrackingEvent} type="submit">
+          <StyledButton disabled={isTrackingEvent} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response {...responseAttr}>{trackResponse}</Response>
       </EndpointWrapper>
     </>
   );
 };
-
-export default EmbeddedForm;

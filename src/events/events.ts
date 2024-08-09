@@ -1,10 +1,11 @@
-import { baseIterableRequest } from 'src/request';
-import { IterableResponse } from 'src/types';
-import { AnonymousUserEventManager } from 'src/anonymousUserTracking/anonymousUserEventManager';
-import { canTrackAnonUser } from 'src/utils/commonFunctions';
-import { InAppTrackRequestParams } from './in-app/types';
+/* eslint-disable no-param-reassign */
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
+import { baseIterableRequest } from '../request';
+import { InAppTrackRequestParams } from './inapp/types';
+import { IterableResponse } from '../types';
 import { trackSchema } from './events.schema';
-import { ENDPOINTS, INITIALIZE_ERROR } from 'src/constants';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
+import { canTrackAnonUser } from '../utils/commonFunctions';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */

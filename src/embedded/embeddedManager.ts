@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { baseIterableRequest } from '../request';
 import {
   IterableEmbeddedMessageUpdateHandler,
@@ -12,7 +13,9 @@ import { handleEmbeddedClick } from './utils';
 
 export class IterableEmbeddedManager {
   public appPackageName: string;
+
   private messages: IterableEmbeddedMessage[] = [];
+
   private updateListeners: IterableEmbeddedMessageUpdateHandler[] = [];
 
   constructor(appPackageName: string) {
@@ -33,24 +36,14 @@ export class IterableEmbeddedManager {
     placementIds: number[]
   ) {
     try {
-      const params: any = {};
-      if (placementIds.length > 0) {
-        params.placementIds = placementIds[0];
-        if (placementIds.length > 1) {
-          params.placementIds += placementIds
-            .slice(1)
-            .map((id) => `&placementIds=${id}`)
-            .join('');
-        }
-      }
       const iterableResult: any = await baseIterableRequest<IterableResponse>({
         method: 'GET',
         url: ENDPOINTS.get_embedded_messages.route,
         params: {
-          ...params,
+          placementIds,
           platform: WEB_PLATFORM,
           sdkVersion: SDK_VERSION,
-          packageName: packageName
+          packageName
         }
       });
       const embeddedMessages = this.getEmbeddedMessages(
@@ -99,17 +92,16 @@ export class IterableEmbeddedManager {
   public getMessagesForPlacement(
     placementId: number
   ): IterableEmbeddedMessage[] {
-    return this.messages.filter((message) => {
-      return message.metadata.placementId === placementId;
-    });
+    return this.messages.filter(
+      (message) => message.metadata.placementId === placementId
+    );
   }
 
   private async trackNewlyRetrieved(_processor: EmbeddedMessagingProcessor) {
     const msgsList = _processor.newlyRetrievedMessages();
     this.notifyUpdateDelegates();
-    msgsList.forEach(
-      async (msg) =>
-        await trackEmbeddedReceived(msg.metadata.messageId, this.appPackageName)
+    msgsList.forEach(async (msg) =>
+      trackEmbeddedReceived(msg.metadata.messageId, this.appPackageName)
     );
   }
 
@@ -135,7 +127,7 @@ export class IterableEmbeddedManager {
     );
   }
 
-  //Get the list of updateHandlers
+  // Get the list of updateHandlers
   public getUpdateHandlers(): IterableEmbeddedMessageUpdateHandler[] {
     return this.updateListeners;
   }
