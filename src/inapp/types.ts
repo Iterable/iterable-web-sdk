@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import { IterablePromise } from '../types';
 
 export enum CloseButtonPosition {

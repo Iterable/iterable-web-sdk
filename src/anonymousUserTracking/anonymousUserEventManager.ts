@@ -1,7 +1,9 @@
+/* eslint-disable class-methods-use-this */
+import { v4 as uuidv4 } from 'uuid';
 import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams
-} from 'src/commerce/types';
+} from '../commerce/types';
 
 import {
   GET_CRITERIA_PATH,
@@ -23,20 +25,19 @@ import {
   WEB_PLATFORM,
   KEY_PREFER_USERID,
   ENDPOINTS
-} from 'src/constants';
-import { baseIterableRequest } from 'src/request';
-import { IterableResponse } from 'src/types';
+} from '../constants';
+import { baseIterableRequest } from '../request';
+import { IterableResponse } from '../types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
-import { v4 as uuidv4 } from 'uuid';
-import { TrackAnonSessionParams } from 'src/utils/types';
-import { UpdateUserParams } from 'src/users/types';
-import { InAppTrackRequestParams } from 'src/events/in-app/types';
-import { trackSchema } from 'src/events/events.schema';
+import { TrackAnonSessionParams } from '../utils/types';
+import { UpdateUserParams } from '../users/types';
+import { trackSchema } from '../events/events.schema';
 import {
   trackPurchaseSchema,
   updateCartSchema
-} from 'src/commerce/commerce.schema';
-import { updateUserSchema } from 'src/users/users.schema';
+} from '../commerce/commerce.schema';
+import { updateUserSchema } from '../users/users.schema';
+import { InAppTrackRequestParams } from '../events';
 
 type AnonUserFunction = (userId: string) => void;
 
@@ -188,7 +189,7 @@ export class AnonymousUserEventManager {
           totalAnonSessionCount: userDataJson.number_of_sessions,
           lastAnonSession: userDataJson.last_session,
           firstAnonSession: userDataJson.first_session,
-          matchedCriteriaId: parseInt(criteriaId),
+          matchedCriteriaId: parseInt(criteriaId, 10),
           webPushOptIn:
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
         }
@@ -218,31 +219,36 @@ export class AnonymousUserEventManager {
       : [];
 
     if (trackEventList.length) {
-      trackEventList.forEach((event: any) => {
-        const eventType = event[SHARED_PREFS_EVENT_TYPE];
-        delete event.eventType;
-        switch (eventType) {
-          case TRACK_EVENT: {
-            this.track(event);
-            break;
+      trackEventList.forEach(
+        (
+          event: any /* eslint-disable-line @typescript-eslint/no-explicit-any */
+        ) => {
+          const eventType = event[SHARED_PREFS_EVENT_TYPE];
+          // eslint-disable-next-line no-param-reassign
+          delete event.eventType;
+          switch (eventType) {
+            case TRACK_EVENT: {
+              this.track(event);
+              break;
+            }
+            case TRACK_PURCHASE: {
+              this.trackPurchase(event);
+              break;
+            }
+            case TRACK_UPDATE_CART: {
+              this.updateCart(event);
+              break;
+            }
+            case UPDATE_USER: {
+              this.updateUser({ dataFields: event });
+              break;
+            }
+            default:
+              break;
           }
-          case TRACK_PURCHASE: {
-            this.trackPurchase(event);
-            break;
-          }
-          case TRACK_UPDATE_CART: {
-            this.updateCart(event);
-            break;
-          }
-          case UPDATE_USER: {
-            this.updateUser({ dataFields: event });
-            break;
-          }
-          default:
-            break;
+          this.removeAnonSessionCriteriaData();
         }
-        this.removeAnonSessionCriteriaData();
-      });
+      );
     }
   }
 
@@ -252,7 +258,10 @@ export class AnonymousUserEventManager {
   }
 
   private async storeEventListToLocalStorage(
-    newDataObject: Record<any, any>,
+    newDataObject: Record<
+      any /* eslint-disable-line @typescript-eslint/no-explicit-any */,
+      any /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    >,
     shouldOverWrite: boolean
   ) {
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
@@ -291,21 +300,18 @@ export class AnonymousUserEventManager {
     }
   }
 
-  private getCurrentTime = () => {
-    return new Date().getTime();
-  };
+  private getCurrentTime = () => new Date().getTime();
 
   private getWebPushOptnIn(): string {
     const notificationManager = window.Notification;
     if (notificationManager && notificationManager.permission === 'granted') {
       return window.location.hostname;
-    } else {
-      return '';
     }
+    return '';
   }
 
-  track = (payload: InAppTrackRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
+  track = (payload: InAppTrackRequestParams) =>
+    baseIterableRequest<IterableResponse>({
       method: 'POST',
       url: ENDPOINTS.event_track.route,
       data: payload,
@@ -313,10 +319,9 @@ export class AnonymousUserEventManager {
         data: trackSchema
       }
     });
-  };
 
-  updateCart = (payload: UpdateCartRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
+  updateCart = (payload: UpdateCartRequestParams) =>
+    baseIterableRequest<IterableResponse>({
       method: 'POST',
       url: ENDPOINTS.commerce_update_cart.route,
       data: {
@@ -330,10 +335,9 @@ export class AnonymousUserEventManager {
         data: updateCartSchema
       }
     });
-  };
 
-  trackPurchase = (payload: TrackPurchaseRequestParams) => {
-    return baseIterableRequest<IterableResponse>({
+  trackPurchase = (payload: TrackPurchaseRequestParams) =>
+    baseIterableRequest<IterableResponse>({
       method: 'POST',
       url: ENDPOINTS.commerce_track_purchase.route,
       data: {
@@ -347,7 +351,6 @@ export class AnonymousUserEventManager {
         data: trackPurchaseSchema
       }
     });
-  };
 
   updateUser = (payload: UpdateUserParams = {}) => {
     if (payload.dataFields) {
@@ -363,5 +366,6 @@ export class AnonymousUserEventManager {
         }
       });
     }
+    return null;
   };
 }

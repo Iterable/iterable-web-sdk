@@ -1,4 +1,5 @@
-import { ENDPOINT_MERGE_USER } from 'src/constants';
+/* eslint-disable class-methods-use-this */
+import { ENDPOINT_MERGE_USER } from '../constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 
@@ -17,10 +18,10 @@ export class AnonymousUserMerge {
     destinationEmail: string | null
   ): Promise<void> {
     const mergeApiParams: MergeApiParams = {
-      sourceUserId: sourceUserId,
-      sourceEmail: sourceEmail,
-      destinationUserId: destinationUserId,
-      destinationEmail: destinationEmail
+      sourceUserId,
+      sourceEmail,
+      destinationUserId,
+      destinationEmail
     };
     return this.callMergeApi(mergeApiParams);
   }

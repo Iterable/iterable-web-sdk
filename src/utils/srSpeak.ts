@@ -6,15 +6,15 @@
 */
 export const srSpeak = (text: string, priority?: 'polite' | 'assertive') => {
   const el = document.createElement('div');
-  const id = 'speak-' + Math.random().toString(36).substr(2, 9);
+  const id = `speak-${Math.random().toString(36).substr(2, 9)}`;
   el.setAttribute('id', id);
   el.setAttribute('data-test-id', 'sr-speak');
   el.setAttribute('aria-live', priority || 'polite');
-  /* 
+  /*
     _display: none_ would cause the SR to not read the message so this just
     hides the message visibly, while still appearing in the DOM
-    
-    https://snook.ca/archives/html_and_css/hiding-content-for-accessibility 
+
+    https://snook.ca/archives/html_and_css/hiding-content-for-accessibility
   */
   el.style.cssText = `
     position: absolute !important;

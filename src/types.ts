@@ -1,7 +1,7 @@
 import { AxiosError, AxiosPromise } from 'axios';
 
 /**
-  make one property in an interface optional 
+  make one property in an interface optional
   @thanks https://stackoverflow.com/a/61108377/7455960
 */
 export type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;

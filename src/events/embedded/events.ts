@@ -1,3 +1,4 @@
+import { WEB_PLATFORM, ENDPOINTS } from '../../constants';
 import { baseIterableRequest } from '../../request';
 import {
   IterableEmbeddedDismissRequestPayload,
@@ -11,7 +12,6 @@ import {
   embeddedDismissSchema,
   embeddedSessionSchema
 } from './events.schema';
-import { WEB_PLATFORM, ENDPOINTS } from 'src/constants';
 
 export const trackEmbeddedReceived = (
   messageId: string,

@@ -1,4 +1,4 @@
-import { IterableEmbeddedDefaultAction } from 'src/embedded';
+import { IterableEmbeddedDefaultAction } from '../../embedded';
 
 export const defaultNotificationStyles = (
   defaultAction?: IterableEmbeddedDefaultAction

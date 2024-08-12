@@ -2,23 +2,22 @@ import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
 import axios from 'axios';
 import './styles/index.css';
 
-import Home from 'src/views/Home';
-import Commerce from 'src/views/Commerce';
-import AUTTesting from 'src/views/AUTTesting';
-
-import Events from 'src/views/Events';
-import Users from 'src/views/Users';
-import InApp from 'src/views/InApp';
-import EmbeddedMessage from 'src/views/Embedded';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
 import styled from 'styled-components';
-import LoginForm from 'src/components/LoginForm';
-import EmbeddedMsgs from 'src/views/EmbeddedMsgs';
-
-import { UserProvider } from 'src/context/Users';
 import { createRoot } from 'react-dom/client';
-import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
+import { Home } from './views/Home';
+import { Commerce } from './views/Commerce';
+import { Events } from './views/Events';
+import { Users } from './views/Users';
+import { InApp } from './views/InApp';
+import { EmbeddedMessage } from './views/Embedded';
+import { Link } from './components/Link';
+import { LoginForm } from './components/LoginForm';
+import { EmbeddedMsgs } from './views/EmbeddedMsgs';
+import AUTTesting from './views/AUTTesting';
+
+import { UserProvider } from './context/Users';
+import { EmbeddedMsgsImpressionTracker } from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -50,8 +49,8 @@ const HomeLink = styled(Link)`
       dangerouslyAllowJsPopups: true,
       enableAnonTracking: true
     },
-    generateJWT: ({ email, userID }) => {
-      return axios
+    generateJWT: ({ email, userID }) =>
+      axios
         .post(
           process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
           {
@@ -66,10 +65,7 @@ const HomeLink = styled(Link)`
             }
           }
         )
-        .then((response: any) => {
-          return response.data?.token;
-        });
-    }
+        .then((response: any) => response.data?.token)
   };
   const { setEmail, setUserID, logout, refreshJwtToken } =
     initializeWithConfig(initializeParams);

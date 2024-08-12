@@ -31,7 +31,7 @@ export const determineRemainingStorageQuota = async () => {
     const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
     const remainingQuota = usage && messageQuota - usage;
 
-    return remainingQuota ? remainingQuota : 0;
+    return remainingQuota || 0;
   } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -55,6 +55,7 @@ export const getCachedMessagesToDelete = (
   cachedMessages.reduce((deleteQueue: string[], [cachedMessageId]) => {
     const isCachedMessageInFetch = fetchedMessages.reduce(
       (isFound, { messageId }) => {
+        // eslint-disable-next-line no-param-reassign
         if (messageId === cachedMessageId) isFound = true;
         return isFound;
       },
