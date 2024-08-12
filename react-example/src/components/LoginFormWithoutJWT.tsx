@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 
-import _TextField from 'src/components/TextField';
-import _Button from 'src/components/Button';
+import { TextField as _TextField } from './TextField';
+import { Button as _Button } from './Button';
 
-import { useUser } from 'src/context/Users';
+import { useUser } from '../context/Users';
 
 const TextField = styled(_TextField)``;
 

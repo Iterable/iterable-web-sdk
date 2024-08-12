@@ -2,20 +2,20 @@ import { initializeWithConfig, WithoutJWTParams } from '@iterable/web-sdk';
 import ReactDOM from 'react-dom';
 import './styles/index.css';
 
-import Home from 'src/views/Home';
-import Commerce from 'src/views/Commerce';
-import Events from 'src/views/Events';
-import Users from 'src/views/Users';
-import InApp from 'src/views/InApp';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
 import styled from 'styled-components';
-import { UserProvider } from 'src/context/Users';
+import { Home } from './views/Home';
+import { Commerce } from './views/Commerce';
+import { Events } from './views/Events';
+import { Users } from './views/Users';
+import { InApp } from './views/InApp';
 import LoginFormWithoutJWT from './components/LoginFormWithoutJWT';
 import AUTTesting from './views/AUTTesting';
-import EmbeddedMsgs from './views/EmbeddedMsgs';
-import EmbeddedMessage from './views/Embedded';
-import EmbeddedMsgsImpressionTracker from './views/EmbeddedMsgsImpressionTracker';
+import { EmbeddedMsgs } from './views/EmbeddedMsgs';
+import { EmbeddedMessage } from './views/Embedded';
+import { EmbeddedMsgsImpressionTracker } from './views/EmbeddedMsgsImpressionTracker';
+import { Link } from './components/Link';
+import { UserProvider } from './context/Users';
 
 const Wrapper = styled.div`
   display: flex;
