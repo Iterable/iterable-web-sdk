@@ -2349,9 +2349,11 @@ If your Iterable project is hosted on Iterable's [European data center (EUDC)](h
 you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based 
 API endpoints.
 
-To do this use [`initializeWithConfig`](#initializeWithConfig) to initialize
-the SDK (rather then [`initialize`](#initialize)), and set set the 
-`isEuIterableService` configuration option to `true`. For example:
+To do this:
+
+- Use [`initializeWithConfig`](#initializeWithConfig) to initialize the SDK 
+  (rather then [`initialize`](#initialize)).
+- Set the `isEuIterableService` configuration option to `true`. For example:
 
   ```ts
   import { initializeWithConfig } from '@iterable/web-sdk';
