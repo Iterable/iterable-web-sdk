@@ -4,6 +4,9 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 /* how many times we try to create a new user when _setUserID_ is invoked */
 export const RETRY_USER_ATTEMPTS = 0;
 
+/* How many events can be stored in the local storage */
+export const DEFAULT_EVENT_THRESHOLD_LIMIT = 100;
+
 const IS_EU_ITERABLE_SERVICE = process.env.IS_EU_ITERABLE_SERVICE === 'true';
 
 export const dangerouslyAllowJsPopupExecution =
