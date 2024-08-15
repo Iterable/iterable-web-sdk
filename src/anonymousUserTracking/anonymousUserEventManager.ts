@@ -292,10 +292,10 @@ export class AnonymousUserEventManager {
       previousDataArray.push(newDataObject);
     }
 
-    /* 
-    - The code below limits the number of events stored in local storage.
-    - The event list acts as a queue, with the oldest events being deleted when new events are stored once the event threshold limit is reached.
-    */
+    // - The code below limits the number of events stored in local storage.
+    // - The event list acts as a queue, with the oldest events being deleted
+    //   when new events are stored once the event threshold limit is reached.
+
     const eventThresholdLimit =
       (config.getConfig('eventThresholdLimit') as number) ??
       DEFAULT_EVENT_THRESHOLD_LIMIT;
