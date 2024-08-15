@@ -300,7 +300,11 @@ export class AnonymousUserEventManager {
     }
   }
 
-  private getCurrentTime = () => new Date().getTime();
+  private getCurrentTime = () => {
+    const dateInMillis = new Date().getTime();
+    const dateInSeconds = Math.floor(dateInMillis / 1000);
+    return dateInSeconds;
+  };
 
   private getWebPushOptnIn(): string {
     const notificationManager = window.Notification;
