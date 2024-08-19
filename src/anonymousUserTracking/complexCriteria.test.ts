@@ -694,9 +694,7 @@ describe('complexCriteria', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              'button-clicked': {
-                lastPageViewed: 'welcome page'
-              }
+              lastPageViewed: 'welcome page'
             },
             eventType: 'customEvent'
           },
