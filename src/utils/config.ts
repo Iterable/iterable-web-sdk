@@ -1,4 +1,4 @@
-import { BASE_URL } from '../constants';
+import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
 
 export type Options = {
   logLevel: 'none' | 'verbose';
@@ -6,6 +6,7 @@ export type Options = {
   enableAnonTracking: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
+  eventThresholdLimit?: number;
 };
 
 const _config = () => {
@@ -14,7 +15,8 @@ const _config = () => {
     baseURL: BASE_URL,
     enableAnonTracking: false,
     isEuIterableService: false,
-    dangerouslyAllowJsPopups: false
+    dangerouslyAllowJsPopups: false,
+    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT
   };
 
   const getConfig = <K extends keyof Options>(option: K) => options[option];
