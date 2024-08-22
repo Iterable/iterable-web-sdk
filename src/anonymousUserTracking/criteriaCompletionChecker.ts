@@ -346,7 +346,7 @@ class CriteriaCompletionChecker {
       }
 
       if (field.includes('.')) {
-        let fields = field.split('.');
+        const fields = field.split('.');
         if (Array.isArray(eventData[fields[0]])) {
           return eventData[fields[0]]?.every((item: any) => {
             const data = {
