@@ -346,6 +346,25 @@ class CriteriaCompletionChecker {
       }
 
       if (field.includes('.')) {
+        let fields = field.split('.');
+        if (Array.isArray(eventData[fields[0]])) {
+          return eventData[fields[0]]?.every((item: any) => {
+            const data = {
+              [fields[0]]: item,
+              eventType: query?.eventType
+            };
+            const valueFromObj = this.getFieldValue(data, field);
+            if (valueFromObj) {
+              return this.evaluateComparison(
+                query.comparatorType,
+                valueFromObj,
+                query.value ? query.value : ''
+              );
+            }
+            return false;
+          });
+        }
+
         const valueFromObj = this.getFieldValue(eventData, field);
         if (valueFromObj) {
           return this.evaluateComparison(
