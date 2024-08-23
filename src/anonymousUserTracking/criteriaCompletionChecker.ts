@@ -453,10 +453,12 @@ class CriteriaCompletionChecker {
 
   private compareValueEquality(sourceTo: any, stringValue: string): boolean {
     if (Array.isArray(sourceTo)) {
-      return sourceTo.some((source) => {
-        return this.compareValueEquality(source, stringValue);
-      });
-    } else if (
+      return sourceTo.some((source) =>
+        this.compareValueEquality(source, stringValue)
+      );
+    }
+
+    if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
       stringValue !== ''
     ) {
@@ -483,7 +485,9 @@ class CriteriaCompletionChecker {
       return sourceTo.some((source) =>
         this.compareNumericValues(source, stringValue, compareOperator)
       );
-    } else if (!isNaN(parseFloat(stringValue))) {
+    }
+
+    if (!Number.isNaN(parseFloat(stringValue))) {
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
       switch (compareOperator) {
