@@ -480,9 +480,9 @@ class CriteriaCompletionChecker {
   ): boolean {
     // eslint-disable-next-line no-restricted-globals
     if (Array.isArray(sourceTo)) {
-      return sourceTo.some((source) => {
-        return this.compareNumericValues(source, stringValue, compareOperator);
-      });
+      return sourceTo.some((source) =>
+        this.compareNumericValues(source, stringValue, compareOperator)
+      );
     } else if (!isNaN(parseFloat(stringValue))) {
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
@@ -504,9 +504,9 @@ class CriteriaCompletionChecker {
 
   private compareStringContains(sourceTo: any, stringValue: string): boolean {
     if (Array.isArray(sourceTo)) {
-      return sourceTo.some((source) => {
-        return this.compareStringContains(source, stringValue);
-      });
+      return sourceTo.some((source) =>
+        this.compareStringContains(source, stringValue)
+      );
     }
     return (
       (typeof sourceTo === 'string' || typeof sourceTo === 'object') &&
@@ -516,18 +516,16 @@ class CriteriaCompletionChecker {
 
   private compareStringStartsWith(sourceTo: any, stringValue: string): boolean {
     if (Array.isArray(sourceTo)) {
-      return sourceTo.some((source) => {
-        return this.compareStringStartsWith(source, stringValue);
-      });
+      return sourceTo.some((source) =>
+        this.compareStringStartsWith(source, stringValue)
+      );
     }
     return typeof sourceTo === 'string' && sourceTo.startsWith(stringValue);
   }
 
   private compareWithRegex(sourceTo: string, pattern: string): boolean {
     if (Array.isArray(sourceTo)) {
-      return sourceTo.some((source) => {
-        return this.compareWithRegex(source, pattern);
-      });
+      return sourceTo.some((source) => this.compareWithRegex(source, pattern));
     }
     try {
       const regexPattern = new RegExp(pattern);
