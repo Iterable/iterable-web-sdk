@@ -55,3 +55,4 @@ if __name__ == "__main__":
     exp = int(sys.argv[5])
 
     jwt_token = generate_jwt(api_key_shared_secret, user_id, email, iat, exp)
+    print(jwt_token)
