@@ -345,6 +345,10 @@ class CriteriaCompletionChecker {
         }
       }
 
+      const eventKeyItems = filteredLocalDataKeys.filter(
+        (keyItem) => keyItem === field
+      );
+
       if (field.includes('.')) {
         const valueFromObj = this.getFieldValue(eventData, field);
         if (valueFromObj) {
@@ -354,12 +358,7 @@ class CriteriaCompletionChecker {
             query.value ? query.value : ''
           );
         }
-      }
-      const eventKeyItems = filteredLocalDataKeys.filter(
-        (keyItem) => keyItem === field
-      );
-
-      if (eventKeyItems.length) {
+      } else if (eventKeyItems.length) {
         return this.evaluateComparison(
           query.comparatorType,
           eventData[field],
