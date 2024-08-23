@@ -452,7 +452,11 @@ class CriteriaCompletionChecker {
   }
 
   private compareValueEquality(sourceTo: any, stringValue: string): boolean {
-    if (
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => {
+        return this.compareValueEquality(source, stringValue);
+      });
+    } else if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
       stringValue !== ''
     ) {
@@ -475,7 +479,11 @@ class CriteriaCompletionChecker {
     compareOperator: string
   ): boolean {
     // eslint-disable-next-line no-restricted-globals
-    if (!isNaN(parseFloat(stringValue))) {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => {
+        return this.compareNumericValues(source, stringValue, compareOperator);
+      });
+    } else if (!isNaN(parseFloat(stringValue))) {
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
       switch (compareOperator) {
@@ -495,6 +503,11 @@ class CriteriaCompletionChecker {
   }
 
   private compareStringContains(sourceTo: any, stringValue: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => {
+        return this.compareStringContains(source, stringValue);
+      });
+    }
     return (
       (typeof sourceTo === 'string' || typeof sourceTo === 'object') &&
       sourceTo.includes(stringValue)
@@ -502,10 +515,20 @@ class CriteriaCompletionChecker {
   }
 
   private compareStringStartsWith(sourceTo: any, stringValue: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => {
+        return this.compareStringStartsWith(source, stringValue);
+      });
+    }
     return typeof sourceTo === 'string' && sourceTo.startsWith(stringValue);
   }
 
   private compareWithRegex(sourceTo: string, pattern: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => {
+        return this.compareWithRegex(source, pattern);
+      });
+    }
     try {
       const regexPattern = new RegExp(pattern);
       return regexPattern.test(sourceTo);
