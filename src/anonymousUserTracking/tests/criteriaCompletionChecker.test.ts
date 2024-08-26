@@ -920,9 +920,8 @@ describe('CriteriaCompletionChecker', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              'button-clicked': 'signup page',
-              'button-clicked.animal': 'test page',
-              'button-clicked.clickCount': '2',
+              animal: 'test page',
+              clickCount: '2',
               total: 3
             },
             createdAt: 1700071052507,
