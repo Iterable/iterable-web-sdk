@@ -470,6 +470,12 @@ class CriteriaCompletionChecker {
   }
 
   private compareValueEquality(sourceTo: any, stringValue: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) =>
+        this.compareValueEquality(source, stringValue)
+      );
+    }
+
     if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
       stringValue !== ''
@@ -493,7 +499,13 @@ class CriteriaCompletionChecker {
     compareOperator: string
   ): boolean {
     // eslint-disable-next-line no-restricted-globals
-    if (!isNaN(parseFloat(stringValue))) {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) =>
+        this.compareNumericValues(source, stringValue, compareOperator)
+      );
+    }
+
+    if (!Number.isNaN(parseFloat(stringValue))) {
       const sourceNumber = parseFloat(sourceTo);
       const numericValue = parseFloat(stringValue);
       switch (compareOperator) {
@@ -513,6 +525,11 @@ class CriteriaCompletionChecker {
   }
 
   private compareStringContains(sourceTo: any, stringValue: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) =>
+        this.compareStringContains(source, stringValue)
+      );
+    }
     return (
       (typeof sourceTo === 'string' || typeof sourceTo === 'object') &&
       sourceTo.includes(stringValue)
@@ -520,10 +537,18 @@ class CriteriaCompletionChecker {
   }
 
   private compareStringStartsWith(sourceTo: any, stringValue: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) =>
+        this.compareStringStartsWith(source, stringValue)
+      );
+    }
     return typeof sourceTo === 'string' && sourceTo.startsWith(stringValue);
   }
 
   private compareWithRegex(sourceTo: string, pattern: string): boolean {
+    if (Array.isArray(sourceTo)) {
+      return sourceTo.some((source) => this.compareWithRegex(source, pattern));
+    }
     try {
       const regexPattern = new RegExp(pattern);
       return regexPattern.test(sourceTo);
