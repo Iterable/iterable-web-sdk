@@ -340,3 +340,54 @@ export const DATA_TYPE_COMPARATOR_IS_SET = {
     }
   ]
 };
+
+export const NESTED_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '168',
+      name: 'nested testing',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'nested'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureType',
+                      comparatorType: 'Equals',
+                      value: 'Sofa',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureColor',
+                      comparatorType: 'Equals',
+                      value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
