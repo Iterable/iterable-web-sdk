@@ -20,7 +20,7 @@
   ],
   "scripts": {
     "build": "tsc && webpack",
-    "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n 'tsc,webpack' -k \"node server/server.js\"",
+    "start": "concurrently \"tsc -w --pretty\" \"webpack-dev-server\" -n 'tsc,webpack' -k",
     "test": "jest --config jest.config.js",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.js\"",
     "typecheck": "tsc --noEmit true --emitDeclarationOnly false",
@@ -70,8 +70,6 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.2.1",
     "styled-components": "^5.3.3",
-    "uuid": "^9.0.0",
-    "cors": "^2.8.5",
-    "express": "^4.19.2"
+    "uuid": "^9.0.0"
   }
 }
