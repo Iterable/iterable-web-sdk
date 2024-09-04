@@ -362,7 +362,7 @@ class CriteriaCompletionChecker {
               return this.evaluateComparison(
                 query.comparatorType,
                 valueFromObj,
-                query.value ? query.value : ''
+                query.value ? query.values : ''
               );
             }
             return false;
@@ -374,14 +374,14 @@ class CriteriaCompletionChecker {
           return this.evaluateComparison(
             query.comparatorType,
             valueFromObj,
-            query.value ? query.value : ''
+            query.value ?? query.values ?? ''
           );
         }
       } else if (eventKeyItems.length) {
         return this.evaluateComparison(
           query.comparatorType,
           eventData[field],
-          query.value ? query.value : ''
+          query.value ?? query.values ?? ''
         );
       }
       return false;
@@ -427,7 +427,7 @@ class CriteriaCompletionChecker {
         return this.evaluateComparison(
           query.comparatorType,
           item[field],
-          query.value ? query.value : ''
+          query.value ?? query.values ?? ''
         );
       }
       return false;
@@ -437,7 +437,7 @@ class CriteriaCompletionChecker {
   private evaluateComparison(
     comparatorType: string,
     matchObj: any,
-    valueToCompare: string
+    valueToCompare: string | string[]
   ): boolean {
     if (!valueToCompare && comparatorType !== 'IsSet') {
       return false;
@@ -455,24 +455,33 @@ class CriteriaCompletionChecker {
       case 'LessThanOrEqualTo':
         return this.compareNumericValues(
           matchObj,
-          valueToCompare,
+          valueToCompare as string,
           comparatorType
         );
       case 'Contains':
-        return this.compareStringContains(matchObj, valueToCompare);
+        return this.compareStringContains(matchObj, valueToCompare as string);
       case 'StartsWith':
-        return this.compareStringStartsWith(matchObj, valueToCompare);
+        return this.compareStringStartsWith(matchObj, valueToCompare as string);
       case 'MatchesRegex':
-        return this.compareWithRegex(matchObj, valueToCompare);
+        return this.compareWithRegex(matchObj, valueToCompare as string);
       default:
         return false;
     }
   }
 
-  private compareValueEquality(sourceTo: any, stringValue: string): boolean {
+  private compareValueEquality(
+    sourceTo: any,
+    stringValue: string | string[]
+  ): boolean {
     if (Array.isArray(sourceTo)) {
       return sourceTo.some((source) =>
         this.compareValueEquality(source, stringValue)
+      );
+    }
+
+    if (Array.isArray(stringValue)) {
+      return stringValue.some((value) =>
+        this.compareValueEquality(sourceTo, value)
       );
     }
 
