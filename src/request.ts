@@ -1,7 +1,8 @@
 import Axios, { AxiosRequestConfig } from 'axios';
-import { BASE_URL, STATIC_HEADERS } from './constants';
-import { IterablePromise, IterableResponse } from './types';
+import qs from 'qs';
 import { AnySchema, ValidationError } from 'yup';
+import { BASE_URL, STATIC_HEADERS, EU_ITERABLE_API } from './constants';
+import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
@@ -35,13 +36,20 @@ export const baseIterableRequest = <T = any>(
         abortEarly: false
       });
     }
+
+    const baseURL = config.getConfig('isEuIterableService')
+      ? EU_ITERABLE_API
+      : config.getConfig('baseURL');
+
     return baseAxiosRequest({
       ...payload,
-      baseURL: config.getConfig('baseURL') || BASE_URL,
+      baseURL,
       headers: {
         ...payload.headers,
         ...STATIC_HEADERS
-      }
+      },
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: 'repeat' })
     });
   } catch (error) {
     /* match Iterable's API error schema and add client errors as a new key */
@@ -54,6 +62,7 @@ export const baseIterableRequest = <T = any>(
       }))
     };
     /* match Axios' Error object schema and reject */
+    // eslint-disable-next-line prefer-promise-reject-errors
     return Promise.reject({
       response: {
         data: newError,

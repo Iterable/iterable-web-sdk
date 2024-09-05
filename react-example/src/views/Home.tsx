@@ -1,6 +1,6 @@
 import { FC } from 'react';
-import _Link from 'src/components/Link';
 import styled from 'styled-components';
+import { Link } from '../components/Link';
 
 const Wrapper = styled.div`
   display: flex;
@@ -8,32 +8,39 @@ const Wrapper = styled.div`
   align-items: center;
 `;
 
-const Link = styled(_Link)`
+const StyledLink = styled(Link)`
   margin-top: 1em;
 `;
 
 interface Props {}
 
-export const Home: FC<Props> = () => {
-  return (
-    <>
-      <h1>Namespace Selection</h1>
-      <Wrapper>
-        <Link to="/commerce" renderAsButton>
-          Commerce
-        </Link>
-        <Link to="/events" renderAsButton>
-          Events
-        </Link>
-        <Link to="/users" renderAsButton>
-          Users
-        </Link>
-        <Link to="/inApp" renderAsButton>
-          inApp
-        </Link>
-      </Wrapper>
-    </>
-  );
-};
-
-export default Home;
+export const Home: FC<Props> = () => (
+  <>
+    <h1>Namespace Selection</h1>
+    <Wrapper>
+      <StyledLink to="/commerce" renderAsButton>
+        Commerce
+      </StyledLink>
+      <StyledLink to="/events" renderAsButton>
+        Events
+      </StyledLink>
+      <StyledLink to="/users" renderAsButton>
+        Users
+      </StyledLink>
+      <StyledLink to="/inApp" renderAsButton>
+        inApp
+      </StyledLink>
+      {/* Note: The following components (specifically Embedded Message View Types)
+      will not be supported until a later release. */}
+      <StyledLink to="/embedded-msgs" renderAsButton>
+        Embedded Msgs
+      </StyledLink>
+      <StyledLink to="/embedded" renderAsButton>
+        embedded
+      </StyledLink>
+      <StyledLink to="/embedded-msgs-impression-tracker" renderAsButton>
+        Embedded msgs impressions tracker
+      </StyledLink>
+    </Wrapper>
+  </>
+);

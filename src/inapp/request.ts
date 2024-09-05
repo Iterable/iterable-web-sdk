@@ -1,6 +1,8 @@
+/* eslint-disable no-unreachable */
 import { delMany, entries } from 'idb-keyval';
-import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from 'src/constants';
-import { baseIterableRequest } from 'src/request';
+import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../constants';
+import { baseIterableRequest } from '../request';
+import { addNewMessagesToCache, getCachedMessagesToDelete } from './cache';
 import schema from './inapp.schema';
 import {
   CachedMessage,
@@ -8,7 +10,6 @@ import {
   InAppMessageResponse,
   InAppMessagesRequestParams
 } from './types';
-import { addNewMessagesToCache, getCachedMessagesToDelete } from './utils';
 
 type RequestInAppMessagesProps = {
   latestCachedMessageId?: string;
@@ -21,7 +22,7 @@ export const requestInAppMessages = ({
 }: RequestInAppMessagesProps) =>
   baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
-    /** @note Parameter will be enabled once new endpoint is ready */
+    /** @note TBD: Parameter will be enabled once new endpoint is ready */
     // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
     url: GETMESSAGES_PATH,
     validation: { params: schema },
@@ -38,10 +39,11 @@ type RequestMessagesProps = {
 };
 
 export const requestMessages = async ({ payload }: RequestMessagesProps) => {
-  /** @note Caching implementation and associated parameter will be enabled once new endpoint is ready */
+  /** @note TBD: Caching implementation and associated parameter
+  // will be enabled once new endpoint is ready */
   // if (!options?.useLocalCache) return await requestInAppMessages({});
   /** @note Always early return until then */
-  return await requestInAppMessages({ payload });
+  return requestInAppMessages({ payload });
 
   try {
     const cachedMessages: CachedMessage[] = await entries();
@@ -92,11 +94,12 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
         if (cachedMessage) allMessages.push(cachedMessage[1]);
       } else {
         allMessages.push(inAppMessage);
-        if (inAppMessage.messageId)
+        if (inAppMessage.messageId) {
           newMessages.push({
             messageId: inAppMessage.messageId,
             message: inAppMessage as InAppMessage
           });
+        }
       }
     });
 
@@ -107,7 +110,8 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
     );
     try {
       await delMany(cachedMessagesToDelete);
-    } catch (err: any) {
+    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+      // eslint-disable-next-line no-console
       console.warn(
         'Error deleting messages from the browser cache',
         err?.response?.data?.clientErrors ?? err
@@ -124,11 +128,12 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
         inAppMessages: allMessages
       }
     };
-  } catch (err: any) {
+  } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
+    // eslint-disable-next-line no-console
     console.warn(
       'Error requesting in-app messages',
       err?.response?.data?.clientErrors ?? err
     );
   }
-  return await requestInAppMessages({ payload });
+  return requestInAppMessages({ payload });
 };

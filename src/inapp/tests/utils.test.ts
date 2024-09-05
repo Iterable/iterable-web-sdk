@@ -5,13 +5,13 @@ import MockAdapter from 'axios-mock-adapter';
 import { messages } from '../../__data__/inAppMessages';
 import { baseAxiosRequest } from '../../request';
 import { srSpeak } from '../../utils/srSpeak';
-import { CLOSE_BUTTON_POSITION, CachedMessage, InAppMessage } from '../types';
+import { CloseButtonPosition, DisplayPosition } from '../types';
 import {
   addButtonAttrsToAnchorTag,
   filterHiddenInAppMessages,
+  filterOnlyReadAndNeverTriggerMessages,
   generateCloseButton,
   generateWidth,
-  getCachedMessagesToDelete,
   getHostnameFromUrl,
   paintIFrame,
   paintOverlay,
@@ -33,7 +33,7 @@ const mockMarkup = `
 `;
 
 describe('Utils', () => {
-  describe('Filtering', () => {
+  describe('filterHiddenInAppMessages', () => {
     it('should filter out read messages', () => {
       expect(filterHiddenInAppMessages()).toEqual([]);
       expect(filterHiddenInAppMessages(messages).every((e) => !e?.read)).toBe(
@@ -125,6 +125,100 @@ describe('Utils', () => {
           }
         ]).length
       ).toBe(0);
+    });
+  });
+
+  describe('filterOnlyReadAndNeverTriggerMessages', () => {
+    it('should filter out read messages', () => {
+      expect(filterOnlyReadAndNeverTriggerMessages()).toEqual([]);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages(messages).every((e) => !e?.read)
+      ).toBe(true);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            read: true
+          },
+          {
+            ...messages[1],
+            read: true
+          }
+        ]).length
+      ).toBe(0);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: { type: 'good' },
+            read: undefined
+          },
+          {
+            ...messages[1],
+            trigger: { type: 'good' },
+            read: undefined
+          }
+        ]).length
+      ).toBe(2);
+    });
+
+    it('should filter out trigger type "never" messages', () => {
+      expect(
+        filterOnlyReadAndNeverTriggerMessages(messages).every(
+          (e) => !e?.trigger?.type
+        )
+      ).not.toBe('never');
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: { type: 'never' }
+          },
+          {
+            ...messages[1],
+            trigger: { type: 'never' }
+          }
+        ]).length
+      ).toBe(0);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            trigger: undefined
+          },
+          {
+            ...messages[1],
+            trigger: undefined
+          }
+        ]).length
+      ).toBe(2);
+    });
+
+    it('should not filter out messages with no HTML body', () => {
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            content: { ...messages[0].content, html: '' }
+          },
+          {
+            ...messages[1],
+            content: { ...messages[0].content, html: '<p>' }
+          }
+        ]).length
+      ).toBe(2);
+      expect(
+        filterOnlyReadAndNeverTriggerMessages([
+          {
+            ...messages[0],
+            content: undefined
+          },
+          {
+            ...messages[1],
+            content: undefined
+          }
+        ]).length
+      ).toBe(2);
     });
   });
 
@@ -411,7 +505,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('100%');
       expect(
@@ -422,7 +516,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('100%');
       expect(
@@ -433,7 +527,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('100%');
       expect(
@@ -444,7 +538,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('100%');
     });
@@ -458,7 +552,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -469,7 +563,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('45%');
       expect(
@@ -480,7 +574,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('45%');
       expect(
@@ -491,7 +585,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -505,7 +599,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -516,7 +610,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('33%');
       expect(
@@ -527,7 +621,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('33%');
       expect(
@@ -538,7 +632,7 @@ describe('Utils', () => {
             lgMatches: true,
             xlMatches: false
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -552,7 +646,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'Full'
+          DisplayPosition.Full
         )
       ).toBe('50%');
       expect(
@@ -563,7 +657,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'TopRight'
+          DisplayPosition.TopRight
         )
       ).toBe('25%');
       expect(
@@ -574,7 +668,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'BottomRight'
+          DisplayPosition.BottomRight
         )
       ).toBe('25%');
       expect(
@@ -585,7 +679,7 @@ describe('Utils', () => {
             lgMatches: false,
             xlMatches: true
           },
-          'Center'
+          DisplayPosition.Center
         )
       ).toBe('50%');
     });
@@ -624,7 +718,12 @@ describe('Utils', () => {
 
     describe('painting the iframe', () => {
       it('should paint the iframe in the center of the screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'Center', false, 'hi');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.Center,
+          false,
+          'hi'
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -640,7 +739,12 @@ describe('Utils', () => {
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'TopRight', false, 'hi');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.TopRight,
+          false,
+          'hi'
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -658,7 +762,7 @@ describe('Utils', () => {
       it('should paint the iframe in the bottom-right of the screen', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'BottomRight',
+          DisplayPosition.BottomRight,
           false,
           'hi'
         );
@@ -677,7 +781,12 @@ describe('Utils', () => {
       });
 
       it('should paint the iframe full-screen', async () => {
-        const iframe = await paintIFrame(mockMarkup, 'Full', false, '');
+        const iframe = await paintIFrame(
+          mockMarkup,
+          DisplayPosition.Full,
+          false,
+          ''
+        );
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
@@ -696,7 +805,7 @@ describe('Utils', () => {
       it('should paint TopRight iframes with custom offsets', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'TopRight',
+          DisplayPosition.TopRight,
           false,
           '',
           '10px',
@@ -720,7 +829,7 @@ describe('Utils', () => {
       it('should paint BottomRight iframes with custom offsets', async () => {
         const iframe = await paintIFrame(
           mockMarkup,
-          'BottomRight',
+          DisplayPosition.BottomRight,
           false,
           '',
           '10px',
@@ -742,13 +851,13 @@ describe('Utils', () => {
       });
 
       it('should call srSpeak if screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, 'Center', false, 'hi');
+        await paintIFrame(mockMarkup, DisplayPosition.Center, false, 'hi');
 
         expect((srSpeak as any).mock.calls.length).toBe(1);
       });
 
       it('should not call srSpeak if no screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, 'Center', false);
+        await paintIFrame(mockMarkup, DisplayPosition.Center, false);
 
         expect((srSpeak as any).mock.calls.length).toBe(0);
       });
@@ -899,7 +1008,7 @@ describe('Utils', () => {
       const button = generateCloseButton(
         buttonId,
         document,
-        CLOSE_BUTTON_POSITION.TopLeft,
+        CloseButtonPosition.TopLeft,
         'blue',
         20,
         undefined,
@@ -921,7 +1030,7 @@ describe('Utils', () => {
       const rightButton = generateCloseButton(
         buttonId,
         document,
-        CLOSE_BUTTON_POSITION.TopRight,
+        CloseButtonPosition.TopRight,
         'blue',
         20,
         './assets/something.svg',
@@ -939,52 +1048,6 @@ describe('Utils', () => {
       expect(rightButton.style.right).toBe('20px');
       expect(rightButton.style.left).toBe('');
       expect(rightButton.innerHTML).toBe('');
-    });
-  });
-
-  describe('Caching', () => {
-    const now = Date.now();
-    const allMessages = [...messages];
-
-    const cachedMessages: CachedMessage[] = allMessages.flatMap((msg) => [
-      [msg.messageId, msg]
-    ]);
-
-    it('should delete cached messages that are expired', () => {
-      const unexpiredMessages = allMessages.filter(
-        (msg) => msg.expiresAt > now
-      );
-      const expiredMessageIds = allMessages.reduce(
-        (allFetchedIds: string[], message) => {
-          if (message.expiresAt < now) allFetchedIds.push(message.messageId);
-          return allFetchedIds;
-        },
-        []
-      );
-
-      const messagesForDeletion = getCachedMessagesToDelete(
-        cachedMessages,
-        unexpiredMessages
-      );
-      expect(messagesForDeletion).toEqual(expiredMessageIds);
-    });
-
-    it('should delete any cached messages not included in the fetch', () => {
-      const validMessages: InAppMessage[] = [];
-      const invalidMessages: InAppMessage[] = [];
-      allMessages.forEach((msg) =>
-        msg.messageId === 'normalMessage!'
-          ? validMessages.push(msg)
-          : invalidMessages.push(msg)
-      );
-
-      const messagesForDeletion = getCachedMessagesToDelete(
-        cachedMessages,
-        validMessages
-      );
-      expect(messagesForDeletion).toEqual(
-        invalidMessages.map((msg) => msg.messageId)
-      );
     });
   });
 });

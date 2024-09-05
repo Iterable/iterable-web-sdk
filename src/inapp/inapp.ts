@@ -1,4 +1,8 @@
-import _set from 'lodash/set';
+/* eslint-disable consistent-return */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-redeclare */
+import { set } from 'lodash';
+import { throttle } from 'throttle-debounce';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
   ANIMATION_DURATION,
@@ -7,8 +11,7 @@ import {
   DISPLAY_INTERVAL_DEFAULT,
   ENABLE_INAPP_CONSUME,
   IS_PRODUCTION
-} from 'src/constants';
-import { throttle } from 'throttle-debounce';
+} from '../constants';
 import {
   trackInAppClick,
   trackInAppClose,
@@ -18,10 +21,9 @@ import {
 import { IterablePromise } from '../types';
 import { requestMessages } from './request';
 import {
-  DISPLAY_OPTIONS,
   DisplayOptions,
   GetInAppMessagesResponse,
-  HANDLE_LINKS,
+  HandleLinks,
   InAppMessage,
   InAppMessageResponse,
   InAppMessagesRequestParams
@@ -130,7 +132,7 @@ export function getInAppMessages(
                   clickedUrl: url
                 }
               : trackPayload
-          ).catch((e) => e);
+          ).catch((e: any) => e);
 
           if (shouldAnimate) {
             const animationTimer = global.setTimeout(() => {
@@ -171,8 +173,9 @@ export function getInAppMessages(
           const throttledResize =
             messagePosition !== 'Full'
               ? throttle(750, () => {
-                  activeIframe.style.height =
-                    (activeIframeDocument?.body?.scrollHeight || 0) + 'px';
+                  activeIframe.style.height = `${
+                    activeIframeDocument?.body?.scrollHeight || 0
+                  }px`;
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
@@ -204,11 +207,12 @@ export function getInAppMessages(
             if (event.key === 'Escape') {
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', documentEventHandler);
-              if (activeIframeDocument && !!iframeEventHandler)
+              if (activeIframeDocument && !!iframeEventHandler) {
                 activeIframeDocument.removeEventListener(
                   'keydown',
                   iframeEventHandler
                 );
+              }
               global.removeEventListener('resize', throttledResize);
             }
           };
@@ -223,12 +227,13 @@ export function getInAppMessages(
             to add the listener needs to know about both of these _addEventListener_ abstracted
             callbacks so the code can properly remove the same listener that was added.
 
-            In other words, it solves for the issue where you're adding an event listener as a lambda
+            In other words, it solves for the issue where you're
+            adding an event listener as a lambda
             like so and and you get a unique event listener each time:
 
             document.addEventListener('keydown', () => // do stuff)
 
-            this example code adds a new event listener each time and never gets cleaned up 
+            this example code adds a new event listener each time and never gets cleaned up
             because there's no reference that to "() => // do stuff" that can be re-used in the
             _removeEventListener_ call.
           */
@@ -244,11 +249,12 @@ export function getInAppMessages(
 
           document.addEventListener('keydown', handleDocumentEscPress);
 
-          if (activeIframeDocument)
+          if (activeIframeDocument) {
             activeIframeDocument.addEventListener(
               'keydown',
               handleIFrameEscPress
             );
+          }
 
           const ua = navigator.userAgent;
           const isSafari =
@@ -268,11 +274,12 @@ export function getInAppMessages(
               dismissMessage(activeIframe);
               document.getElementById(CLOSE_X_BUTTON_ID)?.remove();
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframeDocument)
+              if (activeIframeDocument) {
                 activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
                 );
+              }
               global.removeEventListener('resize', throttledResize);
             });
           }
@@ -297,11 +304,12 @@ export function getInAppMessages(
             const triggerClose = () => {
               dismissMessage(activeIframe);
               document.removeEventListener('keydown', handleDocumentEscPress);
-              if (activeIframeDocument)
+              if (activeIframeDocument) {
                 activeIframeDocument.removeEventListener(
                   'keydown',
                   handleIFrameEscPress
                 );
+              }
               global.removeEventListener('resize', throttledResize);
 
               const closeXButtonElement =
@@ -369,8 +377,8 @@ export function getInAppMessages(
             }
           }
 
-          /* 
-            track in-app consumes only when _saveToInbox_ 
+          /*
+            track in-app consumes only when _saveToInbox_
             is falsy or undefined and always track in-app opens
 
             Also swallow any 400+ response errors. We don't care about them.
@@ -388,7 +396,7 @@ export function getInAppMessages(
                 ? [trackInAppConsume(trackPayload)]
                 : [])
             ];
-            Promise.all(trackRequests).catch((e) => e);
+            Promise.all(trackRequests).catch((e: any) => e);
           }
 
           /* now we'll add click tracking to _all_ anchor tags */
@@ -409,8 +417,8 @@ export function getInAppMessages(
               clickedHostname === global.location.host || !clickedHostname;
             const { handleLinks } = payload;
 
-            /* 
-              If the _handleLinks_ option is set, we need to open links 
+            /*
+              If the _handleLinks_ option is set, we need to open links
               according to that enum and override their target attributes.
 
               1. If _open-all-same-tab_, then open every link in the same tab
@@ -426,9 +434,8 @@ export function getInAppMessages(
             ) => {
               if (typeof handleLinks === 'string') {
                 if (
-                  handleLinks === HANDLE_LINKS.OpenAllSameTab ||
-                  (isInternalLink &&
-                    handleLinks === HANDLE_LINKS.ExternalNewTab)
+                  handleLinks === HandleLinks.OpenAllSameTab ||
+                  (isInternalLink && handleLinks === HandleLinks.ExternalNewTab)
                 ) {
                   sameTabAction();
                 } else {
@@ -438,8 +445,8 @@ export function getInAppMessages(
             };
 
             if (isDismissNode || isActionLink) {
-              /* 
-                give the close anchor tag properties that make it 
+              /*
+                give the close anchor tag properties that make it
                 behave more like a button with a logical aria label
               */
               addButtonAttrsToAnchorTag(link, 'close modal');
@@ -472,8 +479,8 @@ export function getInAppMessages(
               }
             } else {
               link.addEventListener('click', (event) => {
-                /* 
-                  remove default linking behavior because we're in an iframe 
+                /*
+                  remove default linking behavior because we're in an iframe
                   so we need to link the user programatically
                 */
                 event.preventDefault();
@@ -481,9 +488,9 @@ export function getInAppMessages(
                 if (clickedUrl) {
                   const isOpeningLinkInSameTab =
                     (!handleLinks && !openInNewTab) ||
-                    handleLinks === HANDLE_LINKS.OpenAllSameTab ||
+                    handleLinks === HandleLinks.OpenAllSameTab ||
                     (isInternalLink &&
-                      handleLinks === HANDLE_LINKS.ExternalNewTab);
+                      handleLinks === HandleLinks.ExternalNewTab);
 
                   trackInAppClick(
                     {
@@ -493,13 +500,13 @@ export function getInAppMessages(
                         appPackageName: dupedPayload.packageName
                       }
                     },
-                    /* 
-                      only call with the fetch API if we're linking in the 
+                    /*
+                      only call with the fetch API if we're linking in the
                       same tab and it's not a reserved keyword link.
                     */
                     isOpeningLinkInSameTab && !isIterableKeywordLink
                     /* swallow the network error */
-                  ).catch((e) => e);
+                  ).catch((e: any) => e);
 
                   if (isDismissNode || isActionLink) {
                     dismissMessage(activeIframe, clickedUrl);
@@ -507,21 +514,23 @@ export function getInAppMessages(
                       'keydown',
                       handleDocumentEscPress
                     );
-                    if (activeIframeDocument)
+                    if (activeIframeDocument) {
                       activeIframeDocument.removeEventListener(
                         'keydown',
                         handleIFrameEscPress
                       );
+                    }
                     global.removeEventListener('resize', throttledResize);
                   }
 
                   if (isActionLink) {
+                    // eslint-disable-next-line prefer-regex-literals
                     const filteredMatch = (new RegExp(
                       /^.*action:\/\/(.*)$/,
                       'gmi'
                     )?.exec(clickedUrl) || [])?.[1];
-                    /* 
-                      just post the message to the window when clicking 
+                    /*
+                      just post the message to the window when clicking
                       action:// links and early return
                     */
                     return global.postMessage(
@@ -547,11 +556,11 @@ export function getInAppMessages(
                       }
                     );
                     if (!handleLinks) {
-                      if (openInNewTab)
+                      if (openInNewTab) {
                         /**
                           Using target="_blank" without rel="noreferrer" and rel="noopener"
                           makes the website vulnerable to window.opener API exploitation attacks
-  
+
                           @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#security_and_privacy
                         */
                         global.open(
@@ -559,7 +568,7 @@ export function getInAppMessages(
                           '_blank',
                           'noopener,noreferrer'
                         );
-                      else global.location.assign(clickedUrl);
+                      } else global.location.assign(clickedUrl);
                     }
                   }
                 }
@@ -574,7 +583,7 @@ export function getInAppMessages(
       return Promise.resolve('');
     };
 
-    const isDeferred = options.display === DISPLAY_OPTIONS.deferred;
+    const isDeferred = options.display === DisplayOptions.Deferred;
 
     const triggerDisplayFn = isDeferred
       ? {
@@ -591,15 +600,15 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response) => {
+          .then((response: any) => {
             trackMessagesDelivered(
               response.data.inAppMessages || [],
               dupedPayload.packageName
             );
             return response;
           })
-          .then((response) => {
-            if (isDeferred)
+          .then((response: any) => {
+            if (isDeferred) {
               /*
                 if the user passed "deferred" for the second argument to _getMessages_
                 then they're going to choose to display the in-app messages when they want
@@ -607,19 +616,18 @@ export function getInAppMessages(
                 with no filtering or sorting.
               */
               return response;
-
+            }
             /* otherwise, they're choosing to show the messages automatically */
 
-            /* 
+            /*
               if the user passed the flag to automatically paint the in-app messages
               to the DOM, start a timer and show each in-app message upon close + timer countdown
-              
+
               However there are 3 conditions in which to not show a message:
-              
+
               1. _read_ key is truthy
               2. _trigger.type_ key is "never" (deliver silently is checked)
               3. HTML body is blank
-
               so first filter out unwanted messages and sort them
             */
             clearMessages();
@@ -627,14 +635,12 @@ export function getInAppMessages(
               filterHiddenInAppMessages(response.data.inAppMessages)
             ) as InAppMessage[];
 
-            return paintMessageToDOM().then(() => {
-              return {
-                ...response,
-                data: {
-                  inAppMessages: parsedMessages
-                }
-              };
-            });
+            return paintMessageToDOM().then(() => ({
+              ...response,
+              data: {
+                inAppMessages: parsedMessages
+              }
+            }));
           }),
       pauseMessageStream: () => {
         if (timer) {
@@ -652,7 +658,7 @@ export function getInAppMessages(
     };
   }
 
-  /* 
+  /*
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
@@ -662,7 +668,7 @@ export function getInAppMessages(
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html
-        ? _set(message, 'content.html', wrapWithIFrame(html as string))
+        ? set(message, 'content.html', wrapWithIFrame(html as string))
         : message;
     });
     return {

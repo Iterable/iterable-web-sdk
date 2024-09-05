@@ -1,19 +1,19 @@
+/* eslint-disable no-return-assign */
+/* eslint-disable no-plusplus */
+/* eslint-disable no-loop-func */
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-script-url */
+/* eslint-disable no-promise-executor-return */
 import { by } from '@pabra/sortby';
-import { setMany } from 'idb-keyval';
+import { trackInAppDelivery } from '../events/inapp/events';
+import { config } from '../utils/config';
 import {
   ANIMATION_DURATION,
   DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE
-} from 'src/constants';
-import { WebInAppDisplaySettings } from 'src/inapp';
-import { srSpeak } from 'src/utils/srSpeak';
-import { trackInAppDelivery } from '../events';
-import {
-  BrowserStorageEstimate,
-  CLOSE_BUTTON_POSITION,
-  CachedMessage,
-  CloseButtonPosition,
-  InAppMessage
-} from './types';
+} from '../constants';
+import { WebInAppDisplaySettings } from '.';
+import { srSpeak } from '../utils/srSpeak';
+import { CloseButtonPosition, InAppMessage } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -26,9 +26,9 @@ export const generateWidth = (
   { smMatches, mdMatches, lgMatches, xlMatches }: Breakpoints,
   position: WebInAppDisplaySettings['position']
 ): string => {
-  /* 
+  /*
     breakpoint widths are as follows:
-    
+
     1. TopRight, BottomRight (100% at SM; 45% at MD; 33% at LG; 25% at XL)
     2. Center (100% at SM, MD; 50% at LG, XL)
     3. Full (100% all the time)
@@ -39,7 +39,7 @@ export const generateWidth = (
 
   if (mdMatches) {
     if (position === 'TopRight' || position === 'BottomRight') {
-      /* 
+      /*
         in-app messages is being initially painted, but we're on mobile
         breakpoints so remove any offsets the user provided in the config object.
       */
@@ -63,8 +63,8 @@ export const generateWidth = (
     return '50%';
   }
 
-  /* 
-    this line will never run. One of those breakpoints has to return true 
+  /*
+    this line will never run. One of those breakpoints has to return true
     but this is just to appease typescript.
   */
   return '100%';
@@ -80,13 +80,15 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
   if (!imageLinks?.length) {
     callback();
   }
-  const images = [];
+
+  const images: HTMLImageElement[] = [];
   let loadedImages = 0;
   for (let i = 0; i < imageLinks.length; i++) {
     images[i] = new Image();
     images[i].src = imageLinks[i];
+    images[i].loading = 'eager';
     images[i].onload = () => {
-      /* 
+      /*
         track the amount of images we preloaded. If this is the last image
         that's been preloaded, it's time to invoke the callback function we passed.
       */
@@ -110,139 +112,23 @@ export const preloadImages = (imageLinks: string[], callback: () => void) => {
 
 export const filterHiddenInAppMessages = (
   messages: Partial<InAppMessage>[] = []
-) => {
-  return messages.filter((eachMessage) => {
-    return (
+) =>
+  messages.filter(
+    (eachMessage) =>
       !eachMessage.read &&
       eachMessage.trigger?.type !== 'never' &&
       !!eachMessage.content?.html
-    );
-  });
-};
+  );
 
-export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) => {
-  return messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
-};
-
-/**
- * detect amount of local storage remaining (quota) and used (usage).
- * if usageDetails exist (not supported in Safari), use this instead of usage.
- */
-export const determineRemainingStorageQuota = async () => {
-  try {
-    if (!('indexedDB' in window)) return 0;
-
-    const storage: BrowserStorageEstimate | undefined =
-      'storage' in navigator && 'estimate' in navigator.storage
-        ? await navigator.storage.estimate()
-        : undefined;
-
-    /** 50 MB is the lower common denominator on modern mobile browser caches */
-    const mobileBrowserQuota = 52428800;
-    /** max quota of browser storage that in-apps will potentially fill */
-    const estimatedBrowserQuota = storage?.quota;
-    /**
-     * determine lower max quota that can be used for message cache,
-     * set to 60% of quota to leave space for other caching needs
-     * on that domain
-     */
-    const messageQuota =
-      ((estimatedBrowserQuota &&
-        Math.min(estimatedBrowserQuota, mobileBrowserQuota)) ??
-        mobileBrowserQuota) * 0.6;
-
-    /** how much local storage is being used */
-    const usage = storage?.usageDetails?.indexedDB ?? storage?.usage;
-    const remainingQuota = usage && messageQuota - usage;
-
-    return remainingQuota ? remainingQuota : 0;
-  } catch (err: any) {
-    console.warn(
-      'Error determining remaining storage quota',
-      err?.response?.data?.clientErrors ?? err
-    );
-  }
-  /** do not try to add to cache if we cannot determine storage space */
-  return 0;
-};
-
-/**
- * deletes cached messages not present in latest getMessages fetch
- * @param cachedMessages
- * @param fetchedMessages
- */
-export const getCachedMessagesToDelete = (
-  cachedMessages: CachedMessage[],
-  fetchedMessages: Partial<InAppMessage>[]
+export const filterOnlyReadAndNeverTriggerMessages = (
+  messages: Partial<InAppMessage>[] = []
 ) =>
-  cachedMessages.reduce((deleteQueue: string[], [cachedMessageId]) => {
-    const isCachedMessageInFetch = fetchedMessages.reduce(
-      (isFound, { messageId }) => {
-        if (messageId === cachedMessageId) isFound = true;
-        return isFound;
-      },
-      false
-    );
+  messages.filter(
+    (eachMessage) => !eachMessage.read && eachMessage.trigger?.type !== 'never'
+  );
 
-    if (!isCachedMessageInFetch) deleteQueue.push(cachedMessageId);
-    return deleteQueue;
-  }, []);
-
-/**
- * adds messages to cache only if they fit within the quota, starting with
- * oldest messages since newer messages can still be easily retrieved via
- * new requests while passing in latestCachedMessageId param
- * @param messages
- * @param quota
- */
-export const addNewMessagesToCache = async (
-  messages: { messageId: string; message: InAppMessage }[]
-) => {
-  const quota = await determineRemainingStorageQuota();
-  if (quota > 0) {
-    /**
-     * determine total size (in bytes) of new messages to be added to cache
-     * sorted oldest to newest (ascending createdAt property)
-     */
-    const messagesWithSizes: {
-      messageId: string;
-      message: InAppMessage;
-      createdAt: number;
-      size: number;
-    }[] = messages
-      .map(({ messageId, message }) => {
-        const sizeInBytes = new Blob([
-          JSON.stringify(message).replace(/\[\[\],"\]/g, '')
-        ]).size;
-        return {
-          messageId,
-          message,
-          createdAt: message.createdAt,
-          size: sizeInBytes
-        };
-      })
-      .sort((a, b) => a.createdAt - b.createdAt);
-
-    /** only add messages that fit in cache, starting from oldest messages */
-    let remainingQuota = quota;
-    const messagesToAddToCache: [string, InAppMessage][] = [];
-    messagesWithSizes.every(({ messageId, message, size }) => {
-      if (remainingQuota - size < 0) return false;
-      remainingQuota -= size;
-      messagesToAddToCache.push([messageId, message]);
-      return true;
-    });
-
-    try {
-      await setMany(messagesToAddToCache);
-    } catch (err: any) {
-      console.warn(
-        'Error adding new messages to the browser cache',
-        err?.response?.data?.clientErrors ?? err
-      );
-    }
-  }
-};
+export const sortInAppMessages = (messages: Partial<InAppMessage>[] = []) =>
+  messages.sort(by(['priorityLevel', 'asc'], ['createdAt', 'asc']));
 
 export const generateCloseButton = (
   id: string,
@@ -277,7 +163,7 @@ export const generateCloseButton = (
   `;
   const button = doc.createElement('button');
   button.style.cssText =
-    position === CLOSE_BUTTON_POSITION.TopLeft
+    position === CloseButtonPosition.TopLeft
       ? `
     ${sharedStyles}
     left: ${sideOffset || `${DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE}%`};
@@ -394,7 +280,8 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 
 /**
  *
- * @returns { HTMLIFrameElement } iframe with sandbox and hidden styling applied for of an inapp message to render with
+ * @returns { HTMLIFrameElement } iframe with sandbox and hidden
+ * styling applied for of an inapp message to render with
  */
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
@@ -403,7 +290,11 @@ const generateSecuredIFrame = () => {
   // event handlers on elements in it preventing our custom link handling
   iframe.setAttribute(
     'sandbox',
-    'allow-same-origin allow-popups allow-top-navigation'
+    `allow-same-origin allow-popups allow-top-navigation ${
+      config.getConfig('dangerouslyAllowJsPopups')
+        ? 'allow-popups-to-escape-sandbox'
+        : ''
+    }`
   );
   /*
     _display: none_ would remove the ability to set event handlers on elements
@@ -438,13 +329,24 @@ export const wrapWithIFrame = (html: string): HTMLIFrameElement => {
 };
 
 /**
+ * Default Chrome user agent stylesheet adds 8px margin to body element.
+ * This unsets it so that it does not interfere with iframe sizing.
+ */
+const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
+  const { contentDocument } = iframe;
+  const margin = contentDocument?.body.style.margin;
+  if (contentDocument && !margin) contentDocument.body.style.margin = '0px';
+};
+
+/**
  *
  * @param html html you want to paint to the DOM inside the iframe
  * @param position screen position the message should appear in
  * @param shouldAnimate if the in-app should animate in/out
  * @param srMessage The message you want the screen reader to read when popping up the message
  * @param topOffset how many px or % buffer between the in-app message and the top of the screen
- * @param bottomOffset how many px or % buffer between the in-app message and the bottom of the screen
+ * @param bottomOffset how many px or % buffer between the in-app message
+ * and the bottom of the screen
  * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
  *
  * @returns { HTMLIFrameElement }
@@ -461,35 +363,53 @@ export const paintIFrame = (
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
 
-    /* 
-      find all the images in the in-app message, preload them, and 
+    /*
+      find all the images in the in-app message, preload them, and
       only then set the height because we need to know how tall the images
       are before we set the height of the iframe.
-      
+
       This prevents a race condition where if we set the height before the images
       are loaded, we might end up with a scrolling iframe
     */
-    const images =
+    const imageUrls: string[] =
       html?.match(/\b(https?:\/\/\S+(?:png|jpe?g|gif)\S*)\b/gim) || [];
-    return preloadImages(images, () => {
-      /* 
+
+    const imageTags = Array.from(
+      new DOMParser()
+        .parseFromString(html, 'text/html')
+        .getElementsByTagName('img')
+    );
+    const imageTagUrls = imageTags
+      .map((i) => i.src)
+      .filter((src) => {
+        if (!imageUrls.length) return true;
+        const imageUrlSet = new Set(imageUrls);
+        return !imageUrlSet.has(src);
+      });
+
+    const imageLinks = [...imageUrls, ...imageTagUrls];
+
+    return preloadImages(imageLinks, () => {
+      /*
         set the scroll height to the content inside, but since images
         are going to take some time to load, we opt to preload them, THEN
         set the inner HTML of the iframe
       */
       document.body.appendChild(iframe);
-      iframe.contentWindow?.document?.open();
-      iframe.contentWindow?.document?.write(html);
-      iframe.contentWindow?.document?.close();
+      iframe.contentDocument?.open();
+      iframe.contentDocument?.write(html);
+      iframe.contentDocument?.close();
+
+      unsetIframeBodyMargin(iframe);
 
       const timeout = setTimeout(() => {
         /**
-          even though we preloaded the images before setting the height, we add an extra 100MS 
-          here to handle for the case where the user needs to download custom fonts. As 
+          even though we preloaded the images before setting the height, we add an extra 100MS
+          here to handle for the case where the user needs to download custom fonts. As
           of 07/27/2021, the preloading fonts API is still in a draft state
-            
+
           @see https://developer.mozilla.org/en-US/docs/Web/API/CSS_Font_Loading_API
-          
+
           but even if we did preload the fonts, it would still take a non-trivial amount
           of computational time to apply the font to the text, so this setTimeout is acting more
           as a failsafe just incase the new font causes the line-height to grow and create a
@@ -534,19 +454,6 @@ export const paintIFrame = (
               : 'slide-in';
         }
 
-        const initialWidth = generateWidth(
-          {
-            smMatches: mediaQuerySm.matches,
-            mdMatches: mediaQueryMd.matches,
-            lgMatches: mediaQueryLg.matches,
-            xlMatches: mediaQueryXl.matches
-          },
-          position
-        );
-
-        /* set the initial width based at the breakpoint we loaded the message at. */
-        setCSS(position === 'Full' ? '100%' : initialWidth);
-
         const setNewWidth = () => {
           setCSS(
             generateWidth(
@@ -561,49 +468,45 @@ export const paintIFrame = (
           );
         };
 
-        mediaQuerySm.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryMd.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryLg.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
-        mediaQueryXl.onchange = () => {
-          if (position !== 'Full') {
-            setNewWidth();
-          }
-        };
+        if (position === 'Full') {
+          setCSS('100%');
+        } else {
+          setNewWidth();
 
-        if (position !== 'Full') {
-          const iframeHeight =
-            iframe.contentWindow?.document?.body?.scrollHeight;
-          /*
-            For web in-app messages created with WYSIWYG editor,
-            there is 8px margin all around the iframe document body.
-            Add 16px to the iframe height to eliminate scrollbar.
-            Add 10px to eliminate discrepancy between the height
-            of the document html and that of the iframe itself.
-          */
-          iframe.style.height =
-            ((iframeHeight && iframeHeight + 26) || 0) + 'px';
+          mediaQuerySm.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryMd.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryLg.onchange = () => {
+            setNewWidth();
+          };
+          mediaQueryXl.onchange = () => {
+            setNewWidth();
+          };
+
+          const iframeHeight = iframe.contentDocument?.body?.scrollHeight;
+          if (iframeHeight) iframe.style.height = `${iframeHeight}px`;
         }
 
         clearTimeout(timeout);
       }, 100);
+
       resolve(iframe);
     });
   }).then((iframe: HTMLIFrameElement) => {
     if (srMessage) {
       srSpeak(srMessage, 'assertive');
     }
+
+    iframe.onload = () => {
+      if (position !== 'Full') {
+        const scrollHeight = iframe.contentDocument?.body.scrollHeight ?? 0;
+        if (scrollHeight) iframe.style.height = `${scrollHeight}px`;
+      }
+    };
+
     return iframe;
   });
 
@@ -615,24 +518,24 @@ export const addButtonAttrsToAnchorTag = (node: Element, ariaLabel: string) => {
 };
 
 export const trackMessagesDelivered = (
+  // eslint-disable-next-line default-param-last
   messages: Partial<InAppMessage>[] = [],
   packageName: string
-) => {
-  return Promise.all(
-    messages?.map((eachMessage) => {
-      return trackInAppDelivery({
+) =>
+  Promise.all(
+    messages?.map((eachMessage) =>
+      trackInAppDelivery({
         messageId: eachMessage.messageId as string,
         deviceInfo: {
           appPackageName: packageName
         }
-        /* 
-          swallow any network failures. 
-          If it fails, there's nothing really we can do here. 
+        /*
+          swallow any network failures.
+          If it fails, there's nothing really we can do here.
         */
-      });
-    })
-  ).catch((e) => e);
-};
+      })
+    )
+  ).catch((e: any) => e);
 
 export const paintOverlay = (
   color = '#fff',
@@ -724,12 +627,13 @@ export const setCloseButtonPosition = (
     ? `calc(${iframeRect.top}px + ${topOffset})`
     : `${iframeRect.top + defaultTop}px`;
 
-  if (position === CLOSE_BUTTON_POSITION.TopLeft)
+  if (position === CloseButtonPosition.TopLeft) {
     closeButton.style.left = sideOffset
       ? `calc(${iframeRect.left}px + ${sideOffset})`
       : `${iframeRect.left + defaultSide}px`;
-  else
+  } else {
     closeButton.style.left = sideOffset
       ? `calc(${iframeRightEdge}px - ${sideOffset})`
       : `${iframeRightEdge - defaultSide}px`;
+  }
 };

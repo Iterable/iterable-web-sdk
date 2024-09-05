@@ -1,14 +1,13 @@
 import { FC, FormEvent, useState } from 'react';
-import TextField from 'src/components/TextField';
+import { updateCart, trackPurchase } from '@iterable/web-sdk';
+import { TextField } from '../components/TextField';
 import {
-  Button,
+  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
   Response
 } from './Components.styled';
-
-import { updateCart, trackPurchase } from '@iterable/web-sdk';
 
 interface Props {}
 
@@ -32,11 +31,11 @@ export const Commerce: FC<Props> = () => {
     updateCart({
       items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
     })
-      .then((response) => {
+      .then((response: any) => {
         setUpdateCartResponse(JSON.stringify(response.data));
         setUpdatingCart(false);
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setUpdateCartResponse(JSON.stringify(e.response.data));
         setUpdatingCart(false);
       });
@@ -49,11 +48,11 @@ export const Commerce: FC<Props> = () => {
       items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
       total: 200
     })
-      .then((response) => {
+      .then((response: any) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(response.data));
       })
-      .catch((e) => {
+      .catch((e: any) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(e.response.data));
       });
@@ -73,9 +72,9 @@ export const Commerce: FC<Props> = () => {
             placeholder="e.g. keyboard"
             data-qa-cart-input
           />
-          <Button disabled={isUpdatingCart} type="submit">
+          <StyledButton disabled={isUpdatingCart} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response data-qa-cart-response>{updateCartResponse}</Response>
       </EndpointWrapper>
@@ -90,14 +89,12 @@ export const Commerce: FC<Props> = () => {
             placeholder="e.g. keyboard"
             data-qa-purchase-input
           />
-          <Button disabled={isTrackingPurchase} type="submit">
+          <StyledButton disabled={isTrackingPurchase} type="submit">
             Submit
-          </Button>
+          </StyledButton>
         </Form>
         <Response data-qa-purchase-response>{trackPurchaseResponse}</Response>
       </EndpointWrapper>
     </>
   );
 };
-
-export default Commerce;

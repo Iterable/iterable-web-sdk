@@ -9,6 +9,11 @@ import { trackPurchase, updateCart } from '../commerce';
 import { GETMESSAGES_PATH } from '../constants';
 
 let mockRequest: any = null;
+
+const localStorageMock = {
+  setItem: jest.fn()
+};
+
 /*
   decoded payload is:
 
@@ -92,7 +97,7 @@ describe('API Key Interceptors', () => {
       const { setEmail } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-
+      (global as any).localStorage = localStorageMock;
       await setEmail('hello@gmail.com');
 
       const response = await getInAppMessages({
@@ -109,7 +114,7 @@ describe('API Key Interceptors', () => {
       const { setUserID } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-
+      (global as any).localStorage = localStorageMock;
       await setUserID('123ffdas');
 
       const response = await getInAppMessages({
@@ -261,7 +266,7 @@ describe('API Key Interceptors', () => {
         .fn()
         .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
       const { setUserID } = initialize('123', mockGenerateJWT);
-
+      (global as any).localStorage = localStorageMock;
       await setUserID('mock-id');
       await updateUserEmail('helloworld@gmail.com');
       expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
@@ -369,6 +374,7 @@ describe('User Identification', () => {
       });
 
       it('logout method removes the userId field from requests', async () => {
+        (global as any).localStorage = localStorageMock;
         const { logout, setUserID } = initialize('123');
         await setUserID('hello@gmail.com');
         logout();

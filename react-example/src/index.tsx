@@ -1,19 +1,22 @@
-import { initialize } from '@iterable/web-sdk';
+import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
 import axios from 'axios';
-import ReactDOM from 'react-dom';
 import './styles/index.css';
 
-import Home from 'src/views/Home';
-import Commerce from 'src/views/Commerce';
-import Events from 'src/views/Events';
-import Users from 'src/views/Users';
-import InApp from 'src/views/InApp';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Link from 'src/components/Link';
 import styled from 'styled-components';
-import LoginForm from 'src/components/LoginForm';
+import { createRoot } from 'react-dom/client';
+import { Home } from './views/Home';
+import { Commerce } from './views/Commerce';
+import { Events } from './views/Events';
+import { Users } from './views/Users';
+import { InApp } from './views/InApp';
+import { EmbeddedMessage } from './views/Embedded';
+import { Link } from './components/Link';
+import { LoginForm } from './components/LoginForm';
+import { EmbeddedMsgs } from './views/EmbeddedMsgs';
 
-import { UserProvider } from 'src/context/Users';
+import { UserProvider } from './context/Users';
+import { EmbeddedMsgsImpressionTracker } from './views/EmbeddedMsgsImpressionTracker';
 
 const Wrapper = styled.div`
   display: flex;
@@ -38,15 +41,20 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const { setEmail, logout, refreshJwtToken } = initialize(
-    process.env.API_KEY || '',
-    ({ email }) => {
-      return axios
+  const initializeParams: WithJWTParams = {
+    authToken: process.env.API_KEY || '',
+    configOptions: {
+      isEuIterableService: false,
+      dangerouslyAllowJsPopups: true
+    },
+    generateJWT: ({ email, userID }) =>
+      axios
         .post(
-          'http://localhost:5000/generate',
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
           {
             exp_minutes: 2,
             email,
+            user_id: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
@@ -55,13 +63,14 @@ const HomeLink = styled(Link)`
             }
           }
         )
-        .then((response) => {
-          return response.data?.token;
-        });
-    }
-  );
+        .then((response: any) => response.data?.token)
+  };
+  const { setEmail, setUserID, logout, refreshJwtToken } =
+    initializeWithConfig(initializeParams);
 
-  ReactDOM.render(
+  const container = document.getElementById('root');
+  const root = createRoot(container);
+  root.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
@@ -71,6 +80,7 @@ const HomeLink = styled(Link)`
             </HomeLink>
             <LoginForm
               setEmail={setEmail}
+              setUserId={setUserID}
               logout={logout}
               refreshJwt={refreshJwtToken}
             />
@@ -82,11 +92,16 @@ const HomeLink = styled(Link)`
               <Route path="/events" element={<Events />} />
               <Route path="/users" element={<Users />} />
               <Route path="/inApp" element={<InApp />} />
+              <Route path="/embedded-msgs" element={<EmbeddedMsgs />} />
+              <Route path="/embedded" element={<EmbeddedMessage />} />
+              <Route
+                path="/embedded-msgs-impression-tracker"
+                element={<EmbeddedMsgsImpressionTracker />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>
       </Wrapper>
-    </BrowserRouter>,
-    document.getElementById('root')
+    </BrowserRouter>
   );
 })();

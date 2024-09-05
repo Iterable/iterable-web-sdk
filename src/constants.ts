@@ -4,8 +4,10 @@ export const DISPLAY_INTERVAL_DEFAULT = 30000;
 /* how many times we try to create a new user when _setUserID_ is invoked */
 export const RETRY_USER_ATTEMPTS = 0;
 
-const IS_EU_ITERABLE_SERVICE =
-  process.env.IS_EU_ITERABLE_SERVICE === 'true' ? true : false;
+const IS_EU_ITERABLE_SERVICE = process.env.IS_EU_ITERABLE_SERVICE === 'true';
+
+export const dangerouslyAllowJsPopupExecution =
+  process.env.DANGEROUSLY_ALLOW_JS_POPUP_EXECUTION === 'true';
 
 const US_ITERABLE_DOMAIN = 'api.iterable.com';
 
@@ -15,13 +17,12 @@ const ITERABLE_API_URL = `https://${
   IS_EU_ITERABLE_SERVICE ? EU_ITERABLE_DOMAIN : US_ITERABLE_DOMAIN
 }/api`;
 
+export const EU_ITERABLE_API = `https://${EU_ITERABLE_DOMAIN}/api`;
+
 // Do not set `process.env.BASE_URL` if intending on using the prod or EU APIs.
 export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
-
-/** @todo update once new endpoint is ready */
-export const CACHE_ENABLED_GETMESSAGES_PATH = '/newEndpoint';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
@@ -37,9 +38,9 @@ export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 export const SDK_VERSION = process.env.VERSION;
 
-/* 
-  API payload _platform_ param which is send up automatically 
-  with tracking and getMessage requests 
+/*
+  API payload _platform_ param which is send up automatically
+  with tracking and getMessage requests
 */
 export const WEB_PLATFORM = 'Web';
 
@@ -55,6 +56,129 @@ export const ANIMATION_DURATION = 400;
 export const DEFAULT_CLOSE_BUTTON_OFFSET_PERCENTAGE = 4;
 export const CLOSE_X_BUTTON_ID = 'close-x-button';
 export const ABSOLUTE_DISMISS_BUTTON_ID = 'absolute-dismiss-button';
+
+export const URL_SCHEME_ITBL = 'itbl://';
+export const URL_SCHEME_ACTION = 'action://';
+export const URL_SCHEME_OPEN = 'openUrl';
+export const SHARED_PREF_USER_ID = 'userId';
+export const SHARED_PREF_EMAIL = 'email';
+
+export type RouteConfig = {
+  route: string;
+  /** true for POST/PUT requests */
+  body: boolean;
+  /** true if email or userId in request needs to be prepended with `current` */
+  current: boolean;
+  /** true if route expects email or userId field to be nested in user object */
+  nestedUser: boolean;
+};
+
+type EndPointStructure = Record<string, RouteConfig>;
+
+export const ENDPOINTS: EndPointStructure = {
+  commerce_update_cart: {
+    route: '/commerce/updateCart',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  commerce_track_purchase: {
+    route: '/commerce/trackPurchase',
+    body: true,
+    current: false,
+    nestedUser: true
+  },
+  update_email: {
+    route: '/users/updateEmail',
+    body: true,
+    current: true,
+    nestedUser: true
+  },
+  users_update: {
+    route: '/users/update',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  users_update_subscriptions: {
+    route: '/users/updateSubscriptions',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  get_in_app_messages: {
+    route: '/inApp/web/getMessages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  get_embedded_messages: {
+    route: '/embedded-messaging/messages',
+    body: false,
+    current: false,
+    nestedUser: false
+  },
+  event_track: {
+    route: '/events/track',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_received_event_track: {
+    route: '/embedded-messaging/events/received',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_click_event_track: {
+    route: '/embedded-messaging/events/click',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_close: {
+    route: '/events/trackInAppClose',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_open: {
+    route: '/events/trackInAppOpen',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_click: {
+    route: '/events/trackInAppClick',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_delivery: {
+    route: '/events/trackInAppDelivery',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  track_app_consume: {
+    route: '/events/inAppConsume',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_dismiss: {
+    route: '/embedded-messaging/events/dismiss',
+    body: true,
+    current: false,
+    nestedUser: false
+  },
+  msg_session_event_track: {
+    route: '/embedded-messaging/events/session',
+    body: true,
+    current: false,
+    nestedUser: false
+  }
+};
 
 export const ANIMATION_STYLESHEET = (
   animationDuration: number = ANIMATION_DURATION

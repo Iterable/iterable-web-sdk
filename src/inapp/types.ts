@@ -1,19 +1,39 @@
-import { IterablePromise } from 'src/types';
+/* eslint-disable no-use-before-define */
+import { IterablePromise } from '../types';
 
-export enum CLOSE_BUTTON_POSITION {
+export enum CloseButtonPosition {
   TopLeft = 'top-left',
   TopRight = 'top-right'
 }
 
-export type CloseButtonPosition = `${CLOSE_BUTTON_POSITION}`;
-
-export enum HANDLE_LINKS {
+export enum HandleLinks {
   OpenAllNewTab = 'open-all-new-tab',
   OpenAllSameTab = 'open-all-same-tab',
   ExternalNewTab = 'external-new-tab'
 }
 
-export type HandleLinks = `${HANDLE_LINKS}`;
+export enum DisplayOptions {
+  Immediate = 'immediate',
+  Deferred = 'deferred'
+}
+
+export enum DisplayPosition {
+  Center = 'Center',
+  TopRight = 'TopRight',
+  BottomRight = 'BottomRight',
+  Full = 'Full'
+}
+
+type CloseButton = {
+  color?: string;
+  iconPath?: string;
+  /* If true, prevent user from dismissing in-app message by clicking outside of message. */
+  isRequiredToDismissMessage?: boolean;
+  position?: CloseButtonPosition;
+  sideOffset?: string;
+  size?: string | number;
+  topOffset?: string;
+};
 
 interface SDKInAppMessagesParams {
   displayInterval?: number;
@@ -27,29 +47,19 @@ interface SDKInAppMessagesParams {
   /* how long the in-app messages take to animate in/out */
   animationDuration?: number;
   handleLinks?: HandleLinks;
-  closeButton?: {
-    color?: string;
-    iconPath?: string;
-    /* If true, prevent user from dismissing in-app message by clicking outside of message */
-    isRequiredToDismissMessage?: boolean;
-    position?: CloseButtonPosition;
-    sideOffset?: string;
-    size?: string | number;
-    topOffset?: string;
-  };
+  closeButton?: CloseButton;
   /** messageId of the latest (i.e., most recent) message in the device's local cache */
   latestCachedMessageId?: string;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   count: number;
-  // platform?: IterablePlatform; forced to "Web"
   SDKVersion?: string;
   packageName: string;
-  /* 
-    email and userID params omitted in favor of using the "setEmail" 
-    or "setUserID" methods on the _initialize_ method
-  */
+  // platform?: IterablePlatform; forced to "Web"
+
+  /** `email` and `userID` params omitted in favor of using the "setEmail"
+   * or "setUserID" methods on the _initialize_ method. */
   //  email?: string;
   //  userId?: string
 }
@@ -65,21 +75,13 @@ export interface GetInAppMessagesResponse {
 
 export type CachedMessage = [string, InAppMessage];
 
-export enum DISPLAY_OPTIONS {
-  immediate = 'immediate',
-  deferred = 'deferred'
-}
-
-/** template literal type: allows string literals to be used for display options */
-export type DisplayOptions = `${DISPLAY_OPTIONS}`;
-
 export interface InAppDisplaySetting {
   percentage?: number;
   displayOption?: string;
 }
 
 export interface WebInAppDisplaySettings {
-  position: 'Center' | 'TopRight' | 'BottomRight' | 'Full';
+  position: DisplayPosition;
 }
 
 export type BrowserStorageEstimate = StorageEstimate & {

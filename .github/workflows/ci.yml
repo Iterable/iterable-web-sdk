@@ -1,4 +1,4 @@
-# This workflow will do a clean install of node dependencies, cache/restore them, 
+# This workflow will do a clean install of node dependencies, cache/restore them,
 # build the source code and run tests
 
 # source: https://github.com/actions/starter-workflows/blob/main/ci/node.js.yml
@@ -13,20 +13,17 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js 16.3.0
-      uses: actions/setup-node@v2
-      with:
-        node-version: '16.3.0'
-        cache: 'yarn'
-    - run: yarn install --frozen-lockfile
-    - run: yarn build:node
-    - run: node index.node.js
-    - run: yarn build
-    - run: yarn test
-    - run: yarn check-deps
-    
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Use Node.js 16.3.0
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: '16.3.0'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn prepublishOnly
+      - run: node index.node.js
+      - run: yarn test
+      - run: yarn check-deps

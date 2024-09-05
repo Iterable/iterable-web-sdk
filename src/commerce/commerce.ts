@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+import { ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
@@ -12,7 +14,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/updateCart',
+    url: ENDPOINTS.commerce_update_cart.route,
     data: {
       ...payload,
       user: {
@@ -35,7 +37,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
-    url: '/commerce/trackPurchase',
+    url: ENDPOINTS.commerce_track_purchase.route,
     data: {
       ...payload,
       user: {

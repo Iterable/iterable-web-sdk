@@ -1,6 +1,7 @@
 {
 	"presets": [
-		"@babel/typescript"
+		"@babel/preset-env",
+		"@babel/preset-typescript"
 	],
 	"ignore": [
 		"**/*.test.ts",
@@ -12,7 +13,11 @@
 		"@babel/proposal-class-properties",
 		"@babel/proposal-object-rest-spread",
 		"@babel/plugin-proposal-optional-chaining",
+		["@babel/transform-runtime", {
+			"regenerator": true
+		}],
 		"@babel/plugin-transform-modules-umd",
+		"@babel/plugin-transform-nullish-coalescing-operator",
 		[
 			"module-resolver",
 			{
