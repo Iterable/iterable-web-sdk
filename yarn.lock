@@ -6485,7 +6485,7 @@ postcss@^8.4.33, postcss@^8.4.6:
     nanoid "^3.3.7"
     picocolors "^1.0.0"
     source-map-js "^1.2.0"
-   
+
 precinct@^8.0.0, precinct@^8.1.0:
   version "8.3.1"
   resolved "https://registry.yarnpkg.com/precinct/-/precinct-8.3.1.tgz#94b99b623df144eed1ce40e0801c86078466f0dc"
