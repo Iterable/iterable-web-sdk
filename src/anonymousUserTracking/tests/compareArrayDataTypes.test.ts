@@ -66,6 +66,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
+
   it('should return criteriaId null (compare array Equal - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
