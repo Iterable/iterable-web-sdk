@@ -478,13 +478,13 @@ class CriteriaCompletionChecker {
         this.compareValueEquality(source, stringValue)
       );
     }
-      
+
     if (Array.isArray(stringValue)) {
       return stringValue.some((value) =>
         this.compareValueEquality(sourceTo, value)
       );
     }
-      
+
     if (
       (typeof sourceTo === 'number' || typeof sourceTo === 'boolean') &&
       stringValue !== ''
