@@ -351,9 +351,9 @@ class CriteriaCompletionChecker {
 
       if (field.includes('.')) {
         const fields = field.split('.');
-        const firtElement = eventData?.[fields[0]];
-        if (Array.isArray(firtElement)) {
-          return firtElement?.some((item: any) => {
+        const firstElement = eventData?.[fields[0]];
+        if (Array.isArray(firstElement)) {
+          return firstElement?.some((item: any) => {
             const data = {
               ...eventData,
               [fields[0]]: item
