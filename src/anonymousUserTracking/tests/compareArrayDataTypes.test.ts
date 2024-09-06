@@ -1,6 +1,7 @@
 import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 import {
+  IS_NOT_ONE_OF_CRITERIA,
   ARRAY_CONTAINS_CRITERIA,
   ARRAY_DOES_NOT_EQUAL_CRITERIA,
   ARRAY_EQUAL_CRITERIA,
@@ -9,7 +10,8 @@ import {
   ARRAY_LESS_THAN_CRITERIA,
   ARRAY_LESS_THAN_EQUAL_TO_CRITERIA,
   ARRAY_MATCHREGEX_CRITERIA,
-  ARRAY_STARTSWITH_CRITERIA
+  ARRAY_STARTSWITH_CRITERIA,
+  IS_ONE_OF_CRITERIA
 } from './constants';
 
 const localStorageMock = {
@@ -64,7 +66,8 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array Equal - No match)', () => {
+
+  it('should return criteriaId null (compare array Equal - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -143,7 +146,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array DoesNotEqual - No match)', () => {
+  it('should return criteriaId null (compare array DoesNotEqual - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -212,7 +215,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array GreaterThan - No match)', () => {
+  it('should return criteriaId null (compare array GreaterThan - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -269,7 +272,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array LessThan - No match)', () => {
+  it('should return criteriaId null (compare array LessThan - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -326,7 +329,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array GreaterThanOrEqualTo - No match)', () => {
+  it('should return criteriaId null (compare array GreaterThanOrEqualTo - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -383,7 +386,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array LessThanOrEqualTo - No match)', () => {
+  it('should return criteriaId null (compare array LessThanOrEqualTo - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -448,7 +451,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array Contains - No match)', () => {
+  it('should return criteriaId null (compare array Contains - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -513,7 +516,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array StartsWith - No match)', () => {
+  it('should return criteriaId null (compare array StartsWith - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -579,7 +582,7 @@ describe('compareArrayDataTypes', () => {
     expect(result).toEqual('285');
   });
 
-  it('should return criteriaId 285 (compare array MatchesRegex - No match)', () => {
+  it('should return criteriaId null (compare array MatchesRegex - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -609,6 +612,128 @@ describe('compareArrayDataTypes', () => {
 
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_MATCHREGEX_CRITERIA)
+    );
+    expect(result).toEqual(null);
+  });
+
+  // MARK: IsOneOf
+  it('should return criteriaId 299 (compare array IsOneOf)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              country: 'China',
+              addresses: ['US', 'UK', 'JP', 'DE', 'GB']
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(IS_ONE_OF_CRITERIA)
+    );
+    expect(result).toEqual('299');
+  });
+
+  it('should return criteriaId null (compare array IsOneOf - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              country: 'Korea',
+              addresses: ['US', 'UK']
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(IS_ONE_OF_CRITERIA)
+    );
+    expect(result).toEqual(null);
+  });
+
+  // MARK: IsNotOneOf
+  it('should return criteriaId 299 (compare array IsNotOneOf)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              country: 'Korea',
+              addresses: ['US', 'UK']
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(IS_NOT_ONE_OF_CRITERIA)
+    );
+    expect(result).toEqual('299');
+  });
+
+  it('should return criteriaId null (compare array IsNotOneOf - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              country: 'China',
+              addresses: ['US', 'UK', 'JP', 'DE', 'GB']
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(IS_NOT_ONE_OF_CRITERIA)
     );
     expect(result).toEqual(null);
   });

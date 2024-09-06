@@ -833,3 +833,87 @@ export const NESTED_CRITERIA = {
     }
   ]
 };
+
+export const IS_ONE_OF_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '299',
+      name: 'Criteria_Is_One_of',
+      createdAt: 1722851586508,
+      updatedAt: 1724404229481,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'Equals',
+                      values: ['China', 'Japan', 'Kenya']
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'addresses',
+                      comparatorType: 'Equals',
+                      values: ['JP', 'DE', 'GB']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const IS_NOT_ONE_OF_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '299',
+      name: 'Criteria_Is_Not_One_of',
+      createdAt: 1722851586508,
+      updatedAt: 1724404229481,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'DoesNotEqual',
+                      values: ['China', 'Japan', 'Kenya']
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'addresses',
+                      comparatorType: 'DoesNotEqual',
+                      values: ['JP', 'DE', 'GB']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
