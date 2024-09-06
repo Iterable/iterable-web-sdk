@@ -351,21 +351,14 @@ class CriteriaCompletionChecker {
 
       if (field.includes('.')) {
         const fields = field.split('.');
-        if (Array.isArray(eventData[fields[0]])) {
-          return eventData[fields[0]]?.every((item: any) => {
+        const firstElement = eventData?.[fields[0]];
+        if (Array.isArray(firstElement)) {
+          return firstElement?.some((item: any) => {
             const data = {
-              [fields[0]]: item,
-              eventType: query?.eventType
+              ...eventData,
+              [fields[0]]: item
             };
-            const valueFromObj = this.getFieldValue(data, field);
-            if (valueFromObj) {
-              return this.evaluateComparison(
-                query.comparatorType,
-                valueFromObj,
-                query.value ? query.values : ''
-              );
-            }
-            return false;
+            return this.evaluateFieldLogic(searchQueries, data);
           });
         }
 
