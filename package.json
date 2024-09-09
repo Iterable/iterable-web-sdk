@@ -13,6 +13,7 @@
   "author": "Iterable",
   "license": "MIT",
   "private": false,
+  "sideEffects": false,
   "keywords": [
     "javascript",
     "iterable sdk",
