@@ -65,8 +65,14 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
   );
 export interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string, merge?: boolean) => Promise<string>;
-  setUserID: (userId: string, merge?: boolean) => Promise<string>;
+  setEmail: (
+    email: string,
+    disableMergeAndEventReplay?: boolean
+  ) => Promise<string>;
+  setUserID: (
+    userId: string,
+    disableMergeAndEventReplay?: boolean
+  ) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
 }
@@ -74,8 +80,14 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string, merge?: boolean) => Promise<void>;
-  setUserID: (userId: string, merge?: boolean) => Promise<void>;
+  setEmail: (
+    email: string,
+    disableMergeAndEventReplay?: boolean
+  ) => Promise<void>;
+  setUserID: (
+    userId: string,
+    disableMergeAndEventReplay?: boolean
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -124,10 +136,13 @@ const getAnonUserId = () => {
   }
 };
 
-const initializeUserIdAndSync = (userId: string, merge: boolean) => {
+const initializeUserIdAndSync = (
+  userId: string,
+  disableMergeAndEventReplay: boolean
+) => {
   addUserIdToRequest(userId);
   clearAnonymousUser();
-  if (merge) {
+  if (!disableMergeAndEventReplay) {
     syncEvents();
   }
 };
@@ -227,10 +242,13 @@ const addUserIdToRequest = (userId: string) => {
   });
 };
 
-const initializeEmailUserAndSync = (email: string, merge: boolean) => {
+const initializeEmailUserAndSync = (
+  email: string,
+  disableMergeAndEventReplay: boolean
+) => {
   addEmailToRequest(email);
   clearAnonymousUser();
-  if (merge) {
+  if (!disableMergeAndEventReplay) {
     syncEvents();
   }
 };
@@ -433,9 +451,9 @@ export function initialize(
     }
   };
 
-  const getMergeDefaultValue = (merge?: boolean) => {
+  const getMergeDefaultValue = (disableMergeAndEventReplay?: boolean) => {
     const doesAnonUserExist = getAnonUserId() === null;
-    if (merge === undefined) {
+    if (disableMergeAndEventReplay === undefined) {
       if (
         (authIdentifier === null && typeOfAuth === null && doesAnonUserExist) || // Criteria is not yet met (default merge is true)
         (authIdentifier !== null && typeOfAuth !== null && !doesAnonUserExist)
@@ -446,14 +464,14 @@ export function initialize(
         return false; // Current logged in user is identified (default merge is false)
       }
     } else {
-      return merge;
+      return disableMergeAndEventReplay;
     }
   };
 
   const tryMergeUser = async (
     emailOrUserId: string,
     isEmail: boolean,
-    merge: boolean
+    disableMergeAndEventReplay: boolean
   ): Promise<boolean> => {
     const sourceUserIdOrEmail =
       authIdentifier === null ? getAnonUserId() : authIdentifier;
@@ -462,7 +480,10 @@ export function initialize(
     const destinationUserId = isEmail ? null : emailOrUserId;
     const destinationEmail = isEmail ? emailOrUserId : null;
     // This function will try to merge if anon user exists
-    if ((getAnonUserId() !== null || authIdentifier !== null) && merge) {
+    if (
+      (getAnonUserId() !== null || authIdentifier !== null) &&
+      disableMergeAndEventReplay
+    ) {
       const anonymousUserMerge = new AnonymousUserMerge();
       try {
         await anonymousUserMerge.mergeUser(
@@ -501,13 +522,19 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: async (email: string, merge?: boolean) => {
+      setEmail: async (email: string, disableMergeAndEventReplay?: boolean) => {
         clearMessages();
         try {
-          merge = getMergeDefaultValue(merge);
-          const result = await tryMergeUser(email, true, merge);
+          disableMergeAndEventReplay = getMergeDefaultValue(
+            disableMergeAndEventReplay
+          );
+          const result = await tryMergeUser(
+            email,
+            true,
+            disableMergeAndEventReplay
+          );
           if (result) {
-            initializeEmailUserAndSync(email, merge);
+            initializeEmailUserAndSync(email, disableMergeAndEventReplay);
             return Promise.resolve();
           }
         } catch (error) {
@@ -515,7 +542,10 @@ export function initialize(
           return Promise.reject(`merging failed: ${error}`);
         }
       },
-      setUserID: async (userId: string, merge?: boolean) => {
+      setUserID: async (
+        userId: string,
+        disableMergeAndEventReplay?: boolean
+      ) => {
         clearMessages();
         const tryUser = () => {
           let createUserAttempts = 0;
@@ -535,10 +565,16 @@ export function initialize(
           };
         };
         try {
-          merge = getMergeDefaultValue(merge);
-          const result = await tryMergeUser(userId, false, merge);
+          disableMergeAndEventReplay = getMergeDefaultValue(
+            disableMergeAndEventReplay
+          );
+          const result = await tryMergeUser(
+            userId,
+            false,
+            disableMergeAndEventReplay
+          );
           if (result) {
-            initializeUserIdAndSync(userId, merge);
+            initializeUserIdAndSync(userId, disableMergeAndEventReplay);
             try {
               return await tryUser()();
             } catch (e) {
@@ -829,14 +865,20 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: async (email: string, merge?: boolean) => {
+    setEmail: async (email: string, disableMergeAndEventReplay?: boolean) => {
       /* clear previous user */
       clearMessages();
       try {
-        merge = getMergeDefaultValue(merge);
-        const result = await tryMergeUser(email, true, merge);
+        disableMergeAndEventReplay = getMergeDefaultValue(
+          disableMergeAndEventReplay
+        );
+        const result = await tryMergeUser(
+          email,
+          true,
+          disableMergeAndEventReplay
+        );
         if (result) {
-          initializeEmailUserAndSync(email, merge);
+          initializeEmailUserAndSync(email, disableMergeAndEventReplay);
           try {
             return doRequest({ email }).catch((e) => {
               if (logLevel === 'verbose') {
@@ -856,7 +898,7 @@ export function initialize(
         return Promise.reject(`merging failed: ${error}`);
       }
     },
-    setUserID: async (userId: string, merge?: boolean) => {
+    setUserID: async (userId: string, disableMergeAndEventReplay?: boolean) => {
       clearMessages();
 
       const tryUser = () => {
@@ -878,10 +920,16 @@ export function initialize(
         };
       };
       try {
-        merge = getMergeDefaultValue(merge);
-        const result = await tryMergeUser(userId, false, merge);
+        disableMergeAndEventReplay = getMergeDefaultValue(
+          disableMergeAndEventReplay
+        );
+        const result = await tryMergeUser(
+          userId,
+          false,
+          disableMergeAndEventReplay
+        );
         if (result) {
-          initializeUserIdAndSync(userId, merge);
+          initializeUserIdAndSync(userId, disableMergeAndEventReplay);
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
