@@ -73,7 +73,7 @@
     "@types/jest": "^27.0.2",
     "@types/node": "^12.7.1",
     "@types/throttle-debounce": "^2.1.0",
-    "@types/uuid": "^9.0.2",
+    "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "@webpack-cli/serve": "^1.6.0",

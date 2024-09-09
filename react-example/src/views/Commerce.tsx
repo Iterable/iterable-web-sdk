@@ -28,34 +28,44 @@ export const Commerce: FC<Props> = () => {
   const handleUpdateCart = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdatingCart(true);
-    updateCart({
-      items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
-    })
-      .then((response: any) => {
-        setUpdateCartResponse(JSON.stringify(response.data));
-        setUpdatingCart(false);
+    try {
+      updateCart({
+        items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
       })
-      .catch((e: any) => {
-        setUpdateCartResponse(JSON.stringify(e.response.data));
-        setUpdatingCart(false);
-      });
+        .then((response: any) => {
+          setUpdateCartResponse(JSON.stringify(response.data));
+          setUpdatingCart(false);
+        })
+        .catch((e: any) => {
+          setUpdateCartResponse(JSON.stringify(e.response.data));
+          setUpdatingCart(false);
+        });
+    } catch (error) {
+      setUpdateCartResponse(JSON.stringify(error.message));
+      setUpdatingCart(false);
+    }
   };
 
   const handleTrackPurchase = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingPurchase(true);
-    trackPurchase({
-      items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
-      total: 200
-    })
-      .then((response: any) => {
-        setTrackingPurchase(false);
-        setTrackPurchaseResponse(JSON.stringify(response.data));
+    try {
+      trackPurchase({
+        items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
+        total: 200
       })
-      .catch((e: any) => {
-        setTrackingPurchase(false);
-        setTrackPurchaseResponse(JSON.stringify(e.response.data));
-      });
+        .then((response: any) => {
+          setTrackingPurchase(false);
+          setTrackPurchaseResponse(JSON.stringify(response.data));
+        })
+        .catch((e: any) => {
+          setTrackingPurchase(false);
+          setTrackPurchaseResponse(JSON.stringify(e.response.data));
+        });
+    } catch (error) {
+      setTrackingPurchase(false);
+      setTrackPurchaseResponse(JSON.stringify(error.message));
+    }
   };
 
   return (
