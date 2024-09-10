@@ -1,10 +1,9 @@
 /* eslint-disable */
 import axios from 'axios';
-import { baseAxiosRequest, baseIterableRequest } from '../request';
+import { baseAxiosRequest } from '../request';
 import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
-  RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
   SHARED_PREF_ANON_USER_ID,
   ENDPOINTS,
@@ -25,8 +24,6 @@ import {
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
-import { IterableResponse } from 'src/types';
-import { updateUserSchema } from 'src/users/users.schema';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 
@@ -100,19 +97,6 @@ registerAnonUserIdSetter(setAnonUserId);
 
 const clearAnonymousUser = () => {
   localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-};
-
-const updateUser = () => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: ENDPOINTS.users_update.route,
-    data: {
-      preferUserId: true
-    },
-    validation: {
-      data: updateUserSchema
-    }
-  });
 };
 
 const getAnonUserId = () => {
