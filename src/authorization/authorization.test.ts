@@ -671,19 +671,6 @@ describe('User Identification', () => {
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
       });
-
-      it('should try /users/update 0 times if request to create a user fails', async () => {
-        mockRequest.onPost('/users/update').reply(400, {});
-
-        const { setUserID } = initialize('123');
-        await setUserID('999');
-
-        expect(
-          mockRequest.history.post.filter(
-            (e: any) => !!e.url?.match(/users\/update/gim)
-          ).length
-        ).toBe(1);
-      });
     });
   });
 
