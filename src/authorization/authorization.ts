@@ -506,6 +506,7 @@ export function initialize(
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
             initializeUserIdAndSync(userId, merge);
+            return Promise.resolve();
           }
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
