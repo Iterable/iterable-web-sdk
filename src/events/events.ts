@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { ENDPOINTS } from '../constants';
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
 import { InAppTrackRequestParams } from './inapp/types';
 import { IterableResponse } from '../types';
@@ -14,7 +14,7 @@ export const track = (payload: InAppTrackRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
-    return Promise.resolve();
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

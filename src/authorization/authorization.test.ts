@@ -108,7 +108,7 @@ describe('API Key Interceptors', () => {
         packageName: 'my-lil-website'
       });
       expect(response.config.headers['Api-Key']).toBe('123');
-      expect(response.config.headers['Authorization']).toBe(
+      expect(response.config.headers.Authorization).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
@@ -125,7 +125,7 @@ describe('API Key Interceptors', () => {
         packageName: 'my-lil-website'
       });
       expect(response.config.headers['Api-Key']).toBe('123');
-      expect(response.config.headers['Authorization']).toBe(
+      expect(response.config.headers.Authorization).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
@@ -230,8 +230,8 @@ describe('API Key Interceptors', () => {
       await updateUserEmail('helloworld@gmail.com');
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -279,8 +279,8 @@ describe('API Key Interceptors', () => {
       });
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -313,8 +313,8 @@ describe('API Key Interceptors', () => {
       });
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -1075,7 +1075,7 @@ describe('User Identification', () => {
           packageName: 'my-lil-website'
         });
         expect(response.config.headers['Api-Key']).toBe('123');
-        expect(response.config.headers['Authorization']).toBe(
+        expect(response.config.headers.Authorization).toBe(
           `Bearer ${MOCK_JWT_KEY}`
         );
       });
@@ -1092,7 +1092,7 @@ describe('User Identification', () => {
           packageName: 'my-lil-website'
         });
         expect(response.config.headers['Api-Key']).toBe('123');
-        expect(response.config.headers['Authorization']).toBe(
+        expect(response.config.headers.Authorization).toBe(
           `Bearer ${MOCK_JWT_KEY}`
         );
       });

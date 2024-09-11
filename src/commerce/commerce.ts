@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { ENDPOINTS } from '../constants';
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
@@ -16,7 +16,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
-    return Promise.resolve();
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -43,7 +43,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
-    return Promise.resolve();
+    return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
