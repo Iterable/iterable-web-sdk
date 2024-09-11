@@ -58,9 +58,7 @@
     "typecheck": "ttsc --noEmit true --emitDeclarationOnly false",
     "check-deps": "madge --extensions js,ts --circular dist",
     "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build && yarn build:node",
-    "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +",
-    "bundle-stats": "webpack --profile --json > stats.json",
-    "webpack-analyze": "yarn bundle-stats && webpack-bundle-analyzer stats.json"
+    "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -104,7 +102,6 @@
     "typescript": "^4.9.5",
     "typescript-transform-paths": "^3.4.6",
     "webpack": "^5.63.0",
-    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^4.9.1",
     "webpack-dev-server": "^4.7.3"
   },

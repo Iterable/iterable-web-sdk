@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-redeclare */
-import { set } from 'lodash';
+import set from 'lodash/set';
 import { throttle } from 'throttle-debounce';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
