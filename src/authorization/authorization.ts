@@ -1,10 +1,9 @@
 /* eslint-disable */
 import axios from 'axios';
-import { baseAxiosRequest, baseIterableRequest } from '../request';
+import { baseAxiosRequest } from '../request';
 import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
-  RETRY_USER_ATTEMPTS,
   STATIC_HEADERS,
   SHARED_PREF_ANON_USER_ID,
   ENDPOINTS,
@@ -25,8 +24,6 @@ import {
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
-import { IterableResponse } from 'src/types';
-import { updateUserSchema } from 'src/users/users.schema';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 
@@ -82,7 +79,7 @@ export interface WithoutJWT {
 export const setAnonUserId = async (userId: string) => {
   let token: null | string = null;
   if (generateJWTGlobal) {
-    token = await generateJWTGlobal({ userId: userId });
+    token = await generateJWTGlobal({ userID: userId });
   }
 
   baseAxiosRequest.interceptors.request.use((config) => {
@@ -100,19 +97,6 @@ registerAnonUserIdSetter(setAnonUserId);
 
 const clearAnonymousUser = () => {
   localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-};
-
-const updateUser = () => {
-  return baseIterableRequest<IterableResponse>({
-    method: 'POST',
-    url: ENDPOINTS.users_update.route,
-    data: {
-      preferUserId: true
-    },
-    validation: {
-      data: updateUserSchema
-    }
-  });
 };
 
 const getAnonUserId = () => {
@@ -517,34 +501,12 @@ export function initialize(
       },
       setUserID: async (userId: string, merge?: boolean) => {
         clearMessages();
-        const tryUser = () => {
-          let createUserAttempts = 0;
-          return async function tryUserNTimes(): Promise<any> {
-            try {
-              return await updateUser();
-            } catch (e) {
-              if (createUserAttempts < RETRY_USER_ATTEMPTS) {
-                createUserAttempts += 1;
-                return tryUserNTimes();
-              }
-
-              return Promise.reject(
-                `could not create user after ${createUserAttempts} tries`
-              );
-            }
-          };
-        };
         try {
           merge = getMergeDefaultValue(merge);
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
             initializeUserIdAndSync(userId, merge);
-            try {
-              return await tryUser()();
-            } catch (e) {
-              /* failed to create a new user. Just silently resolve */
-              return Promise.resolve();
-            }
+            return Promise.resolve();
           }
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
@@ -858,25 +820,6 @@ export function initialize(
     },
     setUserID: async (userId: string, merge?: boolean) => {
       clearMessages();
-
-      const tryUser = () => {
-        let createUserAttempts = 0;
-
-        return async function tryUserNTimes(): Promise<any> {
-          try {
-            return await updateUser();
-          } catch (e) {
-            if (createUserAttempts < RETRY_USER_ATTEMPTS) {
-              createUserAttempts += 1;
-              return tryUserNTimes();
-            }
-
-            return Promise.reject(
-              `could not create user after ${createUserAttempts} tries`
-            );
-          }
-        };
-      };
       try {
         merge = getMergeDefaultValue(merge);
         const result = await tryMergeUser(userId, false, merge);
@@ -885,7 +828,6 @@ export function initialize(
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
-                await tryUser()();
                 return token;
               })
               .catch((e) => {
