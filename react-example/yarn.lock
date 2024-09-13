@@ -552,7 +552,7 @@
   integrity sha512-ZXRY4jNvVgSVQ8DL3LTcakaAtXwTVUxE81hslsyD2AtoXW/wVob10HkOJ1X/pAlcI7D+2YoZKg5do8G/w6RYgA==
 
 "@iterable/web-sdk@../":
-  version "1.1.1"
+  version "1.1.2"
   dependencies:
     "@pabra/sortby" "^1.0.1"
     "@types/ws" "8.5.4"
