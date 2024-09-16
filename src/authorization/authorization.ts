@@ -498,13 +498,7 @@ export function initialize(
           const result = await tryMergeUser(userId, false, disableEventReplay);
           if (result) {
             initializeUserIdAndSync(userId, disableEventReplay);
-            try {
-              return await tryUser()();
-            } catch (e) {
-              /* failed to create a new user. Just silently resolve */
-              return Promise.resolve();
-            }
-
+            return Promise.resolve();
           }
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
