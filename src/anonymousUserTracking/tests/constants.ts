@@ -917,3 +917,105 @@ export const IS_NOT_ONE_OF_CRITERIA = {
     }
   ]
 };
+
+export const CUSTOM_EVENT_API_TEST_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '6',
+      name: 'EventCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'animal-found',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.type',
+                      comparatorType: 'Equals',
+                      value: 'cat',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.count',
+                      comparatorType: 'Equals',
+                      value: '6',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const USER_UPDATE_API_TEST_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '6',
+      name: 'UserCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureType',
+                      comparatorType: 'Equals',
+                      value: 'Sofa',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureColor',
+                      comparatorType: 'Equals',
+                      value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
