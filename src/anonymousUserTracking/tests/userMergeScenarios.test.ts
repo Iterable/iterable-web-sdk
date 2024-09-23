@@ -127,7 +127,7 @@ describe('UserMergeScenariosTests', () => {
   });
 
   describe('UserMergeScenariosTests with setUserID', () => {
-    it('criteria not met with merge false with setUserId', async () => {
+    it('criteria not met with disableEventReplay true with setUserId', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -142,7 +142,7 @@ describe('UserMergeScenariosTests', () => {
         SHARED_PREFS_EVENT_LIST_KEY,
         expect.any(String)
       );
-      await setUserID('testuser123', false);
+      await setUserID('testuser123', true);
       const response = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -160,7 +160,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria not met with merge true with setUserId', async () => {
+    it('criteria not met with disableEventReplay false with setUserId', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -175,7 +175,7 @@ describe('UserMergeScenariosTests', () => {
         SHARED_PREFS_EVENT_LIST_KEY,
         expect.any(String)
       );
-      await setUserID('testuser123', true);
+      await setUserID('testuser123', false);
       const response = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -193,7 +193,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria not met with merge default value with setUserId', async () => {
+    it('criteria not met with disableEventReplay default value with setUserId', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -226,7 +226,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria is met with merge false with setUserId', async () => {
+    it('criteria is met with disableEventReplay true with setUserId', async () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -247,7 +247,7 @@ describe('UserMergeScenariosTests', () => {
       } catch (e) {
         console.log('');
       }
-      await setUserID('testuser123', false);
+      await setUserID('testuser123', true);
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
@@ -262,7 +262,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria is met with merge true with setUserId', async () => {
+    it('criteria is met with disableEventReplay false with setUserId', async () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -288,7 +288,7 @@ describe('UserMergeScenariosTests', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      await setUserID('testuser123', true);
+      await setUserID('testuser123', false);
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
@@ -302,7 +302,7 @@ describe('UserMergeScenariosTests', () => {
       jest.runAllTimers();
     });
 
-    it('criteria is met with merge default with setUserId', async () => {
+    it('criteria is met with disableEventReplay default with setUserId', async () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -343,7 +343,7 @@ describe('UserMergeScenariosTests', () => {
       jest.runAllTimers();
     });
 
-    it('current user identified with setUserId merge false', async () => {
+    it('current user identified with setUserId disableEventReplay true', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -363,7 +363,7 @@ describe('UserMergeScenariosTests', () => {
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
-      await setUserID('testuseranotheruser', false);
+      await setUserID('testuseranotheruser', true);
       const secondResponse = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -374,7 +374,8 @@ describe('UserMergeScenariosTests', () => {
       );
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
-    it('current user identified with setUserId merge true', async () => {
+
+    it('current user identified with setUserId disableEventReplay false', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -389,7 +390,7 @@ describe('UserMergeScenariosTests', () => {
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
-      await setUserID('testuseranotheruser', true);
+      await setUserID('testuseranotheruser', false);
       const secondResponse = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -400,7 +401,8 @@ describe('UserMergeScenariosTests', () => {
       );
       expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
-    it('current user identified with setUserId merge default', async () => {
+
+    it('current user identified with setUserId disableEventReplay default', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -424,12 +426,12 @@ describe('UserMergeScenariosTests', () => {
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
       );
-      expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
+      expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
   });
 
   describe('UserMergeScenariosTests with setEmail', () => {
-    it('criteria not met with merge false with setEmail', async () => {
+    it('criteria not met with disableEventReplay true with setEmail', async () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -444,7 +446,7 @@ describe('UserMergeScenariosTests', () => {
         SHARED_PREFS_EVENT_LIST_KEY,
         expect.any(String)
       );
-      await setEmail('testuser123@test.com', false);
+      await setEmail('testuser123@test.com', true);
       const response = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -462,7 +464,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria not met with merge true with setEmail', async () => {
+    it('criteria not met with disableEventReplay false with setEmail', async () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -477,7 +479,7 @@ describe('UserMergeScenariosTests', () => {
         SHARED_PREFS_EVENT_LIST_KEY,
         expect.any(String)
       );
-      await setEmail('testuser123@test.com', true);
+      await setEmail('testuser123@test.com', false);
       const response = await getInAppMessages({
         count: 10,
         packageName: 'my-lil-website'
@@ -495,7 +497,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria not met with merge default value with setEmail', async () => {
+    it('criteria not met with disableEventReplay default value with setEmail', async () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -528,7 +530,7 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
     });
 
-    it('criteria is met with merge true with setEmail', async () => {
+    it('criteria is met with disableEventReplay false with setEmail', async () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -553,7 +555,7 @@ describe('UserMergeScenariosTests', () => {
         count: 10,
         packageName: 'my-lil-website'
       });
-      await setEmail('testuser123@test.com', true);
+      await setEmail('testuser123@test.com', false);
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
@@ -567,7 +569,7 @@ describe('UserMergeScenariosTests', () => {
       jest.runAllTimers();
     });
 
-    it('criteria is met with merge default with setEmail', async () => {
+    it('criteria is met with disableEventReplay default with setEmail', async () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -608,41 +610,7 @@ describe('UserMergeScenariosTests', () => {
       jest.runAllTimers();
     });
 
-    it('current user identified with setEmail with merge false', async () => {
-      const { setEmail, logout } = initializeWithConfig({
-        authToken: '123',
-        configOptions: { enableAnonTracking: true }
-      });
-      logout(); // logout to remove logged in users before this test
-      await setEmail('testuser123@test.com');
-      const response = await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
-      expect(response.config.params.email).toBe('testuser123@test.com');
-      try {
-        await track({ eventName: 'testEvent' });
-      } catch (e) {
-        console.log('', e);
-      }
-      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
-      );
-      await setEmail('testuseranotheruser@test.com', false);
-      const secondResponse = await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
-      expect(secondResponse.config.params.email).toBe(
-        'testuseranotheruser@test.com'
-      );
-      const mergePostRequestData = mockRequest.history.post.find(
-        (req) => req.url === ENDPOINT_MERGE_USER
-      );
-      expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
-    });
-
-    it('current user identified with setEmail merge true', async () => {
+    it('current user identified with setEmail with disableEventReplay true', async () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -673,10 +641,44 @@ describe('UserMergeScenariosTests', () => {
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
       );
+      expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
+    });
+
+    it('current user identified with setEmail disableEventReplay false', async () => {
+      const { setEmail, logout } = initializeWithConfig({
+        authToken: '123',
+        configOptions: { enableAnonTracking: true }
+      });
+      logout(); // logout to remove logged in users before this test
+      await setEmail('testuser123@test.com');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.params.email).toBe('testuser123@test.com');
+      try {
+        await track({ eventName: 'testEvent' });
+      } catch (e) {
+        console.log('', e);
+      }
+      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
+        SHARED_PREF_ANON_USER_ID
+      );
+      await setEmail('testuseranotheruser@test.com', false);
+      const secondResponse = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(secondResponse.config.params.email).toBe(
+        'testuseranotheruser@test.com'
+      );
+      const mergePostRequestData = mockRequest.history.post.find(
+        (req) => req.url === ENDPOINT_MERGE_USER
+      );
       expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
 
-    it('current user identified with setEmail merge default', async () => {
+    it('current user identified with setEmail disableEventReplay default', async () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: { enableAnonTracking: true }
@@ -707,7 +709,7 @@ describe('UserMergeScenariosTests', () => {
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
       );
-      expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
+      expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
   });
 });

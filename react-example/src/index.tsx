@@ -52,11 +52,11 @@ const HomeLink = styled(Link)`
     generateJWT: ({ email, userID }) =>
       axios
         .post(
-          process.env.JWT_GENERATOR || 'http://localhost:3000/generate',
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
           {
             exp_minutes: 2,
             email,
-            userId: userID,
+            user_id: userID,
             jwt_secret: process.env.JWT_SECRET
           },
           {
