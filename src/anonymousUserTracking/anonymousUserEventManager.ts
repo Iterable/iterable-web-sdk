@@ -170,6 +170,16 @@ export class AnonymousUserEventManager {
 
   private async createKnownUser(criteriaId: string) {
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
+    const eventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
+    const events = eventList ? JSON.parse(eventList) : [];
+
+    const dataFields = {
+      ...events.find(
+        (event: any) => event[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER
+      )
+    };
+    delete dataFields[SHARED_PREFS_EVENT_TYPE];
+
     const userId = uuidv4();
 
     if (userData) {
@@ -179,7 +189,8 @@ export class AnonymousUserEventManager {
         user: {
           userId,
           mergeNestedObjects: true,
-          createNewFields: true
+          createNewFields: true,
+          dataFields
         },
         createdAt: this.getCurrentTime(),
         deviceInfo: {
@@ -206,6 +217,15 @@ export class AnonymousUserEventManager {
         }
       });
       if (response?.status === 200) {
+        // Update local storage, remove updateUser from local storage
+        localStorage.setItem(
+          SHARED_PREFS_EVENT_LIST_KEY,
+          JSON.stringify(
+            events.filter(
+              (event: any) => event[SHARED_PREFS_EVENT_TYPE] !== UPDATE_USER
+            )
+          )
+        );
         if (anonUserIdSetter !== null) {
           await anonUserIdSetter(userId);
         }
