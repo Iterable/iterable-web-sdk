@@ -975,3 +975,47 @@ export const CUSTOM_EVENT_API_TEST_CRITERIA = {
     }
   ]
 };
+
+export const USER_UPDATE_API_TEST_CRITERIA = {
+  count: 1,
+  criterias: [
+    {
+      criteriaId: '6',
+      name: 'UserCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureType',
+                      comparatorType: 'Equals',
+                      value: 'Sofa',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureColor',
+                      comparatorType: 'Equals',
+                      value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};

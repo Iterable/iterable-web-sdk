@@ -2343,20 +2343,17 @@ At that point, further requests to Iterable's API will fail.
 
 To perform a manual JWT token refresh, call [`refreshJwtToken`](#refreshjwttoken).
 
-# Iterable's European data center (EUDC)
+# Iterable's European data center (EDC)
 
-If your Iterable project is hosted on Iterable's [European data center (EUDC)](https://support.iterable.com/hc/articles/17572750887444), 
+If your Iterable project is hosted on Iterable's [European data center (EDC)](https://support.iterable.com/hc/articles/17572750887444), 
 you'll need to configure Iterable's Web SDK to interact with Iterable's EU-based 
 API endpoints.
 
-To do this, you have two options:
+To do this:
 
-- On the web server that hosts your site, set the `IS_EU_ITERABLE_SERVICE` 
-  environment variable to `true`. 
-
-- Or, when use [`initializeWithConfig`](#initializeWithConfig) to initialize
-  the SDK (rather then [`initialize`](#initialize)), and set set the 
-  `isEuIterableService` configuration option to `true`. For example:
+- Use [`initializeWithConfig`](#initializeWithConfig) to initialize the SDK 
+  (rather then [`initialize`](#initialize)).
+- Set the `isEuIterableService` configuration option to `true`. For example:
 
   ```ts
   import { initializeWithConfig } from '@iterable/web-sdk';

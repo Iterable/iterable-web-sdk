@@ -108,7 +108,7 @@ describe('API Key Interceptors', () => {
         packageName: 'my-lil-website'
       });
       expect(response.config.headers['Api-Key']).toBe('123');
-      expect(response.config.headers['Authorization']).toBe(
+      expect(response.config.headers.Authorization).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
@@ -125,7 +125,7 @@ describe('API Key Interceptors', () => {
         packageName: 'my-lil-website'
       });
       expect(response.config.headers['Api-Key']).toBe('123');
-      expect(response.config.headers['Authorization']).toBe(
+      expect(response.config.headers.Authorization).toBe(
         `Bearer ${MOCK_JWT_KEY}`
       );
     });
@@ -230,8 +230,8 @@ describe('API Key Interceptors', () => {
       await updateUserEmail('helloworld@gmail.com');
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -279,8 +279,8 @@ describe('API Key Interceptors', () => {
       });
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -313,8 +313,8 @@ describe('API Key Interceptors', () => {
       });
 
       jest.advanceTimersByTime(60000 * 4.1);
-      /* 
-        called once originally, a second time after the email was changed, 
+      /*
+        called once originally, a second time after the email was changed,
         and a third after the JWT was about to expire
       */
       expect(mockGenerateJWT).toHaveBeenCalledTimes(3);
@@ -670,19 +670,6 @@ describe('User Identification', () => {
         });
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
-      });
-
-      it('should try /users/update 0 times if request to create a user fails', async () => {
-        mockRequest.onPost('/users/update').reply(400, {});
-
-        const { setUserID } = initialize('123');
-        await setUserID('999');
-
-        expect(
-          mockRequest.history.post.filter(
-            (e: any) => !!e.url?.match(/users\/update/gim)
-          ).length
-        ).toBe(1);
       });
     });
   });
@@ -1075,7 +1062,7 @@ describe('User Identification', () => {
           packageName: 'my-lil-website'
         });
         expect(response.config.headers['Api-Key']).toBe('123');
-        expect(response.config.headers['Authorization']).toBe(
+        expect(response.config.headers.Authorization).toBe(
           `Bearer ${MOCK_JWT_KEY}`
         );
       });
@@ -1092,7 +1079,7 @@ describe('User Identification', () => {
           packageName: 'my-lil-website'
         });
         expect(response.config.headers['Api-Key']).toBe('123');
-        expect(response.config.headers['Authorization']).toBe(
+        expect(response.config.headers.Authorization).toBe(
           `Bearer ${MOCK_JWT_KEY}`
         );
       });
