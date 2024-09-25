@@ -51,7 +51,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '98',
             name: 'Custom Event',
@@ -215,7 +215,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '98',
             name: 'Custom Event',
@@ -378,7 +378,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '99',
             name: 'Custom Event',
@@ -539,7 +539,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '99',
             name: 'Custom Event',
@@ -725,7 +725,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '100',
             name: 'Custom Event',
@@ -893,7 +893,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '100',
             name: 'Custom Event',
@@ -1044,7 +1044,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '101',
             name: 'Complex Criteria 4: (NOT 9) AND 10',
@@ -1143,7 +1143,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '101',
             name: 'Complex Criteria 4: (NOT 9) AND 10',
@@ -1248,7 +1248,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '134',
             name: 'Min-Max 2',
@@ -1336,7 +1336,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '151',
             name: 'test criteria',
@@ -1483,7 +1483,7 @@ describe('complexCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '151',
             name: 'test criteria',

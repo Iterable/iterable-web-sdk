@@ -13,44 +13,9 @@ import {
 import { track } from '../../events';
 import { getInAppMessages } from '../../inapp';
 import { baseAxiosRequest } from '../../request';
-jest.setTimeout(20000); // Set the timeout to 10 seconds
+import { USER_MERGE_SCENARIO_CRITERIA } from './constants';
 
-const mockCriteria = {
-  count: 1,
-  criterias: [
-    {
-      criteriaId: '6',
-      name: 'EventCriteria',
-      createdAt: 1704754280210,
-      updatedAt: 1704754280210,
-      searchQuery: {
-        combinator: 'Or',
-        searchQueries: [
-          {
-            combinator: 'Or',
-            searchQueries: [
-              {
-                dataType: 'customEvent',
-                searchCombo: {
-                  combinator: 'And',
-                  searchQueries: [
-                    {
-                      dataType: 'customEvent',
-                      field: 'eventName',
-                      comparatorType: 'Equals',
-                      value: 'testEvent',
-                      fieldType: 'string'
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    }
-  ]
-};
+jest.setTimeout(20000); // Set the timeout to 10 seconds
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -87,7 +52,7 @@ declare global {
   function setUserID(): string;
 }
 const mockRequest = new MockAdapter(baseAxiosRequest);
-//const mockOnPostSpy = jest.spyOn(mockRequest, 'onPost');
+// const mockOnPostSpy = jest.spyOn(mockRequest, 'onPost');
 
 describe('UserMergeScenariosTests', () => {
   beforeAll(() => {
@@ -116,9 +81,11 @@ describe('UserMergeScenariosTests', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([eventData]);
-      } else if (key === SHARED_PREFS_CRITERIA) {
-        return JSON.stringify(mockCriteria);
-      } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+      }
+      if (key === SHARED_PREFS_CRITERIA) {
+        return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+      }
+      if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
       return null;
@@ -185,7 +152,9 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 means it removed items and so syncEvents was called
-      // because removeItem gets called one time for the key in case of logout and 2nd time on syncevents
+
+      // because removeItem gets called one time for
+      // the key in case of logout and 2nd time on syncevents
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -218,7 +187,9 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 means it removed items and so syncEvents was called
-      // because removeItem gets called one time for the key in case of logout and 2nd time on syncevents
+
+      // because removeItem gets called one time for
+      // the key in case of logout and 2nd time on syncevents
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -230,9 +201,11 @@ describe('UserMergeScenariosTests', () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
-        } else if (key === SHARED_PREFS_CRITERIA) {
-          return JSON.stringify(mockCriteria);
-        } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
         }
         return null;
@@ -266,9 +239,11 @@ describe('UserMergeScenariosTests', () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
-        } else if (key === SHARED_PREFS_CRITERIA) {
-          return JSON.stringify(mockCriteria);
-        } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
         }
         return null;
@@ -306,11 +281,14 @@ describe('UserMergeScenariosTests', () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
-        } else if (key === SHARED_PREFS_CRITERIA) {
-          return JSON.stringify(mockCriteria);
-        } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
-        } else if (key === SHARED_PREF_ANON_USER_ID) {
+        }
+        if (key === SHARED_PREF_ANON_USER_ID) {
           return '123e4567-e89b-12d3-a456-426614174000';
         }
         return null;
@@ -489,7 +467,9 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 means it removed items and so syncEvents was called
-      // because removeItem gets called one time for the key in case of logout and 2nd time on syncevents
+
+      // because removeItem gets called one time for
+      // the key in case of logout and 2nd time on syncevents
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -522,7 +502,9 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 means it removed items and so syncEvents was called
-      // because removeItem gets called one time for the key in case of logout and 2nd time on syncevents
+
+      // because removeItem gets called one time for
+      // the key in case of logout and 2nd time on syncevents
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -534,9 +516,11 @@ describe('UserMergeScenariosTests', () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
-        } else if (key === SHARED_PREFS_CRITERIA) {
-          return JSON.stringify(mockCriteria);
-        } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
         }
         return null;
@@ -573,11 +557,14 @@ describe('UserMergeScenariosTests', () => {
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
-        } else if (key === SHARED_PREFS_CRITERIA) {
-          return JSON.stringify(mockCriteria);
-        } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
-        } else if (key === SHARED_PREF_ANON_USER_ID) {
+        }
+        if (key === SHARED_PREF_ANON_USER_ID) {
           return '123e4567-e89b-12d3-a456-426614174000';
         }
         return null;

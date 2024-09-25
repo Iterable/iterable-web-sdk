@@ -39,7 +39,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '1',
             name: 'Combination Logic - Contact Property AND Custom Event',
@@ -121,7 +121,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '1',
             name: 'Combination Logic - Contact Property AND Custom Event',
@@ -203,7 +203,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '2',
             name: 'Combination Logic - Contact Property OR Custom Event',
@@ -285,7 +285,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '2',
             name: 'Combination Logic - Contact Property OR Custom Event',
@@ -370,7 +370,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '3',
             name: 'Combination Logic - Contact Property NOR (NOT) Custom Event',
@@ -452,7 +452,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '3',
             name: 'Combination Logic - Contact Property NOR (NOT) Custom Event',
@@ -534,7 +534,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '4',
             name: 'Combination Logic - UpdateCart AND Contact Property',
@@ -616,7 +616,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '4',
             name: 'Combination Logic - UpdateCart AND Contact Property',
@@ -698,7 +698,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '5',
             name: 'Combination Logic - UpdateCart OR Contact Property',
@@ -780,7 +780,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '5',
             name: 'Combination Logic - UpdateCart OR Contact Property',
@@ -862,7 +862,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'Combination Logic - UpdateCart NOR (NOT) Contact Property',
@@ -944,7 +944,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'Combination Logic - UpdateCart NOR (NOT) Contact Property',
@@ -1026,7 +1026,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '7',
             name: 'Combination Logic - Purchase AND UpdateCart',
@@ -1108,7 +1108,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '7',
             name: 'Combination Logic - Purchase AND UpdateCart',
@@ -1190,7 +1190,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '8',
             name: 'Combination Logic - Purchase OR UpdateCart',
@@ -1272,7 +1272,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '8',
             name: 'Combination Logic - Purchase OR UpdateCart',
@@ -1354,7 +1354,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '9',
             name: 'Combination Logic - Purchase NOR (NOT) UpdateCart',
@@ -1436,7 +1436,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '9',
             name: 'Combination Logic - Purchase NOR (NOT) UpdateCart',
@@ -1518,7 +1518,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '10',
             name: 'Combination Logic - Custom Event AND Purchase',
@@ -1600,7 +1600,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '10',
             name: 'Combination Logic - Custom Event AND Purchase',
@@ -1682,7 +1682,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '11',
             name: 'Combination Logic - Custom Event OR Purchase',
@@ -1764,7 +1764,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '11',
             name: 'Combination Logic - Custom Event OR Purchase',
@@ -1846,7 +1846,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '12',
             name: 'Combination Logic - Custom Event NOR (NOT) Purchase',
@@ -1928,7 +1928,7 @@ describe('CombinationLogicCriteria', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '12',
             name: 'Combination Logic - Custom Event NOR (NOT) Purchase',
