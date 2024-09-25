@@ -14,11 +14,11 @@ const localStorageMock = {
   removeItem: jest.fn()
 };
 
-jest.mock('../criteriaCompletionChecker', () => {
-  return jest.fn().mockImplementation(() => ({
+jest.mock('../criteriaCompletionChecker', () =>
+  jest.fn().mockImplementation(() => ({
     getMatchedCriteria: jest.fn()
-  }));
-});
+  }))
+);
 
 jest.mock('../../request', () => ({
   baseIterableRequest: jest.fn()
@@ -88,7 +88,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'EventCriteria',
@@ -122,7 +122,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_ANON_SESSIONS) {
+      }
+      if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(userData);
       }
       return null;
@@ -150,7 +151,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'EventCriteria',
@@ -184,7 +185,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(eventData);
       }
       return null;
@@ -210,7 +212,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'EventCriteria',
@@ -244,7 +246,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(eventData);
       }
       return null;
@@ -269,7 +272,8 @@ describe('AnonymousUserEventManager', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === 'criteria') {
         return null;
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(eventData);
       }
       return null;
@@ -295,7 +299,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'UpdateUserCriteria',
@@ -329,7 +333,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(userData);
       }
       return null;
@@ -371,7 +376,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'shoppingCartItemsCriteria',
@@ -412,7 +417,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(userData);
       }
       return null;
@@ -454,7 +460,7 @@ describe('AnonymousUserEventManager', () => {
       if (key === 'criteria') {
         return JSON.stringify({
           count: 1,
-          criterias: [
+          criteriaSets: [
             {
               criteriaId: '6',
               name: 'CartUpdateItemsCriteria',
@@ -495,7 +501,8 @@ describe('AnonymousUserEventManager', () => {
             }
           ]
         });
-      } else if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+      }
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify(userData);
       }
       return null;

@@ -63,7 +63,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -134,7 +134,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -208,7 +208,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -280,7 +280,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -359,7 +359,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -437,7 +437,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -516,7 +516,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'shoppingCartItemsCriteria',
@@ -587,7 +587,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -627,7 +627,7 @@ describe('CriteriaCompletionChecker', () => {
     const result1 = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -691,7 +691,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '6',
             name: 'EventCriteria',
@@ -758,7 +758,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '97',
             name: 'User',
@@ -849,7 +849,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '97',
             name: 'User',
@@ -942,7 +942,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '94',
             name: 'Custom Event',
@@ -1034,7 +1034,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '94',
             name: 'Custom Event',
@@ -1129,7 +1129,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '96',
             name: 'Purchase',
@@ -1222,7 +1222,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '96',
             name: 'Purchase',
@@ -1308,7 +1308,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '95',
             name: 'UpdateCart: isSet Comparator',
@@ -1391,7 +1391,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '95',
             name: 'UpdateCart: isSet Comparator',
@@ -1477,7 +1477,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '100',
             name: 'User',
@@ -1550,7 +1550,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '194',
             name: 'Contact: Phone Number != 57688559',
@@ -1614,7 +1614,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '293',
             name: 'Contact: subscribed != false',
@@ -1683,7 +1683,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '297',
             name: 'Purchase: shoppingCartItems.quantity != 12345678',
@@ -1752,7 +1752,7 @@ describe('CriteriaCompletionChecker', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify({
         count: 1,
-        criterias: [
+        criteriaSets: [
           {
             criteriaId: '298',
             name: 'Purchase: shoppingCartItems.price != 105',
