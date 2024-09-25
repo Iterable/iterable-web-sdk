@@ -144,13 +144,13 @@ describe('validateCustomEventUserUpdateAPI', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
-    const localStoredCriterias = localStorage.getItem(SHARED_PREFS_CRITERIA);
+    const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
       localStoredEventList === null ? '' : localStoredEventList
     );
 
-    const result = checker.getMatchedCriteria(localStoredCriterias!);
+    const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
     expect(result).toEqual('6');
 
     const { setUserID, logout } = initializeWithConfig({
@@ -228,13 +228,13 @@ describe('validateCustomEventUserUpdateAPI', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
-    const localStoredCriterias = localStorage.getItem(SHARED_PREFS_CRITERIA);
+    const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
       localStoredEventList === null ? '' : localStoredEventList
     );
 
-    const result = checker.getMatchedCriteria(localStoredCriterias!);
+    const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
     expect(result).toEqual('6');
 
     const { setUserID, logout } = initializeWithConfig({
@@ -294,13 +294,13 @@ describe('validateCustomEventUserUpdateAPI', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
-    const localStoredCriterias = localStorage.getItem(SHARED_PREFS_CRITERIA);
+    const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
       localStoredEventList === null ? '' : localStoredEventList
     );
 
-    const result = checker.getMatchedCriteria(localStoredCriterias!);
+    const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
 
     expect(result).toEqual('6');
 
@@ -365,13 +365,13 @@ describe('validateCustomEventUserUpdateAPI', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
-    const localStoredCriterias = localStorage.getItem(SHARED_PREFS_CRITERIA);
+    const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
       localStoredEventList === null ? '' : localStoredEventList
     );
     const result = checker.getMatchedCriteria(
-      JSON.stringify(localStoredCriterias)
+      JSON.stringify(localStoredCriteriaSets)
     );
     expect(result).toBeNull();
 

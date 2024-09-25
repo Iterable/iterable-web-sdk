@@ -47,8 +47,8 @@ class CriteriaCompletionChecker {
 
     try {
       const json = JSON.parse(criteriaData);
-      if (json.criterias) {
-        criteriaId = this.findMatchedCriteria(json.criterias);
+      if (json.criteriaSets) {
+        criteriaId = this.findMatchedCriteria(json.criteriaSets);
       }
     } catch (e) {
       this.handleJSONException(e);

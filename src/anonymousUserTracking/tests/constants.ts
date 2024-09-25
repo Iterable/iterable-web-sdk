@@ -2,7 +2,7 @@
 
 export const DATA_TYPE_COMPARATOR_EQUALS = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -60,7 +60,7 @@ export const DATA_TYPE_COMPARATOR_EQUALS = {
 
 export const DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -111,7 +111,7 @@ export const DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL = {
 
 export const DATA_TYPE_COMPARATOR_LESS_THAN = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '289',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -155,7 +155,7 @@ export const DATA_TYPE_COMPARATOR_LESS_THAN = {
 
 export const DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '290',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -199,7 +199,7 @@ export const DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO = {
 
 export const DATA_TYPE_COMPARATOR_GREATER_THAN = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '290',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -243,7 +243,7 @@ export const DATA_TYPE_COMPARATOR_GREATER_THAN = {
 
 export const DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '291',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -287,7 +287,7 @@ export const DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO = {
 
 export const DATA_TYPE_COMPARATOR_IS_SET = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -345,7 +345,7 @@ export const DATA_TYPE_COMPARATOR_IS_SET = {
 
 export const ARRAY_EQUAL_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_Array_Equal',
@@ -432,7 +432,7 @@ export const ARRAY_EQUAL_CRITERIA = {
 
 export const ARRAY_DOES_NOT_EQUAL_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_Array_DoesNotEqual',
@@ -519,7 +519,7 @@ export const ARRAY_DOES_NOT_EQUAL_CRITERIA = {
 
 export const ARRAY_GREATER_THAN_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -557,7 +557,7 @@ export const ARRAY_GREATER_THAN_CRITERIA = {
 
 export const ARRAY_LESS_THAN_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -595,7 +595,7 @@ export const ARRAY_LESS_THAN_CRITERIA = {
 
 export const ARRAY_GREATER_THAN_EQUAL_TO_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -633,7 +633,7 @@ export const ARRAY_GREATER_THAN_EQUAL_TO_CRITERIA = {
 
 export const ARRAY_LESS_THAN_EQUAL_TO_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -671,7 +671,7 @@ export const ARRAY_LESS_THAN_EQUAL_TO_CRITERIA = {
 
 export const ARRAY_CONTAINS_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -709,7 +709,7 @@ export const ARRAY_CONTAINS_CRITERIA = {
 
 export const ARRAY_STARTSWITH_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -747,7 +747,7 @@ export const ARRAY_STARTSWITH_CRITERIA = {
 
 export const ARRAY_MATCHREGEX_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '285',
       name: 'Criteria_EventTimeStamp_3_Long',
@@ -785,7 +785,7 @@ export const ARRAY_MATCHREGEX_CRITERIA = {
 
 export const NESTED_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '168',
       name: 'nested testing',
@@ -836,7 +836,7 @@ export const NESTED_CRITERIA = {
 
 export const IS_ONE_OF_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '299',
       name: 'Criteria_Is_One_of',
@@ -878,7 +878,7 @@ export const IS_ONE_OF_CRITERIA = {
 
 export const IS_NOT_ONE_OF_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '299',
       name: 'Criteria_Is_Not_One_of',
@@ -920,7 +920,7 @@ export const IS_NOT_ONE_OF_CRITERIA = {
 
 export const CUSTOM_EVENT_API_TEST_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '6',
       name: 'EventCriteria',
@@ -978,7 +978,7 @@ export const CUSTOM_EVENT_API_TEST_CRITERIA = {
 
 export const USER_UPDATE_API_TEST_CRITERIA = {
   count: 1,
-  criterias: [
+  criteriaSets: [
     {
       criteriaId: '6',
       name: 'UserCriteria',
@@ -1007,6 +1007,43 @@ export const USER_UPDATE_API_TEST_CRITERIA = {
                       field: 'furniture.furnitureColor',
                       comparatorType: 'Equals',
                       value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const USER_MERGE_SCENARIO_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '6',
+      name: 'EventCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'Or',
+        searchQueries: [
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'testEvent',
                       fieldType: 'string'
                     }
                   ]
