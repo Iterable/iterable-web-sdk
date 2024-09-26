@@ -383,9 +383,9 @@ class CriteriaCompletionChecker {
   }
 
   private getFieldValue(data: any, field: string): any {
-    let fields = field.split('.');
+    const fields: string[] = field.split('.');
     if (data?.eventType === TRACK_EVENT && data?.eventName === fields[0]) {
-      fields = [fields[fields.length - 1]];
+      fields.shift();
     }
     return fields.reduce(
       (value, currentField) =>

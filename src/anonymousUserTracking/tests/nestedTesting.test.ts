@@ -1,6 +1,6 @@
 import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
-import { NESTED_CRITERIA } from './constants';
+import { NESTED_CRITERIA, NESTED_CRITERIA_MULTI_LEVEL } from './constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -53,7 +53,7 @@ describe('nestedTesting', () => {
     expect(result).toEqual('168');
   });
 
-  it('should return criteriaId 168 (nested field - No match)', () => {
+  it('should return criteriaId null (nested field - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
@@ -90,6 +90,160 @@ describe('nestedTesting', () => {
       localStoredEventList === null ? '' : localStoredEventList
     );
     const result = checker.getMatchedCriteria(JSON.stringify(NESTED_CRITERIA));
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 425 (Multi level Nested field criteria)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              updateCart: { updatedShoppingCartItems: { quantity: 10 } },
+              browserVisit: { website: { domain: 'https://mybrand.com/socks' } }
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
+    expect(result).toEqual('425');
+  });
+
+  it('should return criteriaId 425 (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              'button-clicked': {
+                updateCart: { updatedShoppingCartItems: { quantity: 10 } },
+                browserVisit: {
+                  website: { domain: 'https://mybrand.com/socks' }
+                }
+              }
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              'updateCart.updatedShoppingCartItems.quantity': 10,
+              'browserVisit.website.domain': 'https://mybrand.com/socks'
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              updateCart: { updatedShoppingCartItems: { quantity: 11 } },
+              browserVisit: { website: { domain: 'https://mybrand.com' } }
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'button-clicked',
+            dataFields: {
+              quantity: 11,
+              domain: 'https://mybrand.com/socks'
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
     expect(result).toEqual(null);
   });
 });

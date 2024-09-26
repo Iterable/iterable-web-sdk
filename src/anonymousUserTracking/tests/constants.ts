@@ -834,6 +834,51 @@ export const NESTED_CRITERIA = {
   ]
 };
 
+export const NESTED_CRITERIA_MULTI_LEVEL = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '425',
+      name: 'Multi level Nested field criteria',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field:
+                        'button-clicked.updateCart.updatedShoppingCartItems.quantity',
+                      comparatorType: 'Equals',
+                      value: '10',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'button-clicked.browserVisit.website.domain',
+                      comparatorType: 'Equals',
+                      value: 'https://mybrand.com/socks',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 export const IS_ONE_OF_CRITERIA = {
   count: 1,
   criteriaSets: [
