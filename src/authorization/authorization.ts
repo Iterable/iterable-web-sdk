@@ -62,8 +62,8 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
   );
 export interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string, disableEventReplay?: boolean) => Promise<string>;
-  setUserID: (userId: string, disableEventReplay?: boolean) => Promise<string>;
+  setEmail: (email: string) => Promise<string>;
+  setUserID: (userId: string) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
 }
@@ -71,8 +71,8 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string, disableEventReplay?: boolean) => Promise<void>;
-  setUserID: (userId: string, disableEventReplay?: boolean) => Promise<void>;
+  setEmail: (email: string) => Promise<void>;
+  setUserID: (userId: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -108,13 +108,10 @@ const getAnonUserId = () => {
   }
 };
 
-const initializeUserIdAndSync = (
-  userId: string,
-  disableEventReplay?: boolean
-) => {
+const initializeUserIdAndSync = (userId: string, replay?: boolean) => {
   addUserIdToRequest(userId);
   clearAnonymousUser();
-  if (!disableEventReplay) {
+  if (replay) {
     syncEvents();
   }
 };
@@ -214,13 +211,10 @@ const addUserIdToRequest = (userId: string) => {
   });
 };
 
-const initializeEmailUserAndSync = (
-  email: string,
-  disableEventReplay?: boolean
-) => {
+const initializeEmailUserAndSync = (email: string, replay?: boolean) => {
   addEmailToRequest(email);
   clearAnonymousUser();
-  if (!disableEventReplay) {
+  if (replay) {
     syncEvents();
   }
 };
@@ -426,7 +420,7 @@ export function initialize(
   const tryMergeUser = async (
     emailOrUserId: string,
     isEmail: boolean,
-    disableEventReplay?: boolean
+    merge?: boolean
   ): Promise<boolean> => {
     const enableAnonTracking = config.getConfig('enableAnonTracking');
     const sourceUserIdOrEmail =
@@ -438,7 +432,7 @@ export function initialize(
     // This function will try to merge if anon user exists
     if (
       (getAnonUserId() !== null || authIdentifier !== null) &&
-      !disableEventReplay &&
+      merge &&
       enableAnonTracking
     ) {
       const anonymousUserMerge = new AnonymousUserMerge();
@@ -479,12 +473,16 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: async (email: string, disableEventReplay?: boolean) => {
+      setEmail: async (email: string) => {
         clearMessages();
         try {
-          const result = await tryMergeUser(email, true, disableEventReplay);
+          const identityResolution = config.getConfig('identityResolution');
+          const merge = identityResolution?.mergeOnAnonymousToKnown;
+          const replay = identityResolution?.replayOnVisitorToKnown;
+
+          const result = await tryMergeUser(email, true, merge);
           if (result) {
-            initializeEmailUserAndSync(email, disableEventReplay);
+            initializeEmailUserAndSync(email, replay);
             return Promise.resolve();
           }
         } catch (error) {
@@ -492,12 +490,16 @@ export function initialize(
           return Promise.reject(`merging failed: ${error}`);
         }
       },
-      setUserID: async (userId: string, disableEventReplay?: boolean) => {
+      setUserID: async (userId: string) => {
         clearMessages();
         try {
-          const result = await tryMergeUser(userId, false, disableEventReplay);
+          const identityResolution = config.getConfig('identityResolution');
+          const merge = identityResolution?.mergeOnAnonymousToKnown;
+          const replay = identityResolution?.replayOnVisitorToKnown;
+
+          const result = await tryMergeUser(userId, false, merge);
           if (result) {
-            initializeUserIdAndSync(userId, disableEventReplay);
+            initializeUserIdAndSync(userId, replay);
             return Promise.resolve();
           }
         } catch (error) {
@@ -783,13 +785,17 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: async (email: string, disableEventReplay?: boolean) => {
+    setEmail: async (email: string) => {
       /* clear previous user */
       clearMessages();
       try {
-        const result = await tryMergeUser(email, true, disableEventReplay);
+        const identityResolution = config.getConfig('identityResolution');
+        const merge = identityResolution?.mergeOnAnonymousToKnown;
+        const replay = identityResolution?.replayOnVisitorToKnown;
+
+        const result = await tryMergeUser(email, true, merge);
         if (result) {
-          initializeEmailUserAndSync(email, disableEventReplay);
+          initializeEmailUserAndSync(email, replay);
           try {
             return doRequest({ email }).catch((e) => {
               if (logLevel === 'verbose') {
@@ -809,12 +815,16 @@ export function initialize(
         return Promise.reject(`merging failed: ${error}`);
       }
     },
-    setUserID: async (userId: string, disableEventReplay?: boolean) => {
+    setUserID: async (userId: string) => {
       clearMessages();
       try {
-        const result = await tryMergeUser(userId, false, disableEventReplay);
+        const identityResolution = config.getConfig('identityResolution');
+        const merge = identityResolution?.mergeOnAnonymousToKnown;
+        const replay = identityResolution?.replayOnVisitorToKnown;
+
+        const result = await tryMergeUser(userId, false, merge);
         if (result) {
-          initializeUserIdAndSync(userId, disableEventReplay);
+          initializeUserIdAndSync(userId, replay);
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
