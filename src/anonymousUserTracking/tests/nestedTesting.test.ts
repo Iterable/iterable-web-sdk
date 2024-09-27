@@ -100,7 +100,6 @@ describe('nestedTesting', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              updateCart: { updatedShoppingCartItems: { quantity: 10 } },
               browserVisit: { website: { domain: 'https://mybrand.com/socks' } }
             },
             eventType: 'customEvent'
@@ -131,7 +130,6 @@ describe('nestedTesting', () => {
             eventName: 'button-clicked',
             dataFields: {
               'button-clicked': {
-                updateCart: { updatedShoppingCartItems: { quantity: 10 } },
                 browserVisit: {
                   website: { domain: 'https://mybrand.com/socks' }
                 }
@@ -164,7 +162,6 @@ describe('nestedTesting', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              'updateCart.updatedShoppingCartItems.quantity': 10,
               'browserVisit.website.domain': 'https://mybrand.com/socks'
             },
             eventType: 'customEvent'
@@ -194,7 +191,6 @@ describe('nestedTesting', () => {
           {
             eventName: 'button-clicked',
             dataFields: {
-              updateCart: { updatedShoppingCartItems: { quantity: 11 } },
               browserVisit: { website: { domain: 'https://mybrand.com' } }
             },
             eventType: 'customEvent'

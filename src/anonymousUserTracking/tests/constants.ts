@@ -855,14 +855,6 @@ export const NESTED_CRITERIA_MULTI_LEVEL = {
                   searchQueries: [
                     {
                       dataType: 'customEvent',
-                      field:
-                        'button-clicked.updateCart.updatedShoppingCartItems.quantity',
-                      comparatorType: 'Equals',
-                      value: '10',
-                      fieldType: 'long'
-                    },
-                    {
-                      dataType: 'customEvent',
                       field: 'button-clicked.browserVisit.website.domain',
                       comparatorType: 'Equals',
                       value: 'https://mybrand.com/socks',
