@@ -871,6 +871,49 @@ export const NESTED_CRITERIA_MULTI_LEVEL = {
   ]
 };
 
+export const NESTED_CRITERIA_MULTI_LEVEL_ARRAY = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '436',
+      name: 'Criteria 2.1 - 09252024 Bug Bash',
+      createdAt: 1727286807360,
+      updatedAt: 1727445082036,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture.material.type',
+                      comparatorType: 'Contains',
+                      value: 'table',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.material.color',
+                      comparatorType: 'Equals',
+                      values: ['black']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 export const IS_ONE_OF_CRITERIA = {
   count: 1,
   criteriaSets: [

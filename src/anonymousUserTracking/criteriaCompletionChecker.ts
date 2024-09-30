@@ -350,16 +350,41 @@ class CriteriaCompletionChecker {
       );
 
       if (field.includes('.')) {
-        const fields = field.split('.');
-        const firstElement = eventData?.[fields[0]];
-        if (Array.isArray(firstElement)) {
-          return firstElement?.some((item: any) => {
-            const data = {
-              ...eventData,
-              [fields[0]]: item
-            };
-            return this.evaluateFieldLogic(searchQueries, data);
-          });
+        const splitedField = field.split('.') as string[];
+        const fields =
+          eventData?.eventType === TRACK_EVENT &&
+          eventData?.eventName === splitedField[0]
+            ? splitedField.slice(1)
+            : splitedField;
+
+        let fieldValue = eventData;
+        let isSubFieldArray = false;
+        let isSubMatch = false;
+
+        fields.forEach((subField) => {
+          const subFieldValue = fieldValue[subField];
+          if (Array.isArray(subFieldValue)) {
+            isSubFieldArray = true;
+            isSubMatch = subFieldValue.some((item: any) => {
+              const data = fields.reduceRight((acc: any, key) => {
+                if (key === subField) {
+                  return { [key]: item };
+                }
+                return { [key]: acc };
+              }, {});
+
+              return this.evaluateFieldLogic(searchQueries, {
+                ...eventData,
+                ...data
+              });
+            });
+          } else {
+            fieldValue = subFieldValue;
+          }
+        });
+
+        if (isSubFieldArray) {
+          return isSubMatch;
         }
 
         const valueFromObj = this.getFieldValue(eventData, field);
