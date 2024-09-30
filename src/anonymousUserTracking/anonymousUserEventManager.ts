@@ -226,6 +226,11 @@ export class AnonymousUserEventManager {
             )
           )
         );
+
+        const onAnonUserCreated = config.getConfig('onAnonUserCreated');
+        if (onAnonUserCreated) {
+          onAnonUserCreated(userId);
+        }
         if (anonUserIdSetter !== null) {
           await anonUserIdSetter(userId);
         }

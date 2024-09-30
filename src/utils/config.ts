@@ -1,5 +1,10 @@
 import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
 
+type IdentityResolution = {
+  replayOnVisitorToKnown?: boolean;
+  mergeOnAnonymousToKnown?: boolean;
+};
+
 export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
@@ -7,10 +12,8 @@ export type Options = {
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
-  identityResolution?: {
-    replayOnVisitorToKnown?: boolean;
-    mergeOnAnonymousToKnown?: boolean;
-  };
+  identityResolution?: IdentityResolution;
+  onAnonUserCreated?: (userId: string) => void;
 };
 
 const _config = () => {
