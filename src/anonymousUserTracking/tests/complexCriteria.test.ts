@@ -1,5 +1,10 @@
 import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
+import {
+  COMPLEX_CRITERIA_1,
+  COMPLEX_CRITERIA_2,
+  COMPLEX_CRITERIA_3
+} from './constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -1597,5 +1602,132 @@ describe('complexCriteria', () => {
       })
     );
     expect(result).toEqual(null);
+  });
+
+  //  MARK: Complex criteria #1
+  it('should return criteriaId 290 if (1 OR 2 OR 3) AND (4 AND 5) AND (6 NOT 7) matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              saved_cars: { color: 'black' },
+              'animal-found': { vaccinated: true },
+              eventName: 'birthday'
+            },
+            eventType: 'customEvent'
+          },
+          {
+            dataFields: { reason: 'testing', total: 30 },
+            eventType: 'purchase'
+          },
+          {
+            dataFields: { firstName: 'Adam' },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(COMPLEX_CRITERIA_1)
+    );
+    expect(result).toEqual('290');
+  });
+
+  //  MARK: Complex criteria #2
+  it('should return criteriaId 291 if (6 OR 7) OR (4 AND 5) OR (1 NOT 2 NOT 3) matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventType: 'user',
+            dataFields: {
+              firstName: 'xcode'
+            }
+          },
+          {
+            eventType: 'customEvent',
+            eventName: 'saved_cars',
+            dataFields: {
+              color: 'black'
+            }
+          },
+          {
+            eventType: 'customEvent',
+            eventName: 'animal-found',
+            dataFields: {
+              vaccinated: true
+            }
+          },
+          {
+            eventType: 'purchase',
+            dataFields: {
+              total: 110,
+              reason: 'testing'
+            }
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(COMPLEX_CRITERIA_2)
+    );
+    expect(result).toEqual('291');
+  });
+
+  //  MARK: Complex criteria #3
+  it('should return criteriaId 292 if (1 AND 2) NOR (3 OR 4 OR 5) NOR (6 NOR 7) matched', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataType: 'user',
+            dataFields: {
+              firstName: 'xcode',
+              lastName: 'ssr'
+            }
+          },
+          {
+            dataType: 'customEvent',
+            eventName: 'animal-found',
+            dataFields: {
+              vaccinated: true,
+              count: 10
+            }
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(COMPLEX_CRITERIA_3)
+    );
+    expect(result).toEqual('292');
   });
 });

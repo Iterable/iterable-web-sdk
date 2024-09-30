@@ -1136,3 +1136,402 @@ export const USER_MERGE_SCENARIO_CRITERIA = {
     }
   ]
 };
+
+// MARK:Complex Criteria
+
+export const COMPLEX_CRITERIA_1 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '290',
+      name: 'Complex Criteria Unit Test #1',
+      createdAt: 1722532861551,
+      updatedAt: 1722532861551,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'B',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'saved_cars.color',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Not',
+            searchQueries: [
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'total',
+                      comparatorType: 'LessThanOrEqualTo',
+                      value: '100',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'reason',
+                      comparatorType: 'Equals',
+                      value: 'null',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const COMPLEX_CRITERIA_2 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '291',
+      name: 'Complex Criteria Unit Test #2',
+      createdAt: 1722533473263,
+      updatedAt: 1722533473263,
+      searchQuery: {
+        combinator: 'Or',
+        searchQueries: [
+          {
+            combinator: 'Not',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'B',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'saved_cars.color',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'total',
+                      comparatorType: 'GreaterThanOrEqualTo',
+                      value: '100',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'reason',
+                      comparatorType: 'DoesNotEqual',
+                      value: 'null',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const COMPLEX_CRITERIA_3 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '292',
+      name: 'Complex Criteria Unit Test #3',
+      createdAt: 1722533789589,
+      updatedAt: 1722533838989,
+      searchQuery: {
+        combinator: 'Not',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'lastName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'false',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.count',
+                      comparatorType: 'LessThan',
+                      value: '5',
+                      fieldType: 'long'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
