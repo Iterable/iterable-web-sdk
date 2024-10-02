@@ -914,6 +914,50 @@ export const NESTED_CRITERIA_MULTI_LEVEL_ARRAY = {
   ]
 };
 
+export const NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '459',
+      name: 'event a.h.b=d && a.h.c=g',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'TopLevelArrayObject.a.h.b',
+                      comparatorType: 'Equals',
+                      value: 'd',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'TopLevelArrayObject.a.h.c',
+                      comparatorType: 'Equals',
+                      value: 'g',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 export const IS_ONE_OF_CRITERIA = {
   count: 1,
   criteriaSets: [

@@ -350,12 +350,12 @@ class CriteriaCompletionChecker {
       );
 
       if (field.includes('.')) {
-        const splitedField = field.split('.') as string[];
+        const splitField = field.split('.') as string[];
         const fields =
           eventData?.eventType === TRACK_EVENT &&
-          eventData?.eventName === splitedField[0]
-            ? splitedField.slice(1)
-            : splitedField;
+          eventData?.eventName === splitField[0]
+            ? splitField.slice(1)
+            : splitField;
 
         let fieldValue = eventData;
         let isSubFieldArray = false;
