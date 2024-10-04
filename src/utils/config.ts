@@ -7,6 +7,10 @@ export type Options = {
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
+  identityResolution?: {
+    replayOnVisitorToKnown?: boolean;
+    mergeOnAnonymousToKnown?: boolean;
+  };
 };
 
 const _config = () => {
@@ -16,7 +20,11 @@ const _config = () => {
     enableAnonTracking: false,
     isEuIterableService: false,
     dangerouslyAllowJsPopups: false,
-    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT
+    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,
+    identityResolution: {
+      replayOnVisitorToKnown: true,
+      mergeOnAnonymousToKnown: true
+    }
   };
 
   const getConfig = <K extends keyof Options>(option: K) => options[option];
@@ -26,7 +34,11 @@ const _config = () => {
     setConfig: (newOptions: Partial<Options>) => {
       options = {
         ...options,
-        ...newOptions
+        ...newOptions,
+        identityResolution: {
+          ...options.identityResolution,
+          ...newOptions.identityResolution
+        }
       };
     }
   };
