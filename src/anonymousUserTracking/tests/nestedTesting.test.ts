@@ -1,6 +1,11 @@
 import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
-import { NESTED_CRITERIA, NESTED_CRITERIA_MULTI_LEVEL } from './constants';
+import {
+  NESTED_CRITERIA,
+  NESTED_CRITERIA_MULTI_LEVEL,
+  NESTED_CRITERIA_MULTI_LEVEL_ARRAY,
+  NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT
+} from './constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -239,6 +244,172 @@ describe('nestedTesting', () => {
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL)
+    );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 436 (Multi level Nested field criteria)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              furniture: {
+                material: [
+                  {
+                    type: 'table',
+                    color: 'black',
+                    lengthInches: 40,
+                    widthInches: 60
+                  },
+                  {
+                    type: 'Sofa',
+                    color: 'Gray',
+                    lengthInches: 20,
+                    widthInches: 30
+                  }
+                ]
+              }
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY)
+    );
+    expect(result).toEqual('436');
+  });
+
+  it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              furniture: {
+                material: [
+                  {
+                    type: 'table',
+                    color: 'Gray',
+                    lengthInches: 40,
+                    widthInches: 60
+                  },
+                  {
+                    type: 'Sofa',
+                    color: 'black',
+                    lengthInches: 20,
+                    widthInches: 30
+                  }
+                ]
+              }
+            },
+            eventType: 'user'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY)
+    );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 459 (Multi level Nested field criteria)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'TopLevelArrayObject',
+            dataFields: {
+              a: {
+                h: [
+                  {
+                    b: 'e',
+                    c: 'h'
+                  },
+                  {
+                    b: 'd',
+                    c: 'g'
+                  }
+                ]
+              }
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT)
+    );
+    expect(result).toEqual('459');
+  });
+
+  it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            eventName: 'TopLevelArrayObject',
+            dataFields: {
+              a: {
+                h: [
+                  {
+                    b: 'd',
+                    c: 'h'
+                  },
+                  {
+                    b: 'e',
+                    c: 'g'
+                  }
+                ]
+              }
+            },
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT)
     );
     expect(result).toEqual(null);
   });
