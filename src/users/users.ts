@@ -1,10 +1,12 @@
 // eslint-disable @typescript-eslint/no-explicit-any
 import { object, string } from 'yup';
-import { ENDPOINTS } from '../constants';
 import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
+import { canTrackAnonUser } from '../utils/commonFunctions';
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
 
 export const updateUserEmail = (newEmail: string) =>
   baseIterableRequest<IterableResponse>({
@@ -26,6 +28,11 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   delete (payload as any).userId;
   delete (payload as any).email;
 
+  if (canTrackAnonUser()) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonUpdateUser(payload);
+    return Promise.reject(INITIALIZE_ERROR);
+  }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.users_update.route,

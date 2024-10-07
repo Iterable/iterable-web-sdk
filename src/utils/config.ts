@@ -1,18 +1,33 @@
-import { BASE_URL } from '../constants';
+import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
+
+type IdentityResolution = {
+  replayOnVisitorToKnown?: boolean;
+  mergeOnAnonymousToKnown?: boolean;
+  onAnonUserCreated?: (userId: string) => void;
+};
 
 export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
+  enableAnonTracking: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
+  eventThresholdLimit?: number;
+  identityResolution?: IdentityResolution;
 };
 
 const _config = () => {
   let options: Options = {
     logLevel: 'none',
     baseURL: BASE_URL,
+    enableAnonTracking: false,
     isEuIterableService: false,
-    dangerouslyAllowJsPopups: false
+    dangerouslyAllowJsPopups: false,
+    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,
+    identityResolution: {
+      replayOnVisitorToKnown: true,
+      mergeOnAnonymousToKnown: true
+    }
   };
 
   const getConfig = <K extends keyof Options>(option: K) => options[option];
@@ -22,7 +37,11 @@ const _config = () => {
     setConfig: (newOptions: Partial<Options>) => {
       options = {
         ...options,
-        ...newOptions
+        ...newOptions,
+        identityResolution: {
+          ...options.identityResolution,
+          ...newOptions.identityResolution
+        }
       };
     }
   };
