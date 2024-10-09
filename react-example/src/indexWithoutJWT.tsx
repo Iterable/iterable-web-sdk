@@ -46,7 +46,12 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true
+      enableAnonTracking: true,
+      identityResolution: {
+        onAnonUserCreated: (userId: string) => {
+          console.log('onAnonUserCreated', userId);
+        }
+      }
     }
   };
 

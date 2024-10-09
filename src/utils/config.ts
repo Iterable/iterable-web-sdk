@@ -1,5 +1,11 @@
 import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
 
+type IdentityResolution = {
+  replayOnVisitorToKnown?: boolean;
+  mergeOnAnonymousToKnown?: boolean;
+  onAnonUserCreated?: (userId: string) => void;
+};
+
 export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
@@ -7,6 +13,7 @@ export type Options = {
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
+  identityResolution?: IdentityResolution;
 };
 
 const _config = () => {
@@ -16,7 +23,11 @@ const _config = () => {
     enableAnonTracking: false,
     isEuIterableService: false,
     dangerouslyAllowJsPopups: false,
-    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT
+    eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,
+    identityResolution: {
+      replayOnVisitorToKnown: true,
+      mergeOnAnonymousToKnown: true
+    }
   };
 
   const getConfig = <K extends keyof Options>(option: K) => options[option];
@@ -26,7 +37,11 @@ const _config = () => {
     setConfig: (newOptions: Partial<Options>) => {
       options = {
         ...options,
-        ...newOptions
+        ...newOptions,
+        identityResolution: {
+          ...options.identityResolution,
+          ...newOptions.identityResolution
+        }
       };
     }
   };
