@@ -55,8 +55,11 @@ const HomeLink = styled(Link)`
     }
   };
 
-  const { setUserID, logout, setEmail } =
+  const { setUserID, logout, setEmail, startStopAnonymousUserTracking } =
     initializeWithConfig(initializeParams);
+
+  const handleConcent = (concent?: boolean) =>
+    startStopAnonymousUserTracking(concent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
@@ -86,7 +89,10 @@ const HomeLink = styled(Link)`
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
               />
-              <Route path="/aut-testing" element={<AUTTesting />} />
+              <Route
+                path="/aut-testing"
+                element={<AUTTesting setConcent={handleConcent} />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>

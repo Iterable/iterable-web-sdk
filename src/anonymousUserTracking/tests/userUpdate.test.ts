@@ -6,7 +6,8 @@ import {
   SHARED_PREFS_CRITERIA,
   GET_CRITERIA_PATH,
   ENDPOINT_TRACK_ANON_SESSION,
-  ENDPOINT_MERGE_USER
+  ENDPOINT_MERGE_USER,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../../constants';
 import { updateUser } from '../../users';
 import { initializeWithConfig } from '../../authorization';
@@ -94,6 +95,9 @@ describe('UserUpdate', () => {
       }
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
+      }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
       }
       return null;
     });
