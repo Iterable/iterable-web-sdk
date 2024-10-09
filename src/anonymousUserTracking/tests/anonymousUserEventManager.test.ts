@@ -3,7 +3,8 @@ import { baseIterableRequest } from '../../request';
 import {
   SHARED_PREFS_ANON_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
-  SHARED_PREFS_CRITERIA
+  SHARED_PREFS_CRITERIA,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../../constants';
 import { UpdateUserParams } from '../../users';
 import { TrackPurchaseRequestParams } from '../../commerce';
@@ -52,9 +53,15 @@ describe('AnonymousUserEventManager', () => {
       }
     };
 
-    localStorageMock.getItem.mockReturnValue(
-      JSON.stringify(initialAnonSessionInfo)
-    );
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_ANON_SESSIONS) {
+        return JSON.stringify(initialAnonSessionInfo);
+      }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
+      return null;
+    });
 
     anonUserEventManager.updateAnonSession();
 

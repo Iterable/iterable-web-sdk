@@ -8,7 +8,8 @@ import {
   GET_CRITERIA_PATH,
   SHARED_PREFS_ANON_SESSIONS,
   ENDPOINT_MERGE_USER,
-  SHARED_PREF_ANON_USER_ID
+  SHARED_PREF_ANON_USER_ID,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../../constants';
 import { track } from '../../events';
 import { getInAppMessages } from '../../inapp';
@@ -87,6 +88,9 @@ describe('UserMergeScenariosTests', () => {
       }
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
+      }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
       }
       return null;
     });
@@ -269,6 +273,9 @@ describe('UserMergeScenariosTests', () => {
         }
         if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
+        }
+        if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+          return 'true';
         }
         return null;
       });
@@ -586,6 +593,9 @@ describe('UserMergeScenariosTests', () => {
         }
         if (key === SHARED_PREFS_ANON_SESSIONS) {
           return JSON.stringify(initialAnonSessionInfo);
+        }
+        if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+          return 'true';
         }
         return null;
       });

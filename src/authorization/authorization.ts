@@ -7,7 +7,9 @@ import {
   STATIC_HEADERS,
   SHARED_PREF_ANON_USER_ID,
   ENDPOINTS,
-  RouteConfig
+  RouteConfig,
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREFS_CRITERIA
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -21,6 +23,7 @@ import {
 import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
 import {
   AnonymousUserEventManager,
+  isAnonymousUsageTracked,
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { Options, config } from 'src/utils/config';
@@ -74,9 +77,14 @@ export interface WithoutJWT {
   setEmail: (email: string) => Promise<void>;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
+  startStopAnonymousUserTracking: (concent: boolean) => void;
 }
 
 export const setAnonUserId = async (userId: string) => {
+  const anonymousUsageTracked = isAnonymousUsageTracked();
+
+  if (!anonymousUsageTracked) return;
+
   let token: null | string = null;
   if (generateJWTGlobal) {
     token = await generateJWTGlobal({ userID: userId });
@@ -522,6 +530,32 @@ export function initialize(
         if (typeof userInterceptor === 'number') {
           /* stop adding JWT to requests */
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
+        }
+      },
+      startStopAnonymousUserTracking: (concent: boolean) => {
+        /* if concent is true, we want to clear anon user data and start tracking from point forward */
+        if (concent) {
+          anonUserManager.removeAnonSessionCriteriaData();
+          localStorage.removeItem(SHARED_PREFS_CRITERIA);
+
+          localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'true');
+          enableAnonymousTracking();
+        } else {
+          /* if concent is false, we want to stop tracking and clear anon user data */
+          const anonymousUsageTracked = isAnonymousUsageTracked();
+          if (anonymousUsageTracked) {
+            anonUserManager.removeAnonSessionCriteriaData();
+
+            localStorage.removeItem(SHARED_PREFS_CRITERIA);
+            localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+            localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
+
+            typeOfAuth = null;
+            authIdentifier = null;
+            /* clear fetched in-app messages */
+            clearMessages();
+          }
+          localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
         }
       }
     };
