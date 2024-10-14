@@ -28,7 +28,8 @@ describe('EmbeddedManager', () => {
       const embeddedManager = new IterableEmbeddedManager(appPackageName);
 
       async function mockTest() {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
+          // eslint-disable-next-line prefer-promise-reject-errors
           reject('Invalid API Key');
         });
       }

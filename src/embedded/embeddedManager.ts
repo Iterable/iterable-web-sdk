@@ -10,6 +10,7 @@ import { ErrorMessage } from './consts';
 import { SDK_VERSION, WEB_PLATFORM, ENDPOINTS } from '../constants';
 import { trackEmbeddedReceived } from '../events/embedded/events';
 import { handleEmbeddedClick } from './utils';
+import { typeOfAuth } from '../authorization';
 
 export class IterableEmbeddedManager {
   public appPackageName: string;
@@ -27,8 +28,10 @@ export class IterableEmbeddedManager {
     callback: () => void,
     placementIds?: number[]
   ) {
-    await this.retrieveEmbeddedMessages(packageName, placementIds || []);
-    callback();
+    if (typeOfAuth !== null) {
+      await this.retrieveEmbeddedMessages(packageName, placementIds || []);
+      callback();
+    }
   }
 
   private async retrieveEmbeddedMessages(
