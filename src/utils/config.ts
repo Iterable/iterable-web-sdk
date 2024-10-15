@@ -3,7 +3,6 @@ import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
 type IdentityResolution = {
   replayOnVisitorToKnown?: boolean;
   mergeOnAnonymousToKnown?: boolean;
-  onAnonUserCreated?: (userId: string) => void;
 };
 
 export type Options = {
@@ -13,6 +12,7 @@ export type Options = {
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
+  onAnonUserCreated?: (userId: string) => void;
   identityResolution?: IdentityResolution;
 };
 

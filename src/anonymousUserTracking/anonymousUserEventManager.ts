@@ -227,8 +227,7 @@ export class AnonymousUserEventManager {
           )
         );
 
-        const onAnonUserCreated =
-          config.getConfig('identityResolution')?.onAnonUserCreated;
+        const onAnonUserCreated = config.getConfig('onAnonUserCreated');
 
         if (onAnonUserCreated) {
           onAnonUserCreated(userId);
