@@ -69,6 +69,7 @@ export interface WithJWT {
   setUserID: (userId: string) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
+  toggleAnonUserTrackingConsent: (consent: boolean) => void;
 }
 
 export interface WithoutJWT {
@@ -912,6 +913,32 @@ export function initialize(
           console.warn('Could not refresh JWT. Try Refresh the JWT again.');
         }
       });
+    },
+    toggleAnonUserTrackingConsent: (consent: boolean) => {
+      /* if consent is true, we want to clear anon user data and start tracking from point forward */
+      if (consent) {
+        anonUserManager.removeAnonSessionCriteriaData();
+        localStorage.removeItem(SHARED_PREFS_CRITERIA);
+
+        localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'true');
+        enableAnonymousTracking();
+      } else {
+        /* if consent is false, we want to stop tracking and clear anon user data */
+        const anonymousUsageTracked = isAnonymousUsageTracked();
+        if (anonymousUsageTracked) {
+          anonUserManager.removeAnonSessionCriteriaData();
+
+          localStorage.removeItem(SHARED_PREFS_CRITERIA);
+          localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+          localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
+
+          typeOfAuth = null;
+          authIdentifier = null;
+          /* clear fetched in-app messages */
+          clearMessages();
+        }
+        localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
+      }
     }
   };
 }
