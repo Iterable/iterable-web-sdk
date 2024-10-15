@@ -25,7 +25,8 @@ import {
   WEB_PLATFORM,
   KEY_PREFER_USERID,
   ENDPOINTS,
-  DEFAULT_EVENT_THRESHOLD_LIMIT
+  DEFAULT_EVENT_THRESHOLD_LIMIT,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
@@ -48,9 +49,21 @@ let anonUserIdSetter: AnonUserFunction | null = null;
 export function registerAnonUserIdSetter(setterFunction: AnonUserFunction) {
   anonUserIdSetter = setterFunction;
 }
+
+export function isAnonymousUsageTracked(): boolean {
+  const anonymousUsageTracked = localStorage.getItem(
+    SHARED_PREF_ANON_USAGE_TRACKED
+  );
+  return anonymousUsageTracked === 'true';
+}
+
 export class AnonymousUserEventManager {
   updateAnonSession() {
     try {
+      const anonymousUsageTracked = isAnonymousUsageTracked();
+
+      if (!anonymousUsageTracked) return;
+
       const strAnonSessionInfo = localStorage.getItem(
         SHARED_PREFS_ANON_SESSIONS
       );
@@ -91,6 +104,10 @@ export class AnonymousUserEventManager {
   }
 
   getAnonCriteria() {
+    const anonymousUsageTracked = isAnonymousUsageTracked();
+
+    if (!anonymousUsageTracked) return;
+
     baseIterableRequest<IterableResponse>({
       method: 'GET',
       url: GET_CRITERIA_PATH,
@@ -169,6 +186,10 @@ export class AnonymousUserEventManager {
   }
 
   private async createKnownUser(criteriaId: string) {
+    const anonymousUsageTracked = isAnonymousUsageTracked();
+
+    if (!anonymousUsageTracked) return;
+
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
     const eventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const events = eventList ? JSON.parse(eventList) : [];
@@ -293,6 +314,10 @@ export class AnonymousUserEventManager {
     >,
     shouldOverWrite: boolean
   ) {
+    const anonymousUsageTracked = isAnonymousUsageTracked();
+
+    if (!anonymousUsageTracked) return;
+
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     let previousDataArray = [];
 

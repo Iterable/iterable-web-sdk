@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { FC, FormEvent, useState } from 'react';
 import {
   updateCart,
@@ -19,9 +20,11 @@ import {
   Response
 } from './Components.styled';
 
-interface Props {}
+interface Props {
+  setConsent?: (accept: boolean) => void;
+}
 
-export const AUTTesting: FC<Props> = () => {
+export const AUTTesting: FC<Props> = ({ setConsent }) => {
   const [updateCartResponse, setUpdateCartResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -200,6 +203,25 @@ export const AUTTesting: FC<Props> = () => {
   const inputAttr = { 'data-qa-track-input': true };
   const responseAttr = { 'data-qa-track-response': true };
 
+  const acceptCookie = () => setConsent(true);
+
+  const declineCookie = () => setConsent(false);
+
+  const renderCookieConsent = setConsent && (
+    <div id="cookie-consent-container">
+      <h3>We value your privacy</h3>
+      <p>
+        We use cookies to enhance your browsing experience, serve personalized
+        ads or content, and analyze our traffic. By clicking &quot;Accept&quot;,
+        you consent to our use of cookies.
+      </p>
+      <div>
+        <Button onClick={acceptCookie}>Accept</Button>
+        <Button onClick={declineCookie}>Decline</Button>
+      </div>
+    </div>
+  );
+
   return (
     <>
       <h1>Commerce Endpoints</h1>
@@ -274,6 +296,7 @@ export const AUTTesting: FC<Props> = () => {
         </Form>
         <Response {...responseAttr}>{trackResponse}</Response>
       </EndpointWrapper>
+      {renderCookieConsent}
     </>
   );
 };

@@ -55,8 +55,11 @@ const HomeLink = styled(Link)`
     }
   };
 
-  const { setUserID, logout, setEmail } =
+  const { setUserID, logout, setEmail, toggleAnonUserTrackingConsent } =
     initializeWithConfig(initializeParams);
+
+  const handleConsent = (consent?: boolean) =>
+    toggleAnonUserTrackingConsent(consent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
@@ -86,7 +89,10 @@ const HomeLink = styled(Link)`
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
               />
-              <Route path="/aut-testing" element={<AUTTesting />} />
+              <Route
+                path="/aut-testing"
+                element={<AUTTesting setConsent={handleConsent} />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>
