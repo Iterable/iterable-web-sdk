@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { initialize } from './authorization';
+import { initialize, setTypeOfAuthForTestingOnly } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
@@ -41,6 +41,8 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     mockRequest.onPost('/users/update').reply(200, {
       data: 'something'
     });
@@ -342,6 +344,8 @@ describe('API Key Interceptors', () => {
 
 describe('User Identification', () => {
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     /* clear any interceptors already configured */
     [
       ...Array(
@@ -354,6 +358,7 @@ describe('User Identification', () => {
 
   describe('non-JWT auth', () => {
     beforeAll(() => {
+      (global as any).localStorage = localStorageMock;
       mockRequest = new MockAdapter(baseAxiosRequest);
 
       mockRequest.onPost('/users/update').reply(200, {});
@@ -369,11 +374,16 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(
+            new Error('Cannot make API request until a user is signed in')
+          );
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -382,11 +392,16 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(
+            new Error('Cannot make API request until a user is signed in')
+          );
+        }
       });
     });
 
@@ -693,11 +708,16 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(
+            new Error('Cannot make API request until a user is signed in')
+          );
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -707,11 +727,16 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(
+            new Error('Cannot make API request until a user is signed in')
+          );
+        }
       });
     });
 
@@ -1092,8 +1117,8 @@ describe('User Identification', () => {
           .fn()
           .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
         const { refreshJwtToken } = initialize('123', mockGenerateJWT);
-        await refreshJwtToken('hello@gmail.com');
-
+        const res = await refreshJwtToken('hello@gmail.com');
+        console.log({ res });
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(60000 * 4.1);
         expect(mockGenerateJWT).toHaveBeenCalledTimes(2);

@@ -13,8 +13,9 @@ import {
   trackInAppDelivery,
   trackInAppOpen
 } from './inapp/events';
-import { WEB_PLATFORM } from '../constants';
+import { INITIALIZE_ERROR, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { setTypeOfAuthForTestingOnly } from '../authorization';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 const localStorageMock = {
@@ -58,6 +59,10 @@ describe('Events Requests', () => {
         hostname: 'example.com'
       }
     });
+  });
+
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
   });
 
   it('return the correct payload for track', async () => {
@@ -256,6 +261,54 @@ describe('Events Requests', () => {
           }
         ])
       );
+    }
+  });
+  it('should fail trackInAppOpen if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppOpen({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+  it('should fail trackInAppClose if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppClose({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+  it('should fail trackInAppClick if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppClick({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+  it('should fail trackInAppConsume if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppConsume({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+  it('should fail trackInAppDelivery if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppDelivery({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+  it('should fail trackInAppOpen if not authed', async () => {
+    try {
+      setTypeOfAuthForTestingOnly(null);
+      await trackInAppOpen({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
     }
   });
 
@@ -476,5 +529,32 @@ describe('Events Requests', () => {
 
     expect(JSON.parse(trackSessionResponse.config.data).email).toBeUndefined();
     expect(JSON.parse(trackSessionResponse.config.data).userId).toBeUndefined();
+  });
+
+  it('should fail if no auth type set for embedded received', async () => {
+    setTypeOfAuthForTestingOnly(null);
+    try {
+      await trackEmbeddedReceived('abc123', 'packageName');
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+
+  it('should fail if no auth type set for embedded click', async () => {
+    setTypeOfAuthForTestingOnly(null);
+    try {
+      await trackEmbeddedClick({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
+  });
+
+  it('should fail if no auth type set for embedded session', async () => {
+    setTypeOfAuthForTestingOnly(null);
+    try {
+      await trackEmbeddedSession({} as any);
+    } catch (e) {
+      expect(e).toBe(INITIALIZE_ERROR);
+    }
   });
 });

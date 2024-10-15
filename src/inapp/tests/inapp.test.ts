@@ -3,7 +3,7 @@
  */
 import MockAdapter from 'axios-mock-adapter';
 import { messages } from '../../__data__/inAppMessages';
-import { initialize } from '../../authorization';
+import { initialize, setTypeOfAuthForTestingOnly } from '../../authorization';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
 import { createClientError } from '../../utils/testUtils';
@@ -20,6 +20,7 @@ describe('getInAppMessages', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetAllMocks();
+    setTypeOfAuthForTestingOnly('email');
     mockRequest.resetHistory();
 
     mockRequest.onGet(GETMESSAGES_PATH).reply(200, {

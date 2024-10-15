@@ -1,5 +1,6 @@
 /* eslint-disable no-unreachable */
 import { delMany, entries } from 'idb-keyval';
+import { typeOfAuth } from '../authorization';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../constants';
 import { baseIterableRequest } from '../request';
 import { addNewMessagesToCache, getCachedMessagesToDelete } from './cache';
@@ -19,8 +20,13 @@ type RequestInAppMessagesProps = {
 export const requestInAppMessages = ({
   latestCachedMessageId,
   payload
-}: RequestInAppMessagesProps) =>
-  baseIterableRequest<InAppMessageResponse>({
+}: RequestInAppMessagesProps) => {
+  if (typeOfAuth === null) {
+    return Promise.reject(
+      new Error('Cannot make API request until a user is signed in')
+    );
+  }
+  return baseIterableRequest<InAppMessageResponse>({
     method: 'GET',
     /** @note TBD: Parameter will be enabled once new endpoint is ready */
     // url: options?.useLocalCache ? CACHE_ENABLED_GETMESSAGES_PATH : GETMESSAGES_PATH,
@@ -33,6 +39,7 @@ export const requestInAppMessages = ({
       latestCachedMessageId
     }
   });
+};
 
 type RequestMessagesProps = {
   payload: InAppMessagesRequestParams;

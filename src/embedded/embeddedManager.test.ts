@@ -1,4 +1,5 @@
 import { IterableEmbeddedManager } from './embeddedManager';
+import { setTypeOfAuthForTestingOnly } from '../authorization';
 
 // Mock the baseIterableRequest function
 jest.mock('../request', () => ({
@@ -11,6 +12,9 @@ jest.mock('..', () => ({
 }));
 
 describe('EmbeddedManager', () => {
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('email');
+  });
   const appPackageName = 'my-website';
   describe('syncMessages', () => {
     it('should call syncMessages and callback', async () => {
@@ -28,7 +32,8 @@ describe('EmbeddedManager', () => {
       const embeddedManager = new IterableEmbeddedManager(appPackageName);
 
       async function mockTest() {
-        return new Promise(function (resolve, reject) {
+        return new Promise((resolve, reject) => {
+          // eslint-disable-next-line prefer-promise-reject-errors
           reject('Invalid API Key');
         });
       }

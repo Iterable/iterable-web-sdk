@@ -6,6 +6,7 @@ import { IterableResponse } from '../types';
 import { trackSchema } from './events.schema';
 import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from '../utils/commonFunctions';
+import { typeOfAuth } from '../authorization';
 
 export const track = (payload: InAppTrackRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -14,6 +15,9 @@ export const track = (payload: InAppTrackRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonEvent(payload);
+    return Promise.reject(INITIALIZE_ERROR);
+  }
+  if (typeOfAuth === null) {
     return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({

@@ -2,13 +2,18 @@
 import { baseIterableRequest } from '../../request';
 import { InAppEventRequestParams } from './types';
 import { IterableResponse } from '../../types';
-import { ENDPOINTS, WEB_PLATFORM } from '../../constants';
+import { ENDPOINTS, INITIALIZE_ERROR, WEB_PLATFORM } from '../../constants';
 import { eventRequestSchema } from './events.schema';
+import { typeOfAuth } from '../../authorization';
 
 export const trackInAppClose = (payload: InAppEventRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   delete (payload as any).userId;
   delete (payload as any).email;
+
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -36,6 +41,10 @@ export const trackInAppOpen = (
   /* a customer could potentially send these up if they're not using TypeScript */
   delete (payload as any).userId;
   delete (payload as any).email;
+
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -66,6 +75,10 @@ export const trackInAppClick = (
   delete (payload as any).userId;
   delete (payload as any).email;
 
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
+
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_click.route,
@@ -93,6 +106,10 @@ export const trackInAppDelivery = (
   /* a customer could potentially send these up if they're not using TypeScript */
   delete (payload as any).userId;
   delete (payload as any).email;
+
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -124,6 +141,10 @@ export const trackInAppConsume = (
   /* a customer could potentially send these up if they're not using TypeScript */
   delete (payload as any).userId;
   delete (payload as any).email;
+
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

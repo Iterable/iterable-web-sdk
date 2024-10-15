@@ -7,9 +7,15 @@ import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from '../utils/commonFunctions';
 import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
+import { typeOfAuth } from '../authorization';
 
-export const updateUserEmail = (newEmail: string) =>
-  baseIterableRequest<IterableResponse>({
+export const updateUserEmail = (newEmail: string) => {
+  if (typeOfAuth === null) {
+    return Promise.reject(
+      new Error('Cannot make API request until a user is signed in')
+    );
+  }
+  return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.update_email.route,
     data: {
@@ -21,6 +27,7 @@ export const updateUserEmail = (newEmail: string) =>
       })
     }
   });
+};
 
 export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   /* a customer could potentially send these up if they're not using TypeScript */
@@ -31,6 +38,9 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateUser(payload);
+    return Promise.reject(INITIALIZE_ERROR);
+  }
+  if (typeOfAuth === null) {
     return Promise.reject(INITIALIZE_ERROR);
   }
   return baseIterableRequest<IterableResponse>({
@@ -53,6 +63,10 @@ export const updateSubscriptions = (
   const payload = payloadParam;
   delete (payload as any).userId;
   delete (payload as any).email;
+
+  if (typeOfAuth === null) {
+    return Promise.reject(INITIALIZE_ERROR);
+  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

@@ -42,7 +42,8 @@ const MAX_TIMEOUT = ONE_DAY;
     doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
     tokens by user ID.
   */
-export let typeOfAuth: null | 'email' | 'userID' = null;
+export type TypeOfAuth = null | 'email' | 'userID'
+export let typeOfAuth: TypeOfAuth = null;
 /* this will be the literal user ID or email they choose to auth with */
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
@@ -972,4 +973,8 @@ export function initializeWithConfig(initializeParams: InitializeParams) {
   return generateJWT
     ? initialize(authToken, generateJWT)
     : initialize(authToken);
+}
+
+export function setTypeOfAuthForTestingOnly(authType: TypeOfAuth) {
+  typeOfAuth = authType
 }
