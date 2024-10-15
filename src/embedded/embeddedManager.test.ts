@@ -1,4 +1,5 @@
 import { IterableEmbeddedManager } from './embeddedManager';
+import { setTypeOfAuthForTestingOnly } from '../authorization';
 
 // Mock the baseIterableRequest function
 jest.mock('../request', () => ({
@@ -11,6 +12,9 @@ jest.mock('..', () => ({
 }));
 
 describe('EmbeddedManager', () => {
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('email');
+  });
   const appPackageName = 'my-website';
   describe('syncMessages', () => {
     it('should call syncMessages and callback', async () => {

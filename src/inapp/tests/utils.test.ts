@@ -873,6 +873,7 @@ describe('Utils', () => {
 
       expect(el.getAttribute('aria-label')).toBe('hello');
       expect(el.getAttribute('role')).toBe('button');
+      // eslint-disable-next-line no-script-url
       expect(el.getAttribute('href')).toBe('javascript:undefined');
     });
 
