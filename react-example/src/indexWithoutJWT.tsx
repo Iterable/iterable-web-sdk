@@ -55,11 +55,11 @@ const HomeLink = styled(Link)`
     }
   };
 
-  const { setUserID, logout, setEmail, startStopAnonymousUserTracking } =
+  const { setUserID, logout, setEmail, toggleAnonUserTrackingConsent } =
     initializeWithConfig(initializeParams);
 
-  const handleConcent = (concent?: boolean) =>
-    startStopAnonymousUserTracking(concent);
+  const handleConsent = (consent?: boolean) =>
+    toggleAnonUserTrackingConsent(consent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
@@ -91,7 +91,7 @@ const HomeLink = styled(Link)`
               />
               <Route
                 path="/aut-testing"
-                element={<AUTTesting setConcent={handleConcent} />}
+                element={<AUTTesting setConsent={handleConsent} />}
               />
             </Routes>
           </RouteWrapper>

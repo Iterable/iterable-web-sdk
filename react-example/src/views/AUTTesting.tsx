@@ -21,10 +21,10 @@ import {
 } from './Components.styled';
 
 interface Props {
-  setConcent?: (accept: boolean) => void;
+  setConsent?: (accept: boolean) => void;
 }
 
-export const AUTTesting: FC<Props> = ({ setConcent }) => {
+export const AUTTesting: FC<Props> = ({ setConsent }) => {
   const [updateCartResponse, setUpdateCartResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -203,12 +203,12 @@ export const AUTTesting: FC<Props> = ({ setConcent }) => {
   const inputAttr = { 'data-qa-track-input': true };
   const responseAttr = { 'data-qa-track-response': true };
 
-  const acceptCookie = () => setConcent(true);
+  const acceptCookie = () => setConsent(true);
 
-  const declineCookie = () => setConcent(false);
+  const declineCookie = () => setConsent(false);
 
-  const renderCookieConcent = (
-    <div id="cookie-concent-container">
+  const renderCookieConsent = setConsent && (
+    <div id="cookie-consent-container">
       <h3>We value your privacy</h3>
       <p>
         We use cookies to enhance your browsing experience, serve personalized
@@ -296,7 +296,7 @@ export const AUTTesting: FC<Props> = ({ setConcent }) => {
         </Form>
         <Response {...responseAttr}>{trackResponse}</Response>
       </EndpointWrapper>
-      {renderCookieConcent}
+      {renderCookieConsent}
     </>
   );
 };
