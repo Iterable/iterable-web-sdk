@@ -1,6 +1,6 @@
 import { BASE_URL, DEFAULT_EVENT_THRESHOLD_LIMIT } from '../constants';
 
-type IdentityResolution = {
+export type IdentityResolution = {
   replayOnVisitorToKnown?: boolean;
   mergeOnAnonymousToKnown?: boolean;
 };
