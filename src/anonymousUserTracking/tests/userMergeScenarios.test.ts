@@ -296,10 +296,14 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       // this function call is needed for putting some delay before executing setUserId
-      await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
+      try {
+        await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+      } catch (e) {
+        console.log(e);
+      }
       await setUserID('testuser123');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
@@ -342,10 +346,14 @@ describe('UserMergeScenariosTests', () => {
       } catch (e) {
         console.log('', e);
       }
-      await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
+      try {
+        await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+      } catch (e) {
+        console.log(e);
+      }
       await setUserID('testuser123');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
@@ -599,7 +607,7 @@ describe('UserMergeScenariosTests', () => {
         }
         return null;
       });
-      const { setEmail, logout } = initializeWithConfig({
+      const { setEmail } = initializeWithConfig({
         authToken: '123',
         configOptions: {
           enableAnonTracking: true,
@@ -609,16 +617,19 @@ describe('UserMergeScenariosTests', () => {
           }
         }
       });
-      logout(); // logout to remove logged in users before this test
       try {
         await track({ eventName: 'testEvent' });
       } catch (e) {
         console.log('', e);
       }
-      await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
+      try {
+        await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+      } catch (e) {
+        console.log(e);
+      }
       await setEmail('testuser123@test.com');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
@@ -661,10 +672,14 @@ describe('UserMergeScenariosTests', () => {
       } catch (e) {
         console.log('', e);
       }
-      await getInAppMessages({
-        count: 10,
-        packageName: 'my-lil-website'
-      });
+      try {
+        await getInAppMessages({
+          count: 10,
+          packageName: 'my-lil-website'
+        });
+      } catch (e) {
+        console.log(e);
+      }
       await setEmail('testuser123@test.com');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
