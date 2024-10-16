@@ -26,7 +26,7 @@ import {
   isAnonymousUsageTracked,
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
-import { Options, config } from 'src/utils/config';
+import { IdentityResolution, Options, config } from 'src/utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 /* 
@@ -477,12 +477,12 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: async (email: string) => {
+      setEmail: async (email: string, identityResolution?: IdentityResolution) => {
         clearMessages();
         try {
-          const identityResolution = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown;
+          const identityResolutionConfig = config.getConfig('identityResolution');
+          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(email, true, merge);
           if (result) {
@@ -497,12 +497,12 @@ export function initialize(
           return Promise.reject(`merging failed: ${error}`);
         }
       },
-      setUserID: async (userId: string) => {
+      setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
         clearMessages();
         try {
-          const identityResolution = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown;
+          const identityResolutionConfig = config.getConfig('identityResolution');
+          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
@@ -821,13 +821,13 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: async (email: string) => {
+    setEmail: async (email: string, identityResolution?: IdentityResolution) => {
       /* clear previous user */
       clearMessages();
       try {
-        const identityResolution = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown;
+        const identityResolutionConfig = config.getConfig('identityResolution');
+        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
 
         const result = await tryMergeUser(email, true, merge);
         if (result) {
@@ -856,12 +856,12 @@ export function initialize(
         return Promise.reject(`merging failed: ${error}`);
       }
     },
-    setUserID: async (userId: string) => {
+    setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
       clearMessages();
       try {
-        const identityResolution = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown;
+        const identityResolutionConfig = config.getConfig('identityResolution');
+        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
 
         const result = await tryMergeUser(userId, false, merge);
         if (result) {
