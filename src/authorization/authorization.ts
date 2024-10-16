@@ -118,13 +118,10 @@ const getAnonUserId = () => {
   }
 };
 
-const initializeUserIdAndSync = (userId: string, replay?: boolean) => {
+const initializeUserId = (userId: string) => {
   addUserIdToRequest(userId);
   clearAnonymousUser();
-  if (replay) {
-    syncEvents();
-  }
-};
+}
 
 const addUserIdToRequest = (userId: string) => {
   typeOfAuth = 'userID';
@@ -221,13 +218,10 @@ const addUserIdToRequest = (userId: string) => {
   });
 };
 
-const initializeEmailUserAndSync = (email: string, replay?: boolean) => {
+const initializeEmailUser = (email: string) => {
   addEmailToRequest(email);
   clearAnonymousUser();
-  if (replay) {
-    syncEvents();
-  }
-};
+}
 
 const syncEvents = () => {
   if (config.getConfig('enableAnonTracking')) {
@@ -492,7 +486,10 @@ export function initialize(
 
           const result = await tryMergeUser(email, true, merge);
           if (result) {
-            initializeEmailUserAndSync(email, replay);
+            initializeEmailUser(email);
+            if (replay) {
+              syncEvents();
+            }
             return Promise.resolve();
           }
         } catch (error) {
@@ -509,7 +506,10 @@ export function initialize(
 
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
-            initializeUserIdAndSync(userId, replay);
+            initializeUserId(userId);
+            if (replay) {
+              syncEvents();
+            }
             return Promise.resolve();
           }
         } catch (error) {
@@ -831,9 +831,14 @@ export function initialize(
 
         const result = await tryMergeUser(email, true, merge);
         if (result) {
-          initializeEmailUserAndSync(email, replay);
+          initializeEmailUser(email);
           try {
-            return doRequest({ email }).catch((e) => {
+            return doRequest({ email }).then((token) => {
+              if (replay) {
+                syncEvents();
+              }
+              return token;
+            }).catch((e) => {
               if (logLevel === 'verbose') {
                 console.warn(
                   'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
@@ -860,10 +865,13 @@ export function initialize(
 
         const result = await tryMergeUser(userId, false, merge);
         if (result) {
-          initializeUserIdAndSync(userId, replay);
+          initializeUserId(userId);
           try {
             return doRequest({ userID: userId })
               .then(async (token) => {
+                if (replay) {
+                  syncEvents();
+                }
                 return token;
               })
               .catch((e) => {
