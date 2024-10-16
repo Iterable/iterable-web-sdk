@@ -1117,8 +1117,7 @@ describe('User Identification', () => {
           .fn()
           .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
         const { refreshJwtToken } = initialize('123', mockGenerateJWT);
-        const res = await refreshJwtToken('hello@gmail.com');
-        console.log({ res });
+        await refreshJwtToken('hello@gmail.com');
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(60000 * 4.1);
         expect(mockGenerateJWT).toHaveBeenCalledTimes(2);

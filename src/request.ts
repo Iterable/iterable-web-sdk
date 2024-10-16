@@ -10,7 +10,7 @@ import {
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
-import { typeOfAuth } from './authorization';
+import { typeOfAuth } from './utils/typeOfAuth';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
