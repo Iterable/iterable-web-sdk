@@ -1,5 +1,5 @@
 import config from './config';
-import { typeOfAuth } from './typeOfAuth';
+import { getTypeOfAuth } from './typeOfAuth';
 
 export const canTrackAnonUser = (): boolean =>
-  config.getConfig('enableAnonTracking') && typeOfAuth === null;
+  config.getConfig('enableAnonTracking') && getTypeOfAuth() === null;

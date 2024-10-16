@@ -10,7 +10,7 @@ import {
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
-import { typeOfAuth } from './utils/typeOfAuth';
+import { getTypeOfAuth } from './utils/typeOfAuth';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
@@ -40,7 +40,10 @@ export const baseIterableRequest = <T = any>(
     const endpoint = payload?.url ?? '';
 
     // for most Iterable API endpoints, we require a userId or email to be set
-    if (!ENDPOINTS_REQUIRING_USER.includes(endpoint) && typeOfAuth === null) {
+    if (
+      !ENDPOINTS_REQUIRING_USER.includes(endpoint) &&
+      getTypeOfAuth() === null
+    ) {
       Promise.reject(INITIALIZE_ERROR);
     }
     if (payload.validation?.data && payload.data) {

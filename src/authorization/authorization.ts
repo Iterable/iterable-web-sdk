@@ -27,7 +27,7 @@ import {
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
-import { setTypeOfAuth, TypeOfAuth, typeOfAuth } from 'src/utils/typeOfAuth';
+import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
@@ -411,6 +411,7 @@ export function initialize(
     isEmail: boolean,
     merge?: boolean
   ): Promise<boolean> => {
+    const typeOfAuth = getTypeOfAuth();
     const enableAnonTracking = config.getConfig('enableAnonTracking');
     const sourceUserIdOrEmail =
       authIdentifier === null ? getAnonUserId() : authIdentifier;
@@ -618,7 +619,7 @@ export function initialize(
                 const newEmail = JSON.parse(config.config.data)?.newEmail;
 
                 const payloadToPass =
-                  typeOfAuth === 'email'
+                  getTypeOfAuth() === 'email'
                     ? { email: newEmail }
                     : { userID: authIdentifier! };
 

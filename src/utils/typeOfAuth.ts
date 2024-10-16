@@ -16,7 +16,9 @@
 /* this will be the literal user ID or email they choose to auth with */
 
 export type TypeOfAuth = null | 'email' | 'userID';
-export let typeOfAuth: TypeOfAuth = null;
+let typeOfAuth: TypeOfAuth = null;
 export const setTypeOfAuth = (value: TypeOfAuth) => {
   typeOfAuth = value;
 };
+
+export const getTypeOfAuth = () => typeOfAuth;
