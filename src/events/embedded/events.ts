@@ -1,4 +1,4 @@
-import { WEB_PLATFORM, ENDPOINTS, INITIALIZE_ERROR } from '../../constants';
+import { WEB_PLATFORM, ENDPOINTS } from '../../constants';
 import { baseIterableRequest } from '../../request';
 import {
   IterableEmbeddedDismissRequestPayload,
@@ -12,17 +12,12 @@ import {
   embeddedDismissSchema,
   embeddedSessionSchema
 } from './events.schema';
-import { typeOfAuth } from '../../authorization';
 
 export const trackEmbeddedReceived = (
   messageId: string,
   appPackageName: string
-) => {
-  if (typeOfAuth === null) {
-    return Promise.reject(INITIALIZE_ERROR);
-  }
-
-  return baseIterableRequest<IterableResponse>({
+) =>
+  baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.msg_received_event_track.route,
     data: {
@@ -37,16 +32,11 @@ export const trackEmbeddedReceived = (
       data: trackEmbeddedSchema
     }
   });
-};
 
 export const trackEmbeddedClick = (
   payload: IterableEmbeddedClickRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
-
-  if (typeOfAuth === null) {
-    return Promise.reject(INITIALIZE_ERROR);
-  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
@@ -71,10 +61,6 @@ export const trackEmbeddedDismiss = (
 ) => {
   const { appPackageName, ...rest } = payload;
 
-  if (typeOfAuth === null) {
-    return Promise.reject(INITIALIZE_ERROR);
-  }
-
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.msg_dismiss.route,
@@ -97,10 +83,6 @@ export const trackEmbeddedSession = (
   payload: IterableEmbeddedSessionRequestPayload
 ) => {
   const { appPackageName, ...rest } = payload;
-
-  if (typeOfAuth === null) {
-    return Promise.reject(INITIALIZE_ERROR);
-  }
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

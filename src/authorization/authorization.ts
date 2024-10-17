@@ -27,24 +27,9 @@ import {
   registerAnonUserIdSetter
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
+import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
 
 const MAX_TIMEOUT = ONE_DAY;
-/* 
-    AKA did the user auth with their email (setEmail) or user ID (setUserID) 
-
-    we're going to use this variable for one circumstance - when calling _updateUserEmail_.
-    Essentially, when we call the Iterable API to update a user's email address and we get a
-    successful 200 request, we're going to request a new JWT token, since it might need to
-    be re-signed with the new email address; however, if the customer code never authorized the
-    user with an email and instead a user ID, we'll just continue to sign the JWT with the user ID.
-
-    This is mainly just a quality-of-life feature, so that the customer's JWT generation code
-    doesn't _need_ to support email-signed JWTs if they don't want and purely want to issue the
-    tokens by user ID.
-  */
-export type TypeOfAuth = null | 'email' | 'userID'
-export let typeOfAuth: TypeOfAuth = null;
-/* this will be the literal user ID or email they choose to auth with */
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
 let apiKey: null | string = null;
@@ -124,7 +109,7 @@ const initializeUserId = (userId: string) => {
 }
 
 const addUserIdToRequest = (userId: string) => {
-  typeOfAuth = 'userID';
+  setTypeOfAuth('userID');
   authIdentifier = userId;
 
   if (typeof userInterceptor === 'number') {
@@ -230,7 +215,7 @@ const syncEvents = () => {
 };
 
 const addEmailToRequest = (email: string) => {
-  typeOfAuth = 'email';
+  setTypeOfAuth('email');
   authIdentifier = email;
 
   if (typeof userInterceptor === 'number') {
@@ -426,6 +411,7 @@ export function initialize(
     isEmail: boolean,
     merge?: boolean
   ): Promise<boolean> => {
+    const typeOfAuth = getTypeOfAuth();
     const enableAnonTracking = config.getConfig('enableAnonTracking');
     const sourceUserIdOrEmail =
       authIdentifier === null ? getAnonUserId() : authIdentifier;
@@ -519,7 +505,7 @@ export function initialize(
       },
       logout: () => {
         anonUserManager.removeAnonSessionCriteriaData();
-        typeOfAuth = null;
+        setTypeOfAuth(null);
         authIdentifier = null;
         /* clear fetched in-app messages */
         clearMessages();
@@ -552,7 +538,7 @@ export function initialize(
             localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
             localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
 
-            typeOfAuth = null;
+            setTypeOfAuth(null);
             authIdentifier = null;
             /* clear fetched in-app messages */
             clearMessages();
@@ -633,7 +619,7 @@ export function initialize(
                 const newEmail = JSON.parse(config.config.data)?.newEmail;
 
                 const payloadToPass =
-                  typeOfAuth === 'email'
+                  getTypeOfAuth() === 'email'
                     ? { email: newEmail }
                     : { userID: authIdentifier! };
 
@@ -894,7 +880,7 @@ export function initialize(
     },
     logout: () => {
       anonUserManager.removeAnonSessionCriteriaData();
-      typeOfAuth = null;
+      setTypeOfAuth(null);
       authIdentifier = null;
       /* clear fetched in-app messages */
       clearMessages();
@@ -941,7 +927,7 @@ export function initialize(
           localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
           localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
 
-          typeOfAuth = null;
+          setTypeOfAuth(null);
           authIdentifier = null;
           /* clear fetched in-app messages */
           clearMessages();
@@ -984,5 +970,9 @@ export function initializeWithConfig(initializeParams: InitializeParams) {
 }
 
 export function setTypeOfAuthForTestingOnly(authType: TypeOfAuth) {
-  typeOfAuth = authType
+  if (!authType) {
+    setTypeOfAuth(null);
+  } else {
+    setTypeOfAuth(authType);
+  }
 }
