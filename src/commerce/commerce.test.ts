@@ -3,10 +3,14 @@ import { baseAxiosRequest } from '../request';
 import { trackPurchase, updateCart } from './commerce';
 // import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { setTypeOfAuthForTestingOnly } from '../authorization';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
 describe('Users Requests', () => {
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('email');
+  });
   it('should set params and return the correct payload for updateCart', async () => {
     mockRequest.onPost('/commerce/updateCart').reply(200, {
       msg: 'hello'
