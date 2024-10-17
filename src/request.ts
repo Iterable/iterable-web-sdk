@@ -40,8 +40,6 @@ export const baseIterableRequest = <T = any>(
     const endpoint = payload?.url ?? '';
 
     // for most Iterable API endpoints, we require a userId or email to be set
-
-    console.log({ auth: getTypeOfAuth() });
     if (
       !ENDPOINTS_REQUIRING_USER.includes(endpoint) &&
       getTypeOfAuth() === null
