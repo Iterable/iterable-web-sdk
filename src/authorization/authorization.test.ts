@@ -6,7 +6,7 @@ import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
-import { GETMESSAGES_PATH } from '../constants';
+import { GETMESSAGES_PATH, INITIALIZE_ERROR } from '../constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -380,9 +380,7 @@ describe('User Identification', () => {
             packageName: 'my-lil-website'
           });
         } catch (e) {
-          expect(e).toStrictEqual(
-            new Error('Cannot make API request until a user is signed in')
-          );
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
         }
       });
 
@@ -398,9 +396,7 @@ describe('User Identification', () => {
             packageName: 'my-lil-website'
           });
         } catch (e) {
-          expect(e).toStrictEqual(
-            new Error('Cannot make API request until a user is signed in')
-          );
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
         }
       });
     });
@@ -714,9 +710,7 @@ describe('User Identification', () => {
             packageName: 'my-lil-website'
           });
         } catch (e) {
-          expect(e).toStrictEqual(
-            new Error('Cannot make API request until a user is signed in')
-          );
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
         }
       });
 
@@ -733,9 +727,7 @@ describe('User Identification', () => {
             packageName: 'my-lil-website'
           });
         } catch (e) {
-          expect(e).toStrictEqual(
-            new Error('Cannot make API request until a user is signed in')
-          );
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
         }
       });
     });

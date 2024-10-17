@@ -40,11 +40,13 @@ export const baseIterableRequest = <T = any>(
     const endpoint = payload?.url ?? '';
 
     // for most Iterable API endpoints, we require a userId or email to be set
+
+    console.log({ auth: getTypeOfAuth() });
     if (
       !ENDPOINTS_REQUIRING_USER.includes(endpoint) &&
       getTypeOfAuth() === null
     ) {
-      Promise.reject(INITIALIZE_ERROR);
+      return Promise.reject(INITIALIZE_ERROR);
     }
     if (payload.validation?.data && payload.data) {
       payload.validation.data.validateSync(payload.data, { abortEarly: false });
