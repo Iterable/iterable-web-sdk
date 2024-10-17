@@ -6,7 +6,9 @@ import {
   STATIC_HEADERS,
   EU_ITERABLE_API,
   GET_CRITERIA_PATH,
-  INITIALIZE_ERROR
+  INITIALIZE_ERROR,
+  ENDPOINT_MERGE_USER,
+  ENDPOINT_TRACK_ANON_SESSION
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
@@ -27,7 +29,11 @@ interface ClientError extends IterableResponse {
   }[];
 }
 
-const ENDPOINTS_REQUIRING_USER = [GET_CRITERIA_PATH];
+const ENDPOINTS_REQUIRING_SET_USER = [
+  GET_CRITERIA_PATH,
+  ENDPOINT_MERGE_USER,
+  ENDPOINT_TRACK_ANON_SESSION
+];
 
 export const baseAxiosRequest = Axios.create({
   baseURL: BASE_URL
@@ -39,9 +45,9 @@ export const baseIterableRequest = <T = any>(
   try {
     const endpoint = payload?.url ?? '';
 
-    // for most Iterable API endpoints, we require a userId or email to be set
+    // for most Iterable API endpoints, we require a user to be initialized in the SDK.
     if (
-      !ENDPOINTS_REQUIRING_USER.includes(endpoint) &&
+      !ENDPOINTS_REQUIRING_SET_USER.includes(endpoint) &&
       getTypeOfAuth() === null
     ) {
       return Promise.reject(INITIALIZE_ERROR);
