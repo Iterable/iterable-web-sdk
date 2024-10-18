@@ -838,29 +838,29 @@ export function initialize(
           identityResolution?.replayOnVisitorToKnown ||
           identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(email, true, merge);
-        if (result) {
-          initializeEmailUser(email);
-          try {
-            return doRequest({ email })
-              .then((token) => {
+        try {
+          return doRequest({ email })
+            .then(async (token) => {
+              const result = await tryMergeUser(email, true, merge);
+              if (result) {
+                initializeEmailUser(email);
                 if (replay) {
                   syncEvents();
                 }
                 return token;
-              })
-              .catch((e) => {
-                if (logLevel === 'verbose') {
-                  console.warn(
-                    'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
-                  );
-                }
-                return Promise.reject(e);
-              });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+              }
+            })
+            .catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
@@ -881,29 +881,29 @@ export function initialize(
           identityResolution?.replayOnVisitorToKnown ||
           identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(userId, false, merge);
-        if (result) {
-          initializeUserId(userId);
-          try {
-            return doRequest({ userID: userId })
-              .then(async (token) => {
+        try {
+          return doRequest({ userID: userId })
+            .then(async (token) => {
+              const result = await tryMergeUser(userId, false, merge);
+              if (result) {
+                initializeUserId(userId);
                 if (replay) {
                   syncEvents();
                 }
                 return token;
-              })
-              .catch((e) => {
-                if (logLevel === 'verbose') {
-                  console.warn(
-                    'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
-                  );
-                }
-                return Promise.reject(e);
-              });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+              }
+            })
+            .catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
