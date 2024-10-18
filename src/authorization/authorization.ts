@@ -106,7 +106,7 @@ const getAnonUserId = () => {
 const initializeUserId = (userId: string) => {
   addUserIdToRequest(userId);
   clearAnonymousUser();
-}
+};
 
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
@@ -206,7 +206,7 @@ const addUserIdToRequest = (userId: string) => {
 const initializeEmailUser = (email: string) => {
   addEmailToRequest(email);
   clearAnonymousUser();
-}
+};
 
 const syncEvents = () => {
   if (config.getConfig('enableAnonTracking')) {
@@ -463,12 +463,20 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: async (email: string, identityResolution?: IdentityResolution) => {
+      setEmail: async (
+        email: string,
+        identityResolution?: IdentityResolution
+      ) => {
         clearMessages();
         try {
-          const identityResolutionConfig = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+          const identityResolutionConfig =
+            config.getConfig('identityResolution');
+          const merge =
+            identityResolution?.mergeOnAnonymousToKnown ||
+            identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay =
+            identityResolution?.replayOnVisitorToKnown ||
+            identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(email, true, merge);
           if (result) {
@@ -483,12 +491,20 @@ export function initialize(
           return Promise.reject(`merging failed: ${error}`);
         }
       },
-      setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
+      setUserID: async (
+        userId: string,
+        identityResolution?: IdentityResolution
+      ) => {
         clearMessages();
         try {
-          const identityResolutionConfig = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+          const identityResolutionConfig =
+            config.getConfig('identityResolution');
+          const merge =
+            identityResolution?.mergeOnAnonymousToKnown ||
+            identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay =
+            identityResolution?.replayOnVisitorToKnown ||
+            identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
@@ -807,24 +823,34 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: async (email: string, identityResolution?: IdentityResolution) => {
+    setEmail: async (
+      email: string,
+      identityResolution?: IdentityResolution
+    ) => {
       /* clear previous user */
       clearMessages();
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+        const merge =
+          identityResolution?.mergeOnAnonymousToKnown ||
+          identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay =
+          identityResolution?.replayOnVisitorToKnown ||
+          identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(email, true, merge);
-        if (result) {
-          initializeEmailUser(email);
-          try {
-            return doRequest({ email }).then((token) => {
-              if (replay) {
-                syncEvents();
+        try {
+          return doRequest({ email })
+            .then(async (token) => {
+              const result = await tryMergeUser(email, true, merge);
+              if (result) {
+                initializeEmailUser(email);
+                if (replay) {
+                  syncEvents();
+                }
+                return token;
               }
-              return token;
-            }).catch((e) => {
+            })
+            .catch((e) => {
               if (logLevel === 'verbose') {
                 console.warn(
                   'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
@@ -832,46 +858,52 @@ export function initialize(
               }
               return Promise.reject(e);
             });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },
-    setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
+    setUserID: async (
+      userId: string,
+      identityResolution?: IdentityResolution
+    ) => {
       clearMessages();
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+        const merge =
+          identityResolution?.mergeOnAnonymousToKnown ||
+          identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay =
+          identityResolution?.replayOnVisitorToKnown ||
+          identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(userId, false, merge);
-        if (result) {
-          initializeUserId(userId);
-          try {
-            return doRequest({ userID: userId })
-              .then(async (token) => {
+        try {
+          return doRequest({ userID: userId })
+            .then(async (token) => {
+              const result = await tryMergeUser(userId, false, merge);
+              if (result) {
+                initializeUserId(userId);
                 if (replay) {
                   syncEvents();
                 }
                 return token;
-              })
-              .catch((e) => {
-                if (logLevel === 'verbose') {
-                  console.warn(
-                    'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
-                  );
-                }
-                return Promise.reject(e);
-              });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+              }
+            })
+            .catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge

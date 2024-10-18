@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import { initializeWithConfig } from '../../authorization';
+import { GenerateJWTPayload, initializeWithConfig } from '../../authorization';
 import {
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
@@ -54,6 +54,11 @@ declare global {
 }
 const mockRequest = new MockAdapter(baseAxiosRequest);
 // const mockOnPostSpy = jest.spyOn(mockRequest, 'onPost');
+
+const MOCK_JWT_KEY =
+  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MzA2MTc3MzQsImlhdCI6MTYzMDYxNzQzNCwiZW1haWwiOiJ3aWR0aC50ZXN0ZXJAZ21haWwuY29tIn0.knLmbgO8kKM9CHP2TH2v85OSC2Jorh2JjRm76FFsPQc';
+const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE2Nzk0ODMyOTEsImlhdCI6MTY3OTQ4MzIzMX0.APaQAYy-lTE0o8rbR6b6-28eCICq36SQMBXmeZAvk1k';
 
 describe('UserMergeScenariosTests', () => {
   beforeAll(() => {
@@ -439,6 +444,55 @@ describe('UserMergeScenariosTests', () => {
       expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
 
+    it('merge api called with destination userID JWT Authorization', async () => {
+      const { setUserID, logout } = initializeWithConfig({
+        authToken: '123',
+        configOptions: {
+          enableAnonTracking: true,
+          identityResolution: {
+            replayOnVisitorToKnown: true,
+            mergeOnAnonymousToKnown: true
+          }
+        },
+        generateJWT: (payload: GenerateJWTPayload) => {
+          if (payload.userID === 'testuseranotheruser') {
+            return Promise.resolve(MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY);
+          }
+          return Promise.resolve(MOCK_JWT_KEY);
+        }
+      });
+      logout(); // logout to remove logged in users before this test
+      await setUserID('testuser123');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY}`
+      );
+      expect(response.config.params.userId).toBe('testuser123');
+      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
+        SHARED_PREF_ANON_USER_ID
+      );
+      await setUserID('testuseranotheruser');
+      const secondResponse = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(secondResponse.config.headers.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY}`
+      );
+      expect(secondResponse.config.params.userId).toBe('testuseranotheruser');
+      const mergePostRequestData = mockRequest.history.post.find(
+        (req) => req.url === ENDPOINT_MERGE_USER
+      );
+      expect(mergePostRequestData?.headers?.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY}`
+      );
+      expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
+      logout(); // logout to remove logged in users after this test
+    });
+
     it('current user identified with setUserId merge default', async () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
@@ -812,6 +866,61 @@ describe('UserMergeScenariosTests', () => {
         (req) => req.url === ENDPOINT_MERGE_USER
       );
       expect(mergePostRequestData).toBeUndefined(); // ensure that merge API Do NOT get called
+    });
+
+    it('merge api called with destination email JWT Authorization', async () => {
+      const { setEmail, logout } = initializeWithConfig({
+        authToken: '123',
+        configOptions: {
+          enableAnonTracking: true,
+          identityResolution: {
+            replayOnVisitorToKnown: true,
+            mergeOnAnonymousToKnown: true
+          }
+        },
+        generateJWT: (payload: GenerateJWTPayload) => {
+          if (payload.email === 'testuseranotheruser@test.com') {
+            return Promise.resolve(MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY);
+          }
+          return Promise.resolve(MOCK_JWT_KEY);
+        }
+      });
+      logout(); // logout to remove logged in users before this test
+      await setEmail('testuser123@test.com');
+      const response = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(response.config.headers.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY}`
+      );
+      expect(response.config.params.email).toBe('testuser123@test.com');
+      try {
+        await track({ eventName: 'testEvent' });
+      } catch (e) {
+        console.log('', e);
+      }
+      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
+        SHARED_PREF_ANON_USER_ID
+      );
+      await setEmail('testuseranotheruser@test.com');
+      const secondResponse = await getInAppMessages({
+        count: 10,
+        packageName: 'my-lil-website'
+      });
+      expect(secondResponse.config.headers.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY}`
+      );
+      expect(secondResponse.config.params.email).toBe(
+        'testuseranotheruser@test.com'
+      );
+      const mergePostRequestData = mockRequest.history.post.find(
+        (req) => req.url === ENDPOINT_MERGE_USER
+      );
+      expect(mergePostRequestData?.headers?.Authorization).toBe(
+        `Bearer ${MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY}`
+      );
+      expect(mergePostRequestData).toBeDefined(); // ensure that merge API gets called
     });
   });
 });
