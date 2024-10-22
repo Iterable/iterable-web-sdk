@@ -7,7 +7,8 @@ import {
   GET_CRITERIA_PATH,
   ENDPOINT_TRACK_ANON_SESSION,
   ENDPOINT_MERGE_USER,
-  SHARED_PREF_ANON_USAGE_TRACKED
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../../constants';
 import { updateUser } from '../../users';
 import { initializeWithConfig } from '../../authorization';
@@ -82,13 +83,13 @@ describe('UserUpdate', () => {
   it('should not have unnecessary extra nesting when locally stored user update fields are sent to server', async () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            ...userDataMatched.dataFields,
-            eventType: userDataMatched.eventType
-          },
-          eventDataMatched
-        ]);
+        return JSON.stringify([eventDataMatched]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          ...userDataMatched.dataFields,
+          eventType: userDataMatched.eventType
+        });
       }
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(CUSTOM_EVENT_API_TEST_CRITERIA);
@@ -114,7 +115,7 @@ describe('UserUpdate', () => {
       console.log('');
     }
     expect(localStorage.setItem).toHaveBeenCalledWith(
-      SHARED_PREFS_EVENT_LIST_KEY,
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
       expect.any(String)
     );
 

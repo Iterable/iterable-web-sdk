@@ -282,6 +282,7 @@ export const ANIMATION_STYLESHEET = (
 
 export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
+export const SHARED_PREFS_USER_UPDATE_OBJECT_KEY = 'itbl_user_update_object';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
 export const SHARED_PREF_ANON_USER_ID = 'anon_userId';

@@ -26,7 +26,8 @@ import {
   KEY_PREFER_USERID,
   ENDPOINTS,
   DEFAULT_EVENT_THRESHOLD_LIMIT,
-  SHARED_PREF_ANON_USAGE_TRACKED
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
@@ -136,7 +137,7 @@ export class AnonymousUserEventManager {
       [KEY_CREATE_NEW_FIELDS]: true,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    this.storeEventListToLocalStorage(newDataObject);
   }
 
   async trackAnonUpdateUser(payload: UpdateUserParams) {
@@ -144,7 +145,7 @@ export class AnonymousUserEventManager {
       ...payload.dataFields,
       [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
     };
-    this.storeEventListToLocalStorage(newDataObject, true);
+    this.storeUserUpdateToLocalStorage(newDataObject);
   }
 
   async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
@@ -155,7 +156,7 @@ export class AnonymousUserEventManager {
       [KEY_TOTAL]: payload.total,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    this.storeEventListToLocalStorage(newDataObject);
   }
 
   async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
@@ -165,7 +166,7 @@ export class AnonymousUserEventManager {
       [KEY_PREFER_USERID]: true,
       [KEY_CREATED_AT]: this.getCurrentTime()
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    this.storeEventListToLocalStorage(newDataObject);
   }
 
   private checkCriteriaCompletion(): string | null {
@@ -173,9 +174,15 @@ export class AnonymousUserEventManager {
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
     );
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
     try {
       if (criteriaData && localStoredEventList) {
-        const checker = new CriteriaCompletionChecker(localStoredEventList);
+        const checker = new CriteriaCompletionChecker(
+          localStoredEventList,
+          localStoredUserUpdate
+        );
         return checker.getMatchedCriteria(criteriaData);
       }
     } catch (error) {
@@ -191,14 +198,11 @@ export class AnonymousUserEventManager {
     if (!anonymousUsageTracked) return;
 
     const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
-    const eventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
-    const events = eventList ? JSON.parse(eventList) : [];
+    const strUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+    const dataFields = strUserUpdate ? JSON.parse(strUserUpdate) : {};
 
-    const dataFields = {
-      ...events.find(
-        (event: any) => event[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER
-      )
-    };
     delete dataFields[SHARED_PREFS_EVENT_TYPE];
 
     const userId = uuidv4();
@@ -238,15 +242,7 @@ export class AnonymousUserEventManager {
         }
       });
       if (response?.status === 200) {
-        // Update local storage, remove updateUser from local storage
-        localStorage.setItem(
-          SHARED_PREFS_EVENT_LIST_KEY,
-          JSON.stringify(
-            events.filter(
-              (event: any) => event[SHARED_PREFS_EVENT_TYPE] !== UPDATE_USER
-            )
-          )
-        );
+        localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
 
         const onAnonUserCreated = config.getConfig('onAnonUserCreated');
 
@@ -266,6 +262,11 @@ export class AnonymousUserEventManager {
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
       : [];
+
+    const strUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+    const userUpdateObject = strUserUpdate ? JSON.parse(strUserUpdate) : {};
 
     if (trackEventList.length) {
       trackEventList.forEach(
@@ -288,10 +289,6 @@ export class AnonymousUserEventManager {
               this.updateCart(event);
               break;
             }
-            case UPDATE_USER: {
-              this.updateUser({ dataFields: event });
-              break;
-            }
             default:
               break;
           }
@@ -299,19 +296,25 @@ export class AnonymousUserEventManager {
         }
       );
     }
+
+    if (Object.keys(userUpdateObject).length) {
+      // eslint-disable-next-line no-param-reassign
+      delete userUpdateObject[SHARED_PREFS_EVENT_TYPE];
+      this.updateUser(userUpdateObject);
+    }
   }
 
   removeAnonSessionCriteriaData() {
     localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
     localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
+    localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
   }
 
   private async storeEventListToLocalStorage(
     newDataObject: Record<
       any /* eslint-disable-line @typescript-eslint/no-explicit-any */,
       any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    >,
-    shouldOverWrite: boolean
+    >
   ) {
     const anonymousUsageTracked = isAnonymousUsageTracked();
 
@@ -324,24 +327,7 @@ export class AnonymousUserEventManager {
       previousDataArray = JSON.parse(strTrackEventList);
     }
 
-    if (shouldOverWrite) {
-      const trackingType = newDataObject[SHARED_PREFS_EVENT_TYPE];
-      const indexToUpdate = previousDataArray.findIndex(
-        (obj: any) => obj[SHARED_PREFS_EVENT_TYPE] === trackingType
-      );
-      if (indexToUpdate !== -1) {
-        const dataToUpdate = previousDataArray[indexToUpdate];
-
-        previousDataArray[indexToUpdate] = {
-          ...dataToUpdate,
-          ...newDataObject
-        };
-      } else {
-        previousDataArray.push(newDataObject);
-      }
-    } else {
-      previousDataArray.push(newDataObject);
-    }
+    previousDataArray.push(newDataObject);
 
     // - The code below limits the number of events stored in local storage.
     // - The event list acts as a queue, with the oldest events being deleted
@@ -359,6 +345,40 @@ export class AnonymousUserEventManager {
     localStorage.setItem(
       SHARED_PREFS_EVENT_LIST_KEY,
       JSON.stringify(previousDataArray)
+    );
+    const criteriaId = this.checkCriteriaCompletion();
+    if (criteriaId !== null) {
+      this.createKnownUser(criteriaId);
+    }
+  }
+
+  private async storeUserUpdateToLocalStorage(
+    newDataObject: Record<
+      any /* eslint-disable-line @typescript-eslint/no-explicit-any */,
+      any /* eslint-disable-line @typescript-eslint/no-explicit-any */
+    >
+  ) {
+    const anonymousUsageTracked = isAnonymousUsageTracked();
+
+    if (!anonymousUsageTracked) return;
+
+    const strUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+    let userUpdateObject = {};
+
+    if (strUserUpdate) {
+      userUpdateObject = JSON.parse(strUserUpdate);
+    }
+
+    userUpdateObject = {
+      ...userUpdateObject,
+      ...newDataObject
+    };
+
+    localStorage.setItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
+      JSON.stringify(userUpdateObject)
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {

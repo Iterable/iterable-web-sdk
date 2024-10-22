@@ -1,4 +1,7 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
+import {
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+} from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 
 const localStorageMock = {
@@ -732,28 +735,27 @@ describe('CriteriaCompletionChecker', () => {
   // isSet criteria
   it('should return criteriaId 97 if isset user criteria is matched', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              country: 'UK',
-              eventTimeStamp: 10,
-              phoneNumberDetails: '99999999',
-              'shoppingCartItems.price': 50.5
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            country: 'UK',
+            eventTimeStamp: 10,
+            phoneNumberDetails: '99999999',
+            'shoppingCartItems.price': 50.5
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -824,27 +826,26 @@ describe('CriteriaCompletionChecker', () => {
 
   it('should return null (isset user criteria fail)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              eventTimeStamp: 10,
-              phoneNumberDetails: '99999999',
-              'shoppingCartItems.price': 50.5
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            eventTimeStamp: 10,
+            phoneNumberDetails: '99999999',
+            'shoppingCartItems.price': 50.5
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -1453,26 +1454,25 @@ describe('CriteriaCompletionChecker', () => {
 
   it('should return criteriaId 100 (boolean test)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              subscribed: true,
-              phoneNumber: '99999999'
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            subscribed: true,
+            phoneNumber: '99999999'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -1526,26 +1526,25 @@ describe('CriteriaCompletionChecker', () => {
 
   it('should return criteriaId 194 if Contact: Phone Number != 57688559', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              subscribed: true,
-              phoneNumber: '123685748641'
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            subscribed: true,
+            phoneNumber: '123685748641'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -1590,26 +1589,25 @@ describe('CriteriaCompletionChecker', () => {
 
   it('should return criteriaId 293 if Contact: subscribed != false', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              subscribed: true,
-              phoneNumber: '123685748641'
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            subscribed: true,
+            phoneNumber: '123685748641'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({

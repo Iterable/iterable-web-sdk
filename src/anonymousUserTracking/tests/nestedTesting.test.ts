@@ -1,4 +1,7 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
+import {
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+} from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 import {
   NESTED_CRITERIA,
@@ -20,39 +23,38 @@ describe('nestedTesting', () => {
 
   it('should return criteriaId 168 (nested field)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              email: 'user@example.com',
-              furniture: [
-                {
-                  furnitureType: 'Sofa',
-                  furnitureColor: 'White',
-                  lengthInches: 40,
-                  widthInches: 60
-                },
-                {
-                  furnitureType: 'table',
-                  furnitureColor: 'Gray',
-                  lengthInches: 20,
-                  widthInches: 30
-                }
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            email: 'user@example.com',
+            furniture: [
+              {
+                furnitureType: 'Sofa',
+                furnitureColor: 'White',
+                lengthInches: 40,
+                widthInches: 60
+              },
+              {
+                furnitureType: 'table',
+                furnitureColor: 'Gray',
+                lengthInches: 20,
+                widthInches: 30
+              }
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(JSON.stringify(NESTED_CRITERIA));
     expect(result).toEqual('168');
@@ -60,39 +62,38 @@ describe('nestedTesting', () => {
 
   it('should return criteriaId null (nested field - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              email: 'user@example.com',
-              furniture: [
-                {
-                  furnitureType: 'Sofa',
-                  furnitureColor: 'Gray',
-                  lengthInches: 40,
-                  widthInches: 60
-                },
-                {
-                  furnitureType: 'table',
-                  furnitureColor: 'White',
-                  lengthInches: 20,
-                  widthInches: 30
-                }
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            email: 'user@example.com',
+            furniture: [
+              {
+                furnitureType: 'Sofa',
+                furnitureColor: 'Gray',
+                lengthInches: 40,
+                widthInches: 60
+              },
+              {
+                furnitureType: 'table',
+                furnitureColor: 'White',
+                lengthInches: 20,
+                widthInches: 30
+              }
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(JSON.stringify(NESTED_CRITERIA));
     expect(result).toEqual(null);
@@ -250,40 +251,39 @@ describe('nestedTesting', () => {
 
   it('should return criteriaId 436 (Multi level Nested field criteria)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              furniture: {
-                material: [
-                  {
-                    type: 'table',
-                    color: 'black',
-                    lengthInches: 40,
-                    widthInches: 60
-                  },
-                  {
-                    type: 'Sofa',
-                    color: 'Gray',
-                    lengthInches: 20,
-                    widthInches: 30
-                  }
-                ]
-              }
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            furniture: {
+              material: [
+                {
+                  type: 'table',
+                  color: 'black',
+                  lengthInches: 40,
+                  widthInches: 60
+                },
+                {
+                  type: 'Sofa',
+                  color: 'Gray',
+                  lengthInches: 20,
+                  widthInches: 30
+                }
+              ]
+            }
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY)
@@ -293,40 +293,39 @@ describe('nestedTesting', () => {
 
   it('should return criteriaId null (Multi level Nested field criteria - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              furniture: {
-                material: [
-                  {
-                    type: 'table',
-                    color: 'Gray',
-                    lengthInches: 40,
-                    widthInches: 60
-                  },
-                  {
-                    type: 'Sofa',
-                    color: 'black',
-                    lengthInches: 20,
-                    widthInches: 30
-                  }
-                ]
-              }
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            furniture: {
+              material: [
+                {
+                  type: 'table',
+                  color: 'Gray',
+                  lengthInches: 40,
+                  widthInches: 60
+                },
+                {
+                  type: 'Sofa',
+                  color: 'black',
+                  lengthInches: 20,
+                  widthInches: 30
+                }
+              ]
+            }
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY)
