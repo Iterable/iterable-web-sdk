@@ -1,15 +1,22 @@
 /* eslint-disable no-param-reassign */
-import { ENDPOINTS } from '../constants';
+import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
 import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
+import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
+import { canTrackAnonUser } from '../utils/commonFunctions';
 
 export const updateCart = (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   if (payload.user) {
     delete (payload as any).user.userId;
     delete (payload as any).user.email;
+  }
+  if (canTrackAnonUser()) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonUpdateCart(payload);
+    return Promise.reject(INITIALIZE_ERROR);
   }
 
   return baseIterableRequest<IterableResponse>({
@@ -33,6 +40,11 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (payload.user) {
     delete (payload as any).user.userId;
     delete (payload as any).user.email;
+  }
+  if (canTrackAnonUser()) {
+    const anonymousUserEventManager = new AnonymousUserEventManager();
+    anonymousUserEventManager.trackAnonPurchaseEvent(payload);
+    return Promise.reject(INITIALIZE_ERROR);
   }
 
   return baseIterableRequest<IterableResponse>({

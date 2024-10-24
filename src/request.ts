@@ -1,9 +1,18 @@
 import Axios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 import { AnySchema, ValidationError } from 'yup';
-import { BASE_URL, STATIC_HEADERS, EU_ITERABLE_API } from './constants';
+import {
+  BASE_URL,
+  STATIC_HEADERS,
+  EU_ITERABLE_API,
+  GET_CRITERIA_PATH,
+  INITIALIZE_ERROR,
+  ENDPOINT_MERGE_USER,
+  ENDPOINT_TRACK_ANON_SESSION
+} from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
+import { getTypeOfAuth } from './utils/typeOfAuth';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
@@ -20,6 +29,12 @@ interface ClientError extends IterableResponse {
   }[];
 }
 
+const ENDPOINTS_REQUIRING_SET_USER = [
+  GET_CRITERIA_PATH,
+  ENDPOINT_MERGE_USER,
+  ENDPOINT_TRACK_ANON_SESSION
+];
+
 export const baseAxiosRequest = Axios.create({
   baseURL: BASE_URL
 });
@@ -28,6 +43,15 @@ export const baseIterableRequest = <T = any>(
   payload: ExtendedRequestConfig
 ): IterablePromise<T> => {
   try {
+    const endpoint = payload?.url ?? '';
+
+    // for most Iterable API endpoints, we require a user to be initialized in the SDK.
+    if (
+      !ENDPOINTS_REQUIRING_SET_USER.includes(endpoint) &&
+      getTypeOfAuth() === null
+    ) {
+      return Promise.reject(INITIALIZE_ERROR);
+    }
     if (payload.validation?.data && payload.data) {
       payload.validation.data.validateSync(payload.data, { abortEarly: false });
     }
