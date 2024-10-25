@@ -13,6 +13,7 @@ import {
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
 import { getTypeOfAuth } from './utils/typeOfAuth';
+import { AuthorizationToken } from './authorization';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
@@ -65,12 +66,17 @@ export const baseIterableRequest = <T = any>(
       ? EU_ITERABLE_API
       : config.getConfig('baseURL');
 
+    const authorizationToken = new AuthorizationToken();
+    const JWT = authorizationToken.getToken();
+    const Authorization = JWT ? `Bearer ${JWT}` : undefined;
+
     return baseAxiosRequest({
       ...payload,
       baseURL,
       headers: {
         ...payload.headers,
-        ...STATIC_HEADERS
+        ...STATIC_HEADERS,
+        Authorization
       },
       paramsSerializer: (params) =>
         qs.stringify(params, { arrayFormat: 'repeat' })

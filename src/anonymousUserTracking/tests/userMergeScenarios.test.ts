@@ -9,7 +9,8 @@ import {
   SHARED_PREFS_ANON_SESSIONS,
   ENDPOINT_MERGE_USER,
   SHARED_PREF_ANON_USER_ID,
-  SHARED_PREF_ANON_USAGE_TRACKED
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_USER_TOKEN
 } from '../../constants';
 import { track } from '../../events';
 import { getInAppMessages } from '../../inapp';
@@ -462,6 +463,12 @@ describe('UserMergeScenariosTests', () => {
         }
       });
       logout(); // logout to remove logged in users before this test
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY;
+        }
+        return null;
+      });
       await setUserID('testuser123');
       const response = await getInAppMessages({
         count: 10,
@@ -474,6 +481,12 @@ describe('UserMergeScenariosTests', () => {
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY;
+        }
+        return null;
+      });
       await setUserID('testuseranotheruser');
       const secondResponse = await getInAppMessages({
         count: 10,
@@ -886,6 +899,12 @@ describe('UserMergeScenariosTests', () => {
         }
       });
       logout(); // logout to remove logged in users before this test
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY;
+        }
+        return null;
+      });
       await setEmail('testuser123@test.com');
       const response = await getInAppMessages({
         count: 10,
@@ -903,6 +922,12 @@ describe('UserMergeScenariosTests', () => {
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
         SHARED_PREF_ANON_USER_ID
       );
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY;
+        }
+        return null;
+      });
       await setEmail('testuseranotheruser@test.com');
       const secondResponse = await getInAppMessages({
         count: 10,

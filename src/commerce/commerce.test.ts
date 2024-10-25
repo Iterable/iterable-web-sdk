@@ -7,8 +7,15 @@ import { setTypeOfAuthForTestingOnly } from '../authorization';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+};
+
 describe('Users Requests', () => {
   beforeEach(() => {
+    (global as any).localStorage = localStorageMock;
     setTypeOfAuthForTestingOnly('email');
   });
   it('should set params and return the correct payload for updateCart', async () => {

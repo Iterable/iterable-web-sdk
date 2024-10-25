@@ -6,7 +6,11 @@ import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
-import { GETMESSAGES_PATH, INITIALIZE_ERROR } from '../constants';
+import {
+  GETMESSAGES_PATH,
+  INITIALIZE_ERROR,
+  SHARED_PREF_USER_TOKEN
+} from '../constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -102,7 +106,12 @@ describe('API Key Interceptors', () => {
       const { setEmail } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-      (global as any).localStorage = localStorageMock;
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY;
+        }
+        return null;
+      });
       await setEmail('hello@gmail.com');
 
       const response = await getInAppMessages({

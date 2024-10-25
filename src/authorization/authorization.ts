@@ -9,7 +9,8 @@ import {
   ENDPOINTS,
   RouteConfig,
   SHARED_PREF_ANON_USAGE_TRACKED,
-  SHARED_PREFS_CRITERIA
+  SHARED_PREFS_CRITERIA,
+  SHARED_PREF_USER_TOKEN
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -67,6 +68,24 @@ export interface WithoutJWT {
   toggleAnonUserTrackingConsent: (consent: boolean) => void;
 }
 
+export class AuthorizationToken {
+  constructor(public token?: string) {}
+
+  setToken(token: string) {
+    this.token = token;
+    localStorage.setItem(SHARED_PREF_USER_TOKEN, token);
+  }
+
+  getToken(): string | null {
+    return this.token || localStorage.getItem(SHARED_PREF_USER_TOKEN);
+  }
+
+  clearToken() {
+    this.token = '';
+    localStorage.removeItem(SHARED_PREF_USER_TOKEN);
+  }
+}
+
 export const setAnonUserId = async (userId: string) => {
   const anonymousUsageTracked = isAnonymousUsageTracked();
 
@@ -77,11 +96,14 @@ export const setAnonUserId = async (userId: string) => {
     token = await generateJWTGlobal({ userID: userId });
   }
 
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
   baseAxiosRequest.interceptors.request.use((config) => {
     config.headers.set('Api-Key', apiKey);
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
-    }
+
     return config;
   });
   addUserIdToRequest(userId);
@@ -526,6 +548,9 @@ export function initialize(
         /* clear fetched in-app messages */
         clearMessages();
 
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
+
         if (typeof authInterceptor === 'number') {
           /* stop adding auth token to requests */
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -565,11 +590,14 @@ export function initialize(
     };
   }
 
+  const authorizationToken = new AuthorizationToken();
   /*
     We're using a JWT enabled API key
     callback is assumed to be some sort of GET /api/generate-jwt
   */
   const doRequest = (payload: { email?: string; userID?: string }) => {
+    authorizationToken.clearToken();
+
     /* clear any token interceptor if any exists */
     if (typeof authInterceptor === 'number') {
       baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -581,6 +609,9 @@ export function initialize(
 
     return generateJWT(payload)
       .then((token) => {
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.setToken(token);
+
         /* set JWT token and auth token headers */
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
@@ -609,7 +640,6 @@ export function initialize(
             }
 
             config.headers.set('Api-Key', authToken);
-            config.headers.set('Authorization', `Bearer ${token}`);
 
             return config;
           }
@@ -640,6 +670,9 @@ export function initialize(
                     : { userID: authIdentifier! };
 
                 return generateJWT(payloadToPass).then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   /*
                     clear any existing interceptors that are adding user info
                     or API keys
@@ -685,7 +718,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -732,6 +764,9 @@ export function initialize(
             if (error?.response?.status === 401) {
               return generateJWT(payload)
                 .then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   if (authInterceptor) {
                     baseAxiosRequest.interceptors.request.eject(
                       authInterceptor
@@ -763,7 +798,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -810,6 +844,9 @@ export function initialize(
       })
       .catch((error) => {
         /* clear interceptor */
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
+
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
@@ -919,6 +956,9 @@ export function initialize(
 
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
+
+      const authorizationToken = new AuthorizationToken();
+      authorizationToken.clearToken();
 
       if (typeof authInterceptor === 'number') {
         /* stop adding auth token to requests */

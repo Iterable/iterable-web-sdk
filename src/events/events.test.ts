@@ -62,6 +62,7 @@ describe('Events Requests', () => {
   });
 
   beforeEach(() => {
+    (global as any).localStorage = localStorageMock;
     setTypeOfAuthForTestingOnly('userID');
   });
 
