@@ -9,8 +9,7 @@ import {
   ENDPOINTS,
   RouteConfig,
   SHARED_PREF_ANON_USAGE_TRACKED,
-  SHARED_PREFS_CRITERIA,
-  SHARED_PREF_USER_TOKEN
+  SHARED_PREFS_CRITERIA
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -29,6 +28,7 @@ import {
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
 import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
+import AuthorizationToken from 'src/utils/authorizationToken';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
@@ -66,24 +66,6 @@ export interface WithoutJWT {
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
   toggleAnonUserTrackingConsent: (consent: boolean) => void;
-}
-
-export class AuthorizationToken {
-  constructor(public token?: string) {}
-
-  setToken(token: string) {
-    this.token = token;
-    localStorage.setItem(SHARED_PREF_USER_TOKEN, token);
-  }
-
-  getToken(): string | null {
-    return this.token || localStorage.getItem(SHARED_PREF_USER_TOKEN);
-  }
-
-  clearToken() {
-    this.token = '';
-    localStorage.removeItem(SHARED_PREF_USER_TOKEN);
-  }
 }
 
 export const setAnonUserId = async (userId: string) => {

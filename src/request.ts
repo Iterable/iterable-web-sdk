@@ -13,7 +13,7 @@ import {
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
 import { getTypeOfAuth } from './utils/typeOfAuth';
-import { AuthorizationToken } from './authorization';
+import AuthorizationToken from './utils/authorizationToken';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
