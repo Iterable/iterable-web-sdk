@@ -286,6 +286,7 @@ export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
 export const SHARED_PREF_ANON_USER_ID = 'anon_userId';
 export const SHARED_PREF_ANON_USAGE_TRACKED = 'itbl_anonymous_usage_tracked';
+export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';

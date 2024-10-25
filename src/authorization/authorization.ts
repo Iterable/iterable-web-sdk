@@ -28,6 +28,7 @@ import {
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
 import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
+import AuthorizationToken from 'src/utils/authorizationToken';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
@@ -77,11 +78,14 @@ export const setAnonUserId = async (userId: string) => {
     token = await generateJWTGlobal({ userID: userId });
   }
 
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
   baseAxiosRequest.interceptors.request.use((config) => {
     config.headers.set('Api-Key', apiKey);
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
-    }
+
     return config;
   });
   addUserIdToRequest(userId);
@@ -106,7 +110,7 @@ const getAnonUserId = () => {
 const initializeUserId = (userId: string) => {
   addUserIdToRequest(userId);
   clearAnonymousUser();
-}
+};
 
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
@@ -206,7 +210,7 @@ const addUserIdToRequest = (userId: string) => {
 const initializeEmailUser = (email: string) => {
   addEmailToRequest(email);
   clearAnonymousUser();
-}
+};
 
 const syncEvents = () => {
   if (config.getConfig('enableAnonTracking')) {
@@ -463,12 +467,20 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
       },
-      setEmail: async (email: string, identityResolution?: IdentityResolution) => {
+      setEmail: async (
+        email: string,
+        identityResolution?: IdentityResolution
+      ) => {
         clearMessages();
         try {
-          const identityResolutionConfig = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+          const identityResolutionConfig =
+            config.getConfig('identityResolution');
+          const merge =
+            identityResolution?.mergeOnAnonymousToKnown ||
+            identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay =
+            identityResolution?.replayOnVisitorToKnown ||
+            identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(email, true, merge);
           if (result) {
@@ -483,12 +495,20 @@ export function initialize(
           return Promise.reject(`merging failed: ${error}`);
         }
       },
-      setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
+      setUserID: async (
+        userId: string,
+        identityResolution?: IdentityResolution
+      ) => {
         clearMessages();
         try {
-          const identityResolutionConfig = config.getConfig('identityResolution');
-          const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-          const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+          const identityResolutionConfig =
+            config.getConfig('identityResolution');
+          const merge =
+            identityResolution?.mergeOnAnonymousToKnown ||
+            identityResolutionConfig?.mergeOnAnonymousToKnown;
+          const replay =
+            identityResolution?.replayOnVisitorToKnown ||
+            identityResolutionConfig?.replayOnVisitorToKnown;
 
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
@@ -509,6 +529,9 @@ export function initialize(
         authIdentifier = null;
         /* clear fetched in-app messages */
         clearMessages();
+
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
 
         if (typeof authInterceptor === 'number') {
           /* stop adding auth token to requests */
@@ -549,11 +572,14 @@ export function initialize(
     };
   }
 
+  const authorizationToken = new AuthorizationToken();
   /*
     We're using a JWT enabled API key
     callback is assumed to be some sort of GET /api/generate-jwt
   */
   const doRequest = (payload: { email?: string; userID?: string }) => {
+    authorizationToken.clearToken();
+
     /* clear any token interceptor if any exists */
     if (typeof authInterceptor === 'number') {
       baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -565,6 +591,9 @@ export function initialize(
 
     return generateJWT(payload)
       .then((token) => {
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.setToken(token);
+
         /* set JWT token and auth token headers */
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
@@ -593,7 +622,6 @@ export function initialize(
             }
 
             config.headers.set('Api-Key', authToken);
-            config.headers.set('Authorization', `Bearer ${token}`);
 
             return config;
           }
@@ -624,6 +652,9 @@ export function initialize(
                     : { userID: authIdentifier! };
 
                 return generateJWT(payloadToPass).then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   /*
                     clear any existing interceptors that are adding user info
                     or API keys
@@ -669,7 +700,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -716,6 +746,9 @@ export function initialize(
             if (error?.response?.status === 401) {
               return generateJWT(payload)
                 .then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   if (authInterceptor) {
                     baseAxiosRequest.interceptors.request.eject(
                       authInterceptor
@@ -747,7 +780,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -794,6 +826,9 @@ export function initialize(
       })
       .catch((error) => {
         /* clear interceptor */
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
+
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
@@ -807,24 +842,34 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
     },
-    setEmail: async (email: string, identityResolution?: IdentityResolution) => {
+    setEmail: async (
+      email: string,
+      identityResolution?: IdentityResolution
+    ) => {
       /* clear previous user */
       clearMessages();
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+        const merge =
+          identityResolution?.mergeOnAnonymousToKnown ||
+          identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay =
+          identityResolution?.replayOnVisitorToKnown ||
+          identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(email, true, merge);
-        if (result) {
-          initializeEmailUser(email);
-          try {
-            return doRequest({ email }).then((token) => {
-              if (replay) {
-                syncEvents();
+        try {
+          return doRequest({ email })
+            .then(async (token) => {
+              const result = await tryMergeUser(email, true, merge);
+              if (result) {
+                initializeEmailUser(email);
+                if (replay) {
+                  syncEvents();
+                }
+                return token;
               }
-              return token;
-            }).catch((e) => {
+            })
+            .catch((e) => {
               if (logLevel === 'verbose') {
                 console.warn(
                   'Could not generate JWT after calling setEmail. Please try calling setEmail again.'
@@ -832,46 +877,52 @@ export function initialize(
               }
               return Promise.reject(e);
             });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
         return Promise.reject(`merging failed: ${error}`);
       }
     },
-    setUserID: async (userId: string, identityResolution?: IdentityResolution) => {
+    setUserID: async (
+      userId: string,
+      identityResolution?: IdentityResolution
+    ) => {
       clearMessages();
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge = identityResolution?.mergeOnAnonymousToKnown || identityResolutionConfig?.mergeOnAnonymousToKnown;
-        const replay = identityResolution?.replayOnVisitorToKnown || identityResolutionConfig?.replayOnVisitorToKnown;
+        const merge =
+          identityResolution?.mergeOnAnonymousToKnown ||
+          identityResolutionConfig?.mergeOnAnonymousToKnown;
+        const replay =
+          identityResolution?.replayOnVisitorToKnown ||
+          identityResolutionConfig?.replayOnVisitorToKnown;
 
-        const result = await tryMergeUser(userId, false, merge);
-        if (result) {
-          initializeUserId(userId);
-          try {
-            return doRequest({ userID: userId })
-              .then(async (token) => {
+        try {
+          return doRequest({ userID: userId })
+            .then(async (token) => {
+              const result = await tryMergeUser(userId, false, merge);
+              if (result) {
+                initializeUserId(userId);
                 if (replay) {
                   syncEvents();
                 }
                 return token;
-              })
-              .catch((e) => {
-                if (logLevel === 'verbose') {
-                  console.warn(
-                    'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
-                  );
-                }
-                return Promise.reject(e);
-              });
-          } catch (e) {
-            /* failed to create a new user. Just silently resolve */
-            return Promise.resolve();
-          }
+              }
+            })
+            .catch((e) => {
+              if (logLevel === 'verbose') {
+                console.warn(
+                  'Could not generate JWT after calling setUserID. Please try calling setUserID again.'
+                );
+              }
+              return Promise.reject(e);
+            });
+        } catch (e) {
+          /* failed to create a new user. Just silently resolve */
+          return Promise.resolve();
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
@@ -887,6 +938,9 @@ export function initialize(
 
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
+
+      const authorizationToken = new AuthorizationToken();
+      authorizationToken.clearToken();
 
       if (typeof authInterceptor === 'number') {
         /* stop adding auth token to requests */
