@@ -8,7 +8,8 @@ import {
   ENDPOINT_TRACK_ANON_SESSION,
   GET_CRITERIA_PATH,
   GETMESSAGES_PATH,
-  SHARED_PREF_ANON_USAGE_TRACKED
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../../constants';
 import { track } from '../../events';
 import { initializeWithConfig } from '../../authorization';
@@ -124,13 +125,8 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
   it('should not have unnecessary extra nesting when locally stored user update fields are sent to server', async () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            ...userDataMatched.dataFields,
-            eventType: userDataMatched.eventType
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify(userDataMatched);
       }
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(USER_UPDATE_API_TEST_CRITERIA);
@@ -144,14 +140,15 @@ describe('validateCustomEventUserUpdateAPI', () => {
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
@@ -169,7 +166,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
       console.log('');
     }
     expect(localStorage.setItem).toHaveBeenCalledWith(
-      SHARED_PREFS_EVENT_LIST_KEY,
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
       expect.any(String)
     );
     await setUserID('testuser123');
@@ -210,14 +207,12 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
   it('should not have unnecessary extra nesting when locally stored user update fields are sent to server - Fail', async () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            ...userData,
-            ...userData.dataFields,
-            eventType: userData.eventType
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          ...userData,
+          ...userData.dataFields,
+          eventType: userData.eventType
+        });
       }
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(USER_UPDATE_API_TEST_CRITERIA);
@@ -231,14 +226,15 @@ describe('validateCustomEventUserUpdateAPI', () => {
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
@@ -256,7 +252,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
       console.log('');
     }
     expect(localStorage.setItem).toHaveBeenCalledWith(
-      SHARED_PREFS_EVENT_LIST_KEY,
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
       expect.any(String)
     );
     await setUserID('testuser123');
@@ -275,11 +271,11 @@ describe('validateCustomEventUserUpdateAPI', () => {
       expect(requestData.dataFields).toHaveProperty('furniture.furnitureType');
       expect(requestData.dataFields).toHaveProperty('furniture.furnitureColor');
 
-      expect(requestData).not.toHaveProperty('furniture');
-      expect(requestData).not.toHaveProperty('furniture.furnitureType');
-      expect(requestData).not.toHaveProperty('furniture.furnitureColor');
-      expect(requestData.dataFields).toHaveProperty('furnitureType');
-      expect(requestData.dataFields).toHaveProperty('furnitureColor');
+      expect(requestData).toHaveProperty('furniture');
+      expect(requestData).toHaveProperty('furniture.furnitureType');
+      expect(requestData).toHaveProperty('furniture.furnitureColor');
+      expect(requestData).toHaveProperty('furnitureType');
+      expect(requestData).toHaveProperty('furnitureColor');
     });
   });
 
