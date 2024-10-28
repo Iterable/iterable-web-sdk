@@ -378,7 +378,7 @@ class CriteriaCompletionChecker {
                 ...data
               });
             });
-          } else {
+          } else if (subFieldValue instanceof Object) {
             fieldValue = subFieldValue;
           }
         });
