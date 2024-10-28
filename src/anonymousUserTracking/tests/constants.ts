@@ -1042,6 +1042,50 @@ export const IS_NOT_ONE_OF_CRITERIA = {
   ]
 };
 
+export const CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '467',
+      name: 'Custom event - single primitive',
+      createdAt: 1728166585122,
+      updatedAt: 1729581351423,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'animal_found',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal_found.count',
+                      comparatorType: 'DoesNotEqual',
+                      value: '4',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 export const CUSTOM_EVENT_API_TEST_CRITERIA = {
   count: 1,
   criteriaSets: [
