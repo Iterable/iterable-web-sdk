@@ -1181,6 +1181,63 @@ export const USER_MERGE_SCENARIO_CRITERIA = {
   ]
 };
 
+export const NESTED_CRITERIA_MULTI_LEVEL_MORE_THAN_4_EVENTS = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '484',
+      name: 'NickBBFinalUserFlow',
+      createdAt: 1729009617581,
+      updatedAt: 1730096250121,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'likes_boba',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'cancelled_booking.details.event.name',
+                      comparatorType: 'Equals',
+                      value: 'haircut',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 // MARK:Complex Criteria
 
 export const COMPLEX_CRITERIA_1 = {
