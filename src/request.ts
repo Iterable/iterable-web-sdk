@@ -30,7 +30,7 @@ interface ClientError extends IterableResponse {
   }[];
 }
 
-const ENDPOINTS_REQUIRING_SET_USER = [
+const ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH = [
   GET_CRITERIA_PATH,
   ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION
@@ -48,7 +48,7 @@ export const baseIterableRequest = <T = any>(
 
     // for most Iterable API endpoints, we require a user to be initialized in the SDK.
     if (
-      !ENDPOINTS_REQUIRING_SET_USER.includes(endpoint) &&
+      !ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH.includes(endpoint) &&
       getTypeOfAuth() === null
     ) {
       return Promise.reject(INITIALIZE_ERROR);

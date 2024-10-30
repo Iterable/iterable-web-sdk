@@ -52,8 +52,8 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
   );
 export interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
+  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<string>;
+  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
   toggleAnonUserTrackingConsent: (consent: boolean) => void;
@@ -62,8 +62,8 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string) => Promise<void>;
-  setUserID: (userId: string) => Promise<void>;
+  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<void>;
+  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
   logout: () => void;
   toggleAnonUserTrackingConsent: (consent: boolean) => void;
 }
