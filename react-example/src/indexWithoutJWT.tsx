@@ -53,11 +53,10 @@ const HomeLink = styled(Link)`
     }
   };
 
-  const { setUserID, logout, setEmail, toggleAnonUserTrackingConsent } =
+  const { setUserID, logout, setEmail, setVisitorUsageTracked } =
     initializeWithConfig(initializeParams);
 
-  const handleConsent = (consent?: boolean) =>
-    toggleAnonUserTrackingConsent(consent);
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(

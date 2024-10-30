@@ -56,7 +56,7 @@ export interface WithJWT {
   setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
-  toggleAnonUserTrackingConsent: (consent: boolean) => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
 }
 
 export interface WithoutJWT {
@@ -65,7 +65,7 @@ export interface WithoutJWT {
   setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<void>;
   setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
   logout: () => void;
-  toggleAnonUserTrackingConsent: (consent: boolean) => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
 }
 
 export const setAnonUserId = async (userId: string) => {
@@ -543,7 +543,7 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
       },
-      toggleAnonUserTrackingConsent: (consent: boolean) => {
+      setVisitorUsageTracked: (consent: boolean) => {
         /* if consent is true, we want to clear anon user data and start tracking from point forward */
         if (consent) {
           anonUserManager.removeAnonSessionCriteriaData();
@@ -963,7 +963,7 @@ export function initialize(
         }
       });
     },
-    toggleAnonUserTrackingConsent: (consent: boolean) => {
+    setVisitorUsageTracked: (consent: boolean) => {
       /* if consent is true, we want to clear anon user data and start tracking from point forward */
       if (consent) {
         anonUserManager.removeAnonSessionCriteriaData();
