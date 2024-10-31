@@ -108,7 +108,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
             mergeOnAnonymousToKnown: false
@@ -147,7 +147,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -188,7 +188,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -241,7 +241,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -288,7 +288,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -343,7 +343,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true
+          enableAnonActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -378,7 +378,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -416,7 +416,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -449,7 +449,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -510,7 +510,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -545,7 +545,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
             mergeOnAnonymousToKnown: false
@@ -584,7 +584,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -625,7 +625,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true
+          enableAnonActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -677,7 +677,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -730,7 +730,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true
+          enableAnonActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -765,7 +765,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -805,7 +805,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true
@@ -845,7 +845,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: false
@@ -885,7 +885,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonTracking: true,
+          enableAnonActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnAnonymousToKnown: true

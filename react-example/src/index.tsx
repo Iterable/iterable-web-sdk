@@ -47,7 +47,7 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true
+      enableAnonActivation: true
     },
     generateJWT: ({ email, userID }) =>
       axios
