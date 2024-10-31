@@ -7,7 +7,6 @@ import {
   EU_ITERABLE_API,
   GET_CRITERIA_PATH,
   INITIALIZE_ERROR,
-  ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
@@ -32,7 +31,6 @@ interface ClientError extends IterableResponse {
 
 const ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH = [
   GET_CRITERIA_PATH,
-  ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION
 ];
 

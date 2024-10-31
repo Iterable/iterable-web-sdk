@@ -99,7 +99,7 @@ const clearAnonymousUser = () => {
 };
 
 const getAnonUserId = () => {
-  if (config.getConfig('enableAnonTracking')) {
+  if (config.getConfig('enableAnonActivation')) {
     const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
     return anonUser === undefined ? null : anonUser;
   } else {
@@ -213,7 +213,7 @@ const initializeEmailUser = (email: string) => {
 };
 
 const syncEvents = () => {
-  if (config.getConfig('enableAnonTracking')) {
+  if (config.getConfig('enableAnonActivation')) {
     anonUserManager.syncEvents();
   }
 };
@@ -396,7 +396,7 @@ export function initialize(
 
   const enableAnonymousTracking = () => {
     try {
-      if (config.getConfig('enableAnonTracking')) {
+      if (config.getConfig('enableAnonActivation')) {
         anonUserManager.getAnonCriteria();
         anonUserManager.updateAnonSession();
         const anonymousUserId = getAnonUserId();
@@ -416,7 +416,7 @@ export function initialize(
     merge?: boolean
   ): Promise<boolean> => {
     const typeOfAuth = getTypeOfAuth();
-    const enableAnonTracking = config.getConfig('enableAnonTracking');
+    const enableAnonActivation = config.getConfig('enableAnonActivation');
     const sourceUserIdOrEmail =
       authIdentifier === null ? getAnonUserId() : authIdentifier;
     const sourceUserId = typeOfAuth === 'email' ? null : sourceUserIdOrEmail;
@@ -427,7 +427,7 @@ export function initialize(
     if (
       (getAnonUserId() !== null || authIdentifier !== null) &&
       merge &&
-      enableAnonTracking
+      enableAnonActivation
     ) {
       const anonymousUserMerge = new AnonymousUserMerge();
       try {
