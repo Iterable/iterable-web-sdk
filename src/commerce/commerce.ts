@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { ENDPOINTS } from '../constants';
+import { AUA_WARNING_MESSAGE, ENDPOINTS } from '../constants';
 import { baseIterableRequest } from '../request';
 import { TrackPurchaseRequestParams, UpdateCartRequestParams } from './types';
 import { IterableResponse } from '../types';
@@ -16,7 +16,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateCart(payload);
-    return Promise.resolve();
+    return Promise.reject(AUA_WARNING_MESSAGE).catch((e) => console.warn(e));
   }
 
   return baseIterableRequest<IterableResponse>({
@@ -44,7 +44,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonPurchaseEvent(payload);
-    return Promise.resolve();
+    return Promise.reject(AUA_WARNING_MESSAGE).catch((e) => console.warn(e));
   }
 
   return baseIterableRequest<IterableResponse>({

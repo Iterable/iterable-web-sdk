@@ -475,7 +475,7 @@ describe('User Identification', () => {
         expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).email).toBe(
+        expect(JSON.parse(trackResponse?.config.data).email).toBe(
           'hello@gmail.com'
         );
       });
@@ -508,10 +508,10 @@ describe('User Identification', () => {
 
         const cartResponse = await updateCart({ items: [] });
         const trackResponse = await trackPurchase({ items: [], total: 100 });
-        expect(JSON.parse(cartResponse.config.data).user.email).toBe(
+        expect(JSON.parse(cartResponse?.config.data).user.email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).user.email).toBe(
+        expect(JSON.parse(trackResponse?.config.data).user.email).toBe(
           'hello@gmail.com'
         );
       });
@@ -626,7 +626,7 @@ describe('User Identification', () => {
         expect(
           JSON.parse(userResponse && userResponse.config.data).userId
         ).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
+        expect(JSON.parse(trackResponse?.config.data).userId).toBe('999');
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
@@ -654,8 +654,8 @@ describe('User Identification', () => {
 
         const cartResponse = await updateCart({ items: [] });
         const trackResponse = await trackPurchase({ items: [], total: 100 });
-        expect(JSON.parse(cartResponse.config.data).user.userId).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).user.userId).toBe('999');
+        expect(JSON.parse(cartResponse?.config.data).user.userId).toBe('999');
+        expect(JSON.parse(trackResponse?.config.data).user.userId).toBe('999');
       });
 
       it('adds no userId body or header information to unrelated endpoints', async () => {
@@ -813,7 +813,7 @@ describe('User Identification', () => {
         expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).email).toBe(
+        expect(JSON.parse(trackResponse?.config.data).email).toBe(
           'hello@gmail.com'
         );
       });
@@ -850,10 +850,10 @@ describe('User Identification', () => {
 
         const cartResponse = await updateCart({ items: [] });
         const trackResponse = await trackPurchase({ items: [], total: 100 });
-        expect(JSON.parse(cartResponse.config.data).user.email).toBe(
+        expect(JSON.parse(cartResponse?.config.data).user.email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(trackResponse.config.data).user.email).toBe(
+        expect(JSON.parse(trackResponse?.config.data).user.email).toBe(
           'hello@gmail.com'
         );
       });
@@ -980,7 +980,7 @@ describe('User Identification', () => {
         expect(
           JSON.parse(userResponse && userResponse.config.data).userId
         ).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
+        expect(JSON.parse(trackResponse?.config.data).userId).toBe('999');
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
@@ -1012,8 +1012,8 @@ describe('User Identification', () => {
 
         const cartResponse = await updateCart({ items: [] });
         const trackResponse = await trackPurchase({ items: [], total: 100 });
-        expect(JSON.parse(cartResponse.config.data).user.userId).toBe('999');
-        expect(JSON.parse(trackResponse.config.data).user.userId).toBe('999');
+        expect(JSON.parse(cartResponse?.config.data).user.userId).toBe('999');
+        expect(JSON.parse(trackResponse?.config.data).user.userId).toBe('999');
       });
 
       it('adds no userId body or header information to unrelated endpoints', async () => {

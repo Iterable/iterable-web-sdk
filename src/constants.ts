@@ -311,3 +311,7 @@ export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR = new Error(
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods'
 );
+
+export const AUA_WARNING_MESSAGE = new Error(
+  'Event tracked locally using AUA.'
+);

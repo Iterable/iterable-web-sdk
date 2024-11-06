@@ -69,8 +69,8 @@ describe('Events Requests', () => {
   it('return the correct payload for track', async () => {
     const response = await track({ eventName: 'test' });
 
-    expect(JSON.parse(response.config.data).eventName).toBe('test');
-    expect(response.data.msg).toBe('hello');
+    expect(JSON.parse(response?.config.data).eventName).toBe('test');
+    expect(response?.data.msg).toBe('hello');
   });
 
   it('should reject track on bad params', async () => {
@@ -465,10 +465,10 @@ describe('Events Requests', () => {
       appPackageName: 'my-lil-site'
     } as any);
 
-    expect(JSON.parse(trackResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackResponse?.config.data).email).toBeUndefined();
+    expect(JSON.parse(trackResponse?.config.data).userId).toBeUndefined();
     expect(
-      JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
+      JSON.parse(trackResponse?.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
 
     expect(JSON.parse(trackClickResponse.config.data).email).toBeUndefined();

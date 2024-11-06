@@ -34,7 +34,7 @@ describe('Users Requests', () => {
       ]
     });
 
-    expect(JSON.parse(response.config.data).items).toEqual([
+    expect(JSON.parse(response?.config.data).items).toEqual([
       {
         id: 'fdsafds',
         name: 'banana',
@@ -42,10 +42,10 @@ describe('Users Requests', () => {
         price: 12
       }
     ]);
-    expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
+    expect(JSON.parse(response?.config.data).user.preferUserId).toBe(true);
     // expect(response.config.headers['SDK-Version']).toBe(SDK_VERSION);
     // expect(response.config.headers['SDK-Platform']).toBe(WEB_PLATFORM);
-    expect(response.data.msg).toBe('hello');
+    expect(response?.data.msg).toBe('hello');
   });
 
   it('should reject updateCart on bad params', async () => {
@@ -87,10 +87,10 @@ describe('Users Requests', () => {
       total: 100
     });
 
-    expect(JSON.parse(response.config.data).total).toBe(100);
-    expect(JSON.parse(response.config.data).items).toEqual([]);
-    expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
-    expect(response.data.msg).toBe('hello');
+    expect(JSON.parse(response?.config.data).total).toBe(100);
+    expect(JSON.parse(response?.config.data).items).toEqual([]);
+    expect(JSON.parse(response?.config.data).user.preferUserId).toBe(true);
+    expect(response?.data.msg).toBe('hello');
   });
 
   it('should not allow a passed userId or email for API methods', async () => {
@@ -117,10 +117,10 @@ describe('Users Requests', () => {
       total: 100
     } as any);
 
-    expect(JSON.parse(updateResponse.config.data).user.email).toBeUndefined();
-    expect(JSON.parse(updateResponse.config.data).user.userId).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).user.email).toBeUndefined();
-    expect(JSON.parse(trackResponse.config.data).user.userId).toBeUndefined();
+    expect(JSON.parse(updateResponse?.config.data).user.email).toBeUndefined();
+    expect(JSON.parse(updateResponse?.config.data).user.userId).toBeUndefined();
+    expect(JSON.parse(trackResponse?.config.data).user.email).toBeUndefined();
+    expect(JSON.parse(trackResponse?.config.data).user.userId).toBeUndefined();
   });
 
   it('should reject updateCart on bad params', async () => {
