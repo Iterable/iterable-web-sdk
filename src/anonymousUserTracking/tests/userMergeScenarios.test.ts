@@ -136,7 +136,7 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 is because we want to remove the anon user and remove anon details
-      expect(removeItemCalls.length).toBe(1);
+      expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
       );
