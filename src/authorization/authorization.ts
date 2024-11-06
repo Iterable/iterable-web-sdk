@@ -487,8 +487,9 @@ export function initialize(
             initializeEmailUser(email);
             if (replay) {
               syncEvents();
+            } else {
+              anonUserManager.removeAnonSessionCriteriaData();
             }
-            anonUserManager.removeAnonSessionCriteriaData();
             return Promise.resolve();
           }
         } catch (error) {
@@ -516,8 +517,9 @@ export function initialize(
             initializeUserId(userId);
             if (replay) {
               syncEvents();
+            } else {
+              anonUserManager.removeAnonSessionCriteriaData();
             }
-            anonUserManager.removeAnonSessionCriteriaData();
             return Promise.resolve();
           }
         } catch (error) {
@@ -867,8 +869,9 @@ export function initialize(
                 initializeEmailUser(email);
                 if (replay) {
                   syncEvents();
+                } else {
+                  anonUserManager.removeAnonSessionCriteriaData();
                 }
-                anonUserManager.removeAnonSessionCriteriaData();
                 return token;
               }
             })
@@ -911,8 +914,9 @@ export function initialize(
                 initializeUserId(userId);
                 if (replay) {
                   syncEvents();
+                } else {
+                  anonUserManager.removeAnonSessionCriteriaData();
                 }
-                anonUserManager.removeAnonSessionCriteriaData();
                 return token;
               }
             })
