@@ -57,6 +57,7 @@ export interface WithJWT {
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
   setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 
 export interface WithoutJWT {
@@ -66,6 +67,7 @@ export interface WithoutJWT {
   setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
   logout: () => void;
   setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 
 export const setAnonUserId = async (userId: string) => {
@@ -568,6 +570,10 @@ export function initialize(
           }
           localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
         }
+      },
+      clearVisitorEventsAndUserData: () => {
+        anonUserManager.removeAnonSessionCriteriaData();
+        clearAnonymousUser();
       }
     };
   }
@@ -988,6 +994,10 @@ export function initialize(
         }
         localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
       }
+    },
+    clearVisitorEventsAndUserData: () => {
+      anonUserManager.removeAnonSessionCriteriaData();
+      clearAnonymousUser();
     }
   };
 }
