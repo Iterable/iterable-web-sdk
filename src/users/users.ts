@@ -6,7 +6,7 @@ import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from '../utils/commonFunctions';
-import { INITIALIZE_ERROR, ENDPOINTS } from '../constants';
+import { ENDPOINTS } from '../constants';
 
 export const updateUserEmail = (newEmail: string) =>
   baseIterableRequest<IterableResponse>({
@@ -31,7 +31,7 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
     anonymousUserEventManager.trackAnonUpdateUser(payload);
-    return Promise.reject(INITIALIZE_ERROR);
+    return Promise.resolve();
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
