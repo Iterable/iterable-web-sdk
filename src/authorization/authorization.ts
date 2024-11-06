@@ -212,7 +212,7 @@ const initializeEmailUser = (email: string) => {
   clearAnonymousUser();
 };
 
-const syncEvents = () => {
+ const syncEvents = () => {
   if (config.getConfig('enableAnonActivation')) {
     anonUserManager.syncEvents();
   }
@@ -488,6 +488,7 @@ export function initialize(
             if (replay) {
               syncEvents();
             }
+            anonUserManager.removeAnonSessionCriteriaData();
             return Promise.resolve();
           }
         } catch (error) {
@@ -516,6 +517,7 @@ export function initialize(
             if (replay) {
               syncEvents();
             }
+            anonUserManager.removeAnonSessionCriteriaData();
             return Promise.resolve();
           }
         } catch (error) {
@@ -866,6 +868,7 @@ export function initialize(
                 if (replay) {
                   syncEvents();
                 }
+                anonUserManager.removeAnonSessionCriteriaData();
                 return token;
               }
             })
@@ -909,6 +912,7 @@ export function initialize(
                 if (replay) {
                   syncEvents();
                 }
+                anonUserManager.removeAnonSessionCriteriaData();
                 return token;
               }
             })
