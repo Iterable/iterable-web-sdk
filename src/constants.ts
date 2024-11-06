@@ -307,7 +307,9 @@ export const PURCHASE_ITEM = 'shoppingCartItems';
 export const UPDATECART_ITEM_PREFIX = 'updateCart.updatedShoppingCartItems.';
 export const PURCHASE_ITEM_PREFIX = `${PURCHASE_ITEM}.`;
 
-export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
 export const INITIALIZE_ERROR = new Error(
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods'
+);
+export const AUA_WARNING = new Error(
+  'This event was stored locally because you have Anonymous User Activation enabled. If this was unintentional, please check your SDK configuration settings.'
 );
