@@ -212,7 +212,7 @@ const initializeEmailUser = (email: string) => {
   clearAnonymousUser();
 };
 
- const syncEvents = () => {
+const syncEvents = () => {
   if (config.getConfig('enableAnonActivation')) {
     anonUserManager.syncEvents();
   }
