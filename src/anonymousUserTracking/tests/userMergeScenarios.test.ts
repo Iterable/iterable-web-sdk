@@ -135,8 +135,7 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 1 means it did not remove item and so syncEvents was NOT called
-      // because removeItem gets called one time for the key in case of logout
+      // count 2 is because we want to remove the anon user and remove anon details
       expect(removeItemCalls.length).toBe(1);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -175,7 +174,6 @@ describe('UserMergeScenariosTests', () => {
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
       // count 2 means it removed items and so syncEvents was called
-
       // because removeItem gets called one time for
       // the key in case of logout and 2nd time on syncevents
       expect(removeItemCalls.length).toBe(2);
@@ -574,9 +572,8 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 1 means it did not remove item and so syncEvents was NOT called
-      // because removeItem gets called one time for the key in case of logout
-      expect(removeItemCalls.length).toBe(1);
+      // count 2 is because we want to remove the anon user and remove anon details
+      expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
       );
