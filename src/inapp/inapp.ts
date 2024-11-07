@@ -17,7 +17,7 @@ import {
   trackInAppClose,
   trackInAppConsume,
   trackInAppOpen
-} from '../events';
+} from '../events/inapp/events';
 import { IterablePromise } from '../types';
 import { requestMessages } from './request';
 import {

@@ -1,23 +1,21 @@
-import { initializeWithConfig, WithJWTParams } from '@iterable/web-sdk';
-import axios from 'axios';
+import { initializeWithConfig, WithoutJWTParams } from '@iterable/web-sdk';
+import ReactDOM from 'react-dom';
 import './styles/index.css';
 
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
-import { createRoot } from 'react-dom/client';
 import { Home } from './views/Home';
 import { Commerce } from './views/Commerce';
 import { Events } from './views/Events';
 import { Users } from './views/Users';
 import { InApp } from './views/InApp';
-import { EmbeddedMessage } from './views/Embedded';
-import { Link } from './components/Link';
-import { LoginForm } from './components/LoginForm';
-import { EmbeddedMsgs } from './views/EmbeddedMsgs';
+import LoginFormWithoutJWT from './components/LoginFormWithoutJWT';
 import AUTTesting from './views/AUTTesting';
-
-import { UserProvider } from './context/Users';
+import { EmbeddedMsgs } from './views/EmbeddedMsgs';
+import { EmbeddedMessage } from './views/Embedded';
 import { EmbeddedMsgsImpressionTracker } from './views/EmbeddedMsgsImpressionTracker';
+import { Link } from './components/Link';
+import { UserProvider } from './context/Users';
 
 const Wrapper = styled.div`
   display: flex;
@@ -42,44 +40,26 @@ const HomeLink = styled(Link)`
 `;
 
 ((): void => {
-  const initializeParams: WithJWTParams = {
+  // Here we are testing it using NON-JWT based project.
+  const initializeParams: WithoutJWTParams = {
     authToken: process.env.API_KEY || '',
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonActivation: true
-    },
-    generateJWT: ({ email, userID }) =>
-      axios
-        .post(
-          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            user_id: userID,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
-        .then((response: any) => response.data?.token)
+      enableAnonActivation: true,
+      onAnonUserCreated: (userId: string) => {
+        console.log('onAnonUserCreated', userId);
+      }
+    }
   };
-  const {
-    setEmail,
-    setUserID,
-    logout,
-    refreshJwtToken,
-    setVisitorUsageTracked
-  } = initializeWithConfig(initializeParams);
+
+  const { setUserID, logout, setEmail, setVisitorUsageTracked } =
+    initializeWithConfig(initializeParams);
 
   const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
-  const container = document.getElementById('root');
-  const root = createRoot(container);
-  root.render(
+  // eslint-disable-next-line react/no-deprecated
+  ReactDOM.render(
     <BrowserRouter>
       <Wrapper>
         <UserProvider>
@@ -87,11 +67,10 @@ const HomeLink = styled(Link)`
             <HomeLink renderAsButton to="/">
               Home
             </HomeLink>
-            <LoginForm
+            <LoginFormWithoutJWT
               setEmail={setEmail}
               setUserId={setUserID}
               logout={logout}
-              refreshJwt={refreshJwtToken}
             />
           </HeaderWrapper>
           <RouteWrapper>
@@ -115,6 +94,7 @@ const HomeLink = styled(Link)`
           </RouteWrapper>
         </UserProvider>
       </Wrapper>
-    </BrowserRouter>
+    </BrowserRouter>,
+    document.getElementById('root')
   );
 })();

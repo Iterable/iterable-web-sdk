@@ -19,6 +19,7 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from '../utils';
+import { setTypeOfAuthForTestingOnly } from '../../authorization';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -33,6 +34,9 @@ const mockMarkup = `
 `;
 
 describe('Utils', () => {
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('email');
+  });
   describe('filterHiddenInAppMessages', () => {
     it('should filter out read messages', () => {
       expect(filterHiddenInAppMessages()).toEqual([]);
@@ -869,6 +873,7 @@ describe('Utils', () => {
 
       expect(el.getAttribute('aria-label')).toBe('hello');
       expect(el.getAttribute('role')).toBe('button');
+      // eslint-disable-next-line no-script-url
       expect(el.getAttribute('href')).toBe('javascript:undefined');
     });
 
