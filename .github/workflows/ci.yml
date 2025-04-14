@@ -26,4 +26,8 @@ jobs:
       - run: yarn prepublishOnly
       - run: node index.node.js
       - run: yarn test
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
       - run: yarn check-deps
