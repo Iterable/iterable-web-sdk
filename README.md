@@ -94,6 +94,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 
 | Method Name                                                                       | Description |
 | --------------------------------------------------------------------------------- | ----------- |
+| [`baseIterableRequest`](#baseiterablerequest)                                     |  |
 | [`filterHiddenInAppMessages`](#filterhiddeninappmessages)                         | From an array of passed-in in-app messages, filters out messages that have already been read, messages that should not be displayed, and messages that only contain JSON data. |
 | [`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages) | From an array of passed-in in-app messages, filters out messages that have already been read and messages that should not be displayed. |
 | [`getInAppMessages`](#getInAppMessages)                                           | Fetches in-app messages by calling [`GET /api/inApp/getMessages`](https://support.iterable.com/hc/articles/204780579#get-api-inapp-getmessages). |
@@ -126,6 +127,21 @@ Notes:
   like Safari), in-app messages displayed in an iOS web browser browser can't 
   automatically track `inAppClick`  events or handle custom CTAs. This will impact
   analytics for all Safari and mobile iOS users.
+
+## `baseIterableRequest`
+
+```ts
+function baseIterableRequest(
+  payload: ExtendedRequestConfig
+): IterablePromise<T = any>
+```
+
+Parameters:
+- `payload` - A request config see [`ExtendedRequestConfig`](#ExtendedRequestConfig)
+
+See also:
+
+- [`IterablePromise`](#iterablepromise)
 
 ## `filterHiddenInAppMessages`
 
@@ -1791,6 +1807,20 @@ type IterableErrorStatus =
   | 'Forbidden'
   | 'JwtUserIdentifiersMismatched'
   | 'InvalidJwtPayload';
+```
+
+## `ExtendedRequestConfig`
+
+An extension of the AxiosRequestConfig
+
+```ts
+  interface ExtendedRequestConfig extends AxiosRequestConfig {
+    validation?: {
+      data?: AnySchema;
+      params?: AnySchema;
+    };
+    sendBeacon?: boolean;
+  }
 ```
 
 ## `IterablePromise`
