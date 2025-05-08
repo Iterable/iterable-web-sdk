@@ -141,6 +141,20 @@ function baseIterableRequest(
 Parameters:
 - `payload` - A request config see [`ExtendedRequestConfig`](#ExtendedRequestConfig)
 
+Example:
+```ts
+baseIterableRequest<IterableResponse>({
+        method: 'GET',
+        url: '/embedded-messaging/messages',
+        params: {
+          placementIds: [1, 2, 3],
+          platform: 'Web',
+          sdkVersion: '1.0.0',
+          packageName: 'pkgName'
+        }
+      });
+```
+
 See also:
 
 - [`IterablePromise`](#iterablepromise)
