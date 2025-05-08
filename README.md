@@ -130,6 +130,8 @@ Notes:
 
 ## `baseIterableRequest`
 
+Executes a custom API request to Iterable, using an extended request configuration for validation and optional features. Valid for web API keys and their supported endpoints only. [Learn more](https://support.iterable.com/hc/articles/360043464871-API-Keys#client-side-keys) 
+
 ```ts
 function baseIterableRequest(
   payload: ExtendedRequestConfig
