@@ -8,6 +8,7 @@ export * from './embedded';
 export * from './components/card';
 export * from './components/banner';
 export * from './components/notification';
+export { baseIterableRequest } from './request';
 export { config } from './utils/config';
 export { IterableConfig } from './utils/IterableConfig';
 
