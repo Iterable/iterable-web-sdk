@@ -94,7 +94,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 
 | Method Name                                                                       | Description |
 | --------------------------------------------------------------------------------- | ----------- |
-| [`baseIterableRequest`](#baseiterablerequest)                                     |  |
+| [`baseIterableRequest`](#baseiterablerequest)                                     |  Executes a custom API request to Iterable, using an extended request configuration for validation and optional features. Valid for web API keys and their supported endpoints only. [Learn more](https://support.iterable.com/hc/articles/360043464871-API-Keys#client-side-keys)  |
 | [`filterHiddenInAppMessages`](#filterhiddeninappmessages)                         | From an array of passed-in in-app messages, filters out messages that have already been read, messages that should not be displayed, and messages that only contain JSON data. |
 | [`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages) | From an array of passed-in in-app messages, filters out messages that have already been read and messages that should not be displayed. |
 | [`getInAppMessages`](#getInAppMessages)                                           | Fetches in-app messages by calling [`GET /api/inApp/getMessages`](https://support.iterable.com/hc/articles/204780579#get-api-inapp-getmessages). |
