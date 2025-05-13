@@ -91,6 +91,7 @@ export function getInAppMessages(
   delete dupedPayload.animationDuration;
   delete dupedPayload.handleLinks;
   delete dupedPayload.closeButton;
+  delete dupedPayload.maxWidth;
 
   if (options?.display) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
@@ -166,7 +167,8 @@ export function getInAppMessages(
           payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
           payload.topOffset,
           payload.bottomOffset,
-          payload.rightOffset
+          payload.rightOffset,
+          payload.maxWidth
         ).then((activeIframe) => {
           const activeIframeDocument = activeIframe?.contentDocument;
 

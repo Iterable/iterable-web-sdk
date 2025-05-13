@@ -339,6 +339,7 @@ const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
 };
 
 /**
+ * Generates an iframe with the provided html and appends it to the DOM.
  *
  * @param html html you want to paint to the DOM inside the iframe
  * @param position screen position the message should appear in
@@ -348,6 +349,8 @@ const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
  * @param bottomOffset how many px or % buffer between the in-app message
  * and the bottom of the screen
  * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
+ * @param maxWidth An explicitly set max width for the in-app message.
+ * Only applies to `Center`, `TopRight`, and `BottomRight` positions.
  *
  * @returns { HTMLIFrameElement }
  */
@@ -358,7 +361,8 @@ export const paintIFrame = (
   srMessage?: string,
   topOffset?: string,
   bottomOffset?: string,
-  rightOffset?: string
+  rightOffset?: string,
+  maxWidth?: string
 ): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
@@ -423,7 +427,7 @@ export const paintIFrame = (
               position: fixed;
               border: none;
               margin: auto;
-              max-width: 100%;
+              max-width: ${maxWidth || '100%'};
               z-index: 9999;
               transform: translateX(150%);
               -webkit-transform: translateX(150%);
@@ -434,7 +438,7 @@ export const paintIFrame = (
               position: fixed;
               border: none;
               margin: auto;
-              max-width: 100%;
+              max-width: ${maxWidth || '100%'};
               z-index: 9999;
               width: ${width};
               height: ${iframe.style.height};

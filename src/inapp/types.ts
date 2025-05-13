@@ -50,6 +50,9 @@ interface SDKInAppMessagesParams {
   closeButton?: CloseButton;
   /** messageId of the latest (i.e., most recent) message in the device's local cache */
   latestCachedMessageId?: string;
+  /** Set a default max-width style for message iframe.
+   * Only applies to `Center`, `TopRight`, and `BottomRight` positions. */
+  maxWidth?: string;
 }
 
 export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
