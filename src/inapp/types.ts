@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import { IterablePromise } from '../types';
 
 export enum CloseButtonPosition {
@@ -23,6 +22,65 @@ export enum DisplayPosition {
   BottomRight = 'BottomRight',
   Full = 'Full'
 }
+
+export interface InAppDisplaySetting {
+  percentage?: number;
+  displayOption?: string;
+}
+
+export interface WebInAppDisplaySettings {
+  position: DisplayPosition;
+}
+
+export interface InAppMessage {
+  messageId: string;
+  campaignId: number;
+  createdAt: number;
+  expiresAt: number;
+  content: {
+    payload?: Record<string, any>;
+    html: string | HTMLIFrameElement;
+    inAppDisplaySettings: {
+      top: InAppDisplaySetting;
+      right: InAppDisplaySetting;
+      left: InAppDisplaySetting;
+      bottom: InAppDisplaySetting;
+      bgColor?: { alpha: number; hex: string };
+      shouldAnimate?: boolean;
+    };
+    webInAppDisplaySettings: WebInAppDisplaySettings;
+  };
+  customPayload: Record<string, any>;
+  trigger: { type: string };
+  saveToInbox: boolean;
+  inboxMetadata: {
+    title: string;
+    subtitle: string;
+    icon: string;
+  };
+  priorityLevel: number;
+  read: boolean;
+}
+
+export type PaintIframeProps = {
+  /** html you want to paint to the DOM inside the iframe */
+  html: string;
+  /** screen position the message should appear in */
+  position: WebInAppDisplaySettings['position'];
+  /** if the in-app should animate in/out */
+  shouldAnimate?: boolean;
+  /** The message you want the screen reader to read when popping up the message */
+  srMessage?: string;
+  /** how many px or % buffer between the in-app message and the top of the screen */
+  topOffset?: string;
+  /** how many px or % buffer between the in-app message and the bottom of the screen */
+  bottomOffset?: string;
+  /** how many px or % buffer between the in-app message and the right of the screen */
+  rightOffset?: string;
+  /** An explicitly set max width for the in-app message.
+   * Only applies to `Center`, `TopRight`, and `BottomRight` positions. */
+  maxWidth?: string;
+};
 
 type CloseButton = {
   color?: string;
@@ -67,6 +125,10 @@ export interface InAppMessagesRequestParams extends SDKInAppMessagesParams {
   //  userId?: string
 }
 
+export interface InAppMessageResponse {
+  inAppMessages: Partial<InAppMessage>[];
+}
+
 export interface GetInAppMessagesResponse {
   pauseMessageStream: () => void;
   resumeMessageStream: () => Promise<HTMLIFrameElement | ''>;
@@ -78,55 +140,7 @@ export interface GetInAppMessagesResponse {
 
 export type CachedMessage = [string, InAppMessage];
 
-export interface InAppDisplaySetting {
-  percentage?: number;
-  displayOption?: string;
-}
-
-export interface WebInAppDisplaySettings {
-  position: DisplayPosition;
-}
-
 export type BrowserStorageEstimate = StorageEstimate & {
   /** usageDetails not supported in Safari */
   usageDetails?: { indexedDB?: number };
 };
-
-export interface InAppMessage {
-  messageId: string;
-  campaignId: number;
-  createdAt: number;
-  expiresAt: number;
-  content: {
-    payload?: Record<string, any>;
-    html: string | HTMLIFrameElement;
-    inAppDisplaySettings: {
-      top: InAppDisplaySetting;
-      right: InAppDisplaySetting;
-      left: InAppDisplaySetting;
-      bottom: InAppDisplaySetting;
-      bgColor?: {
-        alpha: number;
-        hex: string;
-      };
-      shouldAnimate?: boolean;
-    };
-    webInAppDisplaySettings: WebInAppDisplaySettings;
-  };
-  customPayload: Record<string, any>;
-  trigger: {
-    type: string;
-  };
-  saveToInbox: boolean;
-  inboxMetadata: {
-    title: string;
-    subtitle: string;
-    icon: string;
-  };
-  priorityLevel: number;
-  read: boolean;
-}
-
-export interface InAppMessageResponse {
-  inAppMessages: Partial<InAppMessage>[];
-}

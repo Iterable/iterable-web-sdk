@@ -160,16 +160,17 @@ export function getInAppMessages(
         };
 
         /* add the message's html to an iframe and paint it to the DOM */
-        return paintIFrame(
-          activeMessage.content.html as string,
-          messagePosition,
+        return paintIFrame({
+          html: activeMessage.content.html as string,
+          position: messagePosition,
           shouldAnimate,
-          payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
-          payload.topOffset,
-          payload.bottomOffset,
-          payload.rightOffset,
-          payload.maxWidth
-        ).then((activeIframe) => {
+          srMessage:
+            payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
+          topOffset: payload.topOffset,
+          bottomOffset: payload.bottomOffset,
+          rightOffset: payload.rightOffset,
+          maxWidth: payload.maxWidth
+        }).then((activeIframe) => {
           const activeIframeDocument = activeIframe?.contentDocument;
 
           const throttledResize =

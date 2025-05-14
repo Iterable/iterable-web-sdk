@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { WebInAppDisplaySettings } from '.';
 import { srSpeak } from '../utils/srSpeak';
-import { CloseButtonPosition, InAppMessage } from './types';
+import { CloseButtonPosition, InAppMessage, PaintIframeProps } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -338,32 +338,17 @@ const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
   if (contentDocument && !margin) contentDocument.body.style.margin = '0px';
 };
 
-/**
- * Generates an iframe with the provided html and appends it to the DOM.
- *
- * @param html html you want to paint to the DOM inside the iframe
- * @param position screen position the message should appear in
- * @param shouldAnimate if the in-app should animate in/out
- * @param srMessage The message you want the screen reader to read when popping up the message
- * @param topOffset how many px or % buffer between the in-app message and the top of the screen
- * @param bottomOffset how many px or % buffer between the in-app message
- * and the bottom of the screen
- * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
- * @param maxWidth An explicitly set max width for the in-app message.
- * Only applies to `Center`, `TopRight`, and `BottomRight` positions.
- *
- * @returns { HTMLIFrameElement }
- */
-export const paintIFrame = (
-  html: string,
-  position: WebInAppDisplaySettings['position'],
-  shouldAnimate?: boolean,
-  srMessage?: string,
-  topOffset?: string,
-  bottomOffset?: string,
-  rightOffset?: string,
-  maxWidth?: string
-): Promise<HTMLIFrameElement> =>
+/** Generates an iframe with the provided html and appends it to the DOM. */
+export const paintIFrame = ({
+  html,
+  position,
+  shouldAnimate,
+  srMessage,
+  topOffset,
+  bottomOffset,
+  rightOffset,
+  maxWidth
+}: PaintIframeProps): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
 
