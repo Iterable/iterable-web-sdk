@@ -747,14 +747,27 @@ describe('Utils', () => {
         const iframe = await paintIFrame({
           html: mockMarkup,
           position: DisplayPosition.Center,
-          srMessage: 'hi',
-          maxWidth: '350px'
+          srMessage: 'hi'
         });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        checkStyles(styles, { maxWidth: '350px' });
+        checkStyles(styles);
+      });
+
+      it('should paint the iframe with custom maxWidth', async () => {
+        const { Center, TopRight, BottomRight } = DisplayPosition;
+        [Center, TopRight, BottomRight].forEach(async (position) => {
+          const iframe = await paintIFrame({
+            html: mockMarkup,
+            position,
+            maxWidth: '350px'
+          });
+          jest.advanceTimersByTime(2000);
+          const styles = getComputedStyle(iframe);
+          expect(styles.maxWidth).toBe('350px');
+        });
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
