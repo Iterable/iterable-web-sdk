@@ -2364,17 +2364,20 @@ This chart also implies that your in-app message is taking 100% of its container
 Your results may vary if you add, for example, a `max-width: 200px` CSS rule to 
 your message HTML, as it would not apply to the enclosing iframe.
 
-For Center, Top-Right, and Bottom-Right positions only, if you need to set a custom
-max-width rule for your message, you can include `maxWidth` in your getInAppMessages
-payload like so:
+For Center, Top-Right, and Bottom-Right positions, you can set a custom `maxWidth`
+by including it in your getInAppMessages payload like this:
 
 ```ts
 const { request } = getInAppMessages({
   count: 20,
   packageName: 'my-website',
-  maxWidth: '300px'
+  maxWidth: '900px'
 });
 ```
+
+`maxWidth` accepts any valid CSS max-width value (e.g., px, em, %, ch).
+It is optional—-most in-app messages render well with default sizing, so set it
+only if needed for your use case.
 
 ## How do I add custom callbacks to handle link clicks on in-app and embedded messages?
 
