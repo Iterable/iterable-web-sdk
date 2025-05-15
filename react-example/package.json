@@ -55,6 +55,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.28.0",
     "eslint-webpack-plugin": "3.1.0",
+    "express": "^4.21.1",
     "html-webpack-plugin": "^5.5.0",
     "jest": "^27.3.1",
     "mini-css-extract-plugin": "^2.5.2",
@@ -62,9 +63,9 @@
     "ts-jest": "^27.0.7",
     "typescript": "^4.6.4",
     "webpack": "^5.76.0",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.3",
-    "webpack-bundle-analyzer": "^4.10.2"
+    "webpack-dev-server": "^4.7.3"
   },
   "dependencies": {
     "@iterable/web-sdk": "../",
