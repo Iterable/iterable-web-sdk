@@ -717,147 +717,157 @@ describe('Utils', () => {
     });
 
     describe('painting the iframe', () => {
+      const defaultStyles = {
+        position: 'fixed',
+        left: '0%',
+        right: '0%',
+        top: '0%',
+        bottom: '0%',
+        zIndex: '9999',
+        width: '100%',
+        maxHeight: '95vh',
+        maxWidth: '100%'
+      };
+
+      const checkStyles = (
+        styles: CSSStyleDeclaration,
+        overrides?: Partial<typeof defaultStyles> & { height?: string }
+      ) => {
+        Object.entries(defaultStyles).forEach(([key, value]) => {
+          const styleValue = styles[key as keyof typeof styles];
+          expect(styleValue).toBe(
+            overrides && key in overrides
+              ? overrides[key as keyof typeof overrides]
+              : value
+          );
+        });
+      };
+
       it('should paint the iframe in the center of the screen', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.Center,
-          false,
-          'hi'
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.Center,
+          srMessage: 'hi'
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('0%');
-        expect(styles.right).toBe('0%');
-        expect(styles.top).toBe('0%');
-        expect(styles.bottom).toBe('0%');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('95vh');
+        checkStyles(styles);
+      });
+
+      it('should paint the iframe with custom maxWidth', async () => {
+        const { Center, TopRight, BottomRight } = DisplayPosition;
+        [Center, TopRight, BottomRight].forEach(async (position) => {
+          const iframe = await paintIFrame({
+            html: mockMarkup,
+            position,
+            maxWidth: '350px'
+          });
+          jest.advanceTimersByTime(2000);
+          const styles = getComputedStyle(iframe);
+          expect(styles.maxWidth).toBe('350px');
+        });
       });
 
       it('should paint the iframe in the top-right of the screen', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.TopRight,
-          false,
-          'hi'
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.TopRight,
+          srMessage: 'hi'
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('');
-        expect(styles.right).toBe('0%');
-        expect(styles.top).toBe('0%');
-        expect(styles.bottom).toBe('');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('95vh');
+        checkStyles(styles, { left: '', bottom: '' });
       });
 
       it('should paint the iframe in the bottom-right of the screen', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.BottomRight,
-          false,
-          'hi'
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.BottomRight,
+          srMessage: 'hi'
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('');
-        expect(styles.right).toBe('0%');
-        expect(styles.bottom).toBe('0%');
-        expect(styles.top).toBe('');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('95vh');
+        checkStyles(styles, { left: '', top: '' });
       });
 
       it('should paint the iframe full-screen', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.Full,
-          false,
-          ''
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.Full
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('0%');
-        expect(styles.right).toBe('');
-        expect(styles.bottom).toBe('');
-        expect(styles.top).toBe('0%');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.height).toBe('100%');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('');
+        checkStyles(styles, {
+          right: '',
+          bottom: '',
+          height: '100%',
+          maxHeight: ''
+        });
       });
 
       it('should paint TopRight iframes with custom offsets', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.TopRight,
-          false,
-          '',
-          '10px',
-          '10px',
-          '10px'
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.TopRight,
+          topOffset: '10px',
+          bottomOffset: '10px',
+          rightOffset: '10px'
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('');
-        expect(styles.right).toBe('10px');
-        expect(styles.bottom).toBe('');
-        expect(styles.top).toBe('10px');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('95vh');
+        checkStyles(styles, {
+          left: '',
+          right: '10px',
+          bottom: '',
+          top: '10px'
+        });
       });
 
       it('should paint BottomRight iframes with custom offsets', async () => {
-        const iframe = await paintIFrame(
-          mockMarkup,
-          DisplayPosition.BottomRight,
-          false,
-          '',
-          '10px',
-          '10px',
-          '10px'
-        );
+        const iframe = await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.BottomRight,
+          topOffset: '10px',
+          bottomOffset: '10px',
+          rightOffset: '10px'
+        });
         jest.advanceTimersByTime(2000);
 
         /* speed up time to past the setTimeout */
         const styles = getComputedStyle(iframe);
-        expect(styles.position).toBe('fixed');
-        expect(styles.left).toBe('');
-        expect(styles.right).toBe('10px');
-        expect(styles.bottom).toBe('10px');
-        expect(styles.top).toBe('');
-        expect(styles.zIndex).toBe('9999');
-        expect(styles.width).toBe('100%');
-        expect(styles.maxHeight).toBe('95vh');
+        checkStyles(styles, {
+          left: '',
+          right: '10px',
+          bottom: '10px',
+          top: ''
+        });
       });
 
       it('should call srSpeak if screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, DisplayPosition.Center, false, 'hi');
+        await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.Center,
+          srMessage: 'hi'
+        });
 
         expect((srSpeak as any).mock.calls.length).toBe(1);
       });
 
       it('should not call srSpeak if no screen reader text passed', async () => {
-        await paintIFrame(mockMarkup, DisplayPosition.Center, false);
+        await paintIFrame({
+          html: mockMarkup,
+          position: DisplayPosition.Center
+        });
 
         expect((srSpeak as any).mock.calls.length).toBe(0);
       });
@@ -869,6 +879,7 @@ describe('Utils', () => {
 
       expect(el.getAttribute('aria-label')).toBe('hello');
       expect(el.getAttribute('role')).toBe('button');
+      // eslint-disable-next-line no-script-url
       expect(el.getAttribute('href')).toBe('javascript:undefined');
     });
 
