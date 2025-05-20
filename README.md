@@ -2360,12 +2360,24 @@ For example:
 - If your in-app is positioned in the center and your browser if at 700px, your
   in-app message will grow to take up 100% of the screen.
 
-This chart also implies that yout in-app message is taking 100% of its container. 
+This chart also implies that your in-app message is taking 100% of its container. 
 Your results may vary if you add, for example, a `max-width: 200px` CSS rule to 
-your message HTML. 
+your message HTML, as it would not apply to the enclosing iframe.
 
-Regardless of how you write your CSS, these rules take effect. So, when creating
-an in-app message, it is best to stick with percentage-based CSS widths.
+For Center, Top-Right, and Bottom-Right positions, you can set a custom `maxWidth`
+by including it in your getInAppMessages payload like this:
+
+```ts
+const { request } = getInAppMessages({
+  count: 20,
+  packageName: 'my-website',
+  maxWidth: '900px'
+});
+```
+
+`maxWidth` accepts any valid CSS max-width value (e.g., px, em, %, ch).
+It is optional—-most in-app messages render well with default sizing, so set it
+only if needed for your use case.
 
 ## How do I add custom callbacks to handle link clicks on in-app and embedded messages?
 
