@@ -1,37 +1,28 @@
-import './styles/index.css';
-import axios from 'axios';
 import {
-  initialize,
-  getInAppMessages,
-  updateUserEmail,
+  DisplayOptions,
   GenerateJWTPayload,
+  getInAppMessages,
   HandleLinks,
-  DisplayOptions
+  InAppMessage,
+  initialize,
+  updateUserEmail
+  // eslint-disable-next-line import/no-unresolved
 } from '@iterable/web-sdk';
+import axios from 'axios';
+import './styles/index.css';
 
 ((): void => {
   /* set token in the SDK */
   const { setEmail, logout } = initialize(
     process.env.API_KEY || '',
-    async ({ email }: GenerateJWTPayload) => {
-      return axios
+    async ({ email }: GenerateJWTPayload) =>
+      axios
         .post(
-          'http://localhost:5000/generate',
-          {
-            exp_minutes: 2,
-            email,
-            jwt_secret: process.env.JWT_SECRET
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
+          process.env.JWT_GENERATOR || 'http://localhost:5000/generate',
+          { exp_minutes: 2, email, jwt_secret: process.env.JWT_SECRET },
+          { headers: { 'Content-Type': 'application/json' } }
         )
-        .then((response: any) => {
-          return response.data?.token;
-        });
-    }
+        .then((response: { data: { token: string } }) => response.data?.token)
   );
 
   const {
@@ -50,7 +41,7 @@ import {
       rightOffset: '20px',
       topOffset: '20px',
       bottomOffset: '20px',
-      handleLinks: HandleLinks['ExternalNewTab'],
+      handleLinks: HandleLinks.ExternalNewTab,
       closeButton: {
         color: 'white'
         // position: 'top-right',
@@ -60,7 +51,7 @@ import {
         // topOffset: '6%'
       }
     },
-    { display: DisplayOptions['Deferred'] }
+    { display: DisplayOptions.Deferred }
   );
 
   const startBtn = document.getElementById('start');
@@ -75,10 +66,13 @@ import {
       startBtn.setAttribute('aria-disabled', 'true');
       startBtn.className = 'disabled';
       request()
-        .then((response: any) => {
-          triggerDisplayMessages(response.data.inAppMessages);
-          startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
-        })
+        .then(
+          (response: { data: { inAppMessages: Partial<InAppMessage>[] } }) => {
+            const { inAppMessages } = response.data || {};
+            triggerDisplayMessages(inAppMessages);
+            startBtn.innerText = `${inAppMessages.length} total messages retrieved!`;
+          }
+        )
         // eslint-disable-next-line no-console
         .catch(console.warn);
     }
@@ -86,7 +80,9 @@ import {
 
   const handleLoginClick = (event: MouseEvent) => {
     const email =
-      localStorage.getItem('iterable-email') || 'iterable.tester@gmail.com';
+      process.env.LOGIN_EMAIL ||
+      localStorage.getItem('iterable-email') ||
+      'iterable.tester@gmail.com';
 
     /* disable login btn */
     if (loginBtn.getAttribute('aria-disabled') !== 'true') {
