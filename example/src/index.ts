@@ -68,8 +68,9 @@ import {
       request()
         .then(
           (response: { data: { inAppMessages: Partial<InAppMessage>[] } }) => {
-            triggerDisplayMessages(response.data.inAppMessages);
-            startBtn.innerText = `${response.data.inAppMessages.length} total messages retrieved!`;
+            const { inAppMessages } = response.data || {};
+            triggerDisplayMessages(inAppMessages);
+            startBtn.innerText = `${inAppMessages.length} total messages retrieved!`;
           }
         )
         // eslint-disable-next-line no-console
