@@ -1,15 +1,15 @@
-import './styles/index.css';
-import axios from 'axios';
 import {
-  initialize,
-  getInAppMessages,
-  updateUserEmail,
-  GenerateJWTPayload,
-  HandleLinks,
   DisplayOptions,
-  InAppMessage
+  GenerateJWTPayload,
+  getInAppMessages,
+  HandleLinks,
+  InAppMessage,
+  initialize,
+  updateUserEmail
   // eslint-disable-next-line import/no-unresolved
 } from '@iterable/web-sdk';
+import axios from 'axios';
+import './styles/index.css';
 
 ((): void => {
   /* set token in the SDK */
