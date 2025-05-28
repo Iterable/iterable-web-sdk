@@ -80,7 +80,9 @@ import './styles/index.css';
 
   const handleLoginClick = (event: MouseEvent) => {
     const email =
-      localStorage.getItem('iterable-email') || 'iterable.tester@gmail.com';
+      process.env.LOGIN_EMAIL ||
+      localStorage.getItem('iterable-email') ||
+      'iterable.tester@gmail.com';
 
     /* disable login btn */
     if (loginBtn.getAttribute('aria-disabled') !== 'true') {
