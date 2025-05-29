@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChangeEvent, FC, FormEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 
 import { TextField } from './TextField';
