@@ -5,7 +5,8 @@
   ],
   "rules": {
     "@typescript-eslint/no-empty-interface": "off",
-    "react/react-in-jsx-scope": "off",
+    "import/no-unresolved": "off",
+    "react/react-in-jsx-scope": "off"
   },
   "ignorePatterns": [
     "node_modules/"
