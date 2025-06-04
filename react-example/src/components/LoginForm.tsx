@@ -9,7 +9,8 @@ const StyledTextField = styled(TextField)``;
 
 const StyledButton = styled(Button)`
   margin-left: 0.4em;
-  max-width: 425px;
+  width: fit-content;
+  white-space: nowrap;
 `;
 
 const Form = styled.form`
@@ -79,7 +80,7 @@ export const LoginForm: FC<Props> = ({
   };
 
   const handleJwtRefresh = () => {
-    refreshJwt?.(user);
+    refreshJwt(user);
   };
 
   const handleEditUser = () => {
