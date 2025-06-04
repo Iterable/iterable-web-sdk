@@ -38,8 +38,8 @@ const Error = styled.div`
 interface Props {
   logout: () => void;
   refreshJwt?: (authTypes: string) => Promise<string>;
-  setEmail: (email: string) => Promise<string | void>;
-  setUserId: (userId: string) => Promise<string | void>;
+  setEmail: (email: string) => Promise<string> | void;
+  setUserId: (userId: string) => Promise<string> | void;
 }
 
 export const LoginForm: FC<Props> = ({
@@ -59,13 +59,18 @@ export const LoginForm: FC<Props> = ({
     e.preventDefault();
 
     const setUser = useEmail ? setEmail : setUserId;
+    const result = setUser(user);
 
-    setUser(user)
-      .then(() => {
-        setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: user });
-      })
-      .catch(() => setError('Something went wrong!'));
+    const handleSetUser = () => {
+      setEditingUser(false);
+      setLoggedInUser({ type: 'user_update', data: user });
+    };
+
+    if (result instanceof Promise) {
+      result.then(handleSetUser).catch(() => setError('Something went wrong!'));
+    } else {
+      handleSetUser();
+    }
   };
 
   const handleLogout = () => {

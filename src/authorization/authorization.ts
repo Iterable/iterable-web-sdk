@@ -36,16 +36,16 @@ export interface WithJWT {
   clearRefresh: () => void;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
+  setEmail: (email: string) => Promise<string> | void;
+  setUserID: (userId: string) => Promise<string> | void;
 }
 
 export interface WithoutJWT {
   clearAuthToken: () => void;
   logout: () => void;
-  setEmail: (email: string) => Promise<void>;
+  setEmail: (email: string) => Promise<string> | void;
   setNewAuthToken: (newToken?: string) => void;
-  setUserID: (userId: string) => Promise<void>;
+  setUserID: (userId: string) => Promise<string> | void;
 }
 
 const doesRequestUrlContain = (routeConfig: RouteConfig) =>
