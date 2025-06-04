@@ -8,7 +8,7 @@
     "url": "https://github.com/Iterable/iterable-web-sdk.git"
   },
   "engines": {
-    "node": ">= 16.3.0"
+    "node": ">= 18.12.0"
   },
   "author": "Iterable",
   "license": "MIT",
@@ -34,7 +34,7 @@
   "dependencies": {
     "@pabra/sortby": "^1.0.1",
     "@types/ws": "8.5.4",
-    "axios": "^1.6.2",
+    "axios": "^1.8.2",
     "axios-mock-adapter": "^1.22.0",
     "buffer": "^6.0.3",
     "copy-webpack-plugin": "^11.0.0",
@@ -52,7 +52,7 @@
     "start:all:react": "concurrently \"yarn start\" \"cd react-example && yarn start\" -n 'module,website' -k",
     "build": "ttsc && babel src --out-dir ./dist --extensions '.ts,.tsx' && webpack",
     "build:node": "yarn build --config webpack.node.config.js",
-    "test": "jest --config jest.config.js --collectCoverage",
+    "test": "jest --config jest.config.js --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.{js}\" \"example/src/**/*.{ts,tsx}\" \"example/src/**/*.{js}\" \"react-example/src/**/*.{ts,tsx}\" \"react-example/src/**/*.{js}\" --no-error-on-unmatched-pattern",
     "lint": "eslint src --ignore-pattern '*.test.*' --ignore-pattern '*.spec.*' --ext '.ts,.tsx'",
     "typecheck": "ttsc --noEmit true --emitDeclarationOnly false",
@@ -91,7 +91,7 @@
     "fake-indexeddb": "^4.0.0",
     "file-loader": "^6.2.0",
     "husky": "^3.1.0",
-    "jest": "^27.3.1",
+    "jest": "^27.5.1",
     "lint-staged": "^11.2.6",
     "madge": "^5.0.1",
     "mini-css-extract-plugin": "^2.7.6",
@@ -101,9 +101,9 @@
     "ttypescript": "^1.5.15",
     "typescript": "^4.9.5",
     "typescript-transform-paths": "^3.4.6",
-    "webpack": "^5.63.0",
-    "webpack-cli": "^4.9.1",
-    "webpack-dev-server": "^4.7.3"
+    "webpack": "^5.99.9",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
   },
   "husky": {
     "hooks": {
