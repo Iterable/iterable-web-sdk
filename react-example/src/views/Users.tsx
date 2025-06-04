@@ -1,19 +1,18 @@
+import { FC, FormEvent, useState } from 'react';
 import {
-  IterableResponse,
-  updateSubscriptions,
   updateUser,
+  updateSubscriptions,
   updateUserEmail
 } from '@iterable/web-sdk';
-import { AxiosError, AxiosResponse } from 'axios';
-import { FC, FormEvent, useState } from 'react';
 import { TextField } from '../components/TextField';
+
 import { useUser } from '../context/Users';
 import {
+  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
-  Response,
-  StyledButton
+  Response
 } from './Components.styled';
 
 interface Props {}
@@ -44,11 +43,11 @@ export const Users: FC<Props> = () => {
     updateUser({
       dataFields: { [userDataField]: 'test-data' }
     })
-      .then((response: AxiosResponse<IterableResponse>) => {
+      .then((response: any) => {
         setUpdateUserResponse(JSON.stringify(response.data));
         setUpdatingUser(false);
       })
-      .catch((e: AxiosError<IterableResponse>) => {
+      .catch((e: any) => {
         setUpdateUserResponse(JSON.stringify(e.response.data));
         setUpdatingUser(false);
       });
@@ -58,12 +57,12 @@ export const Users: FC<Props> = () => {
     e.preventDefault();
     setUpdatingUserEmail(true);
     updateUserEmail(email)
-      .then((response: AxiosResponse<IterableResponse>) => {
+      .then((response: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(response.data));
         setLoggedInUser({ type: 'user_update', data: email });
       })
-      .catch((e: AxiosError<IterableResponse>) => {
+      .catch((e: any) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(e.response.data));
       });
@@ -74,11 +73,11 @@ export const Users: FC<Props> = () => {
 
     setUpdatingSubscriptions(true);
     updateSubscriptions({ emailListIds: [+emailListID] })
-      .then((response: AxiosResponse<IterableResponse>) => {
+      .then((response: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(response.data));
       })
-      .catch((e: AxiosError<IterableResponse>) => {
+      .catch((e: any) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(e.response.data));
       });
