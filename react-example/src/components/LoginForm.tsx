@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
-
-import { TextField } from './TextField';
-import { Button } from './Button';
-
 import { useUser } from '../context/Users';
+import { Button } from './Button';
+import { TextField } from './TextField';
 
 const StyledTextField = styled(TextField)``;
 
@@ -38,23 +36,21 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string>;
-  setUserId: (userId: string) => Promise<string>;
   logout: () => void;
-  refreshJwt: (authTypes: string) => Promise<string>;
+  refreshJwt?: (authTypes: string) => Promise<string>;
+  setEmail: (email: string) => Promise<string | void>;
+  setUserId: (userId: string) => Promise<string | void>;
 }
 
 export const LoginForm: FC<Props> = ({
-  setEmail,
-  setUserId,
   logout,
-  refreshJwt
+  refreshJwt,
+  setEmail,
+  setUserId
 }) => {
   const [useEmail, setUseEmail] = useState<boolean>(true);
   const [user, updateUser] = useState<string>(process.env.LOGIN_EMAIL || '');
-
   const [error, setError] = useState<string>('');
-
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
   const { loggedInUser, setLoggedInUser } = useUser();
@@ -78,7 +74,7 @@ export const LoginForm: FC<Props> = ({
   };
 
   const handleJwtRefresh = () => {
-    refreshJwt(user);
+    refreshJwt?.(user);
   };
 
   const handleEditUser = () => {
@@ -105,9 +101,11 @@ export const LoginForm: FC<Props> = ({
           <StyledButton onClick={handleEditUser}>
             Logged in as {`${first5}...${last9}`} (change)
           </StyledButton>
-          <StyledButton onClick={handleJwtRefresh}>
-            Manually Refresh JWT Token
-          </StyledButton>
+          {refreshJwt && (
+            <StyledButton onClick={handleJwtRefresh}>
+              Manually Refresh JWT Token
+            </StyledButton>
+          )}
           <StyledButton onClick={handleLogout}>Logout</StyledButton>
         </>
       ) : (
