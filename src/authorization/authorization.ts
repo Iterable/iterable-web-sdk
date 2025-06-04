@@ -1,4 +1,6 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable no-redeclare */
 import axios from 'axios';
 import {
   ENDPOINTS,
@@ -68,11 +70,11 @@ export function initialize(
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
     if (logLevel === 'verbose') {
-      return console.error(
+      console.error(
         'Please provide a Promise method for generating a JWT token.'
       );
     }
-    return;
+    return {} as WithJWT | WithoutJWT;
   }
 
   /*
@@ -114,6 +116,7 @@ export function initialize(
   const createTokenExpirationTimer = () => {
     let timer: NodeJS.Timeout | null;
 
+    // eslint-disable-next-line consistent-return
     return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
@@ -391,7 +394,9 @@ export function initialize(
               }
 
               return Promise.reject(
-                `could not create user after ${createUserAttempts} tries`
+                new Error(
+                  `could not create user after ${createUserAttempts} tries`
+                )
               );
             }
           };
@@ -449,7 +454,7 @@ export function initialize(
                 that is going to navigate the browser tab to a new page/site and we need
                 to still call POST /trackInAppClick.
 
-                Normally, since the page is going somewhere new, the browser would just navigate away
+                Normally, since the page is going somewhere new, the browser would navigate away
                 and cancel any in-flight requests and not fulfill them, but with the fetch API's
                 "keepalive" flag, it will continue the request without blocking the main thread.
 
@@ -495,7 +500,7 @@ export function initialize(
                 const payloadToPass =
                   typeOfAuth === 'email'
                     ? { email: newEmail }
-                    : { userID: authIdentifier! };
+                    : (authIdentifier && { userID: authIdentifier }) || {};
 
                 return generateJWT(payloadToPass).then((newToken) => {
                   /*
@@ -810,7 +815,9 @@ export function initialize(
             }
 
             return Promise.reject(
-              `could not create user after ${createUserAttempts} tries`
+              new Error(
+                `could not create user after ${createUserAttempts} tries`
+              )
             );
           }
         };
