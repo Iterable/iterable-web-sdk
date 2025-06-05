@@ -271,6 +271,10 @@ export function initialize(
         localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
 
+        if (typeof authInterceptor === 'number') {
+          /* clear previously cached interceptor function */
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
+        }
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
             config.headers.set('Api-Key', authToken);
@@ -293,6 +297,10 @@ export function initialize(
         localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
 
+        if (typeof authInterceptor === 'number') {
+          /* clear previously cached interceptor function */
+          baseAxiosRequest.interceptors.request.eject(authInterceptor);
+        }
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
             config.headers.set('Api-Key', authToken);
