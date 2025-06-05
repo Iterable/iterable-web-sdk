@@ -56,16 +56,17 @@ export const LoginForm: FC<Props> = ({
 
   const { loggedInUser, setLoggedInUser } = useUser();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const setUser = useEmail ? setEmail : setUserId;
-    Promise.resolve(setUser(user))
-      .then(() => {
-        setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: user });
-      })
-      .catch(() => setError('Something went wrong!'));
+    try {
+      await setUser(user);
+      setEditingUser(false);
+      setLoggedInUser({ type: 'user_update', data: user });
+    } catch (error) {
+      setError('Something went wrong!');
+    }
   };
 
   const handleLogout = () => {
