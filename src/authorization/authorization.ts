@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-console */
 /* eslint-disable no-redeclare */
 import axios from 'axios';
@@ -516,7 +517,7 @@ export function initialize(
                 const payloadToPass =
                   typeOfAuth === 'email'
                     ? { email: newEmail }
-                    : { userID: authIdentifier! };
+                    : { userID: authIdentifier ?? '' };
 
                 return generateJWT(payloadToPass).then((newToken) => {
                   /*
