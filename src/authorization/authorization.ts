@@ -270,6 +270,14 @@ export function initialize(
         authIdentifier = email;
         localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
+
+        authInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => {
+            config.headers.set('Api-Key', authToken);
+            return config;
+          }
+        );
+
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
@@ -284,6 +292,13 @@ export function initialize(
         authIdentifier = userId;
         localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
+
+        authInterceptor = baseAxiosRequest.interceptors.request.use(
+          (config) => {
+            config.headers.set('Api-Key', authToken);
+            return config;
+          }
+        );
 
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
