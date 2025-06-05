@@ -1,27 +1,27 @@
 /* eslint-disable */
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { updateUser } from '../users';
-import { clearMessages } from '../inapp';
 import {
+  ENDPOINTS,
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
-  STATIC_HEADERS,
-  SHARED_PREF_USER_ID,
+  RouteConfig,
   SHARED_PREF_EMAIL,
-  ENDPOINTS,
-  RouteConfig
+  SHARED_PREF_USER_ID,
+  STATIC_HEADERS
 } from '../constants';
+import { clearMessages } from '../inapp';
+import { baseAxiosRequest } from '../request';
+import { updateUser } from '../users';
+import { config, Options } from '../utils/config';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
   getEpochExpiryTimeInMS,
-  ONE_MINUTE,
+  isEmail,
   ONE_DAY,
-  validateTokenTime,
-  isEmail
+  ONE_MINUTE,
+  validateTokenTime
 } from './utils';
-import { Options, config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
@@ -31,19 +31,19 @@ export interface GenerateJWTPayload {
 }
 
 export interface WithJWT {
-  clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
+  clearRefresh: () => void;
 }
 
 export interface WithoutJWT {
-  setNewAuthToken: (newToken?: string) => void;
-  clearAuthToken: () => void;
   setEmail: (email: string) => void;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
+  setNewAuthToken: (newToken?: string) => void;
+  clearAuthToken: () => void;
 }
 
 const doesRequestUrlContain = (routeConfig: RouteConfig) =>
