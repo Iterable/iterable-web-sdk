@@ -1,11 +1,11 @@
-import { FC, FormEvent, useEffect, useState } from 'react';
-import styled from 'styled-components';
 import {
   DisplayOptions,
   getInAppMessages,
   InAppMessageResponse
 } from '@iterable/web-sdk';
 import { AxiosError, AxiosResponse } from 'axios';
+import { FC, FormEvent, useEffect, useState } from 'react';
+import styled from 'styled-components';
 import { Button } from '../components/Button';
 import { useUser } from '../context/Users';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
@@ -103,6 +103,7 @@ export const InApp: FC<{}> = () => {
     resumeMessageStream();
   };
 
+  /** Reset state when user is not logged in */
   useEffect(() => {
     if (!loggedInUser.length) {
       setRawMessageCount(null);
