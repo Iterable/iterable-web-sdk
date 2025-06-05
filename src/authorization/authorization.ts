@@ -1,4 +1,5 @@
-/* eslint-disable */
+/* eslint-disable no-console */
+/* eslint-disable no-redeclare */
 import axios from 'axios';
 import {
   ENDPOINTS,
@@ -55,6 +56,22 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
       routeConfig.nestedUser === entry[1].nestedUser
   );
 
+const setAuthInterceptor = (
+  authInterceptor: number | null,
+  authToken: string
+) => {
+  if (typeof authInterceptor === 'number') {
+    /** Clear previously cached interceptor function */
+    baseAxiosRequest.interceptors.request.eject(authInterceptor);
+  }
+
+  /** Set auth token to interceptor for all requests */
+  return baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', authToken);
+    return config;
+  });
+};
+
 export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
@@ -72,7 +89,7 @@ export function initialize(
         'Please provide a Promise method for generating a JWT token.'
       );
     }
-    return;
+    return null;
   }
 
   /*
@@ -81,11 +98,7 @@ export function initialize(
   */
   let authInterceptor: number | null = generateJWT
     ? null
-    : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
-
-        return config;
-      });
+    : setAuthInterceptor(null, authToken);
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /*
@@ -114,6 +127,7 @@ export function initialize(
   const createTokenExpirationTimer = () => {
     let timer: NodeJS.Timeout | null;
 
+    // eslint-disable-next-line consistent-return
     return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
@@ -271,16 +285,7 @@ export function initialize(
         localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
 
-        if (typeof authInterceptor === 'number') {
-          /* clear previously cached interceptor function */
-          baseAxiosRequest.interceptors.request.eject(authInterceptor);
-        }
-        authInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => {
-            config.headers.set('Api-Key', authToken);
-            return config;
-          }
-        );
+        authInterceptor = setAuthInterceptor(authInterceptor, authToken);
 
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -297,16 +302,7 @@ export function initialize(
         localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
 
-        if (typeof authInterceptor === 'number') {
-          /* clear previously cached interceptor function */
-          baseAxiosRequest.interceptors.request.eject(authInterceptor);
-        }
-        authInterceptor = baseAxiosRequest.interceptors.request.use(
-          (config) => {
-            config.headers.set('Api-Key', authToken);
-            return config;
-          }
-        );
+        authInterceptor = setAuthInterceptor(authInterceptor, authToken);
 
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -414,7 +410,9 @@ export function initialize(
               }
 
               return Promise.reject(
-                `could not create user after ${createUserAttempts} tries`
+                new Error(
+                  `could not create user after ${createUserAttempts} tries`
+                )
               );
             }
           };
@@ -472,7 +470,7 @@ export function initialize(
                 that is going to navigate the browser tab to a new page/site and we need
                 to still call POST /trackInAppClick.
 
-                Normally, since the page is going somewhere new, the browser would just navigate away
+                Normally, since the page is going somewhere new, the browser would navigate away
                 and cancel any in-flight requests and not fulfill them, but with the fetch API's
                 "keepalive" flag, it will continue the request without blocking the main thread.
 
@@ -833,7 +831,9 @@ export function initialize(
             }
 
             return Promise.reject(
-              `could not create user after ${createUserAttempts} tries`
+              new Error(
+                `could not create user after ${createUserAttempts} tries`
+              )
             );
           }
         };
