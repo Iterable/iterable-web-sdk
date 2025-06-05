@@ -58,18 +58,26 @@ const HomeLink = styled(Link)`
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true
     },
-    ...(useJwt && {
-      generateJWT: ({ email, userID }: { email: string; userID: string }) =>
-        axios
-          .post(
-            jwtGenerator,
-            { exp_minutes: 2, email, user_id: userID, jwt_secret: jwtSecret },
-            { headers: { 'Content-Type': 'application/json' } }
-          )
-          .then(
-            (response: AxiosResponse<{ token: string }>) => response.data?.token
-          )
-    })
+    ...(useJwt
+      ? {
+          generateJWT: ({ email, userID }: { email: string; userID: string }) =>
+            axios
+              .post(
+                jwtGenerator,
+                {
+                  exp_minutes: 2,
+                  email,
+                  user_id: userID,
+                  jwt_secret: jwtSecret
+                },
+                { headers: { 'Content-Type': 'application/json' } }
+              )
+              .then(
+                (response: AxiosResponse<{ token: string }>) =>
+                  response.data?.token
+              )
+        }
+      : {})
   };
   const { setEmail, setUserID, logout, ...rest } =
     initializeWithConfig(initializeParams);
