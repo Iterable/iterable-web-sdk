@@ -1,7 +1,5 @@
-/* eslint-disable consistent-return */
-/* eslint-disable max-len */
-/* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable consistent-return */
 /* eslint-disable no-console */
 /* eslint-disable no-redeclare */
 import axios from 'axios';
@@ -471,10 +469,11 @@ export function initialize(
           destinationEmail
         );
       } catch (error) {
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     }
-    return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
+    // promise resolves here because merging is not needed so we setUserID passed via dev
+    return Promise.resolve(true);
   };
 
   if (!generateJWT) {
@@ -528,7 +527,7 @@ export function initialize(
           }
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
-          return Promise.reject(`merging failed: ${error}`);
+          return Promise.reject(new Error(`merging failed: ${error}`));
         }
       },
       setUserID: async (
@@ -559,7 +558,7 @@ export function initialize(
           }
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
-          return Promise.reject(`merging failed: ${error}`);
+          return Promise.reject(new Error(`merging failed: ${error}`));
         }
       },
       logout: () => {
@@ -583,7 +582,7 @@ export function initialize(
         }
       },
       setVisitorUsageTracked: (consent: boolean) => {
-        /* if consent is true, we want to clear anon user data and start tracking from point forward */
+        /* if consent is true, clear anon user data and start tracking from point forward */
         if (consent) {
           anonUserManager.removeAnonSessionCriteriaData();
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
@@ -932,7 +931,7 @@ export function initialize(
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     },
     setUserID: async (
@@ -981,7 +980,7 @@ export function initialize(
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     },
     logout: () => {
@@ -1019,7 +1018,7 @@ export function initialize(
       });
     },
     setVisitorUsageTracked: (consent: boolean) => {
-      /* if consent is true, we want to clear anon user data and start tracking from point forward */
+      /* if consent is true, clear anon user data and start tracking from point forward */
       if (consent) {
         anonUserManager.removeAnonSessionCriteriaData();
         localStorage.removeItem(SHARED_PREFS_CRITERIA);
