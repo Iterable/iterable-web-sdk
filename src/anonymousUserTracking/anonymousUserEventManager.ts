@@ -136,7 +136,7 @@ export class AnonymousUserEventManager {
       [KEY_CREATE_NEW_FIELDS]: true,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_EVENT
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    await this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   async trackAnonUpdateUser(payload: UpdateUserParams) {
@@ -144,7 +144,7 @@ export class AnonymousUserEventManager {
       ...payload.dataFields,
       [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
     };
-    this.storeEventListToLocalStorage(newDataObject, true);
+    await this.storeEventListToLocalStorage(newDataObject, true);
   }
 
   async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
@@ -155,7 +155,7 @@ export class AnonymousUserEventManager {
       [KEY_TOTAL]: payload.total,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_PURCHASE
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    await this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
@@ -165,7 +165,7 @@ export class AnonymousUserEventManager {
       [KEY_PREFER_USERID]: true,
       [KEY_CREATED_AT]: this.getCurrentTime()
     };
-    this.storeEventListToLocalStorage(newDataObject, false);
+    await this.storeEventListToLocalStorage(newDataObject, false);
   }
 
   private checkCriteriaCompletion(): string | null {
@@ -362,7 +362,7 @@ export class AnonymousUserEventManager {
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
-      this.createAnonymousUser(criteriaId);
+      await this.createAnonymousUser(criteriaId);
     }
   }
 

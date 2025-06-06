@@ -13,11 +13,21 @@ import { updateUser } from '../../users';
 import { initializeWithConfig } from '../../authorization';
 import { CUSTOM_EVENT_API_TEST_CRITERIA } from './constants';
 
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn()
-};
+const localStorageMock = (() => {
+  let store: { [key: string]: string | null } = {};
+  return {
+    getItem: jest.fn((key: string) => store[key]),
+    setItem: jest.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    removeItem: jest.fn((key: string) => {
+      delete store[key];
+    }),
+    clear: jest.fn(() => {
+      store = {};
+    })
+  };
+})();
 
 declare global {
   function uuidv4(): string;
@@ -75,45 +85,43 @@ describe('UserUpdate', () => {
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_ANON_SESSION).reply(200, {});
-    jest.resetAllMocks();
+    localStorageMock.clear();
+    jest.clearAllMocks();
     jest.useFakeTimers();
   });
 
   it('should not have unnecessary extra nesting when locally stored user update fields are sent to server', async () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            ...userDataMatched.dataFields,
-            eventType: userDataMatched.eventType
-          },
-          eventDataMatched
-        ]);
-      }
-      if (key === SHARED_PREFS_CRITERIA) {
-        return JSON.stringify(CUSTOM_EVENT_API_TEST_CRITERIA);
-      }
-      if (key === SHARED_PREFS_ANON_SESSIONS) {
-        return JSON.stringify(initialAnonSessionInfo);
-      }
-      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
-        return 'true';
-      }
-      return null;
-    });
+    localStorageMock.setItem(
+      SHARED_PREFS_EVENT_LIST_KEY,
+      JSON.stringify([
+        {
+          ...userDataMatched.dataFields,
+          eventType: userDataMatched.eventType
+        },
+        eventDataMatched
+      ])
+    );
+    localStorageMock.setItem(
+      SHARED_PREFS_CRITERIA,
+      JSON.stringify(CUSTOM_EVENT_API_TEST_CRITERIA)
+    );
+    localStorageMock.setItem(
+      SHARED_PREFS_ANON_SESSIONS,
+      JSON.stringify(initialAnonSessionInfo)
+    );
+    localStorageMock.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'true');
 
-    const { logout } = initializeWithConfig({
+    initializeWithConfig({
       authToken: '123',
       configOptions: { enableAnonActivation: true }
     });
-    logout(); // logout to remove logged in users before this test
 
     try {
       await updateUser();
     } catch (e) {
       console.log('');
     }
-    expect(localStorage.setItem).toHaveBeenCalledWith(
+    expect(localStorageMock.setItem).toHaveBeenCalledWith(
       SHARED_PREFS_EVENT_LIST_KEY,
       expect.any(String)
     );
