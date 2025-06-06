@@ -84,6 +84,19 @@ To install the SDK, use Yarn, npm, or a `script` tag:
   <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
   ```
 
+⚠️ Node.js Version Requirement
+Important: This SDK requires Node.js as defined in `package.json`.
+
+Please ensure your development environment meets the minimum required Node.js version. Depending on your current setup, you may already be using a compatible version. If not, you will need to upgrade Node.js to proceed with installation and use of the SDK.
+
+You can check your current Node version by running:
+
+```bash
+node -v
+```
+
+If an upgrade is needed, we recommend using nvm or your preferred version manager for easy installation.
+
 # Functions
 
 Iterable's Web SDK exposes the following functions, which you can use in your
