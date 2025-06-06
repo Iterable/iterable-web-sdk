@@ -1,27 +1,29 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable no-redeclare */
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { updateUser } from '../users';
-import { clearMessages } from '../inapp';
 import {
+  ENDPOINTS,
   IS_PRODUCTION,
   RETRY_USER_ATTEMPTS,
-  STATIC_HEADERS,
-  SHARED_PREF_USER_ID,
+  RouteConfig,
   SHARED_PREF_EMAIL,
-  ENDPOINTS,
-  RouteConfig
+  SHARED_PREF_USER_ID,
+  STATIC_HEADERS
 } from '../constants';
+import { clearMessages } from '../inapp';
+import { baseAxiosRequest } from '../request';
+import { updateUser } from '../users';
+import { config, Options } from '../utils/config';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
   getEpochExpiryTimeInMS,
-  ONE_MINUTE,
+  isEmail,
   ONE_DAY,
-  validateTokenTime,
-  isEmail
+  ONE_MINUTE,
+  validateTokenTime
 } from './utils';
-import { Options, config } from '../utils/config';
 
 const MAX_TIMEOUT = ONE_DAY;
 
@@ -31,19 +33,19 @@ export interface GenerateJWTPayload {
 }
 
 export interface WithJWT {
-  clearRefresh: () => void;
   setEmail: (email: string) => Promise<string>;
   setUserID: (userId: string) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
+  clearRefresh: () => void;
 }
 
 export interface WithoutJWT {
-  setNewAuthToken: (newToken?: string) => void;
-  clearAuthToken: () => void;
   setEmail: (email: string) => void;
   setUserID: (userId: string) => Promise<void>;
   logout: () => void;
+  setNewAuthToken: (newToken?: string) => void;
+  clearAuthToken: () => void;
 }
 
 const doesRequestUrlContain = (routeConfig: RouteConfig) =>
@@ -54,6 +56,22 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
       routeConfig.current === entry[1].current &&
       routeConfig.nestedUser === entry[1].nestedUser
   );
+
+const setAuthInterceptor = (
+  authInterceptor: number | null,
+  authToken: string
+) => {
+  if (typeof authInterceptor === 'number') {
+    /** Clear previously cached interceptor function */
+    baseAxiosRequest.interceptors.request.eject(authInterceptor);
+  }
+
+  /** Set auth token to interceptor for all requests */
+  return baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', authToken);
+    return config;
+  });
+};
 
 export function initialize(
   authToken: string,
@@ -72,7 +90,7 @@ export function initialize(
         'Please provide a Promise method for generating a JWT token.'
       );
     }
-    return;
+    return null;
   }
 
   /*
@@ -81,11 +99,7 @@ export function initialize(
   */
   let authInterceptor: number | null = generateJWT
     ? null
-    : baseAxiosRequest.interceptors.request.use((config) => {
-        config.headers.set('Api-Key', authToken);
-
-        return config;
-      });
+    : setAuthInterceptor(null, authToken);
   let userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
   /*
@@ -114,6 +128,7 @@ export function initialize(
   const createTokenExpirationTimer = () => {
     let timer: NodeJS.Timeout | null;
 
+    // eslint-disable-next-line consistent-return
     return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
@@ -270,6 +285,9 @@ export function initialize(
         authIdentifier = email;
         localStorage.setItem(SHARED_PREF_EMAIL, email);
         clearMessages();
+
+        authInterceptor = setAuthInterceptor(authInterceptor, authToken);
+
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
@@ -284,6 +302,8 @@ export function initialize(
         authIdentifier = userId;
         localStorage.setItem(SHARED_PREF_USER_ID, userId);
         clearMessages();
+
+        authInterceptor = setAuthInterceptor(authInterceptor, authToken);
 
         if (typeof userInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -391,7 +411,9 @@ export function initialize(
               }
 
               return Promise.reject(
-                `could not create user after ${createUserAttempts} tries`
+                new Error(
+                  `could not create user after ${createUserAttempts} tries`
+                )
               );
             }
           };
@@ -449,7 +471,7 @@ export function initialize(
                 that is going to navigate the browser tab to a new page/site and we need
                 to still call POST /trackInAppClick.
 
-                Normally, since the page is going somewhere new, the browser would just navigate away
+                Normally, since the page is going somewhere new, the browser would navigate away
                 and cancel any in-flight requests and not fulfill them, but with the fetch API's
                 "keepalive" flag, it will continue the request without blocking the main thread.
 
@@ -495,7 +517,7 @@ export function initialize(
                 const payloadToPass =
                   typeOfAuth === 'email'
                     ? { email: newEmail }
-                    : { userID: authIdentifier! };
+                    : { userID: authIdentifier ?? '' };
 
                 return generateJWT(payloadToPass).then((newToken) => {
                   /*
@@ -810,7 +832,9 @@ export function initialize(
             }
 
             return Promise.reject(
-              `could not create user after ${createUserAttempts} tries`
+              new Error(
+                `could not create user after ${createUserAttempts} tries`
+              )
             );
           }
         };
