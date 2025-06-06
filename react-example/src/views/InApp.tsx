@@ -1,6 +1,11 @@
-import { FC, FormEvent, useState } from 'react';
+import {
+  DisplayOptions,
+  getInAppMessages,
+  InAppMessageResponse
+} from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { DisplayOptions, getInAppMessages } from '@iterable/web-sdk';
 import { Button } from '../components/Button';
 import { useUser } from '../context/Users';
 import { EndpointWrapper, Heading, Response } from './Components.styled';
@@ -28,6 +33,8 @@ const AutoDisplayContainer = styled.div`
   }
 `;
 
+const DEFAULT_GET_MESSAGES_RESPONSE = 'Endpoint JSON goes here';
+
 const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   {
     count: 20,
@@ -44,7 +51,7 @@ export const InApp: FC<{}> = () => {
   const [isGettingMessagesAuto, setIsGettingMessagesAuto] =
     useState<boolean>(false);
   const [getMessagesResponse, setGetMessagesResponse] = useState<string>(
-    'Endpoint JSON goes here'
+    DEFAULT_GET_MESSAGES_RESPONSE
   );
   const { loggedInUser } = useUser();
   const [rawMessageCount, setRawMessageCount] = useState<number | null>(null);
@@ -60,12 +67,12 @@ export const InApp: FC<{}> = () => {
       { display: DisplayOptions.Deferred }
     )
       .request()
-      .then((response: any) => {
+      .then((response: AxiosResponse<InAppMessageResponse>) => {
         setRawMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(response.data, null, 2));
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<InAppMessageResponse>) => {
         setIsGettingMessagesRaw(false);
         setGetMessagesResponse(JSON.stringify(e.response.data, null, 2));
       });
@@ -77,7 +84,7 @@ export const InApp: FC<{}> = () => {
     setIsGettingMessagesAuto(true);
 
     return request()
-      .then((response: any) => {
+      .then((response: AxiosResponse<InAppMessageResponse>) => {
         setAutoMessageCount(response.data.inAppMessages.length);
         setIsGettingMessagesAuto(false);
       })
@@ -95,6 +102,15 @@ export const InApp: FC<{}> = () => {
     setIsPaused(false);
     resumeMessageStream();
   };
+
+  /** Reset state when user is not logged in */
+  useEffect(() => {
+    if (!loggedInUser.length) {
+      setRawMessageCount(null);
+      setAutoMessageCount(null);
+      setGetMessagesResponse(DEFAULT_GET_MESSAGES_RESPONSE);
+    }
+  }, [loggedInUser]);
 
   return (
     <>

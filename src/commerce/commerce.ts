@@ -7,7 +7,7 @@ import { updateCartSchema, trackPurchaseSchema } from './commerce.schema';
 import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
 import { canTrackAnonUser } from '../utils/commonFunctions';
 
-export const updateCart = (payload: UpdateCartRequestParams) => {
+export const updateCart = async (payload: UpdateCartRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   if (payload.user) {
     delete (payload as any).user.userId;
@@ -15,7 +15,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   }
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
-    anonymousUserEventManager.trackAnonUpdateCart(payload);
+    await anonymousUserEventManager.trackAnonUpdateCart(payload);
     return Promise.reject(AUA_WARNING);
   }
 
@@ -35,7 +35,7 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
   });
 };
 
-export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
+export const trackPurchase = async (payload: TrackPurchaseRequestParams) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   if (payload.user) {
     delete (payload as any).user.userId;
@@ -43,7 +43,7 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
   }
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
-    anonymousUserEventManager.trackAnonPurchaseEvent(payload);
+    await anonymousUserEventManager.trackAnonPurchaseEvent(payload);
     return Promise.reject(AUA_WARNING);
   }
 

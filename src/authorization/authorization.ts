@@ -1,34 +1,39 @@
-/* eslint-disable */
+/* eslint-disable consistent-return */
+/* eslint-disable max-len */
+/* eslint-disable prefer-promise-reject-errors */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable no-redeclare */
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { clearMessages } from 'src/inapp/inapp';
-import {
-  IS_PRODUCTION,
-  STATIC_HEADERS,
-  SHARED_PREF_ANON_USER_ID,
-  ENDPOINTS,
-  RouteConfig,
-  SHARED_PREF_ANON_USAGE_TRACKED,
-  SHARED_PREFS_CRITERIA
-} from 'src/constants';
-import {
-  cancelAxiosRequestAndMakeFetch,
-  getEpochDifferenceInMS,
-  getEpochExpiryTimeInMS,
-  ONE_MINUTE,
-  ONE_DAY,
-  validateTokenTime,
-  isEmail
-} from './utils';
-import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
 import {
   AnonymousUserEventManager,
   isAnonymousUsageTracked,
   registerAnonUserIdSetter
-} from 'src/anonymousUserTracking/anonymousUserEventManager';
-import { IdentityResolution, Options, config } from 'src/utils/config';
-import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
-import AuthorizationToken from 'src/utils/authorizationToken';
+} from '../anonymousUserTracking/anonymousUserEventManager';
+import { AnonymousUserMerge } from '../anonymousUserTracking/anonymousUserMerge';
+import {
+  ENDPOINTS,
+  IS_PRODUCTION,
+  RouteConfig,
+  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_ANON_USER_ID,
+  SHARED_PREFS_CRITERIA,
+  STATIC_HEADERS
+} from '../constants';
+import { clearMessages } from '../inapp';
+import { baseAxiosRequest } from '../request';
+import AuthorizationToken from '../utils/authorizationToken';
+import { config, IdentityResolution, Options } from '../utils/config';
+import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from '../utils/typeOfAuth';
+import {
+  cancelAxiosRequestAndMakeFetch,
+  getEpochDifferenceInMS,
+  getEpochExpiryTimeInMS,
+  isEmail,
+  ONE_DAY,
+  ONE_MINUTE,
+  validateTokenTime
+} from './utils';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
@@ -52,8 +57,14 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
   );
 export interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<string>;
-  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<string>;
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  setUserID: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
   setVisitorUsageTracked: (consent: boolean) => void;
@@ -63,56 +74,18 @@ export interface WithJWT {
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<void>;
-  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<void>;
+  setUserID: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<void>;
   logout: () => void;
   setVisitorUsageTracked: (consent: boolean) => void;
   clearVisitorEventsAndUserData: () => void;
 }
-
-export const setAnonUserId = async (userId: string) => {
-  const anonymousUsageTracked = isAnonymousUsageTracked();
-
-  if (!anonymousUsageTracked) return;
-
-  let token: null | string = null;
-  if (generateJWTGlobal) {
-    token = await generateJWTGlobal({ userID: userId });
-  }
-
-  if (token) {
-    const authorizationToken = new AuthorizationToken();
-    authorizationToken.setToken(token);
-  }
-
-  baseAxiosRequest.interceptors.request.use((config) => {
-    config.headers.set('Api-Key', apiKey);
-
-    return config;
-  });
-  addUserIdToRequest(userId);
-  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
-};
-
-registerAnonUserIdSetter(setAnonUserId);
-
-const clearAnonymousUser = () => {
-  localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-};
-
-const getAnonUserId = () => {
-  if (config.getConfig('enableAnonActivation')) {
-    const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
-    return anonUser === undefined ? null : anonUser;
-  } else {
-    return null;
-  }
-};
-
-const initializeUserId = (userId: string) => {
-  addUserIdToRequest(userId);
-  clearAnonymousUser();
-};
 
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
@@ -122,7 +95,7 @@ const addUserIdToRequest = (userId: string) => {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
   }
   /*
-    endpoints that use _userId_ payload prop in POST/PUT requests 
+    endpoints that use _userId_ payload prop in POST/PUT requests
   */
   userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
     if (
@@ -143,7 +116,7 @@ const addUserIdToRequest = (userId: string) => {
     }
 
     /*
-        endpoints that use _userId_ payload prop in POST/PUT requests 
+        endpoints that use _userId_ payload prop in POST/PUT requests
       */
     if (
       doesRequestUrlContain({
@@ -209,8 +182,46 @@ const addUserIdToRequest = (userId: string) => {
   });
 };
 
-const initializeEmailUser = (email: string) => {
-  addEmailToRequest(email);
+export const setAnonUserId = async (userId: string) => {
+  const anonymousUsageTracked = isAnonymousUsageTracked();
+
+  if (!anonymousUsageTracked) return;
+
+  let token: null | string = null;
+  if (generateJWTGlobal) {
+    token = await generateJWTGlobal({ userID: userId });
+  }
+
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
+  baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', apiKey);
+
+    return config;
+  });
+  addUserIdToRequest(userId);
+  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+};
+
+registerAnonUserIdSetter(setAnonUserId);
+
+const clearAnonymousUser = () => {
+  localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+};
+
+const getAnonUserId = () => {
+  if (config.getConfig('enableAnonActivation')) {
+    const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
+    return anonUser === undefined ? null : anonUser;
+  }
+  return null;
+};
+
+const initializeUserId = (userId: string) => {
+  addUserIdToRequest(userId);
   clearAnonymousUser();
 };
 
@@ -228,8 +239,8 @@ const addEmailToRequest = (email: string) => {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
   }
   userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-    /* 
-      endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+    /*
+      endpoints that use _currentEmail_ payload prop in POST/PUT requests
     */
     if (
       doesRequestUrlContain({
@@ -249,7 +260,7 @@ const addEmailToRequest = (email: string) => {
     }
 
     /*
-      endpoints that use _email_ payload prop in POST/PUT requests 
+      endpoints that use _email_ payload prop in POST/PUT requests
     */
     if (
       doesRequestUrlContain({
@@ -315,6 +326,27 @@ const addEmailToRequest = (email: string) => {
   });
 };
 
+const initializeEmailUser = (email: string) => {
+  addEmailToRequest(email);
+  clearAnonymousUser();
+};
+
+const setAuthInterceptor = (
+  authInterceptor: number | null,
+  authToken: string
+) => {
+  if (typeof authInterceptor === 'number') {
+    /** Clear previously cached interceptor function */
+    baseAxiosRequest.interceptors.request.eject(authInterceptor);
+  }
+
+  /** Set auth token to interceptor for all requests */
+  return baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', authToken);
+    return config;
+  });
+};
+
 export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
@@ -334,18 +366,16 @@ export function initialize(
         'Please provide a Promise method for generating a JWT token.'
       );
     }
-    return;
+    return null;
   }
-  /* 
+  /*
     only set token interceptor if we're using a non-JWT key.
     Otherwise, we'll set it later once we generate the JWT
   */
-  let authInterceptor: number | null =
-    baseAxiosRequest.interceptors.request.use((config) => {
-      config.headers.set('Api-Key', authToken);
-
-      return config;
-    });
+  let authInterceptor: number | null = generateJWT
+    ? null
+    : setAuthInterceptor(null, authToken);
+  const userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
 
   /**
@@ -357,6 +387,7 @@ export function initialize(
   const createTokenExpirationTimer = () => {
     let timer: NodeJS.Timeout | null;
 
+    // eslint-disable-next-line consistent-return
     return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
@@ -486,6 +517,7 @@ export function initialize(
 
           const result = await tryMergeUser(email, true, merge);
           if (result) {
+            authInterceptor = setAuthInterceptor(authInterceptor, authToken);
             initializeEmailUser(email);
             if (replay) {
               syncEvents();
@@ -516,6 +548,7 @@ export function initialize(
 
           const result = await tryMergeUser(userId, false, merge);
           if (result) {
+            authInterceptor = setAuthInterceptor(authInterceptor, authToken);
             initializeUserId(userId);
             if (replay) {
               syncEvents();
@@ -614,7 +647,7 @@ export function initialize(
                 that is going to navigate the browser tab to a new page/site and we need
                 to still call POST /trackInAppClick.
 
-                Normally, since the page is going somewhere new, the browser would just navigate away
+                Normally, since the page is going somewhere new, the browser would navigate away
                 and cancel any in-flight requests and not fulfill them, but with the fetch API's
                 "keepalive" flag, it will continue the request without blocking the main thread.
 
@@ -659,7 +692,7 @@ export function initialize(
                 const payloadToPass =
                   getTypeOfAuth() === 'email'
                     ? { email: newEmail }
-                    : { userID: authIdentifier! };
+                    : { userID: authIdentifier ?? '' };
 
                 return generateJWT(payloadToPass).then((newToken) => {
                   const authorizationToken = new AuthorizationToken();
@@ -872,6 +905,10 @@ export function initialize(
             .then(async (token) => {
               const result = await tryMergeUser(email, true, merge);
               if (result) {
+                authInterceptor = setAuthInterceptor(
+                  authInterceptor,
+                  authToken
+                );
                 initializeEmailUser(email);
                 if (replay) {
                   syncEvents();
@@ -917,6 +954,10 @@ export function initialize(
             .then(async (token) => {
               const result = await tryMergeUser(userId, false, merge);
               if (result) {
+                authInterceptor = setAuthInterceptor(
+                  authInterceptor,
+                  authToken
+                );
                 initializeUserId(userId);
                 if (replay) {
                   syncEvents();

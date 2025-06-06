@@ -22,7 +22,7 @@ export const updateUserEmail = (newEmail: string) =>
     }
   });
 
-export const updateUser = (payloadParam: UpdateUserParams = {}) => {
+export const updateUser = async (payloadParam: UpdateUserParams = {}) => {
   /* a customer could potentially send these up if they're not using TypeScript */
   const payload = payloadParam;
   delete (payload as any).userId;
@@ -30,7 +30,7 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
 
   if (canTrackAnonUser()) {
     const anonymousUserEventManager = new AnonymousUserEventManager();
-    anonymousUserEventManager.trackAnonUpdateUser(payload);
+    await anonymousUserEventManager.trackAnonUpdateUser(payload);
     return Promise.reject(AUA_WARNING);
   }
   return baseIterableRequest<IterableResponse>({
