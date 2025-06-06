@@ -1,17 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ChangeEvent, FC, FormEvent, SetStateAction, useState } from 'react';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
-
-import { TextField } from './TextField';
-import { Button } from './Button';
-
 import { useUser } from '../context/Users';
+import { Button } from './Button';
+import { TextField } from './TextField';
 
 const StyledTextField = styled(TextField)``;
 
 const StyledButton = styled(Button)`
   margin-left: 0.4em;
-  max-width: 425px;
+  width: fit-content;
+  white-space: nowrap;
 `;
 
 const Form = styled.form`
@@ -38,10 +37,10 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string>;
-  setUserId: (userId: string) => Promise<string>;
+  setEmail: (email: string) => Promise<string> | void;
+  setUserId: (userId: string) => Promise<string | void>;
   logout: () => void;
-  refreshJwt: (authTypes: string) => Promise<string>;
+  refreshJwt?: (authTypes: string) => Promise<string>;
 }
 
 export const LoginForm: FC<Props> = ({
@@ -52,24 +51,22 @@ export const LoginForm: FC<Props> = ({
 }) => {
   const [useEmail, setUseEmail] = useState<boolean>(true);
   const [user, updateUser] = useState<string>(process.env.LOGIN_EMAIL || '');
-
   const [error, setError] = useState<string>('');
-
   const [isEditingUser, setEditingUser] = useState<boolean>(false);
 
   const { loggedInUser, setLoggedInUser } = useUser();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const setUser = useEmail ? setEmail : setUserId;
-
-    setUser(user)
-      .then(() => {
-        setEditingUser(false);
-        setLoggedInUser({ type: 'user_update', data: user });
-      })
-      .catch(() => setError('Something went wrong!'));
+    try {
+      await setUser(user);
+      setEditingUser(false);
+      setLoggedInUser({ type: 'user_update', data: user });
+    } catch (error) {
+      setError('Something went wrong!');
+    }
   };
 
   const handleLogout = () => {
@@ -105,9 +102,11 @@ export const LoginForm: FC<Props> = ({
           <StyledButton onClick={handleEditUser}>
             Logged in as {`${first5}...${last9}`} (change)
           </StyledButton>
-          <StyledButton onClick={handleJwtRefresh}>
-            Manually Refresh JWT Token
-          </StyledButton>
+          {refreshJwt && (
+            <StyledButton onClick={handleJwtRefresh}>
+              Manually Refresh JWT Token
+            </StyledButton>
+          )}
           <StyledButton onClick={handleLogout}>Logout</StyledButton>
         </>
       ) : (
