@@ -1,4 +1,4 @@
-// eslint-disable @typescript-eslint/no-explicit-any
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { object, string } from 'yup';
 import { ENDPOINTS } from '../constants';
 import { IterableResponse } from '../types';

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+import { isAxiosError } from 'axios';
 import { setMany } from 'idb-keyval';
 import { BrowserStorageEstimate, CachedMessage, InAppMessage } from './types';
 
@@ -32,11 +34,10 @@ export const determineRemainingStorageQuota = async () => {
     const remainingQuota = usage && messageQuota - usage;
 
     return remainingQuota || 0;
-  } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
-    // eslint-disable-next-line no-console
+  } catch (err: unknown) {
     console.warn(
       'Error determining remaining storage quota',
-      err?.response?.data?.clientErrors ?? err
+      isAxiosError(err) ? err.response?.data?.clientErrors : err
     );
   }
   /** Do not try to add to cache if we cannot determine storage space. */
@@ -113,11 +114,10 @@ export const addNewMessagesToCache = async (
 
     try {
       await setMany(messagesToAddToCache);
-    } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
-      // eslint-disable-next-line no-console
+    } catch (err: unknown) {
       console.warn(
         'Error adding new messages to the browser cache',
-        err?.response?.data?.clientErrors ?? err
+        isAxiosError(err) ? err.response?.data?.clientErrors : err
       );
     }
   }

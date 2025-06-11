@@ -524,7 +524,7 @@ export const trackMessagesDelivered = (
         */
       })
     )
-  ).catch((e: any) => e);
+  ).catch((e: unknown) => e);
 
 export const paintOverlay = (
   color = '#fff',

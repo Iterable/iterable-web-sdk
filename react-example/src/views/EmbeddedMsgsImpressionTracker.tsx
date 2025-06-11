@@ -52,8 +52,10 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
     );
   };
 
+  let observersCard: IntersectionObserver[] = [];
+
   useEffect(() => {
-    const observersCard: IntersectionObserver[] = getCardObserver() || [];
+    observersCard = getCardObserver();
 
     const cleanupObservers = () => {
       observersCard.forEach((observer, index) => {
