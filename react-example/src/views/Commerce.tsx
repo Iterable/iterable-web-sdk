@@ -1,12 +1,13 @@
+import { IterableResponse, trackPurchase, updateCart } from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
 import { FC, FormEvent, useState } from 'react';
-import { updateCart, trackPurchase } from '@iterable/web-sdk';
 import { TextField } from '../components/TextField';
 import {
-  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
-  Response
+  Response,
+  StyledButton
 } from './Components.styled';
 
 interface Props {}
@@ -31,11 +32,11 @@ export const Commerce: FC<Props> = () => {
     updateCart({
       items: [{ name: cartItem, id: 'fdsafds', price: 100, quantity: 2 }]
     })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setUpdateCartResponse(JSON.stringify(response.data));
         setUpdatingCart(false);
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<IterableResponse>) => {
         setUpdateCartResponse(JSON.stringify(e.response.data));
         setUpdatingCart(false);
       });
@@ -48,11 +49,11 @@ export const Commerce: FC<Props> = () => {
       items: [{ name: purchaseItem, id: 'fdsafds', price: 100, quantity: 2 }],
       total: 200
     })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(response.data));
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<IterableResponse>) => {
         setTrackingPurchase(false);
         setTrackPurchaseResponse(JSON.stringify(e.response.data));
       });
