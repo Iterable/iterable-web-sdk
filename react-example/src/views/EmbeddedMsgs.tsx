@@ -1,16 +1,17 @@
-import { FC, useState, useEffect } from 'react';
+/* eslint-disable no-console */
 import {
-  IterableEmbeddedCard,
-  IterableEmbeddedNotification,
+  IterableAction,
+  IterableConfig,
+  IterableCustomActionHandler,
   IterableEmbeddedBanner,
+  IterableEmbeddedCard,
   IterableEmbeddedManager,
   IterableEmbeddedMessage,
   IterableEmbeddedMessageUpdateHandler,
-  IterableUrlHandler,
-  IterableCustomActionHandler,
-  IterableAction,
-  IterableConfig
+  IterableEmbeddedNotification,
+  IterableUrlHandler
 } from '@iterable/web-sdk';
+import { FC, useEffect, useState } from 'react';
 import { Button } from '../components/Button';
 import { useUser } from '../context/Users';
 
@@ -113,7 +114,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
       await embeddedManager.syncMessages('my-website', () => {
         console.log('messages', JSON.stringify(embeddedManager.getMessages()));
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('error', error);
     }
   };
@@ -236,7 +237,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   appPackageName,
                   message,
                   ...(useCustomStyles && { htmlElements: StyleOverrides }),
-                  errorCallback: (error: any) =>
+                  errorCallback: (error: unknown) =>
                     console.log('handleError: ', error)
                 });
                 return (
@@ -252,7 +253,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   appPackageName,
                   message,
                   ...(useCustomStyles && { htmlElements: StyleOverrides }),
-                  errorCallback: (error: any) =>
+                  errorCallback: (error: unknown) =>
                     console.log('handleError: ', error)
                 });
                 return (
@@ -268,7 +269,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
                   appPackageName,
                   message,
                   ...(useCustomStyles && { htmlElements: StyleOverrides }),
-                  errorCallback: (error: any) =>
+                  errorCallback: (error: unknown) =>
                     console.log('handleError: ', error)
                 });
                 return (

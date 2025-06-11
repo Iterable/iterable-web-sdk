@@ -1,11 +1,17 @@
-import { ChangeEvent, FC, FormEvent, useState } from 'react';
-import { IterablePromise, IterableResponse } from '@iterable/web-sdk';
 import {
-  StyledButton,
+  InAppEventRequestParams,
+  InAppTrackRequestParams,
+  IterablePromise,
+  IterableResponse
+} from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
+import { ChangeEvent, FC, FormEvent, useState } from 'react';
+import {
   EndpointWrapper,
   Form,
   Heading,
-  Response
+  Response,
+  StyledButton
 } from '../views/Components.styled';
 import { TextField } from './TextField';
 
@@ -13,8 +19,10 @@ interface Props {
   endpointName: string;
   heading: string;
   needsEventName?: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  method: (...args: any) => IterablePromise<IterableResponse>;
+  method: (
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    args: InAppEventRequestParams | InAppTrackRequestParams
+  ) => IterablePromise<IterableResponse>;
 }
 
 export const EventsForm: FC<Props> = ({
@@ -44,11 +52,11 @@ export const EventsForm: FC<Props> = ({
         appPackageName: 'my-website'
       }
     })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<IterableResponse>) => {
         setTrackResponse(JSON.stringify(e.response.data));
         setTrackingEvent(false);
       });
