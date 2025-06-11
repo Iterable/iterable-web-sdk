@@ -1,4 +1,4 @@
-import { FC, useState, useEffect, useRef } from 'react';
+/* eslint-disable no-console */
 import {
   IterableEmbeddedCard,
   IterableEmbeddedManager,
@@ -6,6 +6,7 @@ import {
   IterableEmbeddedMessageUpdateHandler,
   IterableEmbeddedSessionManager
 } from '@iterable/web-sdk';
+import { FC, useEffect, useRef, useState } from 'react';
 import { useUser } from '../context/Users';
 
 interface Props {}
@@ -51,10 +52,8 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
     );
   };
 
-  let observersCard: any[] = [];
-
   useEffect(() => {
-    observersCard = getCardObserver();
+    const observersCard: IntersectionObserver[] = getCardObserver() || [];
 
     const cleanupObservers = () => {
       observersCard.forEach((observer, index) => {
@@ -93,7 +92,7 @@ export const EmbeddedMsgsImpressionTracker: FC<Props> = () => {
       await embeddedManager.syncMessages('my-website', () => {
         console.log('messages', JSON.stringify(embeddedManager.getMessages()));
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.log('error', error);
     }
   };
