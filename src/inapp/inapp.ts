@@ -1,7 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-redeclare */
-import set from 'lodash/set';
 import { throttle } from 'throttle-debounce';
 import {
   ABSOLUTE_DISMISS_BUTTON_ID,
@@ -670,9 +669,10 @@ export function getInAppMessages(
     trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
-      return html
-        ? set(message, 'content.html', wrapWithIFrame(html as string))
-        : message;
+      if (html && message.content) {
+        message.content.html = wrapWithIFrame(html as string);
+      }
+      return message;
     });
     return {
       ...response,

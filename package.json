@@ -43,7 +43,7 @@
     "qs": "^6.12.3",
     "throttle-debounce": "^3.0.1",
     "uuid": "^9.0.0",
-    "yup": "^0.32.9"
+    "yup": "^1.6.1"
   },
   "scripts": {
     "start": "concurrently \"ttsc -w\" \"babel src --watch --out-dir ./dist --extensions '.ts,.tsx'\" \"webpack-dev-server --config webpack.dev.config.js\" -n 'tsc,babel,webpack' -k",
