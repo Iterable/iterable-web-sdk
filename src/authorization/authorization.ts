@@ -875,11 +875,8 @@ export function initialize(
                 initializeEmailUser(email);
                 if (replay) {
                   syncEvents();
-<<<<<<< HEAD
-=======
                 } else {
                   anonUserManager.removeAnonSessionCriteriaData();
->>>>>>> 4b1829a72a31b10317a7d126c6c3c36dd89a2e51
                 }
                 return token;
               }
