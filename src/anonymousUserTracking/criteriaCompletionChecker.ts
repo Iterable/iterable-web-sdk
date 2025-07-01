@@ -6,7 +6,6 @@ import {
   TRACK_UPDATE_CART,
   TRACK_EVENT,
   UPDATE_CART,
-  UPDATE_USER,
   KEY_EVENT_NAME,
   UPDATECART_ITEM_PREFIX,
   PURCHASE_ITEM_PREFIX,
@@ -38,8 +37,19 @@ interface Criteria {
 class CriteriaCompletionChecker {
   private localStoredEventList: any[];
 
-  constructor(localStoredEventList: string) {
-    this.localStoredEventList = JSON.parse(localStoredEventList);
+  private localStoredUserUpdate: any;
+
+  constructor(
+    localStoredEventList: string,
+    localStoredUserUpdate?: string | null
+  ) {
+    this.localStoredEventList =
+      (localStoredEventList !== '' && JSON.parse(localStoredEventList)) || [];
+    this.localStoredUserUpdate =
+      (localStoredUserUpdate &&
+        localStoredUserUpdate !== '' &&
+        JSON.parse(localStoredUserUpdate)) ||
+      {};
   }
 
   public getMatchedCriteria(criteriaData: string): string | null {
@@ -169,8 +179,7 @@ class CriteriaCompletionChecker {
     this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
-        (localEventData[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER ||
-          localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_EVENT)
+        localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_EVENT
       ) {
         const updatedItem: any = localEventData;
         if (localEventData.dataFields) {
@@ -183,6 +192,19 @@ class CriteriaCompletionChecker {
         nonPurchaseEvents.push(updatedItem);
       }
     });
+
+    if (Object.keys(this.localStoredUserUpdate).length) {
+      const localEventData = { ...this.localStoredUserUpdate };
+      if (localEventData.dataFields) {
+        Object.keys(localEventData.dataFields).forEach((key) => {
+          localEventData[key] = localEventData.dataFields[key];
+        });
+        // eslint-disable-next-line no-param-reassign
+        delete localEventData.dataFields;
+      }
+      nonPurchaseEvents.push(localEventData);
+    }
+
     return nonPurchaseEvents;
   }
 

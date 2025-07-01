@@ -1,4 +1,7 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
+import {
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+} from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 
 const localStorageMock = {
@@ -19,12 +22,14 @@ describe('CombinationLogicCriteria', () => {
           {
             dataFields: { total: 10 },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -33,8 +38,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -101,12 +111,14 @@ describe('CombinationLogicCriteria', () => {
           {
             dataFields: { total: 10 },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -115,8 +127,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -183,12 +200,14 @@ describe('CombinationLogicCriteria', () => {
           {
             dataFields: { total: 10 },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -197,8 +216,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -265,12 +289,14 @@ describe('CombinationLogicCriteria', () => {
           {
             dataFields: { total: 101 },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -279,8 +305,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -350,12 +381,14 @@ describe('CombinationLogicCriteria', () => {
               total: 10
             },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -364,8 +397,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -432,12 +470,14 @@ describe('CombinationLogicCriteria', () => {
           {
             dataFields: { total: 1 },
             eventType: 'customEvent'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -446,8 +486,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -514,12 +559,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'fried', id: 'fried', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -528,8 +575,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -596,12 +648,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'chicken', id: 'chicken', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -610,8 +664,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -678,12 +737,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'fried', id: 'fried', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -692,8 +753,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -760,12 +826,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'chicken', id: 'chicken', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -774,8 +842,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -842,12 +915,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'boiled', id: 'boiled', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'Davidson' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'Davidson' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -856,8 +931,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -924,12 +1004,14 @@ describe('CombinationLogicCriteria', () => {
           {
             items: [{ name: 'fried', id: 'fried', price: 10, quantity: 2 }],
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: { firstName: 'David' },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: { firstName: 'David' },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -938,8 +1020,13 @@ describe('CombinationLogicCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
