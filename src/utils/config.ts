@@ -8,7 +8,7 @@ export type IdentityResolution = {
 export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
-  enableAnonTracking: boolean;
+  enableAnonActivation: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
@@ -20,7 +20,7 @@ const _config = () => {
   let options: Options = {
     logLevel: 'none',
     baseURL: BASE_URL,
-    enableAnonTracking: false,
+    enableAnonActivation: false,
     isEuIterableService: false,
     dangerouslyAllowJsPopups: false,
     eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,

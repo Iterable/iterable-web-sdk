@@ -7,12 +7,12 @@ import {
   EU_ITERABLE_API,
   GET_CRITERIA_PATH,
   INITIALIZE_ERROR,
-  ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
 import { getTypeOfAuth } from './utils/typeOfAuth';
+import AuthorizationToken from './utils/authorizationToken';
 
 interface ExtendedRequestConfig extends AxiosRequestConfig {
   validation?: {
@@ -29,9 +29,8 @@ interface ClientError extends IterableResponse {
   }[];
 }
 
-const ENDPOINTS_REQUIRING_SET_USER = [
+const ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH = [
   GET_CRITERIA_PATH,
-  ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION
 ];
 
@@ -47,7 +46,7 @@ export const baseIterableRequest = <T = any>(
 
     // for most Iterable API endpoints, we require a user to be initialized in the SDK.
     if (
-      !ENDPOINTS_REQUIRING_SET_USER.includes(endpoint) &&
+      !ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH.includes(endpoint) &&
       getTypeOfAuth() === null
     ) {
       return Promise.reject(INITIALIZE_ERROR);
@@ -65,12 +64,17 @@ export const baseIterableRequest = <T = any>(
       ? EU_ITERABLE_API
       : config.getConfig('baseURL');
 
+    const authorizationToken = new AuthorizationToken();
+    const JWT = authorizationToken.getToken();
+    const Authorization = JWT ? `Bearer ${JWT}` : undefined;
+
     return baseAxiosRequest({
       ...payload,
       baseURL,
       headers: {
         ...payload.headers,
-        ...STATIC_HEADERS
+        ...STATIC_HEADERS,
+        Authorization
       },
       paramsSerializer: (params) =>
         qs.stringify(params, { arrayFormat: 'repeat' })

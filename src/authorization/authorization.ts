@@ -28,6 +28,7 @@ import {
 } from 'src/anonymousUserTracking/anonymousUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
 import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
+import AuthorizationToken from 'src/utils/authorizationToken';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
@@ -51,20 +52,22 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
   );
 export interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
+  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<string>;
+  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
-  toggleAnonUserTrackingConsent: (consent: boolean) => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 
 export interface WithoutJWT {
   setNewAuthToken: (newToken?: string) => void;
   clearAuthToken: () => void;
-  setEmail: (email: string) => Promise<void>;
-  setUserID: (userId: string) => Promise<void>;
+  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<void>;
+  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
   logout: () => void;
-  toggleAnonUserTrackingConsent: (consent: boolean) => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 
 export const setAnonUserId = async (userId: string) => {
@@ -77,11 +80,14 @@ export const setAnonUserId = async (userId: string) => {
     token = await generateJWTGlobal({ userID: userId });
   }
 
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
   baseAxiosRequest.interceptors.request.use((config) => {
     config.headers.set('Api-Key', apiKey);
-    if (token) {
-      config.headers.set('Authorization', `Bearer ${token}`);
-    }
+
     return config;
   });
   addUserIdToRequest(userId);
@@ -95,7 +101,7 @@ const clearAnonymousUser = () => {
 };
 
 const getAnonUserId = () => {
-  if (config.getConfig('enableAnonTracking')) {
+  if (config.getConfig('enableAnonActivation')) {
     const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
     return anonUser === undefined ? null : anonUser;
   } else {
@@ -209,7 +215,7 @@ const initializeEmailUser = (email: string) => {
 };
 
 const syncEvents = () => {
-  if (config.getConfig('enableAnonTracking')) {
+  if (config.getConfig('enableAnonActivation')) {
     anonUserManager.syncEvents();
   }
 };
@@ -392,7 +398,7 @@ export function initialize(
 
   const enableAnonymousTracking = () => {
     try {
-      if (config.getConfig('enableAnonTracking')) {
+      if (config.getConfig('enableAnonActivation')) {
         anonUserManager.getAnonCriteria();
         anonUserManager.updateAnonSession();
         const anonymousUserId = getAnonUserId();
@@ -412,7 +418,7 @@ export function initialize(
     merge?: boolean
   ): Promise<boolean> => {
     const typeOfAuth = getTypeOfAuth();
-    const enableAnonTracking = config.getConfig('enableAnonTracking');
+    const enableAnonActivation = config.getConfig('enableAnonActivation');
     const sourceUserIdOrEmail =
       authIdentifier === null ? getAnonUserId() : authIdentifier;
     const sourceUserId = typeOfAuth === 'email' ? null : sourceUserIdOrEmail;
@@ -423,7 +429,7 @@ export function initialize(
     if (
       (getAnonUserId() !== null || authIdentifier !== null) &&
       merge &&
-      enableAnonTracking
+      enableAnonActivation
     ) {
       const anonymousUserMerge = new AnonymousUserMerge();
       try {
@@ -483,6 +489,8 @@ export function initialize(
             initializeEmailUser(email);
             if (replay) {
               syncEvents();
+            } else {
+              anonUserManager.removeAnonSessionCriteriaData();
             }
             return Promise.resolve();
           }
@@ -511,6 +519,8 @@ export function initialize(
             initializeUserId(userId);
             if (replay) {
               syncEvents();
+            } else {
+              anonUserManager.removeAnonSessionCriteriaData();
             }
             return Promise.resolve();
           }
@@ -526,6 +536,9 @@ export function initialize(
         /* clear fetched in-app messages */
         clearMessages();
 
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
+
         if (typeof authInterceptor === 'number') {
           /* stop adding auth token to requests */
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -536,7 +549,7 @@ export function initialize(
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
       },
-      toggleAnonUserTrackingConsent: (consent: boolean) => {
+      setVisitorUsageTracked: (consent: boolean) => {
         /* if consent is true, we want to clear anon user data and start tracking from point forward */
         if (consent) {
           anonUserManager.removeAnonSessionCriteriaData();
@@ -561,15 +574,22 @@ export function initialize(
           }
           localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
         }
+      },
+      clearVisitorEventsAndUserData: () => {
+        anonUserManager.removeAnonSessionCriteriaData();
+        clearAnonymousUser();
       }
     };
   }
 
+  const authorizationToken = new AuthorizationToken();
   /*
     We're using a JWT enabled API key
     callback is assumed to be some sort of GET /api/generate-jwt
   */
   const doRequest = (payload: { email?: string; userID?: string }) => {
+    authorizationToken.clearToken();
+
     /* clear any token interceptor if any exists */
     if (typeof authInterceptor === 'number') {
       baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -581,6 +601,9 @@ export function initialize(
 
     return generateJWT(payload)
       .then((token) => {
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.setToken(token);
+
         /* set JWT token and auth token headers */
         authInterceptor = baseAxiosRequest.interceptors.request.use(
           (config) => {
@@ -609,7 +632,6 @@ export function initialize(
             }
 
             config.headers.set('Api-Key', authToken);
-            config.headers.set('Authorization', `Bearer ${token}`);
 
             return config;
           }
@@ -640,6 +662,9 @@ export function initialize(
                     : { userID: authIdentifier! };
 
                 return generateJWT(payloadToPass).then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   /*
                     clear any existing interceptors that are adding user info
                     or API keys
@@ -685,7 +710,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -732,6 +756,9 @@ export function initialize(
             if (error?.response?.status === 401) {
               return generateJWT(payload)
                 .then((newToken) => {
+                  const authorizationToken = new AuthorizationToken();
+                  authorizationToken.setToken(newToken);
+
                   if (authInterceptor) {
                     baseAxiosRequest.interceptors.request.eject(
                       authInterceptor
@@ -763,7 +790,6 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
-                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -810,6 +836,9 @@ export function initialize(
       })
       .catch((error) => {
         /* clear interceptor */
+        const authorizationToken = new AuthorizationToken();
+        authorizationToken.clearToken();
+
         if (typeof authInterceptor === 'number') {
           baseAxiosRequest.interceptors.request.eject(authInterceptor);
         }
@@ -846,6 +875,11 @@ export function initialize(
                 initializeEmailUser(email);
                 if (replay) {
                   syncEvents();
+<<<<<<< HEAD
+=======
+                } else {
+                  anonUserManager.removeAnonSessionCriteriaData();
+>>>>>>> 4b1829a72a31b10317a7d126c6c3c36dd89a2e51
                 }
                 return token;
               }
@@ -889,6 +923,8 @@ export function initialize(
                 initializeUserId(userId);
                 if (replay) {
                   syncEvents();
+                } else {
+                  anonUserManager.removeAnonSessionCriteriaData();
                 }
                 return token;
               }
@@ -920,6 +956,9 @@ export function initialize(
       /* this will just clear the existing timeout */
       handleTokenExpiration('');
 
+      const authorizationToken = new AuthorizationToken();
+      authorizationToken.clearToken();
+
       if (typeof authInterceptor === 'number') {
         /* stop adding auth token to requests */
         baseAxiosRequest.interceptors.request.eject(authInterceptor);
@@ -941,7 +980,7 @@ export function initialize(
         }
       });
     },
-    toggleAnonUserTrackingConsent: (consent: boolean) => {
+    setVisitorUsageTracked: (consent: boolean) => {
       /* if consent is true, we want to clear anon user data and start tracking from point forward */
       if (consent) {
         anonUserManager.removeAnonSessionCriteriaData();
@@ -966,6 +1005,10 @@ export function initialize(
         }
         localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
       }
+    },
+    clearVisitorEventsAndUserData: () => {
+      anonUserManager.removeAnonSessionCriteriaData();
+      clearAnonymousUser();
     }
   };
 }

@@ -7,7 +7,8 @@ import {
   NESTED_CRITERIA,
   NESTED_CRITERIA_MULTI_LEVEL,
   NESTED_CRITERIA_MULTI_LEVEL_ARRAY,
-  NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT
+  NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT,
+  NESTED_CRITERIA_MULTI_LEVEL_MORE_THAN_4_EVENTS
 } from './constants';
 
 const localStorageMock = {
@@ -411,5 +412,57 @@ describe('nestedTesting', () => {
       JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT)
     );
     expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 484 (Multi level Nested field criteria for more than 3 events)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            items: [{ id: '12', name: 'monitor', price: 50, quantity: 10 }],
+            total: 50,
+            eventType: 'purchase'
+          },
+          {
+            items: [
+              { name: 'piano', id: 'fdsafds', price: 100, quantity: 2 },
+              { name: 'piano2', id: 'fdsafds2', price: 100, quantity: 5 }
+            ],
+            eventType: 'cartUpdate',
+            preferUserId: true,
+            createdAt: 1729585174
+          },
+          { likes_boba: 'true', eventType: 'user' },
+          {
+            eventName: 'cancelled_booking',
+            createdAt: 1729585183,
+            dataFields: { details: { event: { name: 'dummy' } } },
+            createNewFields: true,
+            eventType: 'customEvent'
+          },
+          {
+            eventName: 'cancelled_booking',
+            createdAt: 1729585192,
+            dataFields: { details: { event: { name: 'haircut' } } },
+            createNewFields: true,
+            eventType: 'customEvent'
+          }
+        ]);
+      }
+
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(NESTED_CRITERIA_MULTI_LEVEL_MORE_THAN_4_EVENTS)
+    );
+    expect(result).toEqual('484');
   });
 });

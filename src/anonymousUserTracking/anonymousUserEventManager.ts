@@ -192,7 +192,7 @@ export class AnonymousUserEventManager {
     return null;
   }
 
-  private async createKnownUser(criteriaId: string) {
+  private async createAnonymousUser(criteriaId: string) {
     const anonymousUsageTracked = isAnonymousUsageTracked();
 
     if (!anonymousUsageTracked) return;
@@ -348,7 +348,7 @@ export class AnonymousUserEventManager {
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
-      this.createKnownUser(criteriaId);
+      this.createAnonymousUser(criteriaId);
     }
   }
 

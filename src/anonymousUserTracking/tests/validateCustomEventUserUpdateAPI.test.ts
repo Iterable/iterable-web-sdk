@@ -156,7 +156,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -242,7 +242,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -312,7 +312,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -386,7 +386,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 

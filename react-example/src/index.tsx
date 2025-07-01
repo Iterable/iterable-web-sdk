@@ -47,7 +47,7 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true
+      enableAnonActivation: true
     },
     generateJWT: ({ email, userID }) =>
       axios
@@ -72,11 +72,10 @@ const HomeLink = styled(Link)`
     setUserID,
     logout,
     refreshJwtToken,
-    toggleAnonUserTrackingConsent
+    setVisitorUsageTracked
   } = initializeWithConfig(initializeParams);
 
-  const handleConsent = (consent?: boolean) =>
-    toggleAnonUserTrackingConsent(consent);
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   const container = document.getElementById('root');
   const root = createRoot(container);

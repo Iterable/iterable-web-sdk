@@ -46,18 +46,17 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true,
+      enableAnonActivation: true,
       onAnonUserCreated: (userId: string) => {
         console.log('onAnonUserCreated', userId);
       }
     }
   };
 
-  const { setUserID, logout, setEmail, toggleAnonUserTrackingConsent } =
+  const { setUserID, logout, setEmail, setVisitorUsageTracked } =
     initializeWithConfig(initializeParams);
 
-  const handleConsent = (consent?: boolean) =>
-    toggleAnonUserTrackingConsent(consent);
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
