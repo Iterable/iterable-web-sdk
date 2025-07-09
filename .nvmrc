@@ -1,3 +1,4 @@
 # Tip: You can setup your shell to auto load the node version specified in the .nvmrc file whenever you switch directories.
 # Reference: https://github.com/nvm-sh/nvm?tab=readme-ov-file#calling-nvm-use-automatically-in-a-directory-with-a-nvmrc-file
+
 18.12.0
