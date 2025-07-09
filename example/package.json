@@ -8,7 +8,7 @@
     "directory": "https://github.com/Iterable/iterable-web-sdk/example"
   },
   "engines": {
-    "node": ">= 16.3.0"
+    "node": ">= 22.0.0"
   },
   "author": "Iterable",
   "license": "MIT",
