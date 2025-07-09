@@ -1,6 +1,6 @@
 # Requirements
 
-This project (along with the sample app) both require a minimum Node version of 18.12.0 or greater. [Download NodeJS here.](https://nodejs.org/en/) Alternatively, you can use a tool such as [nvm](https://github.com/nvm-sh/nvm) to install another version of node and switch to that.
+This project (along with the sample app) both require a minimum Node version of 16.3.0 or greater. [Download NodeJS here.](https://nodejs.org/en/) Alternatively, you can use a tool such as [nvm](https://github.com/nvm-sh/nvm) to install another version of node and switch to that.
 
 This project also uses [yarn package manager.](https://yarnpkg.com/getting-started/install) You'll need to install that as well to run the commands within this project.
 
