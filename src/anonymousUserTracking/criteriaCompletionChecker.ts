@@ -9,7 +9,8 @@ import {
   KEY_EVENT_NAME,
   UPDATECART_ITEM_PREFIX,
   PURCHASE_ITEM_PREFIX,
-  PURCHASE_ITEM
+  PURCHASE_ITEM,
+  UPDATE_USER
 } from '../constants';
 
 interface SearchQuery {
@@ -179,7 +180,8 @@ class CriteriaCompletionChecker {
     this.localStoredEventList.forEach((localEventData) => {
       if (
         localEventData[SHARED_PREFS_EVENT_TYPE] &&
-        localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_EVENT
+        (localEventData[SHARED_PREFS_EVENT_TYPE] === TRACK_EVENT ||
+          localEventData[SHARED_PREFS_EVENT_TYPE] === UPDATE_USER)
       ) {
         const updatedItem: any = localEventData;
         if (localEventData.dataFields) {
@@ -434,15 +436,22 @@ class CriteriaCompletionChecker {
 
   private getFieldValue(data: any, field: string): any {
     const fields: string[] = field.split('.');
+    let startingData = data;
+
     if (data?.eventType === TRACK_EVENT && data?.eventName === fields[0]) {
       fields.shift();
+      // After stripping the event name, look for the remaining path in dataFields if it exists
+      if (data.dataFields) {
+        startingData = data.dataFields;
+      }
     }
+
     return fields.reduce(
       (value, currentField) =>
         value && value[currentField] !== undefined
           ? value[currentField]
           : undefined,
-      data
+      startingData
     );
   }
 

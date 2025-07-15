@@ -382,7 +382,7 @@ export class AnonymousUserEventManager {
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
-      this.createKnownUser(criteriaId);
+      this.createAnonymousUser(criteriaId);
     }
   }
 
