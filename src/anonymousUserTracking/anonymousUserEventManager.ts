@@ -43,6 +43,39 @@ import { updateUserSchema } from '../users/users.schema';
 import { InAppTrackRequestParams } from '../events';
 import config from '../utils/config';
 
+// Type definitions for anonymous event data objects
+interface AnonTrackEventData {
+  eventName: string;
+  createdAt: number;
+  dataFields?: Record<string, any>;
+  createNewFields: boolean;
+  eventType: string;
+}
+
+interface AnonTrackPurchaseData {
+  items: any[];
+  createdAt: number;
+  dataFields?: Record<string, any>;
+  total: number;
+  eventType: string;
+}
+
+interface AnonUpdateCartData {
+  items: any[];
+  eventType: string;
+  preferUserId: boolean;
+  createdAt: number;
+}
+
+interface AnonUserUpdateData extends Record<string, any> {
+  eventType: string;
+}
+
+type AnonEventData =
+  | AnonTrackEventData
+  | AnonTrackPurchaseData
+  | AnonUpdateCartData;
+
 type AnonUserFunction = (userId: string) => void;
 
 let anonUserIdSetter: AnonUserFunction | null = null;
@@ -310,12 +343,7 @@ export class AnonymousUserEventManager {
     localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
   }
 
-  private async storeEventListToLocalStorage(
-    newDataObject: Record<
-      any /* eslint-disable-line @typescript-eslint/no-explicit-any */,
-      any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    >
-  ) {
+  private async storeEventListToLocalStorage(newDataObject: AnonEventData) {
     const anonymousUsageTracked = isAnonymousUsageTracked();
 
     if (!anonymousUsageTracked) return;
@@ -353,10 +381,7 @@ export class AnonymousUserEventManager {
   }
 
   private async storeUserUpdateToLocalStorage(
-    newDataObject: Record<
-      any /* eslint-disable-line @typescript-eslint/no-explicit-any */,
-      any /* eslint-disable-line @typescript-eslint/no-explicit-any */
-    >
+    newDataObject: AnonUserUpdateData
   ) {
     const anonymousUsageTracked = isAnonymousUsageTracked();
 
