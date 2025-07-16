@@ -363,7 +363,10 @@ class CriteriaCompletionChecker {
 
         fields.forEach((subField) => {
           const subFieldValue = fieldValue[subField];
-          if (Array.isArray(subFieldValue)) {
+          if (
+            Array.isArray(subFieldValue) &&
+            subFieldValue?.[0] instanceof Object
+          ) {
             isSubFieldArray = true;
             isSubMatch = subFieldValue.some((item: any) => {
               const data = fields.reduceRight((acc: any, key) => {
@@ -378,7 +381,7 @@ class CriteriaCompletionChecker {
                 ...data
               });
             });
-          } else {
+          } else if (subFieldValue instanceof Object) {
             fieldValue = subFieldValue;
           }
         });

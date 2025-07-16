@@ -8,7 +8,7 @@ export * from './embedded';
 export * from './components/card';
 export * from './components/banner';
 export * from './components/notification';
-export { config } from './utils/config';
+export { config, IdentityResolution } from './utils/config';
 export { IterableConfig } from './utils/IterableConfig';
 
 export interface TextParentStyles {

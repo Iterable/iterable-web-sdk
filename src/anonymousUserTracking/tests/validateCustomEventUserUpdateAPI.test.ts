@@ -7,7 +7,8 @@ import {
   ENDPOINT_MERGE_USER,
   ENDPOINT_TRACK_ANON_SESSION,
   GET_CRITERIA_PATH,
-  GETMESSAGES_PATH
+  GETMESSAGES_PATH,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../../constants';
 import { track } from '../../events';
 import { initializeWithConfig } from '../../authorization';
@@ -137,6 +138,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
       return null;
     });
 
@@ -155,7 +159,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -221,6 +225,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
       return null;
     });
 
@@ -239,7 +246,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -287,6 +294,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
       return null;
     });
 
@@ -306,7 +316,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -358,6 +368,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       if (key === SHARED_PREFS_ANON_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
       return null;
     });
 
@@ -377,7 +390,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonTracking: true }
+      configOptions: { enableAnonActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 

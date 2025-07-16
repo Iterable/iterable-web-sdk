@@ -285,6 +285,8 @@ export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
 export const SHARED_PREF_ANON_USER_ID = 'anon_userId';
+export const SHARED_PREF_ANON_USAGE_TRACKED = 'itbl_anonymous_usage_tracked';
+export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';
@@ -305,6 +307,9 @@ export const PURCHASE_ITEM = 'shoppingCartItems';
 export const UPDATECART_ITEM_PREFIX = 'updateCart.updatedShoppingCartItems.';
 export const PURCHASE_ITEM_PREFIX = `${PURCHASE_ITEM}.`;
 
-export const MERGE_SUCCESSFULL = 'MERGE_SUCCESSFULL';
-export const INITIALIZE_ERROR =
-  'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods';
+export const INITIALIZE_ERROR = new Error(
+  'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods'
+);
+export const AUA_WARNING = new Error(
+  'This event was stored locally because you have Anonymous User Activation enabled. If this was unintentional, please check your SDK configuration settings.'
+);

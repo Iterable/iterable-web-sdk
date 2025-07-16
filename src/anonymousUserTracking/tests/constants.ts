@@ -1042,6 +1042,50 @@ export const IS_NOT_ONE_OF_CRITERIA = {
   ]
 };
 
+export const CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '467',
+      name: 'Custom event - single primitive',
+      createdAt: 1728166585122,
+      updatedAt: 1729581351423,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'animal_found',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal_found.count',
+                      comparatorType: 'DoesNotEqual',
+                      value: '4',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
 export const CUSTOM_EVENT_API_TEST_CRITERIA = {
   count: 1,
   criteriaSets: [
@@ -1168,6 +1212,63 @@ export const USER_MERGE_SCENARIO_CRITERIA = {
                       field: 'eventName',
                       comparatorType: 'Equals',
                       value: 'testEvent',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA_MULTI_LEVEL_MORE_THAN_4_EVENTS = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '484',
+      name: 'NickBBFinalUserFlow',
+      createdAt: 1729009617581,
+      updatedAt: 1730096250121,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'likes_boba',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'cancelled_booking.details.event.name',
+                      comparatorType: 'Equals',
+                      value: 'haircut',
                       fieldType: 'string'
                     }
                   ]

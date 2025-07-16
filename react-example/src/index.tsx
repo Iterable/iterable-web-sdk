@@ -47,7 +47,7 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true
+      enableAnonActivation: true
     },
     generateJWT: ({ email, userID }) =>
       axios
@@ -67,8 +67,15 @@ const HomeLink = styled(Link)`
         )
         .then((response: any) => response.data?.token)
   };
-  const { setEmail, setUserID, logout, refreshJwtToken } =
-    initializeWithConfig(initializeParams);
+  const {
+    setEmail,
+    setUserID,
+    logout,
+    refreshJwtToken,
+    setVisitorUsageTracked
+  } = initializeWithConfig(initializeParams);
+
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   const container = document.getElementById('root');
   const root = createRoot(container);
@@ -100,7 +107,10 @@ const HomeLink = styled(Link)`
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
               />
-              <Route path="/aut-testing" element={<AUTTesting />} />
+              <Route
+                path="/aut-testing"
+                element={<AUTTesting setConsent={handleConsent} />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>

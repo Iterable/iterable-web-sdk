@@ -46,17 +46,17 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonTracking: true,
-      identityResolution: {
-        onAnonUserCreated: (userId: string) => {
-          console.log('onAnonUserCreated', userId);
-        }
+      enableAnonActivation: true,
+      onAnonUserCreated: (userId: string) => {
+        console.log('onAnonUserCreated', userId);
       }
     }
   };
 
-  const { setUserID, logout, setEmail } =
+  const { setUserID, logout, setEmail, setVisitorUsageTracked } =
     initializeWithConfig(initializeParams);
+
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   // eslint-disable-next-line react/no-deprecated
   ReactDOM.render(
@@ -86,7 +86,10 @@ const HomeLink = styled(Link)`
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
               />
-              <Route path="/aut-testing" element={<AUTTesting />} />
+              <Route
+                path="/aut-testing"
+                element={<AUTTesting setConsent={handleConsent} />}
+              />
             </Routes>
           </RouteWrapper>
         </UserProvider>

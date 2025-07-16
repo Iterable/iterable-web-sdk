@@ -2,6 +2,7 @@
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
 
+import { IdentityResolution } from '@iterable/web-sdk';
 import { TextField as _TextField } from './TextField';
 import { Button as _Button } from './Button';
 
@@ -39,7 +40,10 @@ const Error = styled.div`
 
 interface Props {
   setEmail: (email: string) => Promise<void>;
-  setUserId: (userId: string, merge?: boolean) => Promise<void>;
+  setUserId: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<void>;
   logout: () => void;
 }
 
@@ -62,7 +66,7 @@ export const LoginFormWithoutJWT: FC<Props> = ({
 
     const setUser = useEmail ? setEmail : setUserId;
 
-    setUser(user, true)
+    setUser(user)
       .then(() => {
         setEditingUser(false);
         setLoggedInUser({ type: 'user_update', data: user });

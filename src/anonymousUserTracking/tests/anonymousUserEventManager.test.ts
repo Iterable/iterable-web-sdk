@@ -3,7 +3,8 @@ import { baseIterableRequest } from '../../request';
 import {
   SHARED_PREFS_ANON_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
-  SHARED_PREFS_CRITERIA
+  SHARED_PREFS_CRITERIA,
+  SHARED_PREF_ANON_USAGE_TRACKED
 } from '../../constants';
 import { UpdateUserParams } from '../../users';
 import { TrackPurchaseRequestParams } from '../../commerce';
@@ -52,9 +53,15 @@ describe('AnonymousUserEventManager', () => {
       }
     };
 
-    localStorageMock.getItem.mockReturnValue(
-      JSON.stringify(initialAnonSessionInfo)
-    );
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_ANON_SESSIONS) {
+        return JSON.stringify(initialAnonSessionInfo);
+      }
+      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        return 'true';
+      }
+      return null;
+    });
 
     anonUserEventManager.updateAnonSession();
 
@@ -132,7 +139,7 @@ describe('AnonymousUserEventManager', () => {
     anonUserEventManager.updateAnonSession();
   });
 
-  it('should call createKnownUser when trackAnonEvent is called', async () => {
+  it('should call createAnonymousUser when trackAnonEvent is called', async () => {
     const payload = {
       eventName: 'testEvent',
       eventType: 'customEvent'
@@ -194,7 +201,7 @@ describe('AnonymousUserEventManager', () => {
     await anonUserEventManager.trackAnonEvent(payload);
   });
 
-  it('should not call createKnownUser when trackAnonEvent is called and criteria does not match', async () => {
+  it('should not call createAnonymousUser when trackAnonEvent is called and criteria does not match', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -255,7 +262,7 @@ describe('AnonymousUserEventManager', () => {
     await anonUserEventManager.trackAnonEvent(payload);
   });
 
-  it('should not call createKnownUser when trackAnonEvent is called and criteria not find', async () => {
+  it('should not call createAnonymousUser when trackAnonEvent is called and criteria not find', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -281,7 +288,7 @@ describe('AnonymousUserEventManager', () => {
     await anonUserEventManager.trackAnonEvent(payload);
   });
 
-  it('should call createKnownUser when trackAnonUpdateUser is called', async () => {
+  it('should call createAnonymousUser when trackAnonUpdateUser is called', async () => {
     const payload: UpdateUserParams = {
       dataFields: { country: 'UK' }
     };
@@ -342,7 +349,7 @@ describe('AnonymousUserEventManager', () => {
     await anonUserEventManager.trackAnonUpdateUser(payload);
   });
 
-  it('should call createKnownUser when trackAnonPurchaseEvent is called', async () => {
+  it('should call createAnonymousUser when trackAnonPurchaseEvent is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {
@@ -426,7 +433,7 @@ describe('AnonymousUserEventManager', () => {
     await anonUserEventManager.trackAnonPurchaseEvent(payload);
   });
 
-  it('should call createKnownUser when trackAnonUpdateCart is called', async () => {
+  it('should call createAnonymousUser when trackAnonUpdateCart is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {

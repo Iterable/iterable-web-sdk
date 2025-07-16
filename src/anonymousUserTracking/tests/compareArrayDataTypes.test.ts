@@ -11,7 +11,8 @@ import {
   ARRAY_LESS_THAN_EQUAL_TO_CRITERIA,
   ARRAY_MATCHREGEX_CRITERIA,
   ARRAY_STARTSWITH_CRITERIA,
-  IS_ONE_OF_CRITERIA
+  IS_ONE_OF_CRITERIA,
+  CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA
 } from './constants';
 
 const localStorageMock = {
@@ -734,6 +735,70 @@ describe('compareArrayDataTypes', () => {
     const result = checker.getMatchedCriteria(
       JSON.stringify(IS_NOT_ONE_OF_CRITERIA)
     );
+    expect(result).toEqual(null);
+  });
+
+  it('should return criteriaId 467 (Custom event - single primitive array)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              count: [5, 8, 9]
+            },
+            eventType: 'customEvent',
+            eventName: 'animal_found'
+          }
+        ]);
+      }
+
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA)
+    );
+
+    expect(result).toEqual('467');
+  });
+
+  it('should return criteriaId null (Custom event - single primitive array - No match)', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+        return JSON.stringify([
+          {
+            dataFields: {
+              count: [4, 8, 9]
+            },
+            eventType: 'customEvent',
+            eventName: 'animal_found'
+          }
+        ]);
+      }
+
+      return null;
+    });
+
+    const localStoredEventList = localStorage.getItem(
+      SHARED_PREFS_EVENT_LIST_KEY
+    );
+
+    const checker = new CriteriaCompletionChecker(
+      localStoredEventList === null ? '' : localStoredEventList
+    );
+
+    const result = checker.getMatchedCriteria(
+      JSON.stringify(CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA)
+    );
+
     expect(result).toEqual(null);
   });
 });

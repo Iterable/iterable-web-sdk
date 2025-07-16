@@ -2,11 +2,22 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { updateSubscriptions, updateUser, updateUserEmail } from './users';
 import { createClientError } from '../utils/testUtils';
+import { setTypeOfAuthForTestingOnly } from '../authorization';
 // import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+};
+
 describe('Users Requests', () => {
+  beforeEach(() => {
+    (global as any).localStorage = localStorageMock;
+    setTypeOfAuthForTestingOnly('email');
+  });
   it('should set params and return the correct payload for updateUser', async () => {
     mockRequest.onPost('/users/update').reply(200, {
       msg: 'hello'

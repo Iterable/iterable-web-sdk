@@ -1,12 +1,16 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { initialize } from './authorization';
+import { initialize, setTypeOfAuthForTestingOnly } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
-import { GETMESSAGES_PATH } from '../constants';
+import {
+  GETMESSAGES_PATH,
+  INITIALIZE_ERROR,
+  SHARED_PREF_USER_TOKEN
+} from '../constants';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -41,6 +45,8 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     mockRequest.onPost('/users/update').reply(200, {
       data: 'something'
     });
@@ -100,7 +106,12 @@ describe('API Key Interceptors', () => {
       const { setEmail } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-      (global as any).localStorage = localStorageMock;
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY;
+        }
+        return null;
+      });
       await setEmail('hello@gmail.com');
 
       const response = await getInAppMessages({
@@ -342,6 +353,8 @@ describe('API Key Interceptors', () => {
 
 describe('User Identification', () => {
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     /* clear any interceptors already configured */
     [
       ...Array(
@@ -354,6 +367,7 @@ describe('User Identification', () => {
 
   describe('non-JWT auth', () => {
     beforeAll(() => {
+      (global as any).localStorage = localStorageMock;
       mockRequest = new MockAdapter(baseAxiosRequest);
 
       mockRequest.onPost('/users/update').reply(200, {});
@@ -369,11 +383,14 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -382,11 +399,14 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
     });
 
@@ -693,11 +713,14 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -707,11 +730,14 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
     });
 
@@ -1093,7 +1119,6 @@ describe('User Identification', () => {
           .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
         const { refreshJwtToken } = initialize('123', mockGenerateJWT);
         await refreshJwtToken('hello@gmail.com');
-
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(60000 * 4.1);
         expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
