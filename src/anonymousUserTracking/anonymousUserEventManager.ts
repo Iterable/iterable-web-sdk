@@ -2,7 +2,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
   UpdateCartRequestParams,
-  TrackPurchaseRequestParams
+  TrackPurchaseRequestParams,
+  CommerceItem
 } from '../commerce/types';
 
 import {
@@ -44,32 +45,32 @@ import { InAppTrackRequestParams } from '../events';
 import config from '../utils/config';
 
 // Type definitions for anonymous event data objects
-interface AnonTrackEventData {
+type AnonTrackEventData = {
   eventName: string;
   createdAt: number;
   dataFields?: Record<string, any>;
   createNewFields: boolean;
   eventType: string;
-}
+};
 
-interface AnonTrackPurchaseData {
-  items: any[];
+type AnonTrackPurchaseData = {
+  items: CommerceItem[];
   createdAt: number;
   dataFields?: Record<string, any>;
   total: number;
   eventType: string;
-}
+};
 
-interface AnonUpdateCartData {
-  items: any[];
+type AnonUpdateCartData = {
+  items: CommerceItem[];
   eventType: string;
   preferUserId: boolean;
   createdAt: number;
-}
+};
 
-interface AnonUserUpdateData extends Record<string, any> {
+type AnonUserUpdateData = Record<string, any> & {
   eventType: string;
-}
+};
 
 type AnonEventData =
   | AnonTrackEventData
