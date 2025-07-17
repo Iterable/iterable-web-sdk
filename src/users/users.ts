@@ -4,8 +4,8 @@ import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
-import { AnonymousUserEventManager } from '../anonymousUserTracking/anonymousUserEventManager';
-import { canTrackAnonUser } from '../utils/commonFunctions';
+import { UnknownUserEventManager } from '../unknownUserTracking/unknownUserEventManager';
+import { canTrackUnknownUser } from '../utils/commonFunctions';
 import { AUA_WARNING, ENDPOINTS } from '../constants';
 
 export const updateUserEmail = (newEmail: string) =>
@@ -28,9 +28,9 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   delete (payload as any).userId;
   delete (payload as any).email;
 
-  if (canTrackAnonUser()) {
-    const anonymousUserEventManager = new AnonymousUserEventManager();
-    anonymousUserEventManager.trackAnonUpdateUser(payload);
+  if (canTrackUnknownUser()) {
+    const unknownUserEventManager = new UnknownUserEventManager();
+    unknownUserEventManager.trackUnknownUpdateUser(payload);
     return Promise.reject(AUA_WARNING);
   }
   return baseIterableRequest<IterableResponse>({

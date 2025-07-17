@@ -1,10 +1,10 @@
-import { AnonymousUserEventManager } from '../anonymousUserEventManager';
+import { UnknownUserEventManager } from '../unknownUserEventManager';
 import { baseIterableRequest } from '../../request';
 import {
-  SHARED_PREFS_ANON_SESSIONS,
+  SHARED_PREFS_UNKNOWN_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
-  SHARED_PREF_ANON_USAGE_TRACKED
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED
 } from '../../constants';
 import { UpdateUserParams } from '../../users';
 import { TrackPurchaseRequestParams } from '../../commerce';
@@ -32,19 +32,19 @@ declare global {
   function setUserID(): string;
 }
 
-describe('AnonymousUserEventManager', () => {
-  let anonUserEventManager: AnonymousUserEventManager;
+describe('UnknownUserEventManager', () => {
+  let unknownUserEventManager: UnknownUserEventManager;
 
   beforeEach(() => {
     (global as any).localStorage = localStorageMock;
-    anonUserEventManager = new AnonymousUserEventManager();
+    unknownUserEventManager = new UnknownUserEventManager();
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should update anonymous session information correctly', () => {
+  it('should update unknown session information correctly', () => {
     const initialAnonSessionInfo = {
       itbl_anon_sessions: {
         number_of_sessions: 1,
@@ -54,20 +54,20 @@ describe('AnonymousUserEventManager', () => {
     };
 
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_ANON_SESSIONS) {
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
-      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+      if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
       }
       return null;
     });
 
-    anonUserEventManager.updateAnonSession();
+    unknownUserEventManager.updateUnknownSession();
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
-      SHARED_PREFS_ANON_SESSIONS,
-      expect.stringContaining('itbl_anon_sessions')
+      SHARED_PREFS_UNKNOWN_SESSIONS,
+      expect.stringContaining('itbl_unknown_sessions')
     );
   });
 
@@ -76,7 +76,7 @@ describe('AnonymousUserEventManager', () => {
     (baseIterableRequest as jest.Mock).mockResolvedValueOnce(mockResponse);
 
     const setItemMock = jest.spyOn(localStorage, 'setItem');
-    await anonUserEventManager.getAnonCriteria();
+    await unknownUserEventManager.getUnknownCriteria();
 
     expect(setItemMock).toHaveBeenCalledWith(
       SHARED_PREFS_CRITERIA,
@@ -130,16 +130,16 @@ describe('AnonymousUserEventManager', () => {
           ]
         });
       }
-      if (key === SHARED_PREFS_ANON_SESSIONS) {
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
         return JSON.stringify(userData);
       }
       return null;
     });
 
-    anonUserEventManager.updateAnonSession();
+    unknownUserEventManager.updateUnknownSession();
   });
 
-  it('should call createAnonymousUser when trackAnonEvent is called', async () => {
+  it('should call createUnknownUser when trackAnonEvent is called', async () => {
     const payload = {
       eventName: 'testEvent',
       eventType: 'customEvent'
@@ -198,10 +198,10 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonEvent(payload);
+    await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should not call createAnonymousUser when trackAnonEvent is called and criteria does not match', async () => {
+  it('should not call createUnknownUser when trackAnonEvent is called and criteria does not match', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -259,10 +259,10 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonEvent(payload);
+    await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should not call createAnonymousUser when trackAnonEvent is called and criteria not find', async () => {
+  it('should not call createUnknownUser when trackAnonEvent is called and criteria not find', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -285,10 +285,10 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonEvent(payload);
+    await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should call createAnonymousUser when trackAnonUpdateUser is called', async () => {
+  it('should call createUnknownUser when trackAnonUpdateUser is called', async () => {
     const payload: UpdateUserParams = {
       dataFields: { country: 'UK' }
     };
@@ -346,10 +346,10 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonUpdateUser(payload);
+    await unknownUserEventManager.trackUnknownUpdateUser(payload);
   });
 
-  it('should call createAnonymousUser when trackAnonPurchaseEvent is called', async () => {
+  it('should call createUnknownUser when trackAnonPurchaseEvent is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {
@@ -430,10 +430,10 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonPurchaseEvent(payload);
+    await unknownUserEventManager.trackUnknownPurchaseEvent(payload);
   });
 
-  it('should call createAnonymousUser when trackAnonUpdateCart is called', async () => {
+  it('should call createUnknownUser when trackAnonUpdateCart is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {
@@ -514,6 +514,6 @@ describe('AnonymousUserEventManager', () => {
       }
       return null;
     });
-    await anonUserEventManager.trackAnonUpdateCart(payload);
+    await unknownUserEventManager.trackUnknownUpdateCart(payload);
   });
 });

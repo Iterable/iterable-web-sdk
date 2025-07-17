@@ -21,19 +21,19 @@ import {
   UPDATE_USER,
   TRACK_UPDATE_CART,
   SHARED_PREFS_CRITERIA,
-  SHARED_PREFS_ANON_SESSIONS,
-  ENDPOINT_TRACK_ANON_SESSION,
+  SHARED_PREFS_UNKNOWN_SESSIONS,
+  ENDPOINT_TRACK_UNKNOWN_SESSION,
   WEB_PLATFORM,
   KEY_PREFER_USERID,
   ENDPOINTS,
   DEFAULT_EVENT_THRESHOLD_LIMIT,
-  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../constants';
 import { baseIterableRequest } from '../request';
 import { IterableResponse } from '../types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
-import { TrackAnonSessionParams } from '../utils/types';
+import { TrackUnknownSessionParams } from '../utils/types';
 import { UpdateUserParams } from '../users/types';
 import { trackSchema } from '../events/events.schema';
 import {
@@ -44,8 +44,8 @@ import { updateUserSchema } from '../users/users.schema';
 import { InAppTrackRequestParams } from '../events';
 import config from '../utils/config';
 
-// Type definitions for anonymous event data objects
-type AnonTrackEventData = {
+// Type definitions for unknown event data objects
+type UnknownTrackEventData = {
   eventName: string;
   createdAt: number;
   dataFields?: Record<string, any>;
@@ -53,7 +53,7 @@ type AnonTrackEventData = {
   eventType: string;
 };
 
-type AnonTrackPurchaseData = {
+type UnknownTrackPurchaseData = {
   items: CommerceItem[];
   createdAt: number;
   dataFields?: Record<string, any>;
@@ -61,87 +61,90 @@ type AnonTrackPurchaseData = {
   eventType: string;
 };
 
-type AnonUpdateCartData = {
+type UnknownUpdateCartData = {
   items: CommerceItem[];
   eventType: string;
   preferUserId: boolean;
   createdAt: number;
 };
 
-type AnonUserUpdateData = Record<string, any> & {
+type UnknownUserUpdateData = Record<string, any> & {
   eventType: string;
 };
 
-type AnonEventData =
-  | AnonTrackEventData
-  | AnonTrackPurchaseData
-  | AnonUpdateCartData;
+type UnknownEventData =
+  | UnknownTrackEventData
+  | UnknownTrackPurchaseData
+  | UnknownUpdateCartData;
 
-type AnonUserFunction = (userId: string) => void;
+type UnknownUserFunction = (userId: string) => void;
 
-let anonUserIdSetter: AnonUserFunction | null = null;
+let unknownUserIdSetter: UnknownUserFunction | null = null;
 
-export function registerAnonUserIdSetter(setterFunction: AnonUserFunction) {
-  anonUserIdSetter = setterFunction;
+export function registerUnknownUserIdSetter(
+  setterFunction: UnknownUserFunction
+) {
+  unknownUserIdSetter = setterFunction;
 }
 
-export function isAnonymousUsageTracked(): boolean {
-  const anonymousUsageTracked = localStorage.getItem(
-    SHARED_PREF_ANON_USAGE_TRACKED
+export function isUnknownUsageTracked(): boolean {
+  const unknownUsageTracked = localStorage.getItem(
+    SHARED_PREF_UNKNOWN_USAGE_TRACKED
   );
-  return anonymousUsageTracked === 'true';
+  return unknownUsageTracked === 'true';
 }
 
-export class AnonymousUserEventManager {
-  updateAnonSession() {
+export class UnknownUserEventManager {
+  updateUnknownSession() {
     try {
-      const anonymousUsageTracked = isAnonymousUsageTracked();
+      const unknownUsageTracked = isUnknownUsageTracked();
 
-      if (!anonymousUsageTracked) return;
+      if (!unknownUsageTracked) return;
 
-      const strAnonSessionInfo = localStorage.getItem(
-        SHARED_PREFS_ANON_SESSIONS
+      const strUnknownSessionInfo = localStorage.getItem(
+        SHARED_PREFS_UNKNOWN_SESSIONS
       );
-      let anonSessionInfo: {
-        itbl_anon_sessions?: {
+      let unknownSessionInfo: {
+        itbl_unknown_sessions?: {
           number_of_sessions?: number;
           first_session?: number;
           last_session?: number;
         };
       } = {};
 
-      if (strAnonSessionInfo) {
-        anonSessionInfo = JSON.parse(strAnonSessionInfo);
+      if (strUnknownSessionInfo) {
+        unknownSessionInfo = JSON.parse(strUnknownSessionInfo);
       }
 
       // Update existing values or set them if they don't exist
-      anonSessionInfo.itbl_anon_sessions =
-        anonSessionInfo.itbl_anon_sessions || {};
-      anonSessionInfo.itbl_anon_sessions.number_of_sessions =
-        (anonSessionInfo.itbl_anon_sessions.number_of_sessions || 0) + 1;
-      anonSessionInfo.itbl_anon_sessions.first_session =
-        anonSessionInfo.itbl_anon_sessions.first_session ||
+      unknownSessionInfo.itbl_unknown_sessions =
+        unknownSessionInfo.itbl_unknown_sessions || {};
+      unknownSessionInfo.itbl_unknown_sessions.number_of_sessions =
+        (unknownSessionInfo.itbl_unknown_sessions.number_of_sessions || 0) + 1;
+      unknownSessionInfo.itbl_unknown_sessions.first_session =
+        unknownSessionInfo.itbl_unknown_sessions.first_session ||
         this.getCurrentTime();
-      anonSessionInfo.itbl_anon_sessions.last_session = this.getCurrentTime();
+      unknownSessionInfo.itbl_unknown_sessions.last_session =
+        this.getCurrentTime();
 
       // Update the structure to the desired format
       const outputObject = {
-        itbl_anon_sessions: anonSessionInfo.itbl_anon_sessions
+        itbl_unknown_sessions: unknownSessionInfo.itbl_unknown_sessions
       };
 
       localStorage.setItem(
-        SHARED_PREFS_ANON_SESSIONS,
+        SHARED_PREFS_UNKNOWN_SESSIONS,
         JSON.stringify(outputObject)
       );
     } catch (error) {
-      console.error('Error updating anonymous session:', error);
+      console.error('Error updating unknown session:', error);
     }
   }
 
-  getAnonCriteria() {
-    const anonymousUsageTracked = isAnonymousUsageTracked();
+  getUnknownCriteria() {
+    const unknownUsageTracked = isUnknownUsageTracked();
 
-    if (!anonymousUsageTracked) return;
+    if (!unknownUsageTracked) return;
 
     baseIterableRequest<IterableResponse>({
       method: 'GET',
@@ -163,7 +166,7 @@ export class AnonymousUserEventManager {
       });
   }
 
-  async trackAnonEvent(payload: InAppTrackRequestParams) {
+  async trackUnknownEvent(payload: InAppTrackRequestParams) {
     const newDataObject = {
       [KEY_EVENT_NAME]: payload.eventName,
       [KEY_CREATED_AT]: this.getCurrentTime(),
@@ -174,7 +177,7 @@ export class AnonymousUserEventManager {
     this.storeEventListToLocalStorage(newDataObject);
   }
 
-  async trackAnonUpdateUser(payload: UpdateUserParams) {
+  async trackUnknownUpdateUser(payload: UpdateUserParams) {
     const newDataObject = {
       ...payload.dataFields,
       [SHARED_PREFS_EVENT_TYPE]: UPDATE_USER
@@ -182,7 +185,7 @@ export class AnonymousUserEventManager {
     this.storeUserUpdateToLocalStorage(newDataObject);
   }
 
-  async trackAnonPurchaseEvent(payload: TrackPurchaseRequestParams) {
+  async trackUnknownPurchaseEvent(payload: TrackPurchaseRequestParams) {
     const newDataObject = {
       [KEY_ITEMS]: payload.items,
       [KEY_CREATED_AT]: this.getCurrentTime(),
@@ -193,7 +196,7 @@ export class AnonymousUserEventManager {
     this.storeEventListToLocalStorage(newDataObject);
   }
 
-  async trackAnonUpdateCart(payload: UpdateCartRequestParams) {
+  async trackUnknownUpdateCart(payload: UpdateCartRequestParams) {
     const newDataObject = {
       [KEY_ITEMS]: payload.items,
       [SHARED_PREFS_EVENT_TYPE]: TRACK_UPDATE_CART,
@@ -226,12 +229,12 @@ export class AnonymousUserEventManager {
     return null;
   }
 
-  private async createAnonymousUser(criteriaId: string) {
-    const anonymousUsageTracked = isAnonymousUsageTracked();
+  private async createUnknownUser(criteriaId: string) {
+    const unknownUsageTracked = isUnknownUsageTracked();
 
-    if (!anonymousUsageTracked) return;
+    if (!unknownUsageTracked) return;
 
-    const userData = localStorage.getItem(SHARED_PREFS_ANON_SESSIONS);
+    const userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
     const strUserUpdate = localStorage.getItem(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
@@ -243,8 +246,8 @@ export class AnonymousUserEventManager {
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);
-      const userDataJson = userSessionInfo[SHARED_PREFS_ANON_SESSIONS];
-      const payload: TrackAnonSessionParams = {
+      const userDataJson = userSessionInfo[SHARED_PREFS_UNKNOWN_SESSIONS] || {};
+      const payload: TrackUnknownSessionParams = {
         user: {
           userId,
           mergeNestedObjects: true,
@@ -257,10 +260,12 @@ export class AnonymousUserEventManager {
           deviceId: global.navigator.userAgent || '',
           platform: WEB_PLATFORM
         },
-        anonSessionContext: {
-          totalAnonSessionCount: userDataJson.number_of_sessions,
-          lastAnonSession: userDataJson.last_session,
-          firstAnonSession: userDataJson.first_session,
+        unknownSessionContext: {
+          totalUnknownSessionCount: userDataJson.number_of_sessions || 0,
+          lastUnknownSession:
+            userDataJson.last_session || this.getCurrentTime(),
+          firstUnknownSession:
+            userDataJson.first_session || this.getCurrentTime(),
           matchedCriteriaId: parseInt(criteriaId, 10),
           webPushOptIn:
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
@@ -268,23 +273,23 @@ export class AnonymousUserEventManager {
       };
       const response = await baseIterableRequest<IterableResponse>({
         method: 'POST',
-        url: ENDPOINT_TRACK_ANON_SESSION,
+        url: ENDPOINT_TRACK_UNKNOWN_SESSION,
         data: payload
       }).catch((e) => {
         if (e?.response?.status === 409) {
-          this.getAnonCriteria();
+          this.getUnknownCriteria();
         }
       });
       if (response?.status === 200) {
         localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
 
-        const onAnonUserCreated = config.getConfig('onAnonUserCreated');
+        const onUnknownUserCreated = config.getConfig('onUnknownUserCreated');
 
-        if (onAnonUserCreated) {
-          onAnonUserCreated(userId);
+        if (onUnknownUserCreated) {
+          onUnknownUserCreated(userId);
         }
-        if (anonUserIdSetter !== null) {
-          await anonUserIdSetter(userId);
+        if (unknownUserIdSetter !== null) {
+          await unknownUserIdSetter(userId);
         }
         this.syncEvents();
       }
@@ -326,7 +331,7 @@ export class AnonymousUserEventManager {
             default:
               break;
           }
-          this.removeAnonSessionCriteriaData();
+          this.removeUnknownSessionCriteriaData();
         }
       );
     }
@@ -338,16 +343,16 @@ export class AnonymousUserEventManager {
     }
   }
 
-  removeAnonSessionCriteriaData() {
-    localStorage.removeItem(SHARED_PREFS_ANON_SESSIONS);
+  removeUnknownSessionCriteriaData() {
+    localStorage.removeItem(SHARED_PREFS_UNKNOWN_SESSIONS);
     localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
     localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
   }
 
-  private async storeEventListToLocalStorage(newDataObject: AnonEventData) {
-    const anonymousUsageTracked = isAnonymousUsageTracked();
+  private async storeEventListToLocalStorage(newDataObject: UnknownEventData) {
+    const unknownUsageTracked = isUnknownUsageTracked();
 
-    if (!anonymousUsageTracked) return;
+    if (!unknownUsageTracked) return;
 
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     let previousDataArray = [];
@@ -377,16 +382,16 @@ export class AnonymousUserEventManager {
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
-      this.createAnonymousUser(criteriaId);
+      this.createUnknownUser(criteriaId);
     }
   }
 
   private async storeUserUpdateToLocalStorage(
-    newDataObject: AnonUserUpdateData
+    newDataObject: UnknownUserUpdateData
   ) {
-    const anonymousUsageTracked = isAnonymousUsageTracked();
+    const unknownUsageTracked = isUnknownUsageTracked();
 
-    if (!anonymousUsageTracked) return;
+    if (!unknownUsageTracked) return;
 
     const strUserUpdate = localStorage.getItem(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY
@@ -408,7 +413,7 @@ export class AnonymousUserEventManager {
     );
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
-      this.createAnonymousUser(criteriaId);
+      this.createUnknownUser(criteriaId);
     }
   }
 

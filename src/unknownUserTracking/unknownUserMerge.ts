@@ -10,7 +10,7 @@ export type MergeApiParams = {
   destinationUserId: string | null;
 };
 
-export class AnonymousUserMerge {
+export class UnknownUserMerge {
   mergeUser(
     sourceUserId: string | null,
     sourceEmail: string | null,

@@ -5,10 +5,10 @@ import { clearMessages } from 'src/inapp/inapp';
 import {
   IS_PRODUCTION,
   STATIC_HEADERS,
-  SHARED_PREF_ANON_USER_ID,
+  SHARED_PREF_UNKNOWN_USER_ID,
   ENDPOINTS,
   RouteConfig,
-  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREFS_CRITERIA
 } from 'src/constants';
 import {
@@ -20,12 +20,12 @@ import {
   validateTokenTime,
   isEmail
 } from './utils';
-import { AnonymousUserMerge } from 'src/anonymousUserTracking/anonymousUserMerge';
+import { UnknownUserMerge } from 'src/unknownUserTracking/unknownUserMerge';
 import {
-  AnonymousUserEventManager,
-  isAnonymousUsageTracked,
-  registerAnonUserIdSetter
-} from 'src/anonymousUserTracking/anonymousUserEventManager';
+  UnknownUserEventManager,
+  isUnknownUsageTracked,
+  registerUnknownUserIdSetter
+} from 'src/unknownUserTracking/unknownUserEventManager';
 import { IdentityResolution, Options, config } from 'src/utils/config';
 import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
 import AuthorizationToken from 'src/utils/authorizationToken';
@@ -33,9 +33,7 @@ import AuthorizationToken from 'src/utils/authorizationToken';
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
-let apiKey: null | string = null;
-let generateJWTGlobal: any = null;
-const anonUserManager = new AnonymousUserEventManager();
+const unknownUserManager = new UnknownUserEventManager();
 
 export interface GenerateJWTPayload {
   email?: string;
@@ -70,48 +68,32 @@ export interface WithoutJWT {
   clearVisitorEventsAndUserData: () => void;
 }
 
-export const setAnonUserId = async (userId: string) => {
-  const anonymousUsageTracked = isAnonymousUsageTracked();
+export const setUnknownUserId = async (userId: string) => {
+  const unknownUsageTracked = isUnknownUsageTracked();
 
-  if (!anonymousUsageTracked) return;
+  if (!unknownUsageTracked) return;
 
-  let token: null | string = null;
-  if (generateJWTGlobal) {
-    token = await generateJWTGlobal({ userID: userId });
-  }
-
-  if (token) {
-    const authorizationToken = new AuthorizationToken();
-    authorizationToken.setToken(token);
-  }
-
-  baseAxiosRequest.interceptors.request.use((config) => {
-    config.headers.set('Api-Key', apiKey);
-
-    return config;
-  });
   addUserIdToRequest(userId);
-  localStorage.setItem(SHARED_PREF_ANON_USER_ID, userId);
+  localStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
 };
 
-registerAnonUserIdSetter(setAnonUserId);
+registerUnknownUserIdSetter(setUnknownUserId);
 
-const clearAnonymousUser = () => {
-  localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
+const clearUnknownUser = () => {
+  localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
 };
 
-const getAnonUserId = () => {
-  if (config.getConfig('enableAnonActivation')) {
-    const anonUser = localStorage.getItem(SHARED_PREF_ANON_USER_ID);
-    return anonUser === undefined ? null : anonUser;
-  } else {
-    return null;
+const getUnknownUserId = () => {
+  if (config.getConfig('enableUnknownActivation')) {
+    const unknownUser = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
+    return unknownUser === undefined ? null : unknownUser;
   }
+  return null;
 };
 
 const initializeUserId = (userId: string) => {
   addUserIdToRequest(userId);
-  clearAnonymousUser();
+  clearUnknownUser();
 };
 
 const addUserIdToRequest = (userId: string) => {
@@ -211,12 +193,12 @@ const addUserIdToRequest = (userId: string) => {
 
 const initializeEmailUser = (email: string) => {
   addEmailToRequest(email);
-  clearAnonymousUser();
+  clearUnknownUser();
 };
 
 const syncEvents = () => {
-  if (config.getConfig('enableAnonActivation')) {
-    anonUserManager.syncEvents();
+  if (config.getConfig('enableUnknownActivation')) {
+    unknownUserManager.syncEvents();
   }
 };
 
@@ -324,8 +306,6 @@ export function initialize(
   authToken: string,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
-  apiKey = authToken;
-  generateJWTGlobal = generateJWT;
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -396,15 +376,15 @@ export function initialize(
 
   const handleTokenExpiration = createTokenExpirationTimer();
 
-  const enableAnonymousTracking = () => {
+  const enableUnknownTracking = () => {
     try {
-      if (config.getConfig('enableAnonActivation')) {
-        anonUserManager.getAnonCriteria();
-        anonUserManager.updateAnonSession();
-        const anonymousUserId = getAnonUserId();
-        if (anonymousUserId !== null) {
-          // This block will restore the anon userID from localstorage
-          setAnonUserId(anonymousUserId);
+      if (config.getConfig('enableUnknownActivation')) {
+                 unknownUserManager.getUnknownCriteria();
+         unknownUserManager.updateUnknownSession();
+        const unknownUserId = getUnknownUserId();
+        if (unknownUserId !== null) {
+          // This block will restore the unknown userID from localstorage
+          setUnknownUserId(unknownUserId);
         }
       }
     } catch (error) {
@@ -418,22 +398,22 @@ export function initialize(
     merge?: boolean
   ): Promise<boolean> => {
     const typeOfAuth = getTypeOfAuth();
-    const enableAnonActivation = config.getConfig('enableAnonActivation');
+    const enableUnknownActivation = config.getConfig('enableUnknownActivation');
     const sourceUserIdOrEmail =
-      authIdentifier === null ? getAnonUserId() : authIdentifier;
+      authIdentifier === null ? getUnknownUserId() : authIdentifier;
     const sourceUserId = typeOfAuth === 'email' ? null : sourceUserIdOrEmail;
     const sourceEmail = typeOfAuth === 'email' ? sourceUserIdOrEmail : null;
     const destinationUserId = isEmail ? null : emailOrUserId;
     const destinationEmail = isEmail ? emailOrUserId : null;
-    // This function will try to merge if anon user exists
+    // This function will try to merge if unknown user exists
     if (
-      (getAnonUserId() !== null || authIdentifier !== null) &&
+      (getUnknownUserId() !== null || authIdentifier !== null) &&
       merge &&
-      enableAnonActivation
+      enableUnknownActivation
     ) {
-      const anonymousUserMerge = new AnonymousUserMerge();
+      const unknownUserMerge = new UnknownUserMerge();
       try {
-        await anonymousUserMerge.mergeUser(
+        await unknownUserMerge.mergeUser(
           sourceUserId,
           sourceEmail,
           destinationUserId,
@@ -447,7 +427,7 @@ export function initialize(
   };
 
   if (!generateJWT) {
-    enableAnonymousTracking();
+    enableUnknownTracking();
     /* we want to set a normal non-JWT enabled API key */
     return {
       setNewAuthToken: (newToken: string) => {
@@ -478,8 +458,8 @@ export function initialize(
           const identityResolutionConfig =
             config.getConfig('identityResolution');
           const merge =
-            identityResolution?.mergeOnAnonymousToKnown ||
-            identityResolutionConfig?.mergeOnAnonymousToKnown;
+            identityResolution?.mergeOnUnknownToKnown ||
+            identityResolutionConfig?.mergeOnUnknownToKnown;
           const replay =
             identityResolution?.replayOnVisitorToKnown ||
             identityResolutionConfig?.replayOnVisitorToKnown;
@@ -490,7 +470,7 @@ export function initialize(
             if (replay) {
               syncEvents();
             } else {
-              anonUserManager.removeAnonSessionCriteriaData();
+              unknownUserManager.removeUnknownSessionCriteriaData();
             }
             return Promise.resolve();
           }
@@ -508,8 +488,8 @@ export function initialize(
           const identityResolutionConfig =
             config.getConfig('identityResolution');
           const merge =
-            identityResolution?.mergeOnAnonymousToKnown ||
-            identityResolutionConfig?.mergeOnAnonymousToKnown;
+            identityResolution?.mergeOnUnknownToKnown ||
+            identityResolutionConfig?.mergeOnUnknownToKnown;
           const replay =
             identityResolution?.replayOnVisitorToKnown ||
             identityResolutionConfig?.replayOnVisitorToKnown;
@@ -520,7 +500,7 @@ export function initialize(
             if (replay) {
               syncEvents();
             } else {
-              anonUserManager.removeAnonSessionCriteriaData();
+              unknownUserManager.removeUnknownSessionCriteriaData();
             }
             return Promise.resolve();
           }
@@ -530,7 +510,7 @@ export function initialize(
         }
       },
       logout: () => {
-        anonUserManager.removeAnonSessionCriteriaData();
+        unknownUserManager.removeUnknownSessionCriteriaData();
         setTypeOfAuth(null);
         authIdentifier = null;
         /* clear fetched in-app messages */
@@ -550,34 +530,34 @@ export function initialize(
         }
       },
       setVisitorUsageTracked: (consent: boolean) => {
-        /* if consent is true, we want to clear anon user data and start tracking from point forward */
+        /* if consent is true, we want to clear unknown user data and start tracking from point forward */
         if (consent) {
-          anonUserManager.removeAnonSessionCriteriaData();
+          unknownUserManager.removeUnknownSessionCriteriaData();
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
-          localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'true');
-          enableAnonymousTracking();
+          localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+          enableUnknownTracking();
         } else {
-          /* if consent is false, we want to stop tracking and clear anon user data */
-          const anonymousUsageTracked = isAnonymousUsageTracked();
-          if (anonymousUsageTracked) {
-            anonUserManager.removeAnonSessionCriteriaData();
+          /* if consent is false, we want to stop tracking and clear unknown user data */
+          const unknownUsageTracked = isUnknownUsageTracked();
+          if (unknownUsageTracked) {
+            unknownUserManager.removeUnknownSessionCriteriaData();
 
             localStorage.removeItem(SHARED_PREFS_CRITERIA);
-            localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-            localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
+            localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+            localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
 
             setTypeOfAuth(null);
             authIdentifier = null;
             /* clear fetched in-app messages */
             clearMessages();
           }
-          localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
+          localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'false');
         }
       },
       clearVisitorEventsAndUserData: () => {
-        anonUserManager.removeAnonSessionCriteriaData();
-        clearAnonymousUser();
+        unknownUserManager.removeUnknownSessionCriteriaData();
+        clearUnknownUser();
       }
     };
   }
@@ -846,7 +826,7 @@ export function initialize(
       });
   };
 
-  enableAnonymousTracking();
+  enableUnknownTracking();
   return {
     clearRefresh: () => {
       /* this will just clear the existing timeout */
@@ -861,8 +841,8 @@ export function initialize(
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
         const merge =
-          identityResolution?.mergeOnAnonymousToKnown ||
-          identityResolutionConfig?.mergeOnAnonymousToKnown;
+          identityResolution?.mergeOnUnknownToKnown ||
+          identityResolutionConfig?.mergeOnUnknownToKnown;
         const replay =
           identityResolution?.replayOnVisitorToKnown ||
           identityResolutionConfig?.replayOnVisitorToKnown;
@@ -876,7 +856,7 @@ export function initialize(
                 if (replay) {
                   syncEvents();
                 } else {
-                  anonUserManager.removeAnonSessionCriteriaData();
+                  unknownUserManager.removeUnknownSessionCriteriaData();
                 }
                 return token;
               }
@@ -906,8 +886,8 @@ export function initialize(
       try {
         const identityResolutionConfig = config.getConfig('identityResolution');
         const merge =
-          identityResolution?.mergeOnAnonymousToKnown ||
-          identityResolutionConfig?.mergeOnAnonymousToKnown;
+          identityResolution?.mergeOnUnknownToKnown ||
+          identityResolutionConfig?.mergeOnUnknownToKnown;
         const replay =
           identityResolution?.replayOnVisitorToKnown ||
           identityResolutionConfig?.replayOnVisitorToKnown;
@@ -921,7 +901,7 @@ export function initialize(
                 if (replay) {
                   syncEvents();
                 } else {
-                  anonUserManager.removeAnonSessionCriteriaData();
+                  unknownUserManager.removeUnknownSessionCriteriaData();
                 }
                 return token;
               }
@@ -944,7 +924,7 @@ export function initialize(
       }
     },
     logout: () => {
-      anonUserManager.removeAnonSessionCriteriaData();
+      unknownUserManager.removeUnknownSessionCriteriaData();
       setTypeOfAuth(null);
       authIdentifier = null;
       /* clear fetched in-app messages */
@@ -978,34 +958,34 @@ export function initialize(
       });
     },
     setVisitorUsageTracked: (consent: boolean) => {
-      /* if consent is true, we want to clear anon user data and start tracking from point forward */
+      /* if consent is true, we want to clear unknown user data and start tracking from point forward */
       if (consent) {
-        anonUserManager.removeAnonSessionCriteriaData();
+        unknownUserManager.removeUnknownSessionCriteriaData();
         localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
-        localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'true');
-        enableAnonymousTracking();
+        localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+        enableUnknownTracking();
       } else {
-        /* if consent is false, we want to stop tracking and clear anon user data */
-        const anonymousUsageTracked = isAnonymousUsageTracked();
-        if (anonymousUsageTracked) {
-          anonUserManager.removeAnonSessionCriteriaData();
+        /* if consent is false, we want to stop tracking and clear unknown user data */
+        const unknownUsageTracked = isUnknownUsageTracked();
+        if (unknownUsageTracked) {
+          unknownUserManager.removeUnknownSessionCriteriaData();
 
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
-          localStorage.removeItem(SHARED_PREF_ANON_USER_ID);
-          localStorage.removeItem(SHARED_PREF_ANON_USAGE_TRACKED);
+          localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+          localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
 
           setTypeOfAuth(null);
           authIdentifier = null;
           /* clear fetched in-app messages */
           clearMessages();
         }
-        localStorage.setItem(SHARED_PREF_ANON_USAGE_TRACKED, 'false');
+        localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'false');
       }
     },
     clearVisitorEventsAndUserData: () => {
-      anonUserManager.removeAnonSessionCriteriaData();
-      clearAnonymousUser();
+      unknownUserManager.removeUnknownSessionCriteriaData();
+      clearUnknownUser();
     }
   };
 }

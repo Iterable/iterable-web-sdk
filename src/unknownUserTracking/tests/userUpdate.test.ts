@@ -1,13 +1,13 @@
 import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../../request';
 import {
-  SHARED_PREFS_ANON_SESSIONS,
+  SHARED_PREFS_UNKNOWN_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
   GET_CRITERIA_PATH,
-  ENDPOINT_TRACK_ANON_SESSION,
+  ENDPOINT_TRACK_UNKNOWN_SESSION,
   ENDPOINT_MERGE_USER,
-  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../../constants';
 import { updateUser } from '../../users';
@@ -65,7 +65,7 @@ describe('UserUpdate', () => {
     mockRequest.onPost('/events/track').reply(200, {});
     mockRequest.onPost('/users/update').reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
-    mockRequest.onPost(ENDPOINT_TRACK_ANON_SESSION).reply(200, {});
+    mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
   });
 
   beforeEach(() => {
@@ -75,7 +75,7 @@ describe('UserUpdate', () => {
     mockRequest.onPost('/users/update').reply(200, {});
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
-    mockRequest.onPost(ENDPOINT_TRACK_ANON_SESSION).reply(200, {});
+    mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
     jest.resetAllMocks();
     jest.useFakeTimers();
   });
@@ -94,10 +94,10 @@ describe('UserUpdate', () => {
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(CUSTOM_EVENT_API_TEST_CRITERIA);
       }
-      if (key === SHARED_PREFS_ANON_SESSIONS) {
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
         return JSON.stringify(initialAnonSessionInfo);
       }
-      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+      if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
       }
       return null;
@@ -105,7 +105,7 @@ describe('UserUpdate', () => {
 
     const { logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableAnonActivation: true }
+      configOptions: { enableUnknownActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -120,7 +120,7 @@ describe('UserUpdate', () => {
     );
 
     const trackEvents = mockRequest.history.post.filter(
-      (req) => req.url === '/anonymoususer/events/session'
+      (req) => req.url === '/unknownuser/events/session'
     );
 
     expect(trackEvents.length > 0).toBe(true);
