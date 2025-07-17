@@ -1,4 +1,4 @@
-interface CommerceItem {
+export interface CommerceItem {
   id: string;
   sku?: string;
   name: string;
