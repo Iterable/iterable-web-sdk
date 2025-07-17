@@ -33,6 +33,8 @@ import AuthorizationToken from 'src/utils/authorizationToken';
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
+let apiKey: null | string = null;
+let generateJWTGlobal: any = null;
 const unknownUserManager = new UnknownUserEventManager();
 
 export interface GenerateJWTPayload {
@@ -73,6 +75,21 @@ export const setUnknownUserId = async (userId: string) => {
 
   if (!unknownUsageTracked) return;
 
+  let token: null | string = null;
+  if (generateJWTGlobal) {
+    token = await generateJWTGlobal({ userID: userId });
+  }
+
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
+  baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', apiKey);
+
+    return config;
+  });
   addUserIdToRequest(userId);
   localStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
 };
@@ -306,6 +323,8 @@ export function initialize(
   authToken: string,
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
+  apiKey = authToken;
+  generateJWTGlobal = generateJWT;
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
