@@ -1,4 +1,7 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../../constants';
+import {
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+} from '../../constants';
 import CriteriaCompletionChecker from '../criteriaCompletionChecker';
 import {
   IS_NOT_ONE_OF_CRITERIA,
@@ -32,17 +35,6 @@ describe('compareArrayDataTypes', () => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
-            dataFields: {
-              milestoneYears: [1996, 1997, 2002, 2020, 2024],
-              score: [10.5, 11.5, 12.5, 13.5, 14.5],
-              timestamp: [
-                1722497422151, 1722500235276, 1722500215276, 1722500225276,
-                1722500245276
-              ]
-            },
-            eventType: 'user'
-          },
-          {
             eventName: 'button-clicked',
             dataFields: {
               animal: ['cat', 'dog', 'giraffe']
@@ -51,6 +43,19 @@ describe('compareArrayDataTypes', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1996, 1997, 2002, 2020, 2024],
+            score: [10.5, 11.5, 12.5, 13.5, 14.5],
+            timestamp: [
+              1722497422151, 1722500235276, 1722500215276, 1722500225276,
+              1722500245276
+            ]
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -58,8 +63,13 @@ describe('compareArrayDataTypes', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_EQUAL_CRITERIA)
@@ -72,16 +82,6 @@ describe('compareArrayDataTypes', () => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
-            dataFields: {
-              milestoneYears: [1996, 1998, 2002, 2020, 2024],
-              score: [12.5, 13.5, 14.5],
-              timestamp: [
-                1722497422151, 1722500235276, 1722500225276, 1722500245276
-              ]
-            },
-            eventType: 'user'
-          },
-          {
             eventName: 'button-clicked',
             dataFields: {
               animal: ['cat', 'dog']
@@ -90,6 +90,18 @@ describe('compareArrayDataTypes', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1996, 1998, 2002, 2020, 2024],
+            score: [12.5, 13.5, 14.5],
+            timestamp: [
+              1722497422151, 1722500235276, 1722500225276, 1722500245276
+            ]
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -97,8 +109,13 @@ describe('compareArrayDataTypes', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_EQUAL_CRITERIA)
@@ -112,16 +129,6 @@ describe('compareArrayDataTypes', () => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
-            dataFields: {
-              milestoneYears: [1996, 1998, 2002, 2020, 2024],
-              score: [12.5, 13.5, 14.5],
-              timestamp: [
-                1722497422151, 1722500235276, 1722500225276, 1722500245276
-              ]
-            },
-            eventType: 'user'
-          },
-          {
             eventName: 'button-clicked',
             dataFields: {
               animal: ['cat', 'dog']
@@ -130,6 +137,18 @@ describe('compareArrayDataTypes', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1996, 1998, 2002, 2020, 2024],
+            score: [12.5, 13.5, 14.5],
+            timestamp: [
+              1722497422151, 1722500235276, 1722500225276, 1722500245276
+            ]
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -137,8 +156,13 @@ describe('compareArrayDataTypes', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_DOES_NOT_EQUAL_CRITERIA)
@@ -151,17 +175,6 @@ describe('compareArrayDataTypes', () => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
         return JSON.stringify([
           {
-            dataFields: {
-              milestoneYears: [1996, 1997, 2002, 2020, 2024],
-              score: [10.5, 11.5, 12.5, 13.5, 14.5],
-              timestamp: [
-                1722497422151, 1722500235276, 1722500215276, 1722500225276,
-                1722500245276
-              ]
-            },
-            eventType: 'user'
-          },
-          {
             eventName: 'button-clicked',
             dataFields: {
               animal: ['cat', 'dog', 'giraffe']
@@ -170,6 +183,19 @@ describe('compareArrayDataTypes', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1996, 1997, 2002, 2020, 2024],
+            score: [10.5, 11.5, 12.5, 13.5, 14.5],
+            timestamp: [
+              1722497422151, 1722500235276, 1722500215276, 1722500225276,
+              1722500245276
+            ]
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -177,8 +203,13 @@ describe('compareArrayDataTypes', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_DOES_NOT_EQUAL_CRITERIA)
@@ -189,25 +220,24 @@ describe('compareArrayDataTypes', () => {
   // MARK: GreaterThan
   it('should return criteriaId 285 (compare array GreaterThan)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1996, 1998, 2002, 2020, 2024]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1996, 1998, 2002, 2020, 2024]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_GREATER_THAN_CRITERIA)
@@ -217,25 +247,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array GreaterThan - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1990, 1992, 1994, 1997]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1990, 1992, 1994, 1997]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_GREATER_THAN_CRITERIA)
@@ -246,25 +275,24 @@ describe('compareArrayDataTypes', () => {
   // MARK: LessThan
   it('should return criteriaId 285 (compare array LessThan)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1990, 1992, 1994, 1996, 1998]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1990, 1992, 1994, 1996, 1998]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_LESS_THAN_CRITERIA)
@@ -274,25 +302,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array LessThan - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1997, 1999, 2002, 2004]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1997, 1999, 2002, 2004]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_LESS_THAN_CRITERIA)
@@ -303,25 +330,24 @@ describe('compareArrayDataTypes', () => {
   // MARK: GreaterThanOrEqualTo
   it('should return criteriaId 285 (compare array GreaterThanOrEqualTo)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1997, 1998, 2002, 2020, 2024]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1997, 1998, 2002, 2020, 2024]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_GREATER_THAN_EQUAL_TO_CRITERIA)
@@ -331,25 +357,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array GreaterThanOrEqualTo - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1990, 1992, 1994, 1996]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1990, 1992, 1994, 1996]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_GREATER_THAN_EQUAL_TO_CRITERIA)
@@ -360,25 +385,24 @@ describe('compareArrayDataTypes', () => {
   // MARK: LessThanOrEqualTo
   it('should return criteriaId 285 (compare array LessThanOrEqualTo)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1990, 1992, 1994, 1996, 1998]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1990, 1992, 1994, 1996, 1998]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_LESS_THAN_EQUAL_TO_CRITERIA)
@@ -388,25 +412,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array LessThanOrEqualTo - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              milestoneYears: [1998, 1999, 2002, 2004]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            milestoneYears: [1998, 1999, 2002, 2004]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_LESS_THAN_EQUAL_TO_CRITERIA)
@@ -417,33 +440,32 @@ describe('compareArrayDataTypes', () => {
   // MARK: Contains
   it('should return criteriaId 285 (compare array Contains)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: [
-                'New York, US',
-                'San Francisco, US',
-                'San Diego, US',
-                'Los Angeles, US',
-                'Tokyo, JP',
-                'Berlin, DE',
-                'London, GB'
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: [
+              'New York, US',
+              'San Francisco, US',
+              'San Diego, US',
+              'Los Angeles, US',
+              'Tokyo, JP',
+              'Berlin, DE',
+              'London, GB'
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_CONTAINS_CRITERIA)
@@ -453,25 +475,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array Contains - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: ['Tokyo, JP', 'Berlin, DE', 'London, GB']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: ['Tokyo, JP', 'Berlin, DE', 'London, GB']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_CONTAINS_CRITERIA)
@@ -482,33 +503,32 @@ describe('compareArrayDataTypes', () => {
   // MARK: StartsWith
   it('should return criteriaId 285 (compare array StartsWith)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: [
-                'US, New York',
-                'US, San Francisco',
-                'US, San Diego',
-                'US, Los Angeles',
-                'JP, Tokyo',
-                'DE, Berlin',
-                'GB, London'
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: [
+              'US, New York',
+              'US, San Francisco',
+              'US, San Diego',
+              'US, Los Angeles',
+              'JP, Tokyo',
+              'DE, Berlin',
+              'GB, London'
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_STARTSWITH_CRITERIA)
@@ -518,25 +538,24 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array StartsWith - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: ['JP, Tokyo', 'DE, Berlin', 'GB, London']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: ['JP, Tokyo', 'DE, Berlin', 'GB, London']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(ARRAY_STARTSWITH_CRITERIA)
@@ -547,33 +566,32 @@ describe('compareArrayDataTypes', () => {
   // MARK: MatchesRegex
   it('should return criteriaId 285 (compare array MatchesRegex)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: [
-                'US, New York',
-                'US, San Francisco',
-                'US, San Diego',
-                'US, Los Angeles',
-                'JP, Tokyo',
-                'DE, Berlin',
-                'GB, London'
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: [
+              'US, New York',
+              'US, San Francisco',
+              'US, San Diego',
+              'US, Los Angeles',
+              'JP, Tokyo',
+              'DE, Berlin',
+              'GB, London'
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(
@@ -584,30 +602,28 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array MatchesRegex - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              addresses: [
-                'US, New York',
-                'US, San Francisco',
-                'US, San Diego',
-                'US, Los Angeles'
-              ]
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            addresses: [
+              'US, New York',
+              'US, San Francisco',
+              'US, San Diego',
+              'US, Los Angeles'
+            ]
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(
@@ -619,26 +635,25 @@ describe('compareArrayDataTypes', () => {
   // MARK: IsOneOf
   it('should return criteriaId 299 (compare array IsOneOf)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              country: 'China',
-              addresses: ['US', 'UK', 'JP', 'DE', 'GB']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            country: 'China',
+            addresses: ['US', 'UK', 'JP', 'DE', 'GB']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(
@@ -649,26 +664,25 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array IsOneOf - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              country: 'Korea',
-              addresses: ['US', 'UK']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            country: 'Korea',
+            addresses: ['US', 'UK']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(
@@ -680,26 +694,25 @@ describe('compareArrayDataTypes', () => {
   // MARK: IsNotOneOf
   it('should return criteriaId 299 (compare array IsNotOneOf)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              country: 'Korea',
-              addresses: ['US', 'UK']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            country: 'Korea',
+            addresses: ['US', 'UK']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(
@@ -710,26 +723,25 @@ describe('compareArrayDataTypes', () => {
 
   it('should return criteriaId null (compare array IsNotOneOf - No match)', () => {
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([
-          {
-            dataFields: {
-              country: 'China',
-              addresses: ['US', 'UK', 'JP', 'DE', 'GB']
-            },
-            eventType: 'user'
-          }
-        ]);
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            country: 'China',
+            addresses: ['US', 'UK', 'JP', 'DE', 'GB']
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
 
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      '',
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
 
     const result = checker.getMatchedCriteria(

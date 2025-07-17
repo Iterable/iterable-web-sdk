@@ -1,4 +1,7 @@
-import { SHARED_PREFS_EVENT_LIST_KEY } from '../constants';
+import {
+  SHARED_PREFS_EVENT_LIST_KEY,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+} from '../constants';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
 
 const localStorageMock = {
@@ -28,15 +31,17 @@ describe('complexCriteria', () => {
             ],
             total: 50,
             eventType: 'purchase'
-          },
-          {
-            dataFields: {
-              preferred_car_models: 'Honda',
-              country: 'Japan'
-            },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Honda',
+            country: 'Japan'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -45,8 +50,13 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -193,14 +203,16 @@ describe('complexCriteria', () => {
             ],
             total: 50,
             eventType: 'purchase'
-          },
-          {
-            dataFields: {
-              preferred_car_models: 'Honda'
-            },
-            eventType: 'user'
           }
         ]);
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Honda'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -209,8 +221,12 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -355,15 +371,18 @@ describe('complexCriteria', () => {
             items: [{ id: '12', name: 'Mocha', price: 90, quantity: 50 }],
             total: 50,
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: {
-              preferred_car_models: 'Subaru',
-              country: 'USA'
-            },
-            eventType: 'user'
           }
         ]);
+      }
+
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Subaru',
+            country: 'USA'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -372,8 +391,13 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -516,15 +540,18 @@ describe('complexCriteria', () => {
             items: [{ id: '12', name: 'Mocha', price: 90, quantity: 50 }],
             total: 50,
             eventType: 'cartUpdate'
-          },
-          {
-            dataFields: {
-              preferred_car_models: 'Subaru',
-              country: 'USA'
-            },
-            eventType: 'user'
           }
         ]);
+      }
+
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Subaru',
+            country: 'USA'
+          },
+          eventType: 'user'
+        });
       }
       return null;
     });
@@ -533,8 +560,13 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -683,14 +715,6 @@ describe('complexCriteria', () => {
             total: 50,
             eventType: 'cartUpdate'
           },
-
-          {
-            dataFields: {
-              preferred_car_models: 'Subaru',
-              country: 'USA'
-            },
-            eventType: 'user'
-          },
           {
             eventName: 'button-clicked',
             dataFields: {
@@ -712,6 +736,15 @@ describe('complexCriteria', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Subaru',
+            country: 'USA'
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -719,8 +752,13 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -863,14 +901,6 @@ describe('complexCriteria', () => {
             total: 50,
             eventType: 'cartUpdate'
           },
-
-          {
-            dataFields: {
-              preferred_car_models: 'Subaru',
-              country: 'USA'
-            },
-            eventType: 'user'
-          },
           {
             eventName: 'button-clicked',
             dataFields: {
@@ -880,6 +910,15 @@ describe('complexCriteria', () => {
           }
         ]);
       }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return JSON.stringify({
+          dataFields: {
+            preferred_car_models: 'Subaru',
+            country: 'USA'
+          },
+          eventType: 'user'
+        });
+      }
       return null;
     });
 
@@ -887,8 +926,13 @@ describe('complexCriteria', () => {
       SHARED_PREFS_EVENT_LIST_KEY
     );
 
+    const localStoredUserUpdate = localStorage.getItem(
+      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+    );
+
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      localStoredUserUpdate === null ? '' : localStoredUserUpdate
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify({
@@ -1123,7 +1167,7 @@ describe('complexCriteria', () => {
           {
             items: [
               { id: '12', name: 'sneakers', price: 10, quantity: 2 },
-              { id: '13', name: 'slippers', price: 10, quantity: 3 }
+              { id: '13', name: 'slippers', price: 10, quantity: 2 }
             ],
             total: 2,
             eventType: 'purchase'
