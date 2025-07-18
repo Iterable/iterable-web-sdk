@@ -15,7 +15,7 @@ export interface UpdateUserParams {
   mergeNestedObjects?: boolean;
 }
 
-export interface UpdateAnonymousUserParams extends UpdateUserParams {
+export interface UpdateUnknownUserParams extends UpdateUserParams {
   createNewFields?: boolean;
   userId?: string;
 }

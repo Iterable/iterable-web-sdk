@@ -4,12 +4,12 @@ import {
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
   GETMESSAGES_PATH,
-  ENDPOINT_TRACK_ANON_SESSION,
+  ENDPOINT_TRACK_UNKNOWN_SESSION,
   GET_CRITERIA_PATH,
-  SHARED_PREFS_ANON_SESSIONS,
+  SHARED_PREFS_UNKNOWN_SESSIONS,
   ENDPOINT_MERGE_USER,
-  SHARED_PREF_ANON_USER_ID,
-  SHARED_PREF_ANON_USAGE_TRACKED,
+  SHARED_PREF_UNKNOWN_USER_ID,
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREF_USER_TOKEN
 } from '../../constants';
 import { track } from '../../events';
@@ -40,8 +40,8 @@ const eventDataMatched = {
   eventType: 'customEvent'
 };
 
-const initialAnonSessionInfo = {
-  itbl_anon_sessions: {
+const initialUnknownSessionInfo = {
+  itbl_unknown_sessions: {
     number_of_sessions: 1,
     first_session: 123456789,
     last_session: expect.any(Number)
@@ -72,7 +72,7 @@ describe('UserMergeScenariosTests', () => {
     mockRequest.onPost('/events/track').reply(200, {});
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
-    mockRequest.onPost(ENDPOINT_TRACK_ANON_SESSION).reply(200, {});
+    mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
   });
 
   beforeEach(() => {
@@ -84,7 +84,7 @@ describe('UserMergeScenariosTests', () => {
     mockRequest.onPost('/events/track').reply(200, {});
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
-    mockRequest.onPost(ENDPOINT_TRACK_ANON_SESSION).reply(200, {});
+    mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
     jest.resetAllMocks();
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
@@ -93,10 +93,10 @@ describe('UserMergeScenariosTests', () => {
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
       }
-      if (key === SHARED_PREFS_ANON_SESSIONS) {
-        return JSON.stringify(initialAnonSessionInfo);
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+        return JSON.stringify(initialUnknownSessionInfo);
       }
-      if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+      if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
       }
       return null;
@@ -109,10 +109,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -135,7 +135,7 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 2 is because we want to remove the anon user and remove anon details
+      // count 2 is because we want to remove the unknown user and remove unknown details
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -147,10 +147,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -187,10 +187,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -232,18 +232,18 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREFS_CRITERIA) {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
-        if (key === SHARED_PREFS_ANON_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         return null;
       });
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -255,7 +255,7 @@ describe('UserMergeScenariosTests', () => {
       }
       await setUserID('testuser123');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       const response = await getInAppMessages({
         count: 10,
@@ -276,10 +276,10 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREFS_CRITERIA) {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
-        if (key === SHARED_PREFS_ANON_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
         }
-        if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
         }
         return null;
@@ -287,10 +287,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -311,7 +311,7 @@ describe('UserMergeScenariosTests', () => {
       }
       await setUserID('testuser123');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       jest.useFakeTimers();
       setTimeout(() => {
@@ -324,7 +324,7 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('criteria is met with merge default with setUserId', async () => {
-      const anonId = '123e4567-e89b-12d3-a456-426614174000';
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -332,18 +332,18 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREFS_CRITERIA) {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
-        if (key === SHARED_PREFS_ANON_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
         }
-        if (key === SHARED_PREF_ANON_USER_ID) {
-          return anonId;
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
         }
         return null;
       });
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true
+          enableUnknownActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -363,7 +363,7 @@ describe('UserMergeScenariosTests', () => {
       setTypeOfAuth('userID');
       await setUserID('testuser123');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       jest.useFakeTimers();
       setTimeout(() => {
@@ -379,10 +379,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -399,7 +399,7 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setUserID('testuseranotheruser');
       const secondResponse = await getInAppMessages({
@@ -417,10 +417,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -432,7 +432,7 @@ describe('UserMergeScenariosTests', () => {
       });
       expect(response.config.params.userId).toBe('testuser123');
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setUserID('testuseranotheruser');
       const secondResponse = await getInAppMessages({
@@ -450,10 +450,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         },
         generateJWT: (payload: GenerateJWTPayload) => {
@@ -480,7 +480,7 @@ describe('UserMergeScenariosTests', () => {
       );
       expect(response.config.params.userId).toBe('testuser123');
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREF_USER_TOKEN) {
@@ -511,10 +511,10 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -526,7 +526,7 @@ describe('UserMergeScenariosTests', () => {
       });
       expect(response.config.params.userId).toBe('testuser123');
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setUserID('testuseranotheruser');
       const secondResponse = await getInAppMessages({
@@ -546,10 +546,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -572,7 +572,7 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 2 is because we want to remove the anon user and remove anon details
+      // count 2 is because we want to remove the unknown user and remove unknown details
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -584,10 +584,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -625,7 +625,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true
+          enableUnknownActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -666,10 +666,10 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREFS_CRITERIA) {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
-        if (key === SHARED_PREFS_ANON_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
         }
-        if (key === SHARED_PREF_ANON_USAGE_TRACKED) {
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
         }
         return null;
@@ -677,10 +677,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -699,7 +699,7 @@ describe('UserMergeScenariosTests', () => {
       }
       await setEmail('testuser123@test.com');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       jest.useFakeTimers();
       setTimeout(() => {
@@ -712,7 +712,7 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('criteria is met with merge default with setEmail', async () => {
-      const anonId = '123e4567-e89b-12d3-a456-426614174000';
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -720,18 +720,18 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREFS_CRITERIA) {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
-        if (key === SHARED_PREFS_ANON_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
         }
-        if (key === SHARED_PREF_ANON_USER_ID) {
-          return anonId;
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
         }
         return null;
       });
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true
+          enableUnknownActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -751,7 +751,7 @@ describe('UserMergeScenariosTests', () => {
       setTypeOfAuth('userID');
       await setEmail('testuser123@test.com');
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       jest.useFakeTimers();
       setTimeout(() => {
@@ -767,10 +767,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -787,7 +787,7 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setEmail('testuseranotheruser@test.com');
       const secondResponse = await getInAppMessages({
@@ -807,10 +807,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         }
       });
@@ -827,7 +827,7 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setEmail('testuseranotheruser@test.com');
       const secondResponse = await getInAppMessages({
@@ -847,10 +847,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: false
+            mergeOnUnknownToKnown: false
           }
         }
       });
@@ -867,7 +867,7 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       await setEmail('testuseranotheruser@test.com');
       const secondResponse = await getInAppMessages({
@@ -887,10 +887,10 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableAnonActivation: true,
+          enableUnknownActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
-            mergeOnAnonymousToKnown: true
+            mergeOnUnknownToKnown: true
           }
         },
         generateJWT: (payload: GenerateJWTPayload) => {
@@ -922,7 +922,7 @@ describe('UserMergeScenariosTests', () => {
         console.log('', e);
       }
       expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_ANON_USER_ID
+        SHARED_PREF_UNKNOWN_USER_ID
       );
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREF_USER_TOKEN) {

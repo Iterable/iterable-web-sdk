@@ -46,9 +46,9 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableAnonActivation: true,
-      onAnonUserCreated: (userId: string) => {
-        console.log('onAnonUserCreated', userId);
+      enableUnknownActivation: true,
+      onUnknownUserCreated: (userId: string) => {
+        console.log('onUnknownUserCreated', userId);
       }
     }
   };
