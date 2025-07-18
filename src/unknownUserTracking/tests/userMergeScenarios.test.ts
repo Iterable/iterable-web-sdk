@@ -40,8 +40,8 @@ const eventDataMatched = {
   eventType: 'customEvent'
 };
 
-const initialAnonSessionInfo = {
-  itbl_anon_sessions: {
+const initialUnknownSessionInfo = {
+  itbl_unknown_sessions: {
     number_of_sessions: 1,
     first_session: 123456789,
     last_session: expect.any(Number)
@@ -94,7 +94,7 @@ describe('UserMergeScenariosTests', () => {
         return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
       }
       if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-        return JSON.stringify(initialAnonSessionInfo);
+        return JSON.stringify(initialUnknownSessionInfo);
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
@@ -135,7 +135,7 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 2 is because we want to remove the anon user and remove anon details
+      // count 2 is because we want to remove the unknown user and remove unknown details
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -233,7 +233,7 @@ describe('UserMergeScenariosTests', () => {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         return null;
       });
@@ -277,7 +277,7 @@ describe('UserMergeScenariosTests', () => {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
@@ -324,7 +324,7 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('criteria is met with merge default with setUserId', async () => {
-      const anonId = '123e4567-e89b-12d3-a456-426614174000';
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -333,10 +333,10 @@ describe('UserMergeScenariosTests', () => {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         if (key === SHARED_PREF_UNKNOWN_USER_ID) {
-          return anonId;
+          return unknownId;
         }
         return null;
       });
@@ -572,7 +572,7 @@ describe('UserMergeScenariosTests', () => {
       const removeItemCalls = localStorageMock.removeItem.mock.calls.filter(
         (call) => call[0] === SHARED_PREFS_EVENT_LIST_KEY
       );
-      // count 2 is because we want to remove the anon user and remove anon details
+      // count 2 is because we want to remove the unknown user and remove unknown details
       expect(removeItemCalls.length).toBe(2);
       const mergePostRequestData = mockRequest.history.post.find(
         (req) => req.url === ENDPOINT_MERGE_USER
@@ -667,7 +667,7 @@ describe('UserMergeScenariosTests', () => {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
@@ -712,7 +712,7 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('criteria is met with merge default with setEmail', async () => {
-      const anonId = '123e4567-e89b-12d3-a456-426614174000';
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
           return JSON.stringify([eventDataMatched]);
@@ -721,10 +721,10 @@ describe('UserMergeScenariosTests', () => {
           return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
         }
         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-          return JSON.stringify(initialAnonSessionInfo);
+          return JSON.stringify(initialUnknownSessionInfo);
         }
         if (key === SHARED_PREF_UNKNOWN_USER_ID) {
-          return anonId;
+          return unknownId;
         }
         return null;
       });

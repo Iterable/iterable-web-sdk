@@ -45,8 +45,8 @@ describe('UnknownUserEventManager', () => {
   });
 
   it('should update unknown session information correctly', () => {
-    const initialAnonSessionInfo = {
-      itbl_anon_sessions: {
+    const initialUnknownSessionInfo = {
+      itbl_unknown_sessions: {
         number_of_sessions: 1,
         first_session: 123456789,
         last_session: expect.any(Number)
@@ -55,7 +55,7 @@ describe('UnknownUserEventManager', () => {
 
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-        return JSON.stringify(initialAnonSessionInfo);
+        return JSON.stringify(initialUnknownSessionInfo);
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
@@ -139,7 +139,7 @@ describe('UnknownUserEventManager', () => {
     unknownUserEventManager.updateUnknownSession();
   });
 
-  it('should call createUnknownUser when trackAnonEvent is called', async () => {
+  it('should call createUnknownUser when trackUnknownEvent is called', async () => {
     const payload = {
       eventName: 'testEvent',
       eventType: 'customEvent'
@@ -201,7 +201,7 @@ describe('UnknownUserEventManager', () => {
     await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should not call createUnknownUser when trackAnonEvent is called and criteria does not match', async () => {
+  it('should not call createUnknownUser when trackUnknownEvent is called and criteria does not match', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -262,7 +262,7 @@ describe('UnknownUserEventManager', () => {
     await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should not call createUnknownUser when trackAnonEvent is called and criteria not find', async () => {
+  it('should not call createUnknownUser when trackUnknownEvent is called and criteria not find', async () => {
     const payload = {
       eventName: 'Event'
     };
@@ -288,7 +288,7 @@ describe('UnknownUserEventManager', () => {
     await unknownUserEventManager.trackUnknownEvent(payload);
   });
 
-  it('should call createUnknownUser when trackAnonUpdateUser is called', async () => {
+  it('should call createUnknownUser when trackUnknownUpdateUser is called', async () => {
     const payload: UpdateUserParams = {
       dataFields: { country: 'UK' }
     };
@@ -349,7 +349,7 @@ describe('UnknownUserEventManager', () => {
     await unknownUserEventManager.trackUnknownUpdateUser(payload);
   });
 
-  it('should call createUnknownUser when trackAnonPurchaseEvent is called', async () => {
+  it('should call createUnknownUser when trackUnknownPurchaseEvent is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {
@@ -433,7 +433,7 @@ describe('UnknownUserEventManager', () => {
     await unknownUserEventManager.trackUnknownPurchaseEvent(payload);
   });
 
-  it('should call createUnknownUser when trackAnonUpdateCart is called', async () => {
+  it('should call createUnknownUser when trackUnknownUpdateCart is called', async () => {
     const payload: TrackPurchaseRequestParams = {
       items: [
         {

@@ -12,12 +12,43 @@ import {
 } from '../../constants';
 import { updateUser } from '../../users';
 import { initializeWithConfig } from '../../authorization';
+import { setupLocalStorageMock } from './testHelpers';
 import { CUSTOM_EVENT_API_TEST_CRITERIA } from './constants';
 
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn()
+// Test data constants
+const TEST_EVENT_DATA = {
+  ANIMAL_FOUND_MATCHED: {
+    eventName: 'animal-found',
+    dataFields: {
+      type: 'cat',
+      count: 6,
+      vaccinated: true
+    },
+    createNewFields: true,
+    eventType: 'customEvent'
+  }
+};
+
+const TEST_USER_DATA = {
+  WHITE_SOFA_FURNITURE: {
+    dataFields: {
+      furniture: {
+        furnitureType: 'Sofa',
+        furnitureColor: 'White'
+      }
+    },
+    eventType: 'user'
+  }
+};
+
+const TEST_UNKNOWN_SESSION = {
+  INITIAL_SESSION: {
+    itbl_unknown_sessions: {
+      number_of_sessions: 1,
+      first_session: 123456789,
+      last_session: expect.any(Number)
+    }
+  }
 };
 
 declare global {
@@ -27,40 +58,11 @@ declare global {
   function setUserID(): string;
 }
 
-const eventDataMatched = {
-  eventName: 'animal-found',
-  dataFields: {
-    type: 'cat',
-    count: 6,
-    vaccinated: true
-  },
-  createNewFields: true,
-  eventType: 'customEvent'
-};
-
-const userDataMatched = {
-  dataFields: {
-    furniture: {
-      furnitureType: 'Sofa',
-      furnitureColor: 'White'
-    }
-  },
-  eventType: 'user'
-};
-
-const initialAnonSessionInfo = {
-  itbl_anon_sessions: {
-    number_of_sessions: 1,
-    first_session: 123456789,
-    last_session: expect.any(Number)
-  }
-};
-
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
 describe('UserUpdate', () => {
   beforeAll(() => {
-    (global as any).localStorage = localStorageMock;
+    setupLocalStorageMock();
     global.window = Object.create({ location: { hostname: 'google.com' } });
     mockRequest.onPost('/events/track').reply(200, {});
     mockRequest.onPost('/users/update').reply(200, {});
@@ -81,21 +83,22 @@ describe('UserUpdate', () => {
   });
 
   it('should not have unnecessary extra nesting when locally stored user update fields are sent to server', async () => {
+    // Set up localStorage mocks with test data
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-        return JSON.stringify([eventDataMatched]);
+        return JSON.stringify([TEST_EVENT_DATA.ANIMAL_FOUND_MATCHED]);
       }
       if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
         return JSON.stringify({
-          ...userDataMatched.dataFields,
-          eventType: userDataMatched.eventType
+          ...TEST_USER_DATA.WHITE_SOFA_FURNITURE.dataFields,
+          eventType: TEST_USER_DATA.WHITE_SOFA_FURNITURE.eventType
         });
       }
       if (key === SHARED_PREFS_CRITERIA) {
         return JSON.stringify(CUSTOM_EVENT_API_TEST_CRITERIA);
       }
       if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-        return JSON.stringify(initialAnonSessionInfo);
+        return JSON.stringify(TEST_UNKNOWN_SESSION.INITIAL_SESSION);
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
@@ -114,6 +117,7 @@ describe('UserUpdate', () => {
     } catch (e) {
       console.log('');
     }
+
     expect(localStorage.setItem).toHaveBeenCalledWith(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
       expect.any(String)
@@ -131,11 +135,11 @@ describe('UserUpdate', () => {
       expect(requestData).toHaveProperty('user');
       expect(requestData.user).toHaveProperty(
         'dataFields',
-        userDataMatched.dataFields
+        TEST_USER_DATA.WHITE_SOFA_FURNITURE.dataFields
       );
       expect(requestData.user.dataFields).toHaveProperty(
         'furniture',
-        userDataMatched.dataFields.furniture
+        TEST_USER_DATA.WHITE_SOFA_FURNITURE.dataFields.furniture
       );
     });
 

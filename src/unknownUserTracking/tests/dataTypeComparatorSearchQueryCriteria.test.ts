@@ -1,5 +1,4 @@
-import { SHARED_PREFS_USER_UPDATE_OBJECT_KEY } from '../../constants';
-import CriteriaCompletionChecker from '../criteriaCompletionChecker';
+import { setupLocalStorageMock, runCriteriaCheck } from './testHelpers';
 import {
   DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL,
   DATA_TYPE_COMPARATOR_EQUALS,
@@ -10,416 +9,251 @@ import {
   DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO
 } from './constants';
 
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn()
+// Test data constants
+const TEST_USER_DATA = {
+  // Equals tests
+  EQUALS_MATCH: {
+    dataFields: {
+      savings: 19.99,
+      likes_boba: true,
+      country: 'Chaina',
+      eventTimeStamp: 3
+    },
+    eventType: 'user'
+  },
+  EQUALS_NO_MATCH: {
+    dataFields: {
+      savings: 10.99,
+      eventTimeStamp: 30,
+      likes_boba: false,
+      country: 'Taiwan'
+    },
+    eventType: 'user'
+  },
+
+  // DoesNotEqual tests
+  DOES_NOT_EQUAL_MATCH: {
+    dataFields: {
+      savings: 11.2,
+      eventTimeStamp: 30,
+      likes_boba: false
+    },
+    eventType: 'user'
+  },
+  DOES_NOT_EQUAL_NO_MATCH: {
+    dataFields: {
+      savings: 10.99,
+      eventTimeStamp: 30,
+      likes_boba: true
+    },
+    eventType: 'user'
+  },
+
+  // LessThan tests
+  LESS_THAN_MATCH: {
+    dataFields: {
+      savings: 10,
+      eventTimeStamp: 14
+    },
+    eventType: 'user'
+  },
+  LESS_THAN_NO_MATCH: {
+    dataFields: {
+      savings: 10,
+      eventTimeStamp: 18
+    },
+    eventType: 'user'
+  },
+
+  // LessThanOrEqualTo tests
+  LESS_THAN_OR_EQUAL_MATCH: {
+    dataFields: {
+      savings: 17,
+      eventTimeStamp: 14
+    },
+    eventType: 'user'
+  },
+  LESS_THAN_OR_EQUAL_NO_MATCH: {
+    dataFields: {
+      savings: 18,
+      eventTimeStamp: 12
+    },
+    eventType: 'user'
+  },
+
+  // GreaterThan tests
+  GREATER_THAN_MATCH: {
+    dataFields: {
+      savings: 56,
+      eventTimeStamp: 51
+    },
+    eventType: 'user'
+  },
+  GREATER_THAN_NO_MATCH: {
+    dataFields: {
+      savings: 5,
+      eventTimeStamp: 3
+    },
+    eventType: 'user'
+  },
+
+  // GreaterThanOrEqualTo tests
+  GREATER_THAN_OR_EQUAL_MATCH: {
+    dataFields: {
+      savings: 20,
+      eventTimeStamp: 30
+    },
+    eventType: 'user'
+  },
+  GREATER_THAN_OR_EQUAL_NO_MATCH: {
+    dataFields: {
+      savings: 18,
+      eventTimeStamp: 16
+    },
+    eventType: 'user'
+  },
+
+  // IsSet tests
+  IS_SET_MATCH: {
+    dataFields: {
+      savings: 10,
+      eventTimeStamp: 20,
+      saved_cars: '10',
+      country: 'Taiwan'
+    },
+    eventType: 'user'
+  },
+  IS_SET_NO_MATCH: {
+    dataFields: {
+      savings: '',
+      eventTimeStamp: '',
+      saved_cars: 'd',
+      country: ''
+    },
+    eventType: 'user'
+  }
+};
+
+// Helper function for comparator tests
+const testComparatorCriteria = (
+  description: string,
+  userData: any,
+  criteria: any,
+  expectedResult: string | null
+) => {
+  it(description, () => {
+    const result = runCriteriaCheck(criteria, null, userData);
+    expect(result).toEqual(expectedResult);
+  });
 };
 
 describe('dataTypeComparatorSearchQueryCriteria', () => {
   beforeEach(() => {
-    (global as any).localStorage = localStorageMock;
+    setupLocalStorageMock();
   });
 
-  it('should return criteriaId 285 (Comparator test For Equal)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 19.99,
-            likes_boba: true,
-            country: 'Chaina',
-            eventTimeStamp: 3
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
+  // Equals Tests
+  testComparatorCriteria(
+    'should return criteriaId 285 (Comparator test For Equal)',
+    TEST_USER_DATA.EQUALS_MATCH,
+    DATA_TYPE_COMPARATOR_EQUALS,
+    '285'
+  );
 
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+  testComparatorCriteria(
+    'should return null (Comparator test For Equal - No Match)',
+    TEST_USER_DATA.EQUALS_NO_MATCH,
+    DATA_TYPE_COMPARATOR_EQUALS,
+    null
+  );
 
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_EQUALS)
-    );
-    expect(result).toEqual('285');
-  });
+  // DoesNotEqual Tests
+  testComparatorCriteria(
+    'should return criteriaId 285 (Comparator test For DoesNotEqual)',
+    TEST_USER_DATA.DOES_NOT_EQUAL_MATCH,
+    DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL,
+    '285'
+  );
 
-  it('should return null (Comparator test For Equal - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 10.99,
-            eventTimeStamp: 30,
-            likes_boba: false,
-            country: 'Taiwan'
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
+  testComparatorCriteria(
+    'should return null (Comparator test For DoesNotEqual - No Match)',
+    TEST_USER_DATA.DOES_NOT_EQUAL_NO_MATCH,
+    DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL,
+    null
+  );
 
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+  // LessThan Tests
+  testComparatorCriteria(
+    'should return criteriaId 289 (Comparator test For LessThan)',
+    TEST_USER_DATA.LESS_THAN_MATCH,
+    DATA_TYPE_COMPARATOR_LESS_THAN,
+    '289'
+  );
 
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_EQUALS)
-    );
-    expect(result).toEqual(null);
-  });
+  testComparatorCriteria(
+    'should return null (Comparator test For LessThan - No Match)',
+    TEST_USER_DATA.LESS_THAN_NO_MATCH,
+    DATA_TYPE_COMPARATOR_LESS_THAN,
+    null
+  );
 
-  it('should return criteriaId 285 (Comparator test For DoesNotEqual)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 11.2,
-            eventTimeStamp: 30,
-            likes_boba: false
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
+  // LessThanOrEqualTo Tests
+  testComparatorCriteria(
+    'should return criteriaId 290 (Comparator test For LessThanOrEqualTo)',
+    TEST_USER_DATA.LESS_THAN_OR_EQUAL_MATCH,
+    DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO,
+    '290'
+  );
 
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+  testComparatorCriteria(
+    'should return null (Comparator test For LessThanOrEqualTo - No Match)',
+    TEST_USER_DATA.LESS_THAN_OR_EQUAL_NO_MATCH,
+    DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO,
+    null
+  );
 
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL)
-    );
-    expect(result).toEqual('285');
-  });
+  // GreaterThan Tests
+  testComparatorCriteria(
+    'should return criteriaId 290 (Comparator test For GreaterThan)',
+    TEST_USER_DATA.GREATER_THAN_MATCH,
+    DATA_TYPE_COMPARATOR_GREATER_THAN,
+    '290'
+  );
 
-  it('should return null (Comparator test For DoesNotEqual - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 10.99,
-            eventTimeStamp: 30,
-            likes_boba: true
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
+  testComparatorCriteria(
+    'should return null (Comparator test For GreaterThan - No Match)',
+    TEST_USER_DATA.GREATER_THAN_NO_MATCH,
+    DATA_TYPE_COMPARATOR_GREATER_THAN,
+    null
+  );
 
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+  // GreaterThanOrEqualTo Tests
+  testComparatorCriteria(
+    'should return criteriaId 291 (Comparator test For GreaterThanOrEqualTo)',
+    TEST_USER_DATA.GREATER_THAN_OR_EQUAL_MATCH,
+    DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO,
+    '291'
+  );
 
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL)
-    );
-    expect(result).toEqual(null);
-  });
+  testComparatorCriteria(
+    'should return null (Comparator test For GreaterThanOrEqualTo - No Match)',
+    TEST_USER_DATA.GREATER_THAN_OR_EQUAL_NO_MATCH,
+    DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO,
+    null
+  );
 
-  it('should return criteriaId 289 (Comparator test For LessThan)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 10,
-            eventTimeStamp: 14
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
+  // IsSet Tests
+  testComparatorCriteria(
+    'should return criteriaId 285 (Comparator test For IsSet)',
+    TEST_USER_DATA.IS_SET_MATCH,
+    DATA_TYPE_COMPARATOR_IS_SET,
+    '285'
+  );
 
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_LESS_THAN)
-    );
-    expect(result).toEqual('289');
-  });
-
-  it('should return null (Comparator test For LessThan - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 10,
-            eventTimeStamp: 18
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_LESS_THAN)
-    );
-    expect(result).toEqual(null);
-  });
-
-  it('should return criteriaId 290 (Comparator test For LessThanOrEqualTo)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 17,
-            eventTimeStamp: 14
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO)
-    );
-    expect(result).toEqual('290');
-  });
-
-  it('should return null (Comparator test For LessThanOrEqualTo - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 18,
-            eventTimeStamp: 12
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO)
-    );
-    expect(result).toEqual(null);
-  });
-
-  it('should return criteriaId 290 (Comparator test For GreaterThan)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 56,
-            eventTimeStamp: 51
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_GREATER_THAN)
-    );
-    expect(result).toEqual('290');
-  });
-
-  it('should return null (Comparator test For GreaterThan - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 5,
-            eventTimeStamp: 3
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_GREATER_THAN)
-    );
-    expect(result).toEqual(null);
-  });
-
-  it('should return criteriaId 291 (Comparator test For GreaterThanOrEqualTo)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 20,
-            eventTimeStamp: 30
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO)
-    );
-    expect(result).toEqual('291');
-  });
-
-  it('should return null (Comparator test For GreaterThanOrEqualTo - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 18,
-            eventTimeStamp: 16
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO)
-    );
-    expect(result).toEqual(null);
-  });
-
-  it('should return criteriaId 285 (Comparator test For IsSet)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: 10,
-            eventTimeStamp: 20,
-            saved_cars: '10',
-            country: 'Taiwan'
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_IS_SET)
-    );
-    expect(result).toEqual('285');
-  });
-
-  it('should return criteriaId 285 (Comparator test For IsSet - No Match)', () => {
-    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-        return JSON.stringify({
-          dataFields: {
-            savings: '',
-            eventTimeStamp: '',
-            saved_cars: 'd',
-            country: ''
-          },
-          eventType: 'user'
-        });
-      }
-      return null;
-    });
-
-    const localStoredUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
-
-    const checker = new CriteriaCompletionChecker(
-      '',
-      localStoredUserUpdate === null ? '' : localStoredUserUpdate
-    );
-    const result = checker.getMatchedCriteria(
-      JSON.stringify(DATA_TYPE_COMPARATOR_IS_SET)
-    );
-    expect(result).toEqual(null);
-  });
+  testComparatorCriteria(
+    'should return criteriaId 285 (Comparator test For IsSet - No Match)',
+    TEST_USER_DATA.IS_SET_NO_MATCH,
+    DATA_TYPE_COMPARATOR_IS_SET,
+    null
+  );
 });

@@ -1680,3 +1680,150 @@ export const COMPLEX_CRITERIA_3 = {
     }
   ]
 };
+
+// Common mock data for tests
+export const MOCK_ITEMS = {
+  MONITOR: { id: '12', name: 'monitor', price: 50, quantity: 10 },
+  COFFEE: { id: '12', name: 'coffee', price: 10, quantity: 5 },
+  MOCHA: { id: '12', name: 'Mocha', price: 90, quantity: 50 },
+  SNEAKERS: { id: '12', name: 'sneakers', price: 10, quantity: 5 },
+  SLIPPERS: { id: '13', name: 'slippers', price: 10, quantity: 3 },
+  CARAMEL: { id: '12', name: 'Caramel', price: 3, quantity: 5 },
+  SNEAKERS_QTY_2: { id: '12', name: 'sneakers', price: 10, quantity: 2 },
+  SLIPPERS_QTY_2: { id: '13', name: 'slippers', price: 10, quantity: 2 }
+} as const;
+
+export const MOCK_USER_DATA = {
+  HONDA_JAPAN: {
+    preferred_car_models: 'Honda',
+    country: 'Japan'
+  },
+  SUBARU_USA: {
+    preferred_car_models: 'Subaru',
+    country: 'USA'
+  },
+  HONDA_ONLY: {
+    preferred_car_models: 'Honda'
+  },
+  ADAM: {
+    firstName: 'Adam'
+  },
+  XCODE: {
+    firstName: 'xcode'
+  },
+  XCODE_SSR: {
+    firstName: 'xcode',
+    lastName: 'ssr'
+  },
+  ALEX_ARIS: {
+    firstName: 'Alex',
+    lastName: 'Aris'
+  }
+} as const;
+
+export const MOCK_CUSTOM_EVENTS = {
+  BUTTON_CLICKED_WELCOME: {
+    eventName: 'button-clicked',
+    dataFields: {
+      lastPageViewed: 'welcome page'
+    },
+    eventType: 'customEvent'
+  },
+  BUTTON_CLICKED_BIRTHDAY: {
+    dataFields: {
+      saved_cars: { color: 'black' },
+      'animal-found': { vaccinated: true },
+      eventName: 'birthday'
+    },
+    eventType: 'customEvent'
+  },
+  ANIMAL_FOUND_CAT: {
+    dataFields: {
+      'animal-found': {
+        type: 'cat',
+        count: 4
+      }
+    },
+    eventType: 'customEvent'
+  },
+  ANIMAL_FOUND_DOG: {
+    dataFields: {
+      'animal-found.type': 'dog',
+      'animal-found.count': 4
+    },
+    eventType: 'customEvent'
+  }
+} as const;
+
+export const MOCK_EVENTS = {
+  // Purchase events
+  PURCHASE_MONITOR: {
+    items: [MOCK_ITEMS.MONITOR],
+    total: 50,
+    eventType: 'purchase'
+  },
+  PURCHASE_COFFEE: {
+    items: [MOCK_ITEMS.COFFEE],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_SNEAKERS_SLIPPERS: {
+    items: [MOCK_ITEMS.SNEAKERS, MOCK_ITEMS.SLIPPERS],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_SNEAKERS_SLIPPERS_QTY_2: {
+    items: [MOCK_ITEMS.SNEAKERS_QTY_2, MOCK_ITEMS.SLIPPERS_QTY_2],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_CARAMEL: {
+    items: [MOCK_ITEMS.CARAMEL],
+    total: 2,
+    eventType: 'purchase'
+  },
+
+  // Cart update events
+  CART_UPDATE_MOCHA: {
+    items: [MOCK_ITEMS.MOCHA],
+    total: 50,
+    eventType: 'cartUpdate'
+  },
+  CART_UPDATE_MOCHA_NO_TOTAL: {
+    items: [MOCK_ITEMS.MOCHA],
+    eventType: 'cartUpdate'
+  },
+
+  // Purchase events for testing
+  PURCHASE_TESTING: {
+    dataFields: { reason: 'testing', total: 30 },
+    eventType: 'purchase'
+  },
+  PURCHASE_TESTING_110: {
+    dataFields: { total: 110, reason: 'testing' },
+    eventType: 'purchase'
+  }
+} as const;
+
+export const MOCK_USER_UPDATES = {
+  HONDA_JAPAN: {
+    dataFields: MOCK_USER_DATA.HONDA_JAPAN,
+    eventType: 'user'
+  },
+  SUBARU_USA: {
+    dataFields: MOCK_USER_DATA.SUBARU_USA,
+    eventType: 'user'
+  },
+  HONDA_ONLY: {
+    dataFields: MOCK_USER_DATA.HONDA_ONLY,
+    eventType: 'user'
+  },
+  ADAM: {
+    dataFields: MOCK_USER_DATA.ADAM,
+    eventType: 'user'
+  },
+  XCODE: {
+    dataFields: MOCK_USER_DATA.XCODE,
+    eventType: 'user'
+  }
+} as const;
