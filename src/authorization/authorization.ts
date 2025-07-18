@@ -398,8 +398,8 @@ export function initialize(
   const enableUnknownTracking = () => {
     try {
       if (config.getConfig('enableUnknownActivation')) {
-                 unknownUserManager.getUnknownCriteria();
-         unknownUserManager.updateUnknownSession();
+        unknownUserManager.getUnknownCriteria();
+        unknownUserManager.updateUnknownSession();
         const unknownUserId = getUnknownUserId();
         if (unknownUserId !== null) {
           // This block will restore the unknown userID from localstorage
