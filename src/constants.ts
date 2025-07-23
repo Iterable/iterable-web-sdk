@@ -29,6 +29,7 @@ export const GETMESSAGES_PATH = '/inApp/web/getMessages';
 export const GET_CRITERIA_PATH = '/unknownuser/list';
 export const ENDPOINT_MERGE_USER = '/users/merge';
 export const ENDPOINT_TRACK_UNKNOWN_SESSION = '/unknownuser/events/session';
+export const ENDPOINT_UNKNOWN_USER_CONSENT = '/unknownuser/consent';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
@@ -287,6 +288,8 @@ export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_UNKNOWN_SESSIONS = 'itbl_unknown_sessions';
 export const SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
 export const SHARED_PREF_UNKNOWN_USAGE_TRACKED = 'itbl_unknown_usage_tracked';
+export const SHARED_PREF_CONSENT_TIMESTAMP = 'itbl_consent_timestamp';
+export const SHARED_PREF_CONSENT_SENT = 'itbl_consent_sent';
 export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
 
 export const KEY_EVENT_NAME = 'eventName';

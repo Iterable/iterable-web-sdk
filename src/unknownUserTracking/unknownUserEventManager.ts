@@ -23,17 +23,27 @@ import {
   SHARED_PREFS_CRITERIA,
   SHARED_PREFS_UNKNOWN_SESSIONS,
   ENDPOINT_TRACK_UNKNOWN_SESSION,
+  ENDPOINT_UNKNOWN_USER_CONSENT,
   WEB_PLATFORM,
   KEY_PREFER_USERID,
   ENDPOINTS,
   DEFAULT_EVENT_THRESHOLD_LIMIT,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+  SHARED_PREF_CONSENT_TIMESTAMP,
+  SHARED_PREF_CONSENT_SENT,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
+  SHARED_PREF_UNKNOWN_USER_ID,
+  SHARED_PREF_EMAIL,
+  SHARED_PREF_USER_ID
 } from '../constants';
 import { baseIterableRequest } from '../request';
+import { getTypeOfAuth } from '../utils/typeOfAuth';
 import { IterableResponse } from '../types';
 import CriteriaCompletionChecker from './criteriaCompletionChecker';
-import { TrackUnknownSessionParams } from '../utils/types';
+import {
+  TrackUnknownSessionParams,
+  ConsentRequestParams
+} from '../utils/types';
 import { UpdateUserParams } from '../users/types';
 import { trackSchema } from '../events/events.schema';
 import {
@@ -43,6 +53,8 @@ import {
 import { updateUserSchema } from '../users/users.schema';
 import { InAppTrackRequestParams } from '../events';
 import config from '../utils/config';
+
+import { consentRequestSchema } from './consent.schema';
 
 // Type definitions for unknown event data objects
 type UnknownTrackEventData = {
@@ -206,7 +218,7 @@ export class UnknownUserEventManager {
     this.storeEventListToLocalStorage(newDataObject);
   }
 
-  private checkCriteriaCompletion(): string | null {
+  public checkCriteriaCompletion(): string | null {
     const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
@@ -215,9 +227,9 @@ export class UnknownUserEventManager {
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
     try {
-      if (criteriaData && localStoredEventList) {
+      if (criteriaData && (localStoredEventList || localStoredUserUpdate)) {
         const checker = new CriteriaCompletionChecker(
-          localStoredEventList,
+          localStoredEventList || '',
           localStoredUserUpdate
         );
         return checker.getMatchedCriteria(criteriaData);
@@ -229,12 +241,19 @@ export class UnknownUserEventManager {
     return null;
   }
 
-  private async createUnknownUser(criteriaId: string) {
+  public async createUnknownUser(criteriaId: string) {
     const unknownUsageTracked = isUnknownUsageTracked();
 
     if (!unknownUsageTracked) return;
 
-    const userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+    let userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+
+    // If no session data exists, create it first
+    if (!userData) {
+      this.updateUnknownSession();
+      userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+    }
+
     const strUserUpdate = localStorage.getItem(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
@@ -260,12 +279,10 @@ export class UnknownUserEventManager {
           deviceId: global.navigator.userAgent || '',
           platform: WEB_PLATFORM
         },
-        unknownSessionContext: {
-          totalUnknownSessionCount: userDataJson.number_of_sessions || 0,
-          lastUnknownSession:
-            userDataJson.last_session || this.getCurrentTime(),
-          firstUnknownSession:
-            userDataJson.first_session || this.getCurrentTime(),
+        anonSessionContext: {
+          totalAnonSessionCount: userDataJson.number_of_sessions || 0,
+          lastAnonSession: userDataJson.last_session || this.getCurrentTime(),
+          firstAnonSession: userDataJson.first_session || this.getCurrentTime(),
           matchedCriteriaId: parseInt(criteriaId, 10),
           webPushOptIn:
             this.getWebPushOptnIn() !== '' ? this.getWebPushOptnIn() : undefined
@@ -291,12 +308,44 @@ export class UnknownUserEventManager {
         if (unknownUserIdSetter !== null) {
           await unknownUserIdSetter(userId);
         }
-        this.syncEvents();
+        this.syncEvents(false);
       }
     }
   }
 
-  async syncEvents() {
+  async syncEvents(isUserKnown?: boolean) {
+    // Track consent only in specific scenarios:
+    // 1. Unknown user created (isUserKnown: false) - after /session call
+    // 2. User signs up after tracking locally but /session was never called
+    if (this.hasConsent()) {
+      const identityResolutionConfig = config.getConfig('identityResolution');
+      const replayEnabled = identityResolutionConfig?.replayOnVisitorToKnown;
+
+      if (replayEnabled) {
+        try {
+          if (isUserKnown === true) {
+            // Scenario 2: User signed up after tracking locally but /session was never called
+            const unknownUserCreated = localStorage.getItem(
+              SHARED_PREF_UNKNOWN_USER_ID
+            );
+            if (!unknownUserCreated) {
+              await this.trackConsent(true);
+            }
+            // If unknownUserCreated exists, consent was already sent when unknown user was created
+          } else {
+            // Scenario 1: Unknown user created after /session call (false or undefined)
+            await this.trackConsent(false);
+          }
+        } catch (error) {
+          // Don't block event replay if consent tracking fails
+          console.warn(
+            'Consent tracking failed, continuing with event replay:',
+            error
+          );
+        }
+      }
+    }
+
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
@@ -489,4 +538,85 @@ export class UnknownUserEventManager {
     }
     return null;
   };
+
+  // Consent tracking methods
+  getConsentTimestamp(): string | null {
+    return localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+  }
+
+  hasConsent(): boolean {
+    return this.getConsentTimestamp() !== null;
+  }
+
+  private getCurrentUserInfo(): { email?: string; userId?: string } {
+    const typeOfAuth = getTypeOfAuth();
+
+    // First priority: actual user credentials from login/signup
+    if (typeOfAuth === 'email') {
+      const email = localStorage.getItem(SHARED_PREF_EMAIL);
+      if (email) {
+        return { email };
+      }
+    }
+
+    if (typeOfAuth === 'userID') {
+      const userId = localStorage.getItem(SHARED_PREF_USER_ID);
+      if (userId) {
+        return { userId };
+      }
+    }
+
+    // Fallback: generated unknown user ID (for scenario 1: after /session call)
+    const unknownUserId = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
+    if (unknownUserId) {
+      return { userId: unknownUserId };
+    }
+
+    return {};
+  }
+
+  async trackConsent(isUserKnown: boolean): Promise<any> {
+    const consentTimestamp = this.getConsentTimestamp();
+    if (!consentTimestamp) return null;
+
+    // Check if consent has already been sent to avoid duplicate calls
+    const consentSent = localStorage.getItem(SHARED_PREF_CONSENT_SENT);
+    if (consentSent === 'true') {
+      return null;
+    }
+
+    const userInfo = this.getCurrentUserInfo();
+    const payload: ConsentRequestParams = {
+      consentTimestamp: parseInt(consentTimestamp, 10),
+      isUserKnown,
+      deviceInfo: {
+        appPackageName: window.location.hostname,
+        deviceId: global.navigator.userAgent || '',
+        platform: WEB_PLATFORM
+      },
+      ...userInfo
+    };
+
+    try {
+      const response = await baseIterableRequest<IterableResponse>({
+        method: 'POST',
+        url: ENDPOINT_UNKNOWN_USER_CONSENT,
+        data: payload,
+        validation: {
+          data: consentRequestSchema
+        }
+      });
+
+      // Mark consent as sent only if the request was successful
+      if (response?.status === 200) {
+        localStorage.setItem(SHARED_PREF_CONSENT_SENT, 'true');
+      }
+
+      return response;
+    } catch (error) {
+      // Don't block event replay if consent call fails
+      console.warn('Failed to track consent:', error);
+      return null;
+    }
+  }
 }

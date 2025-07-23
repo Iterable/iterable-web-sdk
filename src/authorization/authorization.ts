@@ -9,7 +9,11 @@ import {
   ENDPOINTS,
   RouteConfig,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-  SHARED_PREFS_CRITERIA
+  SHARED_PREFS_CRITERIA,
+  SHARED_PREF_CONSENT_TIMESTAMP,
+  SHARED_PREF_CONSENT_SENT,
+  SHARED_PREF_EMAIL,
+  SHARED_PREF_USER_ID
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -116,6 +120,7 @@ const initializeUserId = (userId: string) => {
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
   authIdentifier = userId;
+  localStorage.setItem(SHARED_PREF_USER_ID, userId);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -213,15 +218,16 @@ const initializeEmailUser = (email: string) => {
   clearUnknownUser();
 };
 
-const syncEvents = () => {
+const syncEvents = (isUserKnown?: boolean) => {
   if (config.getConfig('enableUnknownActivation')) {
-    unknownUserManager.syncEvents();
+    unknownUserManager.syncEvents(isUserKnown);
   }
 };
 
 const addEmailToRequest = (email: string) => {
   setTypeOfAuth('email');
   authIdentifier = email;
+  localStorage.setItem(SHARED_PREF_EMAIL, email);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -487,7 +493,7 @@ export function initialize(
           if (result) {
             initializeEmailUser(email);
             if (replay) {
-              syncEvents();
+              syncEvents(true);
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -517,7 +523,7 @@ export function initialize(
           if (result) {
             initializeUserId(userId);
             if (replay) {
-              syncEvents();
+              syncEvents(true);
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -532,6 +538,8 @@ export function initialize(
         unknownUserManager.removeUnknownSessionCriteriaData();
         setTypeOfAuth(null);
         authIdentifier = null;
+        localStorage.removeItem(SHARED_PREF_EMAIL);
+        localStorage.removeItem(SHARED_PREF_USER_ID);
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -555,6 +563,11 @@ export function initialize(
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
           localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+          // Store consent timestamp when user grants consent
+          const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+          if (!existingConsent) {
+            localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+          }
           enableUnknownTracking();
         } else {
           /* if consent is false, we want to stop tracking and clear unknown user data */
@@ -565,6 +578,8 @@ export function initialize(
             localStorage.removeItem(SHARED_PREFS_CRITERIA);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
+            localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+            localStorage.removeItem(SHARED_PREF_CONSENT_SENT);
 
             setTypeOfAuth(null);
             authIdentifier = null;
@@ -873,7 +888,7 @@ export function initialize(
               if (result) {
                 initializeEmailUser(email);
                 if (replay) {
-                  syncEvents();
+                  syncEvents(true);
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }
@@ -918,7 +933,7 @@ export function initialize(
               if (result) {
                 initializeUserId(userId);
                 if (replay) {
-                  syncEvents();
+                  syncEvents(true);
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }
@@ -946,6 +961,8 @@ export function initialize(
       unknownUserManager.removeUnknownSessionCriteriaData();
       setTypeOfAuth(null);
       authIdentifier = null;
+      localStorage.removeItem(SHARED_PREF_EMAIL);
+      localStorage.removeItem(SHARED_PREF_USER_ID);
       /* clear fetched in-app messages */
       clearMessages();
 
@@ -983,6 +1000,11 @@ export function initialize(
         localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
         localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+        // Store consent timestamp when user grants consent
+        const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+        if (!existingConsent) {
+          localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+        }
         enableUnknownTracking();
       } else {
         /* if consent is false, we want to stop tracking and clear unknown user data */
@@ -993,6 +1015,8 @@ export function initialize(
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
+          localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+          localStorage.removeItem(SHARED_PREF_CONSENT_SENT);
 
           setTypeOfAuth(null);
           authIdentifier = null;
