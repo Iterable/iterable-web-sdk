@@ -11,7 +11,6 @@ import {
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREFS_CRITERIA,
   SHARED_PREF_CONSENT_TIMESTAMP,
-  SHARED_PREF_CONSENT_SENT,
   SHARED_PREF_EMAIL,
   SHARED_PREF_USER_ID
 } from 'src/constants';
@@ -579,7 +578,6 @@ export function initialize(
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
             localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
-            localStorage.removeItem(SHARED_PREF_CONSENT_SENT);
 
             setTypeOfAuth(null);
             authIdentifier = null;
@@ -1016,7 +1014,6 @@ export function initialize(
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
           localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
-          localStorage.removeItem(SHARED_PREF_CONSENT_SENT);
 
           setTypeOfAuth(null);
           authIdentifier = null;

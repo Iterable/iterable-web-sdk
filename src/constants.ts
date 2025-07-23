@@ -289,7 +289,6 @@ export const SHARED_PREFS_UNKNOWN_SESSIONS = 'itbl_unknown_sessions';
 export const SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
 export const SHARED_PREF_UNKNOWN_USAGE_TRACKED = 'itbl_unknown_usage_tracked';
 export const SHARED_PREF_CONSENT_TIMESTAMP = 'itbl_consent_timestamp';
-export const SHARED_PREF_CONSENT_SENT = 'itbl_consent_sent';
 export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
 
 export const KEY_EVENT_NAME = 'eventName';

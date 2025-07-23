@@ -5,7 +5,6 @@ import {
   SHARED_PREF_EMAIL,
   SHARED_PREF_USER_ID,
   SHARED_PREF_UNKNOWN_USER_ID,
-  SHARED_PREF_CONSENT_SENT,
   ENDPOINT_UNKNOWN_USER_CONSENT,
   WEB_PLATFORM
 } from '../../constants';
@@ -339,64 +338,6 @@ describe('Consent Tracking', () => {
       consoleWarnSpy.mockRestore();
     });
 
-    it('should not track consent if already sent (prevents duplicate calls)', async () => {
-      mockGetTypeOfAuth.mockReturnValue('email');
-      localStorageMock.getItem.mockImplementation((key) => {
-        if (key === SHARED_PREF_CONSENT_TIMESTAMP) return mockTimestamp;
-        if (key === SHARED_PREF_EMAIL) return 'test@example.com';
-        if (key === SHARED_PREF_CONSENT_SENT) return 'true'; // Already sent
-        return null;
-      });
-
-      const result = await unknownUserEventManager.trackConsent(true);
-
-      // Should return null without making a request
-      expect(result).toBeNull();
-      expect(mockBaseIterableRequest).not.toHaveBeenCalled();
-    });
-
-    it('should mark consent as sent after successful request', async () => {
-      mockGetTypeOfAuth.mockReturnValue('email');
-      localStorageMock.getItem.mockImplementation((key) => {
-        if (key === SHARED_PREF_CONSENT_TIMESTAMP) return mockTimestamp;
-        if (key === SHARED_PREF_EMAIL) return 'test@example.com';
-        if (key === SHARED_PREF_CONSENT_SENT) return null; // Not sent yet
-        return null;
-      });
-
-      await unknownUserEventManager.trackConsent(true);
-
-      expect(mockBaseIterableRequest).toHaveBeenCalled();
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        SHARED_PREF_CONSENT_SENT,
-        'true'
-      );
-    });
-
-    it('should not mark consent as sent if request fails', async () => {
-      mockGetTypeOfAuth.mockReturnValue('email');
-      localStorageMock.getItem.mockImplementation((key) => {
-        if (key === SHARED_PREF_CONSENT_TIMESTAMP) return mockTimestamp;
-        if (key === SHARED_PREF_EMAIL) return 'test@example.com';
-        if (key === SHARED_PREF_CONSENT_SENT) return null; // Not sent yet
-        return null;
-      });
-
-      // Mock failed request
-      mockBaseIterableRequest.mockRejectedValue(new Error('Network error'));
-      const consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation();
-
-      await unknownUserEventManager.trackConsent(true);
-
-      expect(mockBaseIterableRequest).toHaveBeenCalled();
-      expect(localStorageMock.setItem).not.toHaveBeenCalledWith(
-        SHARED_PREF_CONSENT_SENT,
-        'true'
-      );
-
-      consoleWarnSpy.mockRestore();
-    });
-  });
 
   describe('syncEvents with consent tracking', () => {
     beforeEach(() => {

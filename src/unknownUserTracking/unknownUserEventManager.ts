@@ -30,7 +30,6 @@ import {
   DEFAULT_EVENT_THRESHOLD_LIMIT,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREF_CONSENT_TIMESTAMP,
-  SHARED_PREF_CONSENT_SENT,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
   SHARED_PREF_UNKNOWN_USER_ID,
   SHARED_PREF_EMAIL,
@@ -218,7 +217,7 @@ export class UnknownUserEventManager {
     this.storeEventListToLocalStorage(newDataObject);
   }
 
-  public checkCriteriaCompletion(): string | null {
+  private checkCriteriaCompletion(): string | null {
     const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
     const localStoredEventList = localStorage.getItem(
       SHARED_PREFS_EVENT_LIST_KEY
@@ -314,37 +313,7 @@ export class UnknownUserEventManager {
   }
 
   async syncEvents(isUserKnown?: boolean) {
-    // Track consent only in specific scenarios:
-    // 1. Unknown user created (isUserKnown: false) - after /session call
-    // 2. User signs up after tracking locally but /session was never called
-    if (this.hasConsent()) {
-      const identityResolutionConfig = config.getConfig('identityResolution');
-      const replayEnabled = identityResolutionConfig?.replayOnVisitorToKnown;
-
-      if (replayEnabled) {
-        try {
-          if (isUserKnown === true) {
-            // Scenario 2: User signed up after tracking locally but /session was never called
-            const unknownUserCreated = localStorage.getItem(
-              SHARED_PREF_UNKNOWN_USER_ID
-            );
-            if (!unknownUserCreated) {
-              await this.trackConsent(true);
-            }
-            // If unknownUserCreated exists, consent was already sent when unknown user was created
-          } else {
-            // Scenario 1: Unknown user created after /session call (false or undefined)
-            await this.trackConsent(false);
-          }
-        } catch (error) {
-          // Don't block event replay if consent tracking fails
-          console.warn(
-            'Consent tracking failed, continuing with event replay:',
-            error
-          );
-        }
-      }
-    }
+    await this.handleConsentTracking(isUserKnown);
 
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
@@ -389,6 +358,40 @@ export class UnknownUserEventManager {
       // eslint-disable-next-line no-param-reassign
       delete userUpdateObject[SHARED_PREFS_EVENT_TYPE];
       this.updateUser(userUpdateObject);
+    }
+  }
+
+  private async handleConsentTracking(isUserKnown?: boolean) {
+    // Track consent only in specific scenarios:
+    // 1. Unknown user created (isUserKnown: false) - after /session call
+    // 2. User signs up after tracking locally but /session was never called
+    if (this.hasConsent()) {
+      const identityResolutionConfig = config.getConfig('identityResolution');
+      const replayEnabled = identityResolutionConfig?.replayOnVisitorToKnown;
+
+      if (replayEnabled) {
+        try {
+          if (isUserKnown === true) {
+            // Scenario 2: User signed up after tracking locally but /session was never called
+            const unknownUserCreated = localStorage.getItem(
+              SHARED_PREF_UNKNOWN_USER_ID
+            );
+            if (!unknownUserCreated) {
+              await this.trackConsent(true);
+            }
+            // If unknownUserCreated exists, consent was already sent when unknown user was created
+          } else {
+            // Scenario 1: Unknown user created after /session call (false or undefined)
+            await this.trackConsent(false);
+          }
+        } catch (error) {
+          // Don't block event replay if consent tracking fails
+          console.warn(
+            'Consent tracking failed, continuing with event replay:',
+            error
+          );
+        }
+      }
     }
   }
 
@@ -579,12 +582,6 @@ export class UnknownUserEventManager {
     const consentTimestamp = this.getConsentTimestamp();
     if (!consentTimestamp) return null;
 
-    // Check if consent has already been sent to avoid duplicate calls
-    const consentSent = localStorage.getItem(SHARED_PREF_CONSENT_SENT);
-    if (consentSent === 'true') {
-      return null;
-    }
-
     const userInfo = this.getCurrentUserInfo();
     const payload: ConsentRequestParams = {
       consentTimestamp: parseInt(consentTimestamp, 10),
@@ -606,11 +603,6 @@ export class UnknownUserEventManager {
           data: consentRequestSchema
         }
       });
-
-      // Mark consent as sent only if the request was successful
-      if (response?.status === 200) {
-        localStorage.setItem(SHARED_PREF_CONSENT_SENT, 'true');
-      }
 
       return response;
     } catch (error) {
