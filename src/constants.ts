@@ -26,9 +26,9 @@ export const EU_ITERABLE_API = `https://${EU_ITERABLE_DOMAIN}/api`;
 export const BASE_URL = process.env.BASE_URL || ITERABLE_API_URL;
 
 export const GETMESSAGES_PATH = '/inApp/web/getMessages';
-export const GET_CRITERIA_PATH = '/anonymoususer/list';
+export const GET_CRITERIA_PATH = '/unknownuser/list';
 export const ENDPOINT_MERGE_USER = '/users/merge';
-export const ENDPOINT_TRACK_ANON_SESSION = '/anonymoususer/events/session';
+export const ENDPOINT_TRACK_UNKNOWN_SESSION = '/unknownuser/events/session';
 
 const GET_ENABLE_INAPP_CONSUME = () => {
   try {
@@ -284,9 +284,9 @@ export const SHARED_PREFS_EVENT_TYPE = 'eventType';
 export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_USER_UPDATE_OBJECT_KEY = 'itbl_user_update_object';
 export const SHARED_PREFS_CRITERIA = 'criteria';
-export const SHARED_PREFS_ANON_SESSIONS = 'itbl_anon_sessions';
-export const SHARED_PREF_ANON_USER_ID = 'anon_userId';
-export const SHARED_PREF_ANON_USAGE_TRACKED = 'itbl_anonymous_usage_tracked';
+export const SHARED_PREFS_UNKNOWN_SESSIONS = 'itbl_unknown_sessions';
+export const SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
+export const SHARED_PREF_UNKNOWN_USAGE_TRACKED = 'itbl_unknown_usage_tracked';
 export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
 
 export const KEY_EVENT_NAME = 'eventName';
@@ -312,5 +312,5 @@ export const INITIALIZE_ERROR = new Error(
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods'
 );
 export const AUA_WARNING = new Error(
-  'This event was stored locally because you have Anonymous User Activation enabled. If this was unintentional, please check your SDK configuration settings.'
+  'This event was stored locally because you have Unknown User Activation enabled. If this was unintentional, please check your SDK configuration settings.'
 );

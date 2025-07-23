@@ -7,7 +7,7 @@ import {
   EU_ITERABLE_API,
   GET_CRITERIA_PATH,
   INITIALIZE_ERROR,
-  ENDPOINT_TRACK_ANON_SESSION
+  ENDPOINT_TRACK_UNKNOWN_SESSION
 } from './constants';
 import { IterablePromise, IterableResponse } from './types';
 import { config } from './utils/config';
@@ -31,7 +31,7 @@ interface ClientError extends IterableResponse {
 
 const ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH = [
   GET_CRITERIA_PATH,
-  ENDPOINT_TRACK_ANON_SESSION
+  ENDPOINT_TRACK_UNKNOWN_SESSION
 ];
 
 export const baseAxiosRequest = Axios.create({
