@@ -217,11 +217,22 @@ const initializeEmailUser = (email: string) => {
   clearUnknownUser();
 };
 
-const syncEvents = (isUserKnown?: boolean) => {
-  if (config.getConfig('enableUnknownActivation')) {
-    unknownUserManager.syncEvents(isUserKnown);
-  }
-};
+  const syncEvents = ({
+    isUserKnown = false,
+    isMergeOperation = false
+  }: { isUserKnown?: boolean; isMergeOperation?: boolean } = {}) => {
+    if (config.getConfig('enableUnknownActivation')) {
+      unknownUserManager.syncEvents({ isUserKnown, isMergeOperation });
+    }
+  };
+
+  const getIdentityResolutionBehavior = (identityResolution?: IdentityResolution) => {
+    const identityResolutionConfig = config.getConfig('identityResolution');
+    return {
+      merge: identityResolution?.mergeOnUnknownToKnown ?? identityResolutionConfig?.mergeOnUnknownToKnown,
+      replay: identityResolution?.replayOnVisitorToKnown ?? identityResolutionConfig?.replayOnVisitorToKnown
+    };
+  };
 
 const addEmailToRequest = (email: string) => {
   setTypeOfAuth('email');
@@ -420,7 +431,7 @@ export function initialize(
     emailOrUserId: string,
     isEmail: boolean,
     merge?: boolean
-  ): Promise<boolean> => {
+  ): Promise<{ success: boolean; mergePerformed: boolean }> => {
     const typeOfAuth = getTypeOfAuth();
     const enableUnknownActivation = config.getConfig('enableUnknownActivation');
     const sourceUserIdOrEmail =
@@ -443,11 +454,12 @@ export function initialize(
           destinationUserId,
           destinationEmail
         );
+        return Promise.resolve({ success: true, mergePerformed: true });
       } catch (error) {
         return Promise.reject(`merging failed: ${error}`);
       }
     }
-    return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
+    return Promise.resolve({ success: true, mergePerformed: false }); // promise resolves here because merging is not needed so we setUserID passed via dev
   };
 
   if (!generateJWT) {
@@ -479,20 +491,13 @@ export function initialize(
       ) => {
         clearMessages();
         try {
-          const identityResolutionConfig =
-            config.getConfig('identityResolution');
-          const merge =
-            identityResolution?.mergeOnUnknownToKnown ||
-            identityResolutionConfig?.mergeOnUnknownToKnown;
-          const replay =
-            identityResolution?.replayOnVisitorToKnown ||
-            identityResolutionConfig?.replayOnVisitorToKnown;
+          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
           const result = await tryMergeUser(email, true, merge);
-          if (result) {
+          if (result.success) {
             initializeEmailUser(email);
             if (replay) {
-              syncEvents(true);
+              syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -509,20 +514,13 @@ export function initialize(
       ) => {
         clearMessages();
         try {
-          const identityResolutionConfig =
-            config.getConfig('identityResolution');
-          const merge =
-            identityResolution?.mergeOnUnknownToKnown ||
-            identityResolutionConfig?.mergeOnUnknownToKnown;
-          const replay =
-            identityResolution?.replayOnVisitorToKnown ||
-            identityResolutionConfig?.replayOnVisitorToKnown;
+          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
           const result = await tryMergeUser(userId, false, merge);
-          if (result) {
+          if (result.success) {
             initializeUserId(userId);
             if (replay) {
-              syncEvents(true);
+              syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -871,22 +869,16 @@ export function initialize(
       /* clear previous user */
       clearMessages();
       try {
-        const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge =
-          identityResolution?.mergeOnUnknownToKnown ||
-          identityResolutionConfig?.mergeOnUnknownToKnown;
-        const replay =
-          identityResolution?.replayOnVisitorToKnown ||
-          identityResolutionConfig?.replayOnVisitorToKnown;
+        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ email })
             .then(async (token) => {
               const result = await tryMergeUser(email, true, merge);
-              if (result) {
+              if (result.success) {
                 initializeEmailUser(email);
                 if (replay) {
-                  syncEvents(true);
+                  syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }
@@ -916,22 +908,16 @@ export function initialize(
     ) => {
       clearMessages();
       try {
-        const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge =
-          identityResolution?.mergeOnUnknownToKnown ||
-          identityResolutionConfig?.mergeOnUnknownToKnown;
-        const replay =
-          identityResolution?.replayOnVisitorToKnown ||
-          identityResolutionConfig?.replayOnVisitorToKnown;
+        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ userID: userId })
             .then(async (token) => {
               const result = await tryMergeUser(userId, false, merge);
-              if (result) {
+              if (result.success) {
                 initializeUserId(userId);
                 if (replay) {
-                  syncEvents(true);
+                  syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }

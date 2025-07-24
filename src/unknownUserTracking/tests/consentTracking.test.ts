@@ -337,7 +337,7 @@ describe('Consent Tracking', () => {
       );
       consoleWarnSpy.mockRestore();
     });
-
+  });
 
   describe('syncEvents with consent tracking', () => {
     beforeEach(() => {
@@ -371,7 +371,7 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents(true);
+      await unknownUserEventManager.syncEvents({ isUserKnown: true });
 
       expect(trackConsentSpy).toHaveBeenCalledWith(true);
     });
@@ -391,7 +391,7 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents(true);
+      await unknownUserEventManager.syncEvents({ isUserKnown: true });
 
       expect(trackConsentSpy).not.toHaveBeenCalled();
     });
@@ -410,7 +410,7 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents(true);
+      await unknownUserEventManager.syncEvents({ isUserKnown: true });
 
       expect(trackConsentSpy).not.toHaveBeenCalled();
     });
@@ -433,7 +433,7 @@ describe('Consent Tracking', () => {
 
       // Should not throw an error
       await expect(
-        unknownUserEventManager.syncEvents(true)
+        unknownUserEventManager.syncEvents({ isUserKnown: true })
       ).resolves.toBeUndefined();
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
@@ -458,9 +458,35 @@ describe('Consent Tracking', () => {
         .spyOn(unknownUserEventManager, 'trackConsent')
         .mockResolvedValue(null);
 
-      await unknownUserEventManager.syncEvents();
+      await unknownUserEventManager.syncEvents({
+        isUserKnown: false,
+        isMergeOperation: false
+      });
 
       expect(trackConsentSpy).toHaveBeenCalledWith(false);
+    });
+
+    it('should NOT track consent when isMergeOperation is true', async () => {
+      const timestamp = '1234567890';
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) return timestamp;
+        return null;
+      });
+      mockConfig.getConfig.mockReturnValue({
+        replayOnVisitorToKnown: true
+      });
+
+      const trackConsentSpy = jest
+        .spyOn(unknownUserEventManager, 'trackConsent')
+        .mockResolvedValue(null);
+
+      // Call with isMergeOperation: true - consent should NOT be tracked
+      await unknownUserEventManager.syncEvents({
+        isUserKnown: true,
+        isMergeOperation: true
+      });
+
+      expect(trackConsentSpy).not.toHaveBeenCalled();
     });
   });
 });

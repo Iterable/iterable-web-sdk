@@ -55,6 +55,12 @@ import config from '../utils/config';
 
 import { consentRequestSchema } from './consent.schema';
 
+// Type definitions for sync events options
+type SyncEventsOptions = {
+  isUserKnown?: boolean;
+  isMergeOperation?: boolean;
+};
+
 // Type definitions for unknown event data objects
 type UnknownTrackEventData = {
   eventName: string;
@@ -307,13 +313,16 @@ export class UnknownUserEventManager {
         if (unknownUserIdSetter !== null) {
           await unknownUserIdSetter(userId);
         }
-        this.syncEvents(false);
+        this.syncEvents({ isUserKnown: false });
       }
     }
   }
 
-  async syncEvents(isUserKnown?: boolean) {
-    await this.handleConsentTracking(isUserKnown);
+  async syncEvents({
+    isUserKnown = false,
+    isMergeOperation = false
+  }: SyncEventsOptions = {}) {
+    await this.handleConsentTracking(isUserKnown, isMergeOperation);
 
     const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
@@ -361,11 +370,15 @@ export class UnknownUserEventManager {
     }
   }
 
-  private async handleConsentTracking(isUserKnown?: boolean) {
+  private async handleConsentTracking(
+    isUserKnown?: boolean,
+    isMergeOperation?: boolean
+  ) {
     // Track consent only in specific scenarios:
     // 1. Unknown user created (isUserKnown: false) - after /session call
     // 2. User signs up after tracking locally but /session was never called
-    if (this.hasConsent()) {
+    // Skip consent tracking if this is a merge operation
+    if (this.hasConsent() && !isMergeOperation) {
       const identityResolutionConfig = config.getConfig('identityResolution');
       const replayEnabled = identityResolutionConfig?.replayOnVisitorToKnown;
 
