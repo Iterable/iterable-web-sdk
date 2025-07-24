@@ -4,7 +4,6 @@ interface UnknownSessionContext {
   totalUnknownSessionCount?: number;
   lastUnknownSession?: number;
   firstUnknownSession?: number;
-  webPushOptIn?: string;
   lastPage?: string;
   matchedCriteriaId: number;
 }
@@ -18,4 +17,16 @@ export interface TrackUnknownSessionParams {
     platform: string;
   };
   unknownSessionContext: UnknownSessionContext;
+}
+
+export interface ConsentRequestParams {
+  consentTimestamp: number;
+  email?: string;
+  userId?: string;
+  isUserKnown: boolean;
+  deviceInfo: {
+    deviceId: string;
+    platform: string;
+    appPackageName: string;
+  };
 }
