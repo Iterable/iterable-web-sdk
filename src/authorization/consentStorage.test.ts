@@ -26,10 +26,15 @@ jest.mock('../unknownUserTracking/unknownUserEventManager', () => ({
   registerUnknownUserIdSetter: jest.fn()
 }));
 
-jest.mock('../utils/config', () => ({
+jest.mock('src/utils/config', () => ({
   __esModule: true,
   default: {
-    getConfig: jest.fn().mockReturnValue(true)
+    getConfig: jest.fn().mockReturnValue(true),
+    setConfig: jest.fn()
+  },
+  config: {
+    getConfig: jest.fn().mockReturnValue(true),
+    setConfig: jest.fn()
   }
 }));
 
@@ -84,7 +89,7 @@ describe('Consent Storage in Authorization', () => {
 
     beforeEach(async () => {
       // Import and initialize after mocks are set up
-      const { initialize } = await import('.');
+      const { initialize } = await import('./authorization');
       const auth = initialize('test-api-key');
       setVisitorUsageTracked = auth.setVisitorUsageTracked;
     });
@@ -161,7 +166,7 @@ describe('Consent Storage in Authorization', () => {
       // Mock JWT function
       const mockGenerateJWT = jest.fn().mockResolvedValue('mock-jwt-token');
 
-      const { initialize } = await import('.');
+      const { initialize } = await import('./authorization');
       const auth = initialize('test-api-key', mockGenerateJWT);
       setVisitorUsageTracked = auth.setVisitorUsageTracked;
     });

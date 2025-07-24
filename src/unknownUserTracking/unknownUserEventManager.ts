@@ -228,7 +228,7 @@ export class UnknownUserEventManager {
     try {
       if (criteriaData && (localStoredEventList || localStoredUserUpdate)) {
         const checker = new CriteriaCompletionChecker(
-          localStoredEventList || '',
+          localStoredEventList,
           localStoredUserUpdate
         );
         return checker.getMatchedCriteria(criteriaData);
