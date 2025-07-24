@@ -1,10 +1,9 @@
 import { UpdateUnknownUserParams } from '../users/types';
 
 interface UnknownSessionContext {
-  totalAnonSessionCount?: number;
-  lastAnonSession?: number;
-  firstAnonSession?: number;
-  webPushOptIn?: string;
+  totalUnknownSessionCount?: number;
+  lastUnknownSession?: number;
+  firstUnknownSession?: number;
   lastPage?: string;
   matchedCriteriaId: number;
 }
@@ -17,7 +16,7 @@ export interface TrackUnknownSessionParams {
     appPackageName: string; // customer-defined name
     platform: string;
   };
-  anonSessionContext: UnknownSessionContext;
+  unknownSessionContext: UnknownSessionContext;
 }
 
 export interface ConsentRequestParams {

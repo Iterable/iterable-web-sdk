@@ -593,7 +593,7 @@ describe('UnknownUserEventManager', () => {
           user: expect.objectContaining({
             userId: expect.any(String)
           }),
-          anonSessionContext: expect.objectContaining({
+          unknownSessionContext: expect.objectContaining({
             matchedCriteriaId: 123
           })
         })

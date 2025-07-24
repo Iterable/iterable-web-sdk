@@ -371,7 +371,8 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents({ isUserKnown: true });
+      await unknownUserEventManager.handleConsentTracking(true);
+      await unknownUserEventManager.syncEvents();
 
       expect(trackConsentSpy).toHaveBeenCalledWith(true);
     });
@@ -391,7 +392,8 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents({ isUserKnown: true });
+      await unknownUserEventManager.handleConsentTracking(true);
+      await unknownUserEventManager.syncEvents();
 
       expect(trackConsentSpy).not.toHaveBeenCalled();
     });
@@ -410,7 +412,8 @@ describe('Consent Tracking', () => {
         'trackConsent'
       );
 
-      await unknownUserEventManager.syncEvents({ isUserKnown: true });
+      await unknownUserEventManager.handleConsentTracking(true);
+      await unknownUserEventManager.syncEvents();
 
       expect(trackConsentSpy).not.toHaveBeenCalled();
     });
@@ -433,8 +436,9 @@ describe('Consent Tracking', () => {
 
       // Should not throw an error
       await expect(
-        unknownUserEventManager.syncEvents({ isUserKnown: true })
+        unknownUserEventManager.handleConsentTracking(true)
       ).resolves.toBeUndefined();
+      await unknownUserEventManager.syncEvents();
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
         'Consent tracking failed, continuing with event replay:',
@@ -458,10 +462,8 @@ describe('Consent Tracking', () => {
         .spyOn(unknownUserEventManager, 'trackConsent')
         .mockResolvedValue(null);
 
-      await unknownUserEventManager.syncEvents({
-        isUserKnown: false,
-        isMergeOperation: false
-      });
+      await unknownUserEventManager.handleConsentTracking(false, false);
+      await unknownUserEventManager.syncEvents();
 
       expect(trackConsentSpy).toHaveBeenCalledWith(false);
     });
@@ -481,10 +483,8 @@ describe('Consent Tracking', () => {
         .mockResolvedValue(null);
 
       // Call with isMergeOperation: true - consent should NOT be tracked
-      await unknownUserEventManager.syncEvents({
-        isUserKnown: true,
-        isMergeOperation: true
-      });
+      await unknownUserEventManager.handleConsentTracking(true, true);
+      await unknownUserEventManager.syncEvents();
 
       expect(trackConsentSpy).not.toHaveBeenCalled();
     });

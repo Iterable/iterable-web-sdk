@@ -217,12 +217,15 @@ const initializeEmailUser = (email: string) => {
   clearUnknownUser();
 };
 
-  const syncEvents = ({
-    isUserKnown = false,
-    isMergeOperation = false
-  }: { isUserKnown?: boolean; isMergeOperation?: boolean } = {}) => {
+  const syncEvents = () => {
     if (config.getConfig('enableUnknownActivation')) {
-      unknownUserManager.syncEvents({ isUserKnown, isMergeOperation });
+      unknownUserManager.syncEvents();
+    }
+  };
+
+  const handleConsentTracking = (isUserKnown = false, isMergeOperation = false) => {
+    if (config.getConfig('enableUnknownActivation')) {
+      unknownUserManager.handleConsentTracking(isUserKnown, isMergeOperation);
     }
   };
 
@@ -497,7 +500,8 @@ export function initialize(
           if (result.success) {
             initializeEmailUser(email);
             if (replay) {
-              syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
+              await handleConsentTracking(true, result.mergePerformed);
+              syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -520,7 +524,8 @@ export function initialize(
           if (result.success) {
             initializeUserId(userId);
             if (replay) {
-              syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
+              await handleConsentTracking(true, result.mergePerformed);
+              syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
@@ -878,7 +883,8 @@ export function initialize(
               if (result.success) {
                 initializeEmailUser(email);
                 if (replay) {
-                  syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
+                  await handleConsentTracking(true, result.mergePerformed);
+                  syncEvents();
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }
@@ -917,7 +923,8 @@ export function initialize(
               if (result.success) {
                 initializeUserId(userId);
                 if (replay) {
-                  syncEvents({ isUserKnown: true, isMergeOperation: result.mergePerformed });
+                  await handleConsentTracking(true, result.mergePerformed);
+                  syncEvents();
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
                 }
