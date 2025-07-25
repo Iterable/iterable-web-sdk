@@ -303,7 +303,8 @@ describe('validateCustomEventUserUpdateAPI', () => {
     const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      null
     );
 
     const result = checker.getMatchedCriteria(localStoredCriteriaSets!);
@@ -379,7 +380,8 @@ describe('validateCustomEventUserUpdateAPI', () => {
     const localStoredCriteriaSets = localStorage.getItem(SHARED_PREFS_CRITERIA);
 
     const checker = new CriteriaCompletionChecker(
-      localStoredEventList === null ? '' : localStoredEventList
+      localStoredEventList === null ? '' : localStoredEventList,
+      null
     );
     const result = checker.getMatchedCriteria(
       JSON.stringify(localStoredCriteriaSets)

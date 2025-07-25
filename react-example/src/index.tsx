@@ -47,7 +47,11 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableUnknownActivation: true
+      enableUnknownActivation: true,
+      identityResolution: {
+        replayOnVisitorToKnown: true,
+        mergeOnUnknownToKnown: true
+      }
     },
     generateJWT: ({ email, userID }) =>
       axios

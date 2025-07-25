@@ -9,7 +9,10 @@ import {
   ENDPOINTS,
   RouteConfig,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-  SHARED_PREFS_CRITERIA
+  SHARED_PREFS_CRITERIA,
+  SHARED_PREF_CONSENT_TIMESTAMP,
+  SHARED_PREF_EMAIL,
+  SHARED_PREF_USER_ID
 } from 'src/constants';
 import {
   cancelAxiosRequestAndMakeFetch,
@@ -116,6 +119,7 @@ const initializeUserId = (userId: string) => {
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
   authIdentifier = userId;
+  localStorage.setItem(SHARED_PREF_USER_ID, userId);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -213,15 +217,30 @@ const initializeEmailUser = (email: string) => {
   clearUnknownUser();
 };
 
-const syncEvents = () => {
-  if (config.getConfig('enableUnknownActivation')) {
-    unknownUserManager.syncEvents();
-  }
-};
+  const syncEvents = () => {
+    if (config.getConfig('enableUnknownActivation')) {
+      unknownUserManager.syncEvents();
+    }
+  };
+
+  const handleConsentTracking = (isUserKnown = false, isMergeOperation = false) => {
+    if (config.getConfig('enableUnknownActivation')) {
+      unknownUserManager.handleConsentTracking(isUserKnown, isMergeOperation);
+    }
+  };
+
+  const getIdentityResolutionBehavior = (identityResolution?: IdentityResolution) => {
+    const identityResolutionConfig = config.getConfig('identityResolution');
+    return {
+      merge: identityResolution?.mergeOnUnknownToKnown ?? identityResolutionConfig?.mergeOnUnknownToKnown,
+      replay: identityResolution?.replayOnVisitorToKnown ?? identityResolutionConfig?.replayOnVisitorToKnown
+    };
+  };
 
 const addEmailToRequest = (email: string) => {
   setTypeOfAuth('email');
   authIdentifier = email;
+  localStorage.setItem(SHARED_PREF_EMAIL, email);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -415,7 +434,7 @@ export function initialize(
     emailOrUserId: string,
     isEmail: boolean,
     merge?: boolean
-  ): Promise<boolean> => {
+  ): Promise<{ success: boolean; mergePerformed: boolean }> => {
     const typeOfAuth = getTypeOfAuth();
     const enableUnknownActivation = config.getConfig('enableUnknownActivation');
     const sourceUserIdOrEmail =
@@ -438,11 +457,12 @@ export function initialize(
           destinationUserId,
           destinationEmail
         );
+        return Promise.resolve({ success: true, mergePerformed: true });
       } catch (error) {
         return Promise.reject(`merging failed: ${error}`);
       }
     }
-    return Promise.resolve(true); // promise resolves here because merging is not needed so we setUserID passed via dev
+    return Promise.resolve({ success: true, mergePerformed: false }); // promise resolves here because merging is not needed so we setUserID passed via dev
   };
 
   if (!generateJWT) {
@@ -474,19 +494,13 @@ export function initialize(
       ) => {
         clearMessages();
         try {
-          const identityResolutionConfig =
-            config.getConfig('identityResolution');
-          const merge =
-            identityResolution?.mergeOnUnknownToKnown ||
-            identityResolutionConfig?.mergeOnUnknownToKnown;
-          const replay =
-            identityResolution?.replayOnVisitorToKnown ||
-            identityResolutionConfig?.replayOnVisitorToKnown;
+          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
           const result = await tryMergeUser(email, true, merge);
-          if (result) {
+          if (result.success) {
             initializeEmailUser(email);
             if (replay) {
+              await handleConsentTracking(true, result.mergePerformed);
               syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
@@ -504,19 +518,13 @@ export function initialize(
       ) => {
         clearMessages();
         try {
-          const identityResolutionConfig =
-            config.getConfig('identityResolution');
-          const merge =
-            identityResolution?.mergeOnUnknownToKnown ||
-            identityResolutionConfig?.mergeOnUnknownToKnown;
-          const replay =
-            identityResolution?.replayOnVisitorToKnown ||
-            identityResolutionConfig?.replayOnVisitorToKnown;
+          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
           const result = await tryMergeUser(userId, false, merge);
-          if (result) {
+          if (result.success) {
             initializeUserId(userId);
             if (replay) {
+              await handleConsentTracking(true, result.mergePerformed);
               syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
@@ -532,6 +540,8 @@ export function initialize(
         unknownUserManager.removeUnknownSessionCriteriaData();
         setTypeOfAuth(null);
         authIdentifier = null;
+        localStorage.removeItem(SHARED_PREF_EMAIL);
+        localStorage.removeItem(SHARED_PREF_USER_ID);
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -555,6 +565,11 @@ export function initialize(
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
           localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+          // Store consent timestamp when user grants consent
+          const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+          if (!existingConsent) {
+            localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+          }
           enableUnknownTracking();
         } else {
           /* if consent is false, we want to stop tracking and clear unknown user data */
@@ -565,6 +580,7 @@ export function initialize(
             localStorage.removeItem(SHARED_PREFS_CRITERIA);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
+            localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
             setTypeOfAuth(null);
             authIdentifier = null;
@@ -858,21 +874,16 @@ export function initialize(
       /* clear previous user */
       clearMessages();
       try {
-        const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge =
-          identityResolution?.mergeOnUnknownToKnown ||
-          identityResolutionConfig?.mergeOnUnknownToKnown;
-        const replay =
-          identityResolution?.replayOnVisitorToKnown ||
-          identityResolutionConfig?.replayOnVisitorToKnown;
+        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ email })
             .then(async (token) => {
               const result = await tryMergeUser(email, true, merge);
-              if (result) {
+              if (result.success) {
                 initializeEmailUser(email);
                 if (replay) {
+                  await handleConsentTracking(true, result.mergePerformed);
                   syncEvents();
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
@@ -903,21 +914,16 @@ export function initialize(
     ) => {
       clearMessages();
       try {
-        const identityResolutionConfig = config.getConfig('identityResolution');
-        const merge =
-          identityResolution?.mergeOnUnknownToKnown ||
-          identityResolutionConfig?.mergeOnUnknownToKnown;
-        const replay =
-          identityResolution?.replayOnVisitorToKnown ||
-          identityResolutionConfig?.replayOnVisitorToKnown;
+        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ userID: userId })
             .then(async (token) => {
               const result = await tryMergeUser(userId, false, merge);
-              if (result) {
+              if (result.success) {
                 initializeUserId(userId);
                 if (replay) {
+                  await handleConsentTracking(true, result.mergePerformed);
                   syncEvents();
                 } else {
                   unknownUserManager.removeUnknownSessionCriteriaData();
@@ -946,6 +952,8 @@ export function initialize(
       unknownUserManager.removeUnknownSessionCriteriaData();
       setTypeOfAuth(null);
       authIdentifier = null;
+      localStorage.removeItem(SHARED_PREF_EMAIL);
+      localStorage.removeItem(SHARED_PREF_USER_ID);
       /* clear fetched in-app messages */
       clearMessages();
 
@@ -983,6 +991,11 @@ export function initialize(
         localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
         localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
+        // Store consent timestamp when user grants consent
+        const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+        if (!existingConsent) {
+          localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+        }
         enableUnknownTracking();
       } else {
         /* if consent is false, we want to stop tracking and clear unknown user data */
@@ -993,6 +1006,7 @@ export function initialize(
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
+          localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
           setTypeOfAuth(null);
           authIdentifier = null;

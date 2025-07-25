@@ -41,11 +41,14 @@ class CriteriaCompletionChecker {
   private localStoredUserUpdate: any;
 
   constructor(
-    localStoredEventList: string,
-    localStoredUserUpdate?: string | null
+    localStoredEventList: string | null,
+    localStoredUserUpdate: string | null
   ) {
     this.localStoredEventList =
-      (localStoredEventList !== '' && JSON.parse(localStoredEventList)) || [];
+      (localStoredEventList &&
+        localStoredEventList !== '' &&
+        JSON.parse(localStoredEventList)) ||
+      [];
     this.localStoredUserUpdate =
       (localStoredUserUpdate &&
         localStoredUserUpdate !== '' &&

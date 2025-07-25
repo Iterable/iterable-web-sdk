@@ -4,7 +4,9 @@ import {
   SHARED_PREFS_UNKNOWN_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
-  SHARED_PREF_UNKNOWN_USAGE_TRACKED
+  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
+  ENDPOINT_TRACK_UNKNOWN_SESSION,
+  SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../../constants';
 import { UpdateUserParams } from '../../users';
 import { TrackPurchaseRequestParams } from '../../commerce';
@@ -515,5 +517,87 @@ describe('UnknownUserEventManager', () => {
       return null;
     });
     await unknownUserEventManager.trackUnknownUpdateCart(payload);
+  });
+
+  it('should create session data and call /session immediately when criteria is met without existing session data', async () => {
+    // Mock window object for the test
+    global.window = Object.create({
+      location: { hostname: 'test.example.com' },
+      navigator: { userAgent: 'test-user-agent' }
+    });
+
+    const mockBaseIterableRequest = baseIterableRequest as jest.MockedFunction<
+      typeof baseIterableRequest
+    >;
+
+    // Mock successful session creation response
+    mockBaseIterableRequest.mockResolvedValue({
+      status: 200,
+      data: { success: true }
+    } as any);
+
+    // Create a new instance to test directly
+    const manager = new UnknownUserEventManager();
+
+    // Set up localStorage mocks
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+        return 'true';
+      }
+      // Initially no session data exists
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+        return null;
+      }
+      if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+        return null;
+      }
+      return null;
+    });
+
+    // Mock setItem to simulate session creation
+    let sessionDataCreated = false;
+    (localStorage.setItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+        sessionDataCreated = true;
+        // After updateUnknownSession is called, simulate the session data being available
+        (localStorage.getItem as jest.Mock).mockImplementation((getKey) => {
+          if (getKey === SHARED_PREFS_UNKNOWN_SESSIONS) {
+            return JSON.stringify({
+              itbl_unknown_sessions: {
+                number_of_sessions: 1,
+                first_session: Math.floor(Date.now() / 1000),
+                last_session: Math.floor(Date.now() / 1000)
+              }
+            });
+          }
+          if (getKey === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+            return 'true';
+          }
+          return null;
+        });
+      }
+    });
+
+    // Directly call createUnknownUser with a criteria ID to test the fix
+    await (manager as any).createUnknownUser('123');
+
+    // Verify that session data was created
+    expect(sessionDataCreated).toBe(true);
+
+    // Verify that the session endpoint was called
+    expect(mockBaseIterableRequest).toHaveBeenCalledWith(
+      expect.objectContaining({
+        method: 'POST',
+        url: ENDPOINT_TRACK_UNKNOWN_SESSION,
+        data: expect.objectContaining({
+          user: expect.objectContaining({
+            userId: expect.any(String)
+          }),
+          unknownSessionContext: expect.objectContaining({
+            matchedCriteriaId: 123
+          })
+        })
+      })
+    );
   });
 });
