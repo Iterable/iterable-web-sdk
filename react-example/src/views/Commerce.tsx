@@ -1,12 +1,12 @@
+import { trackPurchase, updateCart } from '@iterable/web-sdk';
 import { FC, FormEvent, useState } from 'react';
-import { updateCart, trackPurchase } from '@iterable/web-sdk';
 import { TextField } from '../components/TextField';
 import {
-  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
-  Response
+  Response,
+  StyledButton
 } from './Components.styled';
 
 interface Props {}

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unreachable */
 import { delMany, entries } from 'idb-keyval';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../constants';
@@ -111,7 +112,6 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
     try {
       await delMany(cachedMessagesToDelete);
     } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
-      // eslint-disable-next-line no-console
       console.warn(
         'Error deleting messages from the browser cache',
         err?.response?.data?.clientErrors ?? err
@@ -129,7 +129,6 @@ export const requestMessages = async ({ payload }: RequestMessagesProps) => {
       }
     };
   } catch (err: any /* eslint-disable-line @typescript-eslint/no-explicit-any */) {
-    // eslint-disable-next-line no-console
     console.warn(
       'Error requesting in-app messages',
       err?.response?.data?.clientErrors ?? err

@@ -70,6 +70,7 @@ describe('UserMergeScenariosTests', () => {
       data: 'something'
     });
     mockRequest.onPost('/events/track').reply(200, {});
+    mockRequest.onPost('/users/update').reply(200, {});
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
@@ -82,6 +83,7 @@ describe('UserMergeScenariosTests', () => {
       data: 'something'
     });
     mockRequest.onPost('/events/track').reply(200, {});
+    mockRequest.onPost('/users/update').reply(200, {});
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});

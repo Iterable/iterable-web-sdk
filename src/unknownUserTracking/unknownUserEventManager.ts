@@ -28,7 +28,6 @@ import {
   KEY_PREFER_USERID,
   ENDPOINTS,
   DEFAULT_EVENT_THRESHOLD_LIMIT,
-  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREF_CONSENT_TIMESTAMP,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
   SHARED_PREF_UNKNOWN_USER_ID,
@@ -99,10 +98,8 @@ export function registerUnknownUserIdSetter(
 }
 
 export function isUnknownUsageTracked(): boolean {
-  const unknownUsageTracked = localStorage.getItem(
-    SHARED_PREF_UNKNOWN_USAGE_TRACKED
-  );
-  return unknownUsageTracked === 'true';
+  const consentTimestamp = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+  return consentTimestamp !== null;
 }
 
 export class UnknownUserEventManager {
@@ -594,6 +591,9 @@ export class UnknownUserEventManager {
           data: consentRequestSchema
         }
       });
+
+      // Remove consent timestamp after successful call
+      localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
       return response;
     } catch (error) {
