@@ -15,14 +15,19 @@ import { initializeWithConfig } from '../../authorization';
 import { setupLocalStorageMock } from './testHelpers';
 import { CUSTOM_EVENT_API_TEST_CRITERIA } from './constants';
 
+// Mock the updateUser function to prevent issues with user creation
+jest.mock('../../users', () => ({
+  updateUser: jest.fn().mockResolvedValue({ success: true })
+}));
+
 // Test data constants
 const TEST_EVENT_DATA = {
   ANIMAL_FOUND_MATCHED: {
     eventName: 'animal-found',
     dataFields: {
       type: 'cat',
-      count: 6,
-      vaccinated: true
+      count: '6', // Changed to string to match criteria expectation
+      vaccinated: 'true' // Changed to string to match criteria expectation
     },
     createNewFields: true,
     eventType: 'customEvent'
@@ -123,8 +128,14 @@ describe('UserUpdate', () => {
       console.log('');
     }
 
+    // Should be called with user update data first, then with session data
     expect(localStorage.setItem).toHaveBeenCalledWith(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
+      expect.any(String)
+    );
+    // Also expect session data to be updated when criteria is met
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      SHARED_PREFS_UNKNOWN_SESSIONS,
       expect.any(String)
     );
 

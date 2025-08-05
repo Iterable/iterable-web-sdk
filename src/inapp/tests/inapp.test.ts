@@ -116,6 +116,15 @@ describe('getInAppMessages', () => {
   describe('getInAppMessages with auto painting', () => {
     beforeAll(() => {
       jest.useFakeTimers();
+
+      // Mock navigator.userAgent to simulate a non-Safari browser
+      // This ensures click tracking works in tests (Safari blocks iframe event handlers)
+      Object.defineProperty(navigator, 'userAgent', {
+        value:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        writable: true
+      });
+
       mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
         inAppMessages: messages
       });

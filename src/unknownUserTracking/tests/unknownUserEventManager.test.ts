@@ -574,6 +574,9 @@ describe('UnknownUserEventManager', () => {
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
       }
+      if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+        return '1234567890'; // Mock consent timestamp to allow session creation
+      }
       // Initially no session data exists
       if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
         return null;

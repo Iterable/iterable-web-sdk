@@ -21,6 +21,11 @@ import {
   USER_UPDATE_API_TEST_CRITERIA
 } from './constants';
 
+// Mock the updateUser function to prevent "could not create user" errors
+jest.mock('../../users', () => ({
+  updateUser: jest.fn().mockResolvedValue({ success: true })
+}));
+
 // Test data constants
 const TEST_EVENT_DATA = {
   // SUCCESS case - properly nested data
@@ -170,8 +175,14 @@ describe('validateCustomEventUserUpdateAPI', () => {
     } catch (e) {
       console.log('');
     }
+    // Should be called with user update data first, then with session data
     expect(localStorage.setItem).toHaveBeenCalledWith(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
+      expect.any(String)
+    );
+    // Also expect session data to be updated when criteria is met
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      SHARED_PREFS_UNKNOWN_SESSIONS,
       expect.any(String)
     );
     await setUserID('testuser123');
@@ -259,8 +270,14 @@ describe('validateCustomEventUserUpdateAPI', () => {
     } catch (e) {
       console.log('');
     }
+    // Should be called with user update data first, then with session data
     expect(localStorage.setItem).toHaveBeenCalledWith(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
+      expect.any(String)
+    );
+    // Also expect session data to be updated when criteria is met
+    expect(localStorage.setItem).toHaveBeenCalledWith(
+      SHARED_PREFS_UNKNOWN_SESSIONS,
       expect.any(String)
     );
     await setUserID('testuser123');
