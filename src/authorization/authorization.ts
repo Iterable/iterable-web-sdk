@@ -13,16 +13,16 @@ import {
   SHARED_PREF_EMAIL,
   SHARED_PREF_USER_ID,
   RETRY_USER_ATTEMPTS
-} from 'src/constants';
-import { UnknownUserMerge } from 'src/unknownUserTracking/unknownUserMerge';
+} from '../constants';
+import { UnknownUserMerge } from '../unknownUserTracking/unknownUserMerge';
 import {
   UnknownUserEventManager,
   isUnknownUsageTracked,
   registerUnknownUserIdSetter
-} from 'src/unknownUserTracking/unknownUserEventManager';
-import { IdentityResolution, Options, config } from 'src/utils/config';
-import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
-import AuthorizationToken from 'src/utils/authorizationToken';
+} from '../unknownUserTracking/unknownUserEventManager';
+import { IdentityResolution, Options, config } from '../utils/config';
+import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from '../utils/typeOfAuth';
+import AuthorizationToken from '../utils/authorizationToken';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
@@ -989,6 +989,7 @@ export function initialize(
                 }
                 return token;
               }
+              return token;
             })
             .catch((e) => {
               if (logLevel === 'verbose') {
