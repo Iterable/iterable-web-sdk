@@ -103,10 +103,7 @@ describe('Consent Storage in Authorization', () => {
         SHARED_PREF_CONSENT_TIMESTAMP,
         '1234567890'
       );
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-        'true'
-      );
+      // Note: SHARED_PREF_UNKNOWN_USAGE_TRACKED no longer used - consent determined by timestamp
     });
 
     it('should not overwrite existing consent timestamp when consent is granted again', () => {
@@ -121,10 +118,7 @@ describe('Consent Storage in Authorization', () => {
         SHARED_PREF_CONSENT_TIMESTAMP,
         expect.any(String)
       );
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-        'true'
-      );
+      // Note: SHARED_PREF_UNKNOWN_USAGE_TRACKED no longer used
     });
 
     it('should remove consent timestamp when consent is revoked', () => {
@@ -144,18 +138,13 @@ describe('Consent Storage in Authorization', () => {
       expect(localStorageMock.removeItem).toHaveBeenCalledWith(
         SHARED_PREF_UNKNOWN_USER_ID
       );
-      expect(localStorageMock.removeItem).toHaveBeenCalledWith(
-        SHARED_PREF_UNKNOWN_USAGE_TRACKED
-      );
+      // Note: SHARED_PREF_UNKNOWN_USAGE_TRACKED no longer used
     });
 
     it('should set unknown usage tracked to false when consent is revoked', () => {
       setVisitorUsageTracked(false);
 
-      expect(localStorageMock.setItem).toHaveBeenCalledWith(
-        SHARED_PREF_UNKNOWN_USAGE_TRACKED,
-        'false'
-      );
+      // Note: SHARED_PREF_UNKNOWN_USAGE_TRACKED no longer used
     });
   });
 

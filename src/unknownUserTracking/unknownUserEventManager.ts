@@ -50,7 +50,7 @@ import {
 } from '../commerce/commerce.schema';
 import { updateUserSchema } from '../users/users.schema';
 import { InAppTrackRequestParams } from '../events';
-import config from '../utils/config';
+import { config } from '../utils/config';
 
 import { consentRequestSchema } from './consent.schema';
 
@@ -98,6 +98,11 @@ export function registerUnknownUserIdSetter(
 }
 
 export function isUnknownUsageTracked(): boolean {
+  // Check both configuration AND user consent
+  const isEnabled = config.getConfig('enableUnknownActivation') || false;
+  if (!isEnabled) return false;
+
+  // Also check if user has given consent (consent timestamp exists)
   const consentTimestamp = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
   return consentTimestamp !== null;
 }

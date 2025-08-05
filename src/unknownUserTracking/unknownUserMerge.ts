@@ -11,6 +11,23 @@ export type MergeApiParams = {
 };
 
 export class UnknownUserMerge {
+  /**
+   * Merge an unknown user (identified by userId only) into a known user
+   */
+  mergeUnknownUser(
+    unknownUserId: string,
+    destinationUserId: string | null,
+    destinationEmail: string | null
+  ): Promise<void> {
+    const mergeApiParams: MergeApiParams = {
+      sourceUserId: unknownUserId,
+      sourceEmail: null, // unknown users don't have emails
+      destinationUserId,
+      destinationEmail
+    };
+    return this.callMergeApi(mergeApiParams);
+  }
+
   mergeUser(
     sourceUserId: string | null,
     sourceEmail: string | null,

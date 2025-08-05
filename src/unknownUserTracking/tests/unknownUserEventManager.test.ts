@@ -1,10 +1,12 @@
 import { UnknownUserEventManager } from '../unknownUserEventManager';
 import { baseIterableRequest } from '../../request';
+import { config } from '../../utils/config';
 import {
   SHARED_PREFS_UNKNOWN_SESSIONS,
   SHARED_PREFS_EVENT_LIST_KEY,
   SHARED_PREFS_CRITERIA,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
+  SHARED_PREF_CONSENT_TIMESTAMP,
   ENDPOINT_TRACK_UNKNOWN_SESSION,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY
 } from '../../constants';
@@ -27,6 +29,13 @@ jest.mock('../../request', () => ({
   baseIterableRequest: jest.fn()
 }));
 
+jest.mock('../../utils/config', () => ({
+  __esModule: true,
+  config: {
+    getConfig: jest.fn()
+  }
+}));
+
 declare global {
   function uuidv4(): string;
   function getEmail(): string;
@@ -36,9 +45,27 @@ declare global {
 
 describe('UnknownUserEventManager', () => {
   let unknownUserEventManager: UnknownUserEventManager;
+  const mockConfig = config as jest.Mocked<typeof config>;
 
   beforeEach(() => {
     (global as any).localStorage = localStorageMock;
+
+    // Default consent setup for most tests
+    localStorageMock.getItem.mockImplementation((key) => {
+      if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+        return '1234567890'; // Mock consent timestamp
+      }
+      return null;
+    });
+
+    // Mock config for unknown user activation
+    mockConfig.getConfig.mockImplementation((key) => {
+      if (key === 'enableUnknownActivation') {
+        return true;
+      }
+      return undefined;
+    });
+
     unknownUserEventManager = new UnknownUserEventManager();
   });
 
@@ -61,6 +88,9 @@ describe('UnknownUserEventManager', () => {
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
+      }
+      if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+        return '1234567890'; // Mock consent timestamp
       }
       return null;
     });
@@ -572,6 +602,9 @@ describe('UnknownUserEventManager', () => {
           }
           if (getKey === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
             return 'true';
+          }
+          if (getKey === SHARED_PREF_CONSENT_TIMESTAMP) {
+            return '1234567890'; // Mock consent timestamp
           }
           return null;
         });

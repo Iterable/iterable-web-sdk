@@ -9,11 +9,13 @@ class AuthorizationToken {
   }
 
   getToken(): string | null {
-    return this.token || localStorage.getItem(SHARED_PREF_USER_TOKEN);
+    return this.token && this.token.length > 0
+      ? this.token
+      : localStorage.getItem(SHARED_PREF_USER_TOKEN);
   }
 
   clearToken() {
-    this.token = '';
+    this.token = null;
     localStorage.removeItem(SHARED_PREF_USER_TOKEN);
   }
 }

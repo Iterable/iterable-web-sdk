@@ -106,6 +106,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
+    mockRequest.onPost('/unknownuser/consent').reply(200, {});
   });
 
   beforeEach(() => {
@@ -119,6 +120,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
+    mockRequest.onPost('/unknownuser/consent').reply(200, {});
     jest.resetAllMocks();
     jest.useFakeTimers();
   });
@@ -136,6 +138,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
+      }
+      if (key === 'itbl_consent_timestamp') {
+        return '1234567890'; // Mock consent timestamp
       }
       return null;
     });
@@ -223,6 +228,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
       }
+      if (key === 'itbl_consent_timestamp') {
+        return '1234567890'; // Mock consent timestamp
+      }
       return null;
     });
 
@@ -292,6 +300,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
+      }
+      if (key === 'itbl_consent_timestamp') {
+        return '1234567890'; // Mock consent timestamp
       }
       return null;
     });
@@ -369,6 +380,9 @@ describe('validateCustomEventUserUpdateAPI', () => {
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
+      }
+      if (key === 'itbl_consent_timestamp') {
+        return '1234567890'; // Mock consent timestamp
       }
       return null;
     });

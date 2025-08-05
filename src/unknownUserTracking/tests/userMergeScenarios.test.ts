@@ -10,6 +10,7 @@ import {
   ENDPOINT_MERGE_USER,
   SHARED_PREF_UNKNOWN_USER_ID,
   SHARED_PREF_UNKNOWN_USAGE_TRACKED,
+  SHARED_PREF_CONSENT_TIMESTAMP,
   SHARED_PREF_USER_TOKEN
 } from '../../constants';
 import { track } from '../../events';
@@ -19,6 +20,11 @@ import { USER_MERGE_SCENARIO_CRITERIA } from './constants';
 import { setTypeOfAuth } from '../../utils/typeOfAuth';
 
 jest.setTimeout(20000); // Set the timeout to 10 seconds
+
+// Mock the users module to prevent "could not create user" errors
+jest.mock('../../users', () => ({
+  updateUser: jest.fn().mockResolvedValue({ success: true })
+}));
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -74,6 +80,7 @@ describe('UserMergeScenariosTests', () => {
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
+    mockRequest.onPost('/unknownuser/consent').reply(200, {});
   });
 
   beforeEach(() => {
@@ -87,6 +94,7 @@ describe('UserMergeScenariosTests', () => {
     mockRequest.onPost(ENDPOINT_MERGE_USER).reply(200, {});
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     mockRequest.onPost(ENDPOINT_TRACK_UNKNOWN_SESSION).reply(200, {});
+    mockRequest.onPost('/unknownuser/consent').reply(200, {});
     jest.resetAllMocks();
     (localStorage.getItem as jest.Mock).mockImplementation((key) => {
       if (key === SHARED_PREFS_EVENT_LIST_KEY) {
@@ -100,6 +108,9 @@ describe('UserMergeScenariosTests', () => {
       }
       if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
         return 'true';
+      }
+      if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+        return '1234567890'; // Mock consent timestamp
       }
       return null;
     });
@@ -284,6 +295,9 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
         }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890'; // Mock consent timestamp for this test
+        }
         return null;
       });
       const { setUserID, logout } = initializeWithConfig({
@@ -416,6 +430,28 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('current user identified with setUserId merge true', async () => {
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+          return JSON.stringify([eventDataMatched]);
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
+        }
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+          return 'true';
+        }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890';
+        }
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
+        }
+        return null;
+      });
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
@@ -449,6 +485,28 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('merge api called with destination userID JWT Authorization', async () => {
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+          return JSON.stringify([eventDataMatched]);
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
+        }
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+          return 'true';
+        }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890';
+        }
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
+        }
+        return null;
+      });
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
@@ -674,6 +732,9 @@ describe('UserMergeScenariosTests', () => {
         if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
           return 'true';
         }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890'; // Mock consent timestamp for this test
+        }
         return null;
       });
       const { setEmail } = initializeWithConfig({
@@ -806,6 +867,28 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('current user identified with setEmail merge true', async () => {
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+          return JSON.stringify([eventDataMatched]);
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
+        }
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+          return 'true';
+        }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890';
+        }
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
+        }
+        return null;
+      });
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
@@ -886,6 +969,28 @@ describe('UserMergeScenariosTests', () => {
     });
 
     it('merge api called with destination email JWT Authorization', async () => {
+      const unknownId = '123e4567-e89b-12d3-a456-426614174000';
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+          return JSON.stringify([eventDataMatched]);
+        }
+        if (key === SHARED_PREFS_CRITERIA) {
+          return JSON.stringify(USER_MERGE_SCENARIO_CRITERIA);
+        }
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify(initialUnknownSessionInfo);
+        }
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+          return 'true';
+        }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890';
+        }
+        if (key === SHARED_PREF_UNKNOWN_USER_ID) {
+          return unknownId;
+        }
+        return null;
+      });
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
