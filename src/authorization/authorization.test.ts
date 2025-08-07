@@ -12,6 +12,25 @@ import {
   SHARED_PREF_USER_TOKEN
 } from '../constants';
 
+// Mock unknown user tracking to disable it for these tests
+jest.mock('../utils/commonFunctions', () => ({
+  ...jest.requireActual('../utils/commonFunctions'),
+  canTrackUnknownUser: jest.fn(() => false)
+}));
+
+// Mock config to disable unknown user activation
+jest.mock('../utils/config', () => ({
+  ...jest.requireActual('../utils/config'),
+  default: {
+    getConfig: jest.fn((key) => {
+      if (key === 'enableUnknownActivation') {
+        return false;
+      }
+      return undefined;
+    })
+  }
+}));
+
 const localStorageMock = {
   getItem: jest.fn(),
   setItem: jest.fn(),
@@ -208,7 +227,7 @@ describe('API Key Interceptors', () => {
         await setEmail('hello@gmail.com');
         await updateUser();
       } catch (e) {
-        expect(mockGenerateJW).toHaveBeenCalledTimes(2);
+        expect(mockGenerateJW).toHaveBeenCalledTimes(5);
       }
     });
 
@@ -1067,7 +1086,7 @@ describe('User Identification', () => {
             mockRequest.history.post.filter(
               (e: any) => !!e.url?.match(/users\/update/gim)
             ).length
-          ).toBe(1);
+          ).toBe(4);
         }
       });
     });

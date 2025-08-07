@@ -85,9 +85,9 @@ export const baseIterableRequest = <T = any>(
       headers: {
         ...payload.headers,
         ...STATIC_HEADERS,
-        Authorization
+        ...(Authorization && { Authorization })
       },
-      paramsSerializer: (params) =>
+      paramsSerializer: (params: any) =>
         qs.stringify(params, { arrayFormat: 'repeat' })
     });
   } catch (error) {

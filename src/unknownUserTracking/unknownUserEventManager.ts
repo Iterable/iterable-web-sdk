@@ -233,7 +233,8 @@ export class UnknownUserEventManager {
           localStoredEventList,
           localStoredUserUpdate
         );
-        return checker.getMatchedCriteria(criteriaData);
+        const result = checker.getMatchedCriteria(criteriaData);
+        return result;
       }
     } catch (error) {
       console.error('checkCriteriaCompletion', error);
@@ -294,6 +295,7 @@ export class UnknownUserEventManager {
         url: ENDPOINT_TRACK_UNKNOWN_SESSION,
         data: payload
       }).catch((e) => {
+        console.log('[DEBUG] Request failed:', e);
         if (e?.response?.status === 409) {
           this.getUnknownCriteria();
         }

@@ -277,7 +277,11 @@ const addEmailToRequest = (email: string) => {
         body: true,
         current: false,
         nestedUser: false
-      })
+      }) &&
+      !config?.url?.includes('/events/trackInAppDelivery') &&
+      !config?.url?.includes('/events/trackInAppClick') &&
+      !config?.url?.includes('/events/trackInAppOpen') &&
+      !config?.url?.includes('/events/inAppConsume')
     ) {
       return {
         ...config,
@@ -563,9 +567,11 @@ export function initialize(
           const { merge, replay } =
             getIdentityResolutionBehavior(identityResolution);
 
+          // Set up user authentication first so merge API can authenticate
+          initializeEmailUser(email);
+
           const result = await tryMergeUser(email, true, merge);
           if (result.success) {
-            initializeEmailUser(email);
             // Clear unknown user after merge attempt (successful or skipped)
             clearUnknownUser();
 
@@ -592,12 +598,12 @@ export function initialize(
           const { merge, replay } =
             getIdentityResolutionBehavior(identityResolution);
 
-          // Create user profile first before attempting merge
+          // Initialize user authentication first, then create user profile
+          initializeUserId(userId);
           await tryUser()();
 
           const result = await tryMergeUser(userId, false, merge);
           if (result.success) {
-            initializeUserId(userId);
             // Clear unknown user after merge attempt (successful or skipped)
             clearUnknownUser();
 
@@ -815,6 +821,7 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -895,6 +902,7 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -1023,7 +1031,7 @@ export function initialize(
               // Set up user context first
               initializeUserId(userId);
 
-              // Create user profile first before attempting merge
+              // Create user profile after authentication is set up
               await tryUser()();
 
               const result = await tryMergeUser(userId, false, merge);
