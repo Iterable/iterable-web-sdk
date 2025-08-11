@@ -88,12 +88,11 @@ const HomeLink = styled(Link)`
   };
   const { setEmail, setUserID, logout, setVisitorUsageTracked, ...rest } =
     initializeWithConfig(initializeParams);
-
-  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
-
   const refreshJwtToken = useJwt
     ? (rest as Partial<WithJWT>).refreshJwtToken
     : undefined;
+
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   const container = document.getElementById('root');
   const root = createRoot(container);
