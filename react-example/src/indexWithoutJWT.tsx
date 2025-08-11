@@ -47,6 +47,10 @@ const HomeLink = styled(Link)`
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
       enableUnknownActivation: true,
+      identityResolution: {
+        replayOnVisitorToKnown: true,
+        mergeOnUnknownToKnown: true
+      },
       onUnknownUserCreated: (userId: string) => {
         console.log('onUnknownUserCreated', userId);
       }

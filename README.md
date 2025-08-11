@@ -84,6 +84,19 @@ To install the SDK, use Yarn, npm, or a `script` tag:
   <script src="https://unpkg.com/@iterable/web-sdk/index.js"></script>
   ```
 
+⚠️ Node.js Version Requirement
+Important: This SDK requires Node.js as defined in `package.json`.
+
+Please ensure your development environment meets the minimum required Node.js version. Depending on your current setup, you may already be using a compatible version. If not, you will need to upgrade Node.js to proceed with installation and use of the SDK.
+
+You can check your current Node version by running:
+
+```bash
+node -v
+```
+
+If an upgrade is needed, we recommend using nvm or your preferred version manager for easy installation.
+
 # Functions
 
 Iterable's Web SDK exposes the following functions, which you can use in your
@@ -94,6 +107,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 
 | Method Name                                                                       | Description |
 | --------------------------------------------------------------------------------- | ----------- |
+| [`baseIterableRequest`](#baseiterablerequest)                                     |  Executes a custom API request to Iterable, using an extended request configuration for validation and optional features. Valid for web API keys and their supported endpoints only. [Learn more](https://support.iterable.com/hc/articles/360043464871-API-Keys#client-side-keys)  |
 | [`filterHiddenInAppMessages`](#filterhiddeninappmessages)                         | From an array of passed-in in-app messages, filters out messages that have already been read, messages that should not be displayed, and messages that only contain JSON data. |
 | [`filterOnlyReadAndNeverTriggerMessages`](#filteronlyreadandnevertriggermessages) | From an array of passed-in in-app messages, filters out messages that have already been read and messages that should not be displayed. |
 | [`getInAppMessages`](#getInAppMessages)                                           | Fetches in-app messages by calling [`GET /api/inApp/getMessages`](https://support.iterable.com/hc/articles/204780579#get-api-inapp-getmessages). |
@@ -126,6 +140,37 @@ Notes:
   like Safari), in-app messages displayed in an iOS web browser browser can't 
   automatically track `inAppClick`  events or handle custom CTAs. This will impact
   analytics for all Safari and mobile iOS users.
+
+## `baseIterableRequest`
+
+Executes a custom API request to Iterable, using an extended request configuration for validation and optional features. Valid for web API keys and their supported endpoints only. [Learn more](https://support.iterable.com/hc/articles/360043464871-API-Keys#client-side-keys) 
+
+```ts
+function baseIterableRequest(
+  payload: ExtendedRequestConfig
+): IterablePromise<T = any>
+```
+
+Parameters:
+- `payload` - A request config see [`ExtendedRequestConfig`](#ExtendedRequestConfig)
+
+Example:
+```ts
+baseIterableRequest<IterableResponse>({
+        method: 'GET',
+        url: '/embedded-messaging/messages',
+        params: {
+          placementIds: [1, 2, 3],
+          platform: 'Web',
+          sdkVersion: '1.0.0',
+          packageName: 'pkgName'
+        }
+      });
+```
+
+See also:
+
+- [`IterablePromise`](#iterablepromise)
 
 ## `filterHiddenInAppMessages`
 
@@ -1793,6 +1838,20 @@ type IterableErrorStatus =
   | 'InvalidJwtPayload';
 ```
 
+## `ExtendedRequestConfig`
+
+An extension of the AxiosRequestConfig
+
+```ts
+  interface ExtendedRequestConfig extends AxiosRequestConfig {
+    validation?: {
+      data?: AnySchema;
+      params?: AnySchema;
+    };
+    sendBeacon?: boolean;
+  }
+```
+
 ## `IterablePromise`
 
 A promise.
@@ -2314,12 +2373,24 @@ For example:
 - If your in-app is positioned in the center and your browser if at 700px, your
   in-app message will grow to take up 100% of the screen.
 
-This chart also implies that yout in-app message is taking 100% of its container. 
+This chart also implies that your in-app message is taking 100% of its container. 
 Your results may vary if you add, for example, a `max-width: 200px` CSS rule to 
-your message HTML. 
+your message HTML, as it would not apply to the enclosing iframe.
 
-Regardless of how you write your CSS, these rules take effect. So, when creating
-an in-app message, it is best to stick with percentage-based CSS widths.
+For Center, Top-Right, and Bottom-Right positions, you can set a custom `maxWidth`
+by including it in your getInAppMessages payload like this:
+
+```ts
+const { request } = getInAppMessages({
+  count: 20,
+  packageName: 'my-website',
+  maxWidth: '900px'
+});
+```
+
+`maxWidth` accepts any valid CSS max-width value (e.g., px, em, %, ch).
+It is optional—-most in-app messages render well with default sizing, so set it
+only if needed for your use case.
 
 ## How do I add custom callbacks to handle link clicks on in-app and embedded messages?
 

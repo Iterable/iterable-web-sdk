@@ -91,6 +91,7 @@ export function getInAppMessages(
   delete dupedPayload.animationDuration;
   delete dupedPayload.handleLinks;
   delete dupedPayload.closeButton;
+  delete dupedPayload.maxWidth;
 
   if (options?.display) {
     addStyleSheet(document, ANIMATION_STYLESHEET(payload.animationDuration));
@@ -159,15 +160,17 @@ export function getInAppMessages(
         };
 
         /* add the message's html to an iframe and paint it to the DOM */
-        return paintIFrame(
-          activeMessage.content.html as string,
-          messagePosition,
+        return paintIFrame({
+          html: activeMessage.content.html as string,
+          position: messagePosition,
           shouldAnimate,
-          payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
-          payload.topOffset,
-          payload.bottomOffset,
-          payload.rightOffset
-        ).then((activeIframe) => {
+          srMessage:
+            payload.onOpenScreenReaderMessage || 'in-app iframe message opened',
+          topOffset: payload.topOffset,
+          bottomOffset: payload.bottomOffset,
+          rightOffset: payload.rightOffset,
+          maxWidth: payload.maxWidth
+        }).then((activeIframe) => {
           const activeIframeDocument = activeIframe?.contentDocument;
 
           const throttledResize =
@@ -600,8 +603,8 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response: any) => {
-            trackMessagesDelivered(
+          .then(async (response: any) => {
+            await trackMessagesDelivered(
               response.data.inAppMessages || [],
               dupedPayload.packageName
             );
@@ -662,9 +665,9 @@ export function getInAppMessages(
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
-  return requestMessages({ payload: dupedPayload }).then((response) => {
+  return requestMessages({ payload: dupedPayload }).then(async (response) => {
     const messages = response.data.inAppMessages;
-    trackMessagesDelivered(messages || [], dupedPayload.packageName);
+    await trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html

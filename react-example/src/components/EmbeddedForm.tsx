@@ -1,21 +1,24 @@
-import { FC, FormEvent, useState } from 'react';
+/* eslint-disable no-console */
 import {
   IterableEmbeddedManager,
   IterableEmbeddedMessageUpdateHandler,
-  trackEmbeddedSession,
-  trackEmbeddedReceived,
+  IterableResponse,
   trackEmbeddedClick,
-  trackEmbeddedDismiss
+  trackEmbeddedDismiss,
+  trackEmbeddedReceived,
+  trackEmbeddedSession
 } from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse, isAxiosError } from 'axios';
+import { FC, FormEvent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { TextField } from './TextField';
 import {
-  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
-  Response
+  Response,
+  StyledButton
 } from '../views/Components.styled';
+import { TextField } from './TextField';
 
 interface Props {
   endpointName: string;
@@ -63,8 +66,10 @@ export const EmbeddedForm: FC<Props> = ({
       await embeddedManager.syncMessages('my-website', () =>
         console.log('Synced message')
       );
-    } catch (error: any) {
-      setTrackResponse(JSON.stringify(error?.response?.data));
+    } catch (error: unknown) {
+      setTrackResponse(
+        JSON.stringify(isAxiosError(error) ? error.response?.data : error)
+      );
     }
   };
 
@@ -80,11 +85,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedReceived(receivedMessage.messageId, 'my-website')
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error: any) => {
+      .catch((error: AxiosError<IterableResponse>) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -111,11 +116,11 @@ export const EmbeddedForm: FC<Props> = ({
       targetUrl,
       appPackageName
     })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error: any) => {
+      .catch((error: AxiosError<IterableResponse>) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -139,11 +144,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedDismiss(sessionData)
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error: any) => {
+      .catch((error: AxiosError<IterableResponse>) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });
@@ -177,11 +182,11 @@ export const EmbeddedForm: FC<Props> = ({
     };
 
     trackEmbeddedSession(sessionData)
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setTrackResponse(JSON.stringify(response.data));
         setTrackingEvent(false);
       })
-      .catch((error: any) => {
+      .catch((error: AxiosError<IterableResponse>) => {
         setTrackResponse(JSON.stringify(error.response.data));
         setTrackingEvent(false);
       });

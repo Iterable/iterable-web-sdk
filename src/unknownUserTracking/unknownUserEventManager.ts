@@ -28,7 +28,6 @@ import {
   KEY_PREFER_USERID,
   ENDPOINTS,
   DEFAULT_EVENT_THRESHOLD_LIMIT,
-  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREF_CONSENT_TIMESTAMP,
   SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
   SHARED_PREF_UNKNOWN_USER_ID,
@@ -51,7 +50,7 @@ import {
 } from '../commerce/commerce.schema';
 import { updateUserSchema } from '../users/users.schema';
 import { InAppTrackRequestParams } from '../events';
-import config from '../utils/config';
+import { config } from '../utils/config';
 
 import { consentRequestSchema } from './consent.schema';
 
@@ -99,10 +98,13 @@ export function registerUnknownUserIdSetter(
 }
 
 export function isUnknownUsageTracked(): boolean {
-  const unknownUsageTracked = localStorage.getItem(
-    SHARED_PREF_UNKNOWN_USAGE_TRACKED
-  );
-  return unknownUsageTracked === 'true';
+  // Check both configuration AND user consent
+  const isEnabled = config.getConfig('enableUnknownActivation') || false;
+  if (!isEnabled) return false;
+
+  // Also check if user has given consent (consent timestamp exists)
+  const consentTimestamp = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+  return consentTimestamp !== null;
 }
 
 export class UnknownUserEventManager {
@@ -231,7 +233,8 @@ export class UnknownUserEventManager {
           localStoredEventList,
           localStoredUserUpdate
         );
-        return checker.getMatchedCriteria(criteriaData);
+        const result = checker.getMatchedCriteria(criteriaData);
+        return result;
       }
     } catch (error) {
       console.error('checkCriteriaCompletion', error);
@@ -292,6 +295,7 @@ export class UnknownUserEventManager {
         url: ENDPOINT_TRACK_UNKNOWN_SESSION,
         data: payload
       }).catch((e) => {
+        console.log('[DEBUG] Request failed:', e);
         if (e?.response?.status === 409) {
           this.getUnknownCriteria();
         }
@@ -594,6 +598,9 @@ export class UnknownUserEventManager {
           data: consentRequestSchema
         }
       });
+
+      // Remove consent timestamp after successful call
+      localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
       return response;
     } catch (error) {

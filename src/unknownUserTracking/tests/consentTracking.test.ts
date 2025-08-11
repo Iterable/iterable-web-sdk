@@ -9,7 +9,7 @@ import {
   WEB_PLATFORM
 } from '../../constants';
 import { getTypeOfAuth } from '../../utils/typeOfAuth';
-import config from '../../utils/config';
+import { config } from '../../utils/config';
 
 const localStorageMock = {
   getItem: jest.fn(),
@@ -28,7 +28,7 @@ jest.mock('../../utils/typeOfAuth', () => ({
 
 jest.mock('../../utils/config', () => ({
   __esModule: true,
-  default: {
+  config: {
     getConfig: jest.fn()
   }
 }));
@@ -58,9 +58,17 @@ describe('Consent Tracking', () => {
 
     // Default mocks
     mockGetTypeOfAuth.mockReturnValue(null);
-    mockConfig.getConfig.mockReturnValue({
-      replayOnVisitorToKnown: true,
-      mergeOnUnknownToKnown: true
+    mockConfig.getConfig.mockImplementation((key) => {
+      if (key === 'identityResolution') {
+        return {
+          replayOnVisitorToKnown: true,
+          mergeOnUnknownToKnown: true
+        };
+      }
+      if (key === 'enableUnknownActivation') {
+        return true;
+      }
+      return undefined;
     });
   });
 
@@ -355,8 +363,13 @@ describe('Consent Tracking', () => {
         if (key === SHARED_PREF_CONSENT_TIMESTAMP) return timestamp;
         return null;
       });
-      mockConfig.getConfig.mockReturnValue({
-        replayOnVisitorToKnown: true
+      mockConfig.getConfig.mockImplementation((key) => {
+        if (key === 'identityResolution') {
+          return {
+            replayOnVisitorToKnown: true
+          };
+        }
+        return undefined;
       });
       mockBaseIterableRequest.mockResolvedValue({
         data: { success: true },
@@ -383,8 +396,13 @@ describe('Consent Tracking', () => {
         if (key === SHARED_PREF_CONSENT_TIMESTAMP) return timestamp;
         return null;
       });
-      mockConfig.getConfig.mockReturnValue({
-        replayOnVisitorToKnown: false
+      mockConfig.getConfig.mockImplementation((key) => {
+        if (key === 'identityResolution') {
+          return {
+            replayOnVisitorToKnown: false
+          };
+        }
+        return undefined;
       });
 
       const trackConsentSpy = jest.spyOn(
@@ -425,8 +443,13 @@ describe('Consent Tracking', () => {
         if (key === SHARED_PREF_CONSENT_TIMESTAMP) return timestamp;
         return null;
       });
-      mockConfig.getConfig.mockReturnValue({
-        replayOnVisitorToKnown: true
+      mockConfig.getConfig.mockImplementation((key) => {
+        if (key === 'identityResolution') {
+          return {
+            replayOnVisitorToKnown: true
+          };
+        }
+        return undefined;
       });
 
       // Mock trackConsent to throw an error

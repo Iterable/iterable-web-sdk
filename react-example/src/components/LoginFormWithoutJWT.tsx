@@ -39,11 +39,11 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<void>;
+  setEmail: (email: string) => Promise<string>;
   setUserId: (
     userId: string,
     identityResolution?: IdentityResolution
-  ) => Promise<void>;
+  ) => Promise<string>;
   logout: () => void;
 }
 

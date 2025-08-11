@@ -1,18 +1,19 @@
-import { FC, FormEvent, useState } from 'react';
 import {
-  updateUser,
+  IterableResponse,
   updateSubscriptions,
+  updateUser,
   updateUserEmail
 } from '@iterable/web-sdk';
+import { AxiosError, AxiosResponse } from 'axios';
+import { FC, FormEvent, useState } from 'react';
 import { TextField } from '../components/TextField';
-
 import { useUser } from '../context/Users';
 import {
-  StyledButton,
   EndpointWrapper,
   Form,
   Heading,
-  Response
+  Response,
+  StyledButton
 } from './Components.styled';
 
 interface Props {}
@@ -62,12 +63,12 @@ export const Users: FC<Props> = () => {
     e.preventDefault();
     setUpdatingUserEmail(true);
     updateUserEmail(email)
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(response.data));
         setLoggedInUser({ type: 'user_update', data: email });
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<IterableResponse>) => {
         setUpdatingUserEmail(false);
         setUpdateUserEmailResponse(JSON.stringify(e.response.data));
       });
@@ -78,11 +79,11 @@ export const Users: FC<Props> = () => {
 
     setUpdatingSubscriptions(true);
     updateSubscriptions({ emailListIds: [+emailListID] })
-      .then((response: any) => {
+      .then((response: AxiosResponse<IterableResponse>) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(response.data));
       })
-      .catch((e: any) => {
+      .catch((e: AxiosError<IterableResponse>) => {
         setUpdatingSubscriptions(false);
         setUpdateSubscriptionsResponse(JSON.stringify(e.response.data));
       });

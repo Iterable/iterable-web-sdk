@@ -1,41 +1,45 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-console */
+/* eslint-disable no-redeclare */
 import axios from 'axios';
-import { baseAxiosRequest } from '../request';
-import { clearMessages } from 'src/inapp/inapp';
 import {
+  ENDPOINTS,
   IS_PRODUCTION,
   STATIC_HEADERS,
   SHARED_PREF_UNKNOWN_USER_ID,
-  ENDPOINTS,
   RouteConfig,
-  SHARED_PREF_UNKNOWN_USAGE_TRACKED,
   SHARED_PREFS_CRITERIA,
   SHARED_PREF_CONSENT_TIMESTAMP,
   SHARED_PREF_EMAIL,
-  SHARED_PREF_USER_ID
-} from 'src/constants';
-import {
-  cancelAxiosRequestAndMakeFetch,
-  getEpochDifferenceInMS,
-  getEpochExpiryTimeInMS,
-  ONE_MINUTE,
-  ONE_DAY,
-  validateTokenTime,
-  isEmail
-} from './utils';
-import { UnknownUserMerge } from 'src/unknownUserTracking/unknownUserMerge';
+  SHARED_PREF_USER_ID,
+  RETRY_USER_ATTEMPTS
+} from '../constants';
+import { UnknownUserMerge } from '../unknownUserTracking/unknownUserMerge';
 import {
   UnknownUserEventManager,
   isUnknownUsageTracked,
   registerUnknownUserIdSetter
-} from 'src/unknownUserTracking/unknownUserEventManager';
-import { IdentityResolution, Options, config } from 'src/utils/config';
-import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from 'src/utils/typeOfAuth';
-import AuthorizationToken from 'src/utils/authorizationToken';
+} from '../unknownUserTracking/unknownUserEventManager';
+import { IdentityResolution, Options, config } from '../utils/config';
+import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from '../utils/typeOfAuth';
+import AuthorizationToken from '../utils/authorizationToken';
+import {
+  cancelAxiosRequestAndMakeFetch,
+  getEpochDifferenceInMS,
+  getEpochExpiryTimeInMS,
+  isEmail,
+  ONE_DAY,
+  ONE_MINUTE,
+  validateTokenTime
+} from './utils';
+import { updateUser } from '../users';
+import { baseAxiosRequest } from '../request';
+import { clearMessages } from '../inapp';
 
 const MAX_TIMEOUT = ONE_DAY;
 let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
+let authInterceptor: number | null = null;
 let apiKey: null | string = null;
 let generateJWTGlobal: any = null;
 const unknownUserManager = new UnknownUserEventManager();
@@ -43,6 +47,38 @@ const unknownUserManager = new UnknownUserEventManager();
 export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
+}
+
+export interface WithJWT {
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  setUserID: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  logout: () => void;
+  refreshJwtToken: (authTypes: string) => Promise<string>;
+  clearRefresh: () => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
+}
+
+export interface WithoutJWT {
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  setUserID: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  logout: () => void;
+  setNewAuthToken: (newToken?: string) => void;
+  clearAuthToken: () => void;
+  setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 
 const doesRequestUrlContain = (routeConfig: RouteConfig) =>
@@ -53,68 +89,6 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
       routeConfig.current === entry[1].current &&
       routeConfig.nestedUser === entry[1].nestedUser
   );
-export interface WithJWT {
-  clearRefresh: () => void;
-  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<string>;
-  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<string>;
-  logout: () => void;
-  refreshJwtToken: (authTypes: string) => Promise<string>;
-  setVisitorUsageTracked: (consent: boolean) => void;
-  clearVisitorEventsAndUserData: () => void;
-}
-
-export interface WithoutJWT {
-  setNewAuthToken: (newToken?: string) => void;
-  clearAuthToken: () => void;
-  setEmail: (email: string, identityResolution?: IdentityResolution) => Promise<void>;
-  setUserID: (userId: string, identityResolution?: IdentityResolution) => Promise<void>;
-  logout: () => void;
-  setVisitorUsageTracked: (consent: boolean) => void;
-  clearVisitorEventsAndUserData: () => void;
-}
-
-export const setUnknownUserId = async (userId: string) => {
-  const unknownUsageTracked = isUnknownUsageTracked();
-
-  if (!unknownUsageTracked) return;
-
-  let token: null | string = null;
-  if (generateJWTGlobal) {
-    token = await generateJWTGlobal({ userID: userId });
-  }
-
-  if (token) {
-    const authorizationToken = new AuthorizationToken();
-    authorizationToken.setToken(token);
-  }
-
-  baseAxiosRequest.interceptors.request.use((config) => {
-    config.headers.set('Api-Key', apiKey);
-
-    return config;
-  });
-  addUserIdToRequest(userId);
-  localStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
-};
-
-registerUnknownUserIdSetter(setUnknownUserId);
-
-const clearUnknownUser = () => {
-  localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
-};
-
-const getUnknownUserId = () => {
-  if (config.getConfig('enableUnknownActivation')) {
-    const unknownUser = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
-    return unknownUser === undefined ? null : unknownUser;
-  }
-  return null;
-};
-
-const initializeUserId = (userId: string) => {
-  addUserIdToRequest(userId);
-  clearUnknownUser();
-};
 
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
@@ -125,7 +99,7 @@ const addUserIdToRequest = (userId: string) => {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
   }
   /*
-    endpoints that use _userId_ payload prop in POST/PUT requests 
+    endpoints that use _userId_ payload prop in POST/PUT requests
   */
   userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
     if (
@@ -146,7 +120,7 @@ const addUserIdToRequest = (userId: string) => {
     }
 
     /*
-        endpoints that use _userId_ payload prop in POST/PUT requests 
+        endpoints that use _userId_ payload prop in POST/PUT requests
       */
     if (
       doesRequestUrlContain({
@@ -212,30 +186,58 @@ const addUserIdToRequest = (userId: string) => {
   });
 };
 
-const initializeEmailUser = (email: string) => {
-  addEmailToRequest(email);
-  clearUnknownUser();
+export const setUnknownUserId = async (userId: string) => {
+  const unknownUsageTracked = isUnknownUsageTracked();
+
+  if (!unknownUsageTracked) return;
+
+  let token: null | string = null;
+  if (generateJWTGlobal) {
+    token = await generateJWTGlobal({ userID: userId });
+  }
+
+  if (token) {
+    const authorizationToken = new AuthorizationToken();
+    authorizationToken.setToken(token);
+  }
+
+  // Only set up API key interceptor if in JWT mode
+  // In non-JWT mode, this is already handled by initialization
+  if (generateJWTGlobal) {
+    // Clear any existing auth interceptor first
+    if (typeof authInterceptor === 'number') {
+      baseAxiosRequest.interceptors.request.eject(authInterceptor);
+    }
+
+    // Store the interceptor ID in the global variable
+    authInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
+      config.headers.set('Api-Key', apiKey);
+      return config;
+    });
+  }
+
+  addUserIdToRequest(userId);
+  localStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
 };
 
-  const syncEvents = () => {
-    if (config.getConfig('enableUnknownActivation')) {
-      unknownUserManager.syncEvents();
-    }
-  };
+registerUnknownUserIdSetter(setUnknownUserId);
 
-  const handleConsentTracking = (isUserKnown = false, isMergeOperation = false) => {
-    if (config.getConfig('enableUnknownActivation')) {
-      unknownUserManager.handleConsentTracking(isUserKnown, isMergeOperation);
-    }
-  };
+const clearUnknownUser = () => {
+  localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+};
 
-  const getIdentityResolutionBehavior = (identityResolution?: IdentityResolution) => {
-    const identityResolutionConfig = config.getConfig('identityResolution');
-    return {
-      merge: identityResolution?.mergeOnUnknownToKnown ?? identityResolutionConfig?.mergeOnUnknownToKnown,
-      replay: identityResolution?.replayOnVisitorToKnown ?? identityResolutionConfig?.replayOnVisitorToKnown
-    };
-  };
+const getUnknownUserId = () => {
+  if (config.getConfig('enableUnknownActivation')) {
+    const unknownUser = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
+    return unknownUser === undefined ? null : unknownUser;
+  }
+  return null;
+};
+
+const initializeUserId = (userId: string) => {
+  addUserIdToRequest(userId);
+  // Note: clearUnknownUser() moved to happen after merge attempt
+};
 
 const addEmailToRequest = (email: string) => {
   setTypeOfAuth('email');
@@ -246,8 +248,8 @@ const addEmailToRequest = (email: string) => {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
   }
   userInterceptor = baseAxiosRequest.interceptors.request.use((config) => {
-    /* 
-      endpoints that use _currentEmail_ payload prop in POST/PUT requests 
+    /*
+      endpoints that use _currentEmail_ payload prop in POST/PUT requests
     */
     if (
       doesRequestUrlContain({
@@ -267,7 +269,7 @@ const addEmailToRequest = (email: string) => {
     }
 
     /*
-      endpoints that use _email_ payload prop in POST/PUT requests 
+      endpoints that use _email_ payload prop in POST/PUT requests
     */
     if (
       doesRequestUrlContain({
@@ -275,7 +277,11 @@ const addEmailToRequest = (email: string) => {
         body: true,
         current: false,
         nestedUser: false
-      })
+      }) &&
+      !config?.url?.includes('/events/trackInAppDelivery') &&
+      !config?.url?.includes('/events/trackInAppClick') &&
+      !config?.url?.includes('/events/trackInAppOpen') &&
+      !config?.url?.includes('/events/inAppConsume')
     ) {
       return {
         ...config,
@@ -333,6 +339,56 @@ const addEmailToRequest = (email: string) => {
   });
 };
 
+const initializeEmailUser = (email: string) => {
+  addEmailToRequest(email);
+  // Note: clearUnknownUser() moved to happen after merge attempt
+};
+
+const syncEvents = () => {
+  if (config.getConfig('enableUnknownActivation')) {
+    unknownUserManager.syncEvents();
+  }
+};
+
+const handleConsentTracking = (
+  isUserKnown = false,
+  isMergeOperation = false
+) => {
+  if (config.getConfig('enableUnknownActivation')) {
+    unknownUserManager.handleConsentTracking(isUserKnown, isMergeOperation);
+  }
+};
+
+const getIdentityResolutionBehavior = (
+  identityResolution?: IdentityResolution
+) => {
+  const identityResolutionConfig = config.getConfig('identityResolution');
+  return {
+    merge:
+      identityResolution?.mergeOnUnknownToKnown ??
+      identityResolutionConfig?.mergeOnUnknownToKnown,
+    replay:
+      identityResolution?.replayOnVisitorToKnown ??
+      identityResolutionConfig?.replayOnVisitorToKnown
+  };
+};
+
+const setAuthInterceptor = (
+  authInterceptor: number | null,
+  authToken: string
+) => {
+  if (typeof authInterceptor === 'number') {
+    /** Clear previously cached interceptor function */
+    baseAxiosRequest.interceptors.request.eject(authInterceptor);
+  }
+
+  /** Set auth token to interceptor for all requests */
+  return baseAxiosRequest.interceptors.request.use((config) => {
+    config.headers.set('Api-Key', authToken);
+    return config;
+  });
+};
+
 export function initialize(
   authToken: string,
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>
@@ -352,18 +408,15 @@ export function initialize(
         'Please provide a Promise method for generating a JWT token.'
       );
     }
-    return;
+    return null;
   }
-  /* 
-    only set token interceptor if we're using a non-JWT key.
-    Otherwise, we'll set it later once we generate the JWT
+  /*
+    Always set the API key interceptor during initialization.
+    This is needed for endpoints like /unknownuser/list that require the API key
+    but are called before user authentication (and thus before JWT generation).
   */
-  let authInterceptor: number | null =
-    baseAxiosRequest.interceptors.request.use((config) => {
-      config.headers.set('Api-Key', authToken);
-
-      return config;
-    });
+  authInterceptor = setAuthInterceptor(null, authToken);
+  const userInterceptor: number | null = null;
   let responseInterceptor: number | null = null;
 
   /**
@@ -375,6 +428,7 @@ export function initialize(
   const createTokenExpirationTimer = () => {
     let timer: NodeJS.Timeout | null;
 
+    // eslint-disable-next-line consistent-return
     return (jwt: string, callback?: (...args: any) => Promise<any>) => {
       if (timer) {
         /* clear existing timeout on JWT refresh */
@@ -414,6 +468,25 @@ export function initialize(
 
   const handleTokenExpiration = createTokenExpirationTimer();
 
+  const tryUser = () => {
+    let createUserAttempts = 0;
+
+    return async function tryUserNTimes(): Promise<any> {
+      try {
+        return await updateUser({});
+      } catch (e) {
+        if (createUserAttempts < RETRY_USER_ATTEMPTS) {
+          createUserAttempts += 1;
+          return tryUserNTimes();
+        }
+
+        return Promise.reject(
+          new Error(`could not create user after ${createUserAttempts} tries`)
+        );
+      }
+    };
+  };
+
   const enableUnknownTracking = () => {
     try {
       if (config.getConfig('enableUnknownActivation')) {
@@ -435,34 +508,28 @@ export function initialize(
     isEmail: boolean,
     merge?: boolean
   ): Promise<{ success: boolean; mergePerformed: boolean }> => {
-    const typeOfAuth = getTypeOfAuth();
     const enableUnknownActivation = config.getConfig('enableUnknownActivation');
-    const sourceUserIdOrEmail =
-      authIdentifier === null ? getUnknownUserId() : authIdentifier;
-    const sourceUserId = typeOfAuth === 'email' ? null : sourceUserIdOrEmail;
-    const sourceEmail = typeOfAuth === 'email' ? sourceUserIdOrEmail : null;
     const destinationUserId = isEmail ? null : emailOrUserId;
     const destinationEmail = isEmail ? emailOrUserId : null;
-    // This function will try to merge if unknown user exists
-    if (
-      (getUnknownUserId() !== null || authIdentifier !== null) &&
-      merge &&
-      enableUnknownActivation
-    ) {
+
+    // Only merge if there's an unknown user that was successfully created via /session
+    const unknownUserId = getUnknownUserId();
+
+    if (unknownUserId !== null && merge && enableUnknownActivation) {
       const unknownUserMerge = new UnknownUserMerge();
       try {
-        await unknownUserMerge.mergeUser(
-          sourceUserId,
-          sourceEmail,
+        await unknownUserMerge.mergeUnknownUser(
+          unknownUserId,
           destinationUserId,
           destinationEmail
         );
         return Promise.resolve({ success: true, mergePerformed: true });
       } catch (error) {
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     }
-    return Promise.resolve({ success: true, mergePerformed: false }); // promise resolves here because merging is not needed so we setUserID passed via dev
+    // promise resolves here because merging is not needed
+    return Promise.resolve({ success: true, mergePerformed: false });
   };
 
   if (!generateJWT) {
@@ -493,23 +560,33 @@ export function initialize(
         identityResolution?: IdentityResolution
       ) => {
         clearMessages();
+
+        authInterceptor = setAuthInterceptor(authInterceptor, authToken);
+
         try {
-          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
+          const { merge, replay } =
+            getIdentityResolutionBehavior(identityResolution);
+
+          // Set up user authentication first so merge API can authenticate
+          initializeEmailUser(email);
 
           const result = await tryMergeUser(email, true, merge);
           if (result.success) {
-            initializeEmailUser(email);
+            // Clear unknown user after merge attempt (successful or skipped)
+            clearUnknownUser();
+
             if (replay) {
               await handleConsentTracking(true, result.mergePerformed);
               syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
-            return Promise.resolve();
+            return Promise.resolve(email);
           }
+          return Promise.resolve(email);
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
-          return Promise.reject(`merging failed: ${error}`);
+          return Promise.reject(new Error(`merging failed: ${error}`));
         }
       },
       setUserID: async (
@@ -518,22 +595,30 @@ export function initialize(
       ) => {
         clearMessages();
         try {
-          const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
+          const { merge, replay } =
+            getIdentityResolutionBehavior(identityResolution);
+
+          // Initialize user authentication first, then create user profile
+          initializeUserId(userId);
+          await tryUser()();
 
           const result = await tryMergeUser(userId, false, merge);
           if (result.success) {
-            initializeUserId(userId);
+            // Clear unknown user after merge attempt (successful or skipped)
+            clearUnknownUser();
+
             if (replay) {
               await handleConsentTracking(true, result.mergePerformed);
               syncEvents();
             } else {
               unknownUserManager.removeUnknownSessionCriteriaData();
             }
-            return Promise.resolve();
+            return Promise.resolve(userId);
           }
+          return Promise.resolve(userId);
         } catch (error) {
           // here we will not sync events but just bubble up error of merge
-          return Promise.reject(`merging failed: ${error}`);
+          return Promise.reject(new Error(`merging failed: ${error}`));
         }
       },
       logout: () => {
@@ -542,6 +627,7 @@ export function initialize(
         authIdentifier = null;
         localStorage.removeItem(SHARED_PREF_EMAIL);
         localStorage.removeItem(SHARED_PREF_USER_ID);
+        localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -557,18 +643,30 @@ export function initialize(
           /* stop adding JWT to requests */
           baseAxiosRequest.interceptors.request.eject(userInterceptor);
         }
+
+        /*
+          Re-establish the API key interceptor for unknown user endpoints
+          This ensures /unknownuser/list and similar endpoints continue to work after logout
+        */
+        if (apiKey) {
+          authInterceptor = setAuthInterceptor(null, apiKey);
+        }
       },
       setVisitorUsageTracked: (consent: boolean) => {
-        /* if consent is true, we want to clear unknown user data and start tracking from point forward */
+        /* if consent is true, we want to clear unknown user data and start tracking */
         if (consent) {
           unknownUserManager.removeUnknownSessionCriteriaData();
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
-          localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
           // Store consent timestamp when user grants consent
-          const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+          const existingConsent = localStorage.getItem(
+            SHARED_PREF_CONSENT_TIMESTAMP
+          );
           if (!existingConsent) {
-            localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+            localStorage.setItem(
+              SHARED_PREF_CONSENT_TIMESTAMP,
+              Date.now().toString()
+            );
           }
           enableUnknownTracking();
         } else {
@@ -579,7 +677,6 @@ export function initialize(
 
             localStorage.removeItem(SHARED_PREFS_CRITERIA);
             localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
-            localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
             localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
             setTypeOfAuth(null);
@@ -587,7 +684,6 @@ export function initialize(
             /* clear fetched in-app messages */
             clearMessages();
           }
-          localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'false');
         }
       },
       clearVisitorEventsAndUserData: () => {
@@ -629,7 +725,7 @@ export function initialize(
                 that is going to navigate the browser tab to a new page/site and we need
                 to still call POST /trackInAppClick.
 
-                Normally, since the page is going somewhere new, the browser would just navigate away
+                Normally, since the page is going somewhere new, the browser would navigate away
                 and cancel any in-flight requests and not fulfill them, but with the fetch API's
                 "keepalive" flag, it will continue the request without blocking the main thread.
 
@@ -674,7 +770,7 @@ export function initialize(
                 const payloadToPass =
                   getTypeOfAuth() === 'email'
                     ? { email: newEmail }
-                    : { userID: authIdentifier! };
+                    : { userID: authIdentifier ?? '' };
 
                 return generateJWT(payloadToPass).then((newToken) => {
                   const authorizationToken = new AuthorizationToken();
@@ -725,6 +821,7 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -805,6 +902,7 @@ export function initialize(
                       }
 
                       config.headers.set('Api-Key', authToken);
+                      config.headers.set('Authorization', `Bearer ${newToken}`);
 
                       return config;
                     }
@@ -874,14 +972,23 @@ export function initialize(
       /* clear previous user */
       clearMessages();
       try {
-        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
+        const { merge, replay } =
+          getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ email })
             .then(async (token) => {
+              // Set up user context first
+              initializeEmailUser(email);
+
+              // Create user profile first before attempting merge
+              await tryUser()();
+
               const result = await tryMergeUser(email, true, merge);
               if (result.success) {
-                initializeEmailUser(email);
+                // Clear unknown user after merge attempt (successful or skipped)
+                clearUnknownUser();
+
                 if (replay) {
                   await handleConsentTracking(true, result.mergePerformed);
                   syncEvents();
@@ -890,6 +997,7 @@ export function initialize(
                 }
                 return token;
               }
+              return token;
             })
             .catch((e) => {
               if (logLevel === 'verbose') {
@@ -905,7 +1013,7 @@ export function initialize(
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     },
     setUserID: async (
@@ -914,14 +1022,23 @@ export function initialize(
     ) => {
       clearMessages();
       try {
-        const { merge, replay } = getIdentityResolutionBehavior(identityResolution);
+        const { merge, replay } =
+          getIdentityResolutionBehavior(identityResolution);
 
         try {
           return doRequest({ userID: userId })
             .then(async (token) => {
+              // Set up user context first
+              initializeUserId(userId);
+
+              // Create user profile after authentication is set up
+              await tryUser()();
+
               const result = await tryMergeUser(userId, false, merge);
               if (result.success) {
-                initializeUserId(userId);
+                // Clear unknown user after merge attempt (successful or skipped)
+                clearUnknownUser();
+
                 if (replay) {
                   await handleConsentTracking(true, result.mergePerformed);
                   syncEvents();
@@ -930,6 +1047,7 @@ export function initialize(
                 }
                 return token;
               }
+              return token;
             })
             .catch((e) => {
               if (logLevel === 'verbose') {
@@ -945,7 +1063,7 @@ export function initialize(
         }
       } catch (error) {
         // here we will not sync events but just bubble up error of merge
-        return Promise.reject(`merging failed: ${error}`);
+        return Promise.reject(new Error(`merging failed: ${error}`));
       }
     },
     logout: () => {
@@ -954,6 +1072,7 @@ export function initialize(
       authIdentifier = null;
       localStorage.removeItem(SHARED_PREF_EMAIL);
       localStorage.removeItem(SHARED_PREF_USER_ID);
+      localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
       /* clear fetched in-app messages */
       clearMessages();
 
@@ -972,6 +1091,19 @@ export function initialize(
         /* stop adding JWT to requests */
         baseAxiosRequest.interceptors.request.eject(userInterceptor);
       }
+
+      if (typeof responseInterceptor === 'number') {
+        /* stop JWT retry logic on 401 errors */
+        baseAxiosRequest.interceptors.response.eject(responseInterceptor);
+      }
+
+      /*
+        Re-establish the API key interceptor for unknown user endpoints
+        This ensures /unknownuser/list and similar endpoints continue to work after logout
+      */
+      if (apiKey) {
+        authInterceptor = setAuthInterceptor(null, apiKey);
+      }
     },
     refreshJwtToken: async (user: string) => {
       /* this will just clear the existing timeout */
@@ -985,16 +1117,20 @@ export function initialize(
       });
     },
     setVisitorUsageTracked: (consent: boolean) => {
-      /* if consent is true, we want to clear unknown user data and start tracking from point forward */
+      /* if consent is true, we want to clear unknown user data and start tracking */
       if (consent) {
         unknownUserManager.removeUnknownSessionCriteriaData();
         localStorage.removeItem(SHARED_PREFS_CRITERIA);
 
-        localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'true');
         // Store consent timestamp when user grants consent
-        const existingConsent = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+        const existingConsent = localStorage.getItem(
+          SHARED_PREF_CONSENT_TIMESTAMP
+        );
         if (!existingConsent) {
-          localStorage.setItem(SHARED_PREF_CONSENT_TIMESTAMP, Date.now().toString());
+          localStorage.setItem(
+            SHARED_PREF_CONSENT_TIMESTAMP,
+            Date.now().toString()
+          );
         }
         enableUnknownTracking();
       } else {
@@ -1005,7 +1141,6 @@ export function initialize(
 
           localStorage.removeItem(SHARED_PREFS_CRITERIA);
           localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
-          localStorage.removeItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED);
           localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
           setTypeOfAuth(null);
@@ -1013,7 +1148,6 @@ export function initialize(
           /* clear fetched in-app messages */
           clearMessages();
         }
-        localStorage.setItem(SHARED_PREF_UNKNOWN_USAGE_TRACKED, 'false');
       }
     },
     clearVisitorEventsAndUserData: () => {

@@ -68,7 +68,16 @@ export const baseIterableRequest = <T = any>(
 
     const authorizationToken = new AuthorizationToken();
     const JWT = authorizationToken.getToken();
-    const Authorization = JWT ? `Bearer ${JWT}` : undefined;
+
+    // Only add JWT Authorization header if endpoint requires it
+    // Unknown user endpoints should only use API key
+    // Also ensure we have a valid authenticated user before using JWT
+    const hasValidAuth = getTypeOfAuth() !== null;
+    const shouldAddJWTAuth =
+      !ENDPOINTS_NOT_REQUIRING_TYPE_OF_AUTH.includes(endpoint) &&
+      JWT &&
+      hasValidAuth;
+    const Authorization = shouldAddJWTAuth ? `Bearer ${JWT}` : undefined;
 
     return baseAxiosRequest({
       ...payload,
@@ -76,9 +85,9 @@ export const baseIterableRequest = <T = any>(
       headers: {
         ...payload.headers,
         ...STATIC_HEADERS,
-        Authorization
+        ...(Authorization && { Authorization })
       },
-      paramsSerializer: (params) =>
+      paramsSerializer: (params: any) =>
         qs.stringify(params, { arrayFormat: 'repeat' })
     });
   } catch (error) {

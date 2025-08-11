@@ -82,7 +82,7 @@ export const cancelAxiosRequestAndMakeFetch = (
       'Api-Key': authToken,
       Authorization: `Bearer ${jwtToken}`
     },
-    body: JSON.stringify({ ...config?.data, ...additionalData } || {}),
+    body: JSON.stringify({ ...config?.data, ...additionalData }),
     keepalive: true
   }).catch();
 

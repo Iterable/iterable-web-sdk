@@ -1,5 +1,4 @@
-import { FC, useEffect, useState } from 'react';
-import { initialize } from '@iterable/web-sdk';
+import { FC, useState } from 'react';
 import { TextField } from '../components/TextField';
 import {
   EmbeddedForm,
@@ -14,10 +13,6 @@ interface Props {}
 
 export const EmbeddedMessage: FC<Props> = () => {
   const [userId, setUserId] = useState<string>();
-
-  useEffect(() => {
-    initialize(process.env.API_KEY);
-  }, []);
 
   return (
     <>

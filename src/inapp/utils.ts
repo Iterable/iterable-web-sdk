@@ -13,7 +13,7 @@ import {
 } from '../constants';
 import { WebInAppDisplaySettings } from '.';
 import { srSpeak } from '../utils/srSpeak';
-import { CloseButtonPosition, InAppMessage } from './types';
+import { CloseButtonPosition, InAppMessage, PaintIframeProps } from './types';
 
 interface Breakpoints {
   smMatches: boolean;
@@ -338,28 +338,17 @@ const unsetIframeBodyMargin = (iframe: HTMLIFrameElement) => {
   if (contentDocument && !margin) contentDocument.body.style.margin = '0px';
 };
 
-/**
- *
- * @param html html you want to paint to the DOM inside the iframe
- * @param position screen position the message should appear in
- * @param shouldAnimate if the in-app should animate in/out
- * @param srMessage The message you want the screen reader to read when popping up the message
- * @param topOffset how many px or % buffer between the in-app message and the top of the screen
- * @param bottomOffset how many px or % buffer between the in-app message
- * and the bottom of the screen
- * @param rightOffset how many px or % buffer between the in-app message and the right of the screen
- *
- * @returns { HTMLIFrameElement }
- */
-export const paintIFrame = (
-  html: string,
-  position: WebInAppDisplaySettings['position'],
-  shouldAnimate?: boolean,
-  srMessage?: string,
-  topOffset?: string,
-  bottomOffset?: string,
-  rightOffset?: string
-): Promise<HTMLIFrameElement> =>
+/** Generates an iframe with the provided html and appends it to the DOM. */
+export const paintIFrame = ({
+  html,
+  position,
+  shouldAnimate,
+  srMessage,
+  topOffset,
+  bottomOffset,
+  rightOffset,
+  maxWidth
+}: PaintIframeProps): Promise<HTMLIFrameElement> =>
   new Promise((resolve: (value: HTMLIFrameElement) => void) => {
     const iframe = generateSecuredIFrame();
 
@@ -423,7 +412,7 @@ export const paintIFrame = (
               position: fixed;
               border: none;
               margin: auto;
-              max-width: 100%;
+              max-width: ${maxWidth || '100%'};
               z-index: 9999;
               transform: translateX(150%);
               -webkit-transform: translateX(150%);
@@ -434,7 +423,7 @@ export const paintIFrame = (
               position: fixed;
               border: none;
               margin: auto;
-              max-width: 100%;
+              max-width: ${maxWidth || '100%'};
               z-index: 9999;
               width: ${width};
               height: ${iframe.style.height};
@@ -535,7 +524,7 @@ export const trackMessagesDelivered = (
         */
       })
     )
-  ).catch((e: any) => e);
+  ).catch((e: unknown) => e);
 
 export const paintOverlay = (
   color = '#fff',
