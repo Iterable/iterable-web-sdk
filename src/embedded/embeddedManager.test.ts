@@ -1,5 +1,5 @@
 import { IterableEmbeddedManager } from './embeddedManager';
-import { setTypeOfAuthForTestingOnly } from '../authorization';
+import { setTypeOfAuthForTestingOnly } from '../testing';
 
 // Mock the baseIterableRequest function
 jest.mock('../request', () => ({

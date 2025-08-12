@@ -15,7 +15,7 @@ import {
 } from './inapp/events';
 import { INITIALIZE_ERROR, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
-import { setTypeOfAuthForTestingOnly } from '../authorization';
+import { setTypeOfAuthForTestingOnly } from '../testing';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 const localStorageMock = {

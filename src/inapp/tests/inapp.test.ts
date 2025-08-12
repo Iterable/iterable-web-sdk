@@ -3,7 +3,8 @@
  */
 import MockAdapter from 'axios-mock-adapter';
 import { messages } from '../../__data__/inAppMessages';
-import { initialize, setTypeOfAuthForTestingOnly } from '../../authorization';
+import { initialize } from '../../authorization';
+import { setTypeOfAuthForTestingOnly } from '../../testing';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
 import { createClientError } from '../../utils/testUtils';

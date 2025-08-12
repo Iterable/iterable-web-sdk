@@ -2,7 +2,7 @@ import MockAdapter from 'axios-mock-adapter';
 import { baseAxiosRequest } from '../request';
 import { updateSubscriptions, updateUser, updateUserEmail } from './users';
 import { createClientError } from '../utils/testUtils';
-import { setTypeOfAuthForTestingOnly } from '../authorization';
+import { setTypeOfAuthForTestingOnly } from '../testing';
 // import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
