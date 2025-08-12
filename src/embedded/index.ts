@@ -1,4 +1,4 @@
 export * from './embeddedManager';
 export * from './types';
 export * from './embeddedSessionManager';
-export * from '../utils/IterableActionRunner';
+// Keep IterableActionRunner internal; not exported
