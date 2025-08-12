@@ -131,6 +131,8 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 | [`updateSubscriptions`](#updateSubscriptions)                                     | Updates the user's subscriptions by calling [`POST /api/users/updateSubscriptions`](https://support.iterable.com/hc/articles/204780579#post-api-users-updatesubscriptions). |
 | [`updateUser`](#updateUser)                                                       | Updates the data on a user's Iterable profile by calling [`POST /api/users/updateUser`](https://support.iterable.com/hc/articles/204780579#post-api-users-update). |
 | [`updateUserEmail`](#updateUserEmail)                                             | Updates the current user's `email` by calling [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail). Causes the SDK to fetch a JWT for the new email address. |
+| [`setVisitorUsageTracked`](#setVisitorUsageTracked)                                 | Enables or disables unknown visitor tracking based on user consent (UUA). Returned by `initialize`/`initializeWithConfig`. |
+| [`clearVisitorEventsAndUserData`](#clearVisitorEventsAndUserData)                 | Clears unknown visitor session data and queued events (UUA). Returned by `initialize`/`initializeWithConfig`. |
 
 Notes:
 
@@ -1052,6 +1054,24 @@ See also:
 - [`UpdateUserParams`](#updateuserparams)
 
 ## `updateUserEmail`
+## `setVisitorUsageTracked`
+
+Enables or disables unknown visitor tracking based on user consent (UUA). Returned by `initialize` and `initializeWithConfig`.
+
+```ts
+setVisitorUsageTracked: (consent: boolean) => void
+```
+
+- `true`: begin or continue collecting unknown events (and start/restore unknown session if enabled)
+- `false`: stop collecting and clear unknown user data
+
+## `clearVisitorEventsAndUserData`
+
+Clears unknown visitor session data and queued events (UUA). Returned by `initialize` and `initializeWithConfig`.
+
+```ts
+clearVisitorEventsAndUserData: () => void
+```
 
 Updates the current user's `email` by calling [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail).
 Causes the SDK to fetch a JWT for the new email address.
@@ -1979,6 +1999,8 @@ interface SDKInAppMessagesParams {
     // messageId of the latest (i.e., most recent) message in the device's 
     // local cache 
     latestCachedMessageId?: string;
+    // Set a default max-width style for message iframe. Applies to Center, TopRight, BottomRight
+    maxWidth?: string;
 }
 ```
 
@@ -2453,8 +2475,8 @@ const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserDa
 ### Using UUA
 
 - Consent control:
-  - `gatherUserConsent(true)` to begin/continue collecting unknown events
-  - `gatherUserConsent(false)` to stop collection and clear related local data
+  - `setVisitorUsageTracked(true)` to begin/continue collecting unknown events
+  - `setVisitorUsageTracked(false)` to stop collection and clear related local data
   - `clearVisitorEventsAndUserData()` to purge queued unknown data explicitly
 - Identification:
   - Call `setEmail(email)` or `setUserID(userId)`
@@ -2466,7 +2488,7 @@ const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserDa
 - Storage: the unknown user id is stored in `localStorage` under a project-scoped key. It has no TTL and persists across reloads and restarts until explicitly cleared.
 - Automatic restoration: on initialize (with `enableUnknownActivation: true`), the SDK restores the unknown id from storage and automatically applies it to outgoing requests for supported endpoints.
 - JWT mode: when using a JWT-enabled API key and consent is present, the SDK generates a JWT for the restored unknown id and attaches it so requests are authenticated.
-- Lifecycle end: the unknown id is cleared when you identify (merge then clear), revoke consent via `gatherUserConsent(false)`, call `clearVisitorEventsAndUserData()`, or when browser storage is cleared.
+- Lifecycle end: the unknown id is cleared when you identify (merge then clear), revoke consent via `setVisitorUsageTracked(false)`, call `clearVisitorEventsAndUserData()`, or when browser storage is cleared.
 
 ### Configuration options (UUA-specific)
 
@@ -2489,7 +2511,7 @@ type Options = {
    - When `enableUnknownActivation` is true, SDK fetches unknown user criteria and starts an unknown session.
    - If an unknown user id exists in storage, SDK restores it and authenticates appropriately.
  2. Event collection (unknown)
-   - When consent is set via `gatherUserConsent(true)`, SDK queues unknown events locally.
+   - When consent is set via `setVisitorUsageTracked(true)`, SDK queues unknown events locally.
    - Queue flush is governed by `eventThresholdLimit` and internal batching.
 3. Identification
    - App calls `setEmail` or `setUserID`.
