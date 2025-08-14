@@ -3,7 +3,7 @@ import { baseAxiosRequest } from '../request';
 import { trackPurchase, updateCart } from './commerce';
 // import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
-import { setTypeOfAuthForTestingOnly } from '../authorization';
+import { setTypeOfAuthForTestingOnly } from '../testing';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 

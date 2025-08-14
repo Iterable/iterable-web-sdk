@@ -11,9 +11,3 @@ export * from './components/notification';
 export { config, IdentityResolution } from './utils/config';
 export { baseIterableRequest } from './request';
 export { IterableConfig } from './utils/IterableConfig';
-
-export interface TextParentStyles {
-  overflowWrap?: 'normal' | 'break-word' | 'initial' | 'inherit' | 'unset';
-  margin?: string;
-  flex?: string;
-}

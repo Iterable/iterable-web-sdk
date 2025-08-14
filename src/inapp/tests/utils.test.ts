@@ -19,7 +19,7 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from '../utils';
-import { setTypeOfAuthForTestingOnly } from '../../authorization';
+import { setTypeOfAuthForTestingOnly } from '../../testing';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
