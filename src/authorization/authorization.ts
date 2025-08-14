@@ -1163,6 +1163,10 @@ export interface WithJWTParams {
   generateJWT: (payload: GenerateJWTPayload) => Promise<string>;
 }
 
+/**
+ * @deprecated This interface is for testing purposes only and should not be used in production.
+ * Use WithJWTParams instead for proper JWT-based authentication.
+ */
 export interface WithoutJWTParams {
   authToken: string;
   configOptions: Partial<Options>;
@@ -1176,6 +1180,10 @@ export interface InitializeParams {
 
 export function initializeWithConfig(initializeParams: WithJWTParams): WithJWT;
 
+/**
+ * @deprecated This overload is for testing purposes only and should not be used in production.
+ * Use the WithJWTParams overload instead for proper JWT-based authentication.
+ */
 export function initializeWithConfig(
   initializeParams: WithoutJWTParams
 ): WithoutJWT;

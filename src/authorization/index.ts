@@ -2,6 +2,7 @@ export type {
   GenerateJWTPayload,
   WithJWT,
   WithJWTParams,
+  WithoutJWTParams,
   InitializeParams
 } from './authorization';
 
