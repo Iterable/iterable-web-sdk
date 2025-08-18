@@ -301,8 +301,6 @@ export class UnknownUserEventManager {
         }
       });
       if (response?.status === 200) {
-        localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
-
         const onUnknownUserCreated = config.getConfig('onUnknownUserCreated');
 
         if (onUnknownUserCreated) {
@@ -312,6 +310,7 @@ export class UnknownUserEventManager {
           await unknownUserIdSetter(userId);
         }
         await this.handleConsentTracking(false);
+
         this.syncEvents();
       }
     }
@@ -352,7 +351,6 @@ export class UnknownUserEventManager {
             default:
               break;
           }
-          this.removeUnknownSessionCriteriaData();
         }
       );
     }
@@ -360,8 +358,18 @@ export class UnknownUserEventManager {
     if (Object.keys(userUpdateObject).length) {
       // eslint-disable-next-line no-param-reassign
       delete userUpdateObject[SHARED_PREFS_EVENT_TYPE];
-      this.updateUser(userUpdateObject);
+
+      // Strip email and userId fields from dataFields
+      // ignore email and userId
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { email, userId, ...dataFields } = userUpdateObject;
+
+      // Pass remaining fields as dataFields to the /update/user endpoint
+      this.updateUser({ dataFields });
     }
+
+    // Clean up after processing all events
+    this.removeUnknownSessionCriteriaData();
   }
 
   async handleConsentTracking(
@@ -521,7 +529,7 @@ export class UnknownUserEventManager {
     });
 
   updateUser = (payload: UpdateUserParams = {}) => {
-    if (payload.dataFields) {
+    if (payload.dataFields && Object.keys(payload.dataFields).length > 0) {
       return baseIterableRequest<IterableResponse>({
         method: 'POST',
         url: ENDPOINTS.users_update.route,
