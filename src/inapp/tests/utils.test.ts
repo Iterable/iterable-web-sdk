@@ -19,6 +19,7 @@ import {
   sortInAppMessages,
   trackMessagesDelivered
 } from '../utils';
+import { setTypeOfAuthForTestingOnly } from '../../testing';
 
 jest.mock('../../utils/srSpeak', () => ({
   srSpeak: jest.fn()
@@ -33,6 +34,9 @@ const mockMarkup = `
 `;
 
 describe('Utils', () => {
+  beforeEach(() => {
+    setTypeOfAuthForTestingOnly('email');
+  });
   describe('filterHiddenInAppMessages', () => {
     it('should filter out read messages', () => {
       expect(filterHiddenInAppMessages()).toEqual([]);

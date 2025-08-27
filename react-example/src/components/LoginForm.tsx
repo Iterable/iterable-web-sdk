@@ -37,8 +37,8 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string) => Promise<string> | void;
-  setUserId: (userId: string) => Promise<string | void>;
+  setEmail: (email: string, identityResolution?: any) => Promise<string>;
+  setUserId: (userId: string, identityResolution?: any) => Promise<string>;
   logout: () => void;
   refreshJwt?: (authTypes: string) => Promise<string>;
 }

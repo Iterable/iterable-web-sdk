@@ -131,6 +131,8 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 | [`updateSubscriptions`](#updateSubscriptions)                                     | Updates the user's subscriptions by calling [`POST /api/users/updateSubscriptions`](https://support.iterable.com/hc/articles/204780579#post-api-users-updatesubscriptions). |
 | [`updateUser`](#updateUser)                                                       | Updates the data on a user's Iterable profile by calling [`POST /api/users/updateUser`](https://support.iterable.com/hc/articles/204780579#post-api-users-update). |
 | [`updateUserEmail`](#updateUserEmail)                                             | Updates the current user's `email` by calling [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail). Causes the SDK to fetch a JWT for the new email address. |
+| [`setVisitorUsageTracked`](#setVisitorUsageTracked)                                 | Enables or disables unknown visitor tracking based on user consent (UUA). Returned by `initialize`/`initializeWithConfig`. |
+| [`clearVisitorEventsAndUserData`](#clearVisitorEventsAndUserData)                 | Clears unknown visitor session data and queued events (UUA). Returned by `initialize`/`initializeWithConfig`. |
 
 Notes:
 
@@ -152,7 +154,7 @@ function baseIterableRequest(
 ```
 
 Parameters:
-- `payload` - A request config see [`ExtendedRequestConfig`](#ExtendedRequestConfig)
+- `payload` - A request config see [`ExtendedRequestConfig`](#extendedrequestconfig)
 
 Example:
 ```ts
@@ -499,7 +501,7 @@ Parameters:
 import { IterableEmbeddedCard } from '@iterable/web-sdk';
 
 const card = IterableEmbeddedCard({
-  packageName,
+  appPackageName,
   message,
   htmlElements,
   errorCallback: (error) => console.log('handleError: ', error)
@@ -563,7 +565,7 @@ For example:
 import { IterableEmbeddedBanner } from '@iterable/web-sdk';
 
 const banner = IterableEmbeddedBanner({
-  packageName,
+  appPackageName,
   message,
   htmlElements,
   errorCallback: (error) => console.log('handleError: ', error)
@@ -623,7 +625,7 @@ Parameters:
 import { IterableEmbeddedNotification } from '@iterable/web-sdk';
 
 const notification = IterableEmbeddedNotification({
-  packageName,
+  appPackageName,
   message,
   htmlElements,
   errorCallback: (error) => console.log('handleError: ', error)
@@ -702,13 +704,13 @@ const trackEmbeddedClick = (
 Example:
 
 ```js
-import { trackEmbeddedReceived } from '@iterable/web-sdk';
+import { trackEmbeddedClick } from '@iterable/web-sdk';
 
 trackEmbeddedClick({
-  messageId: message.metadata.messageId, 
+  messageId: message.metadata.messageId,
   buttonIdentifier: button.id,
-  clickedUrl: defaultUrl,
-  appPackageName: packageName
+  targetUrl: defaultUrl,
+  appPackageName
 }).then((response) => {
   if (response.status != 200) {
     console.log("Failure tracking embedded click")
@@ -999,7 +1001,7 @@ updateCart({
 
 See also:
 
-- [`UpdateCartRequestParams](#updatecartrequestparams)
+- [`UpdateCartRequestParams`](#updatecartrequestparams)
 - [`IterablePromise`](#iterablepromise)
 - [`IterableResponse`](#iterableresponse)
 
@@ -1052,6 +1054,24 @@ See also:
 - [`UpdateUserParams`](#updateuserparams)
 
 ## `updateUserEmail`
+## `setVisitorUsageTracked`
+
+Enables or disables unknown visitor tracking based on user consent (UUA). Returned by `initialize` and `initializeWithConfig`.
+
+```ts
+setVisitorUsageTracked: (consent: boolean) => void
+```
+
+- `true`: begin or continue collecting unknown events (and start/restore unknown session if enabled)
+- `false`: stop collecting and clear unknown user data
+
+## `clearVisitorEventsAndUserData`
+
+Clears unknown visitor session data and queued events (UUA). Returned by `initialize` and `initializeWithConfig`.
+
+```ts
+clearVisitorEventsAndUserData: () => void
+```
 
 Updates the current user's `email` by calling [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail).
 Causes the SDK to fetch a JWT for the new email address.
@@ -1923,8 +1943,15 @@ Configuration options to pass to [`initializeWithConfig`](#initializewithconfig)
 type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
+  enableUnknownActivation: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
+  eventThresholdLimit?: number;
+  onUnknownUserCreated?: (userId: string) => void;
+  identityResolution?: {
+    mergeOnUnknownToKnown?: boolean;
+    replayOnVisitorToKnown?: boolean;
+  };
 };
 ```
 
@@ -1972,6 +1999,8 @@ interface SDKInAppMessagesParams {
     // messageId of the latest (i.e., most recent) message in the device's 
     // local cache 
     latestCachedMessageId?: string;
+    // Set a default max-width style for message iframe. Applies to Center, TopRight, BottomRight
+    maxWidth?: string;
 }
 ```
 
@@ -2075,6 +2104,8 @@ interface WithJWT {
   setUserID: (userId: string) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
+  setVisitorUsageTracked: (consent: boolean) => void;
+  clearVisitorEventsAndUserData: () => void;
 }
 ```
 
@@ -2089,6 +2120,8 @@ Definitions:
   or [`initializeWithConfig`](#initializeWithConfig).
 - `refreshJwtToken` – Manually refreshes the JWT token for the signed-in user.
 - `logout` – Signs the current user out of the SDK.
+- `setVisitorUsageTracked` – Enables/disables unknown visitor tracking based on user consent.
+- `clearVisitorEventsAndUserData` – Clears unknown visitor session data and queued events.
 
 ## `WithJWTParams`
 
@@ -2413,6 +2446,85 @@ If there's a failure when requesting a new JWT, the SDK does not try again.
 At that point, further requests to Iterable's API will fail.
 
 To perform a manual JWT token refresh, call [`refreshJwtToken`](#refreshjwttoken).
+
+## UUA (Unknown User Activation)
+
+Unknown User Activation (UUA) lets the SDK collect and queue events for unknown visitors and then transparently associate them to a known user once identified. The SDK handles session creation, consent, queuing, merge, and optional replay—out of the box.
+
+### Enable UUA
+
+```ts
+import { initializeWithConfig } from '@iterable/web-sdk';
+
+const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserData } = initializeWithConfig({
+  authToken: '<YOUR_API_KEY>',
+  configOptions: {
+    enableUnknownActivation: true,
+    identityResolution: {
+      mergeOnUnknownToKnown: true,      // default
+      replayOnVisitorToKnown: true      // default
+    },
+    onUnknownUserCreated: (userId) => {
+      console.log('unknown user created:', userId);
+    }
+  },
+  generateJWT: ({ email, userID }) => fetchJWT({ email, userID })
+});
+```
+
+### Using UUA
+
+- Consent control:
+  - `setVisitorUsageTracked(true)` to begin/continue collecting unknown events
+  - `setVisitorUsageTracked(false)` to stop collection and clear related local data
+  - `clearVisitorEventsAndUserData()` to purge queued unknown data explicitly
+- Identification:
+  - Call `setEmail(email)` or `setUserID(userId)`
+  - SDK will merge unknown user → known user when `mergeOnUnknownToKnown` is true
+  - If `replayOnVisitorToKnown` is true, SDK will replay queued unknown events after identification
+
+### Persistence and restoration across sessions
+
+- Storage: the unknown user id is stored in `localStorage` under a project-scoped key. It has no TTL and persists across reloads and restarts until explicitly cleared.
+- Automatic restoration: on initialize (with `enableUnknownActivation: true`), the SDK restores the unknown id from storage and automatically applies it to outgoing requests for supported endpoints.
+- JWT mode: when using a JWT-enabled API key and consent is present, the SDK generates a JWT for the restored unknown id and attaches it so requests are authenticated.
+- Lifecycle end: the unknown id is cleared when you identify (merge then clear), revoke consent via `setVisitorUsageTracked(false)`, call `clearVisitorEventsAndUserData()`, or when browser storage is cleared.
+
+### Configuration options (UUA-specific)
+
+```ts
+type Options = {
+  enableUnknownActivation: boolean;               // Enable UUA (default: false)
+  eventThresholdLimit?: number;                  // Queue flush threshold (default provided by SDK)
+  onUnknownUserCreated?: (userId: string) => void; // Callback when unknown user id is created
+  identityResolution?: {
+    mergeOnUnknownToKnown?: boolean;             // Merge unknown → known on identify (default: true)
+    replayOnVisitorToKnown?: boolean;            // Replay queued events after identify (default: true)
+  };
+  // ...plus general options like logLevel, baseURL, etc.
+}
+```
+
+### Logic flow (what happens under the hood)
+
+1. Initialization
+   - When `enableUnknownActivation` is true, SDK fetches unknown user criteria and starts an unknown session.
+   - If an unknown user id exists in storage, SDK restores it and authenticates appropriately.
+ 2. Event collection (unknown)
+   - When consent is set via `setVisitorUsageTracked(true)`, SDK queues unknown events locally.
+   - Queue flush is governed by `eventThresholdLimit` and internal batching.
+3. Identification
+   - App calls `setEmail` or `setUserID`.
+   - SDK authenticates the known identity and attempts to create the user (if needed).
+   - If `mergeOnUnknownToKnown` is true and an unknown id exists, SDK calls merge (unknown → known).
+4. Replay (optional)
+   - If `replayOnVisitorToKnown` is true, SDK replays queued unknown events under the known identity and clears the unknown queue.
+5. Cleanup
+   - After merge attempt (successful or skipped), SDK clears the stored unknown user id and related anonymous state.
+
+Notes:
+- UUA works for Events, In-App, Embedded, Commerce, and Users APIs; the SDK ensures requests are authenticated correctly pre/post identification.
+- If consent is revoked (`setVisitorUsageTracked(false)`), the SDK clears unknown state and stops tracking until re-enabled.
 
 # Iterable's European data center (EDC)
 

@@ -4,7 +4,6 @@ import {
   IterableEmbeddedMessageUpdateHandler,
   IterableResponse,
   trackEmbeddedClick,
-  trackEmbeddedDismiss,
   trackEmbeddedReceived,
   trackEmbeddedSession
 } from '@iterable/web-sdk';
@@ -126,34 +125,6 @@ export const EmbeddedForm: FC<Props> = ({
       });
   };
 
-  const submitEmbeddedMessagesDismissEvent = async (
-    e: FormEvent<HTMLFormElement>
-  ) => {
-    e.preventDefault();
-    setTrackingEvent(true);
-
-    const sessionData = {
-      messageId,
-      buttonIdentifier: '123',
-      deviceInfo: {
-        deviceId: '123',
-        platform: 'web',
-        appPackageName: 'my-website'
-      },
-      createdAt: Date.now()
-    };
-
-    trackEmbeddedDismiss(sessionData)
-      .then((response: AxiosResponse<IterableResponse>) => {
-        setTrackResponse(JSON.stringify(response.data));
-        setTrackingEvent(false);
-      })
-      .catch((error: AxiosError<IterableResponse>) => {
-        setTrackResponse(JSON.stringify(error.response.data));
-        setTrackingEvent(false);
-      });
-  };
-
   const submitEmbeddedSessionEvent = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setTrackingEvent(true);
@@ -199,8 +170,6 @@ export const EmbeddedForm: FC<Props> = ({
       submitEmbeddedMessagesReceivedEvent(e);
     } else if (type === TYPE_CLICK) {
       submitEmbeddedMessagesClickEvent(e);
-    } else if (type === TYPE_DISMISS) {
-      submitEmbeddedMessagesDismissEvent(e);
     } else if (type === TYPE_SESSION) {
       submitEmbeddedSessionEvent(e);
     }

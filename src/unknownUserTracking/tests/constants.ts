@@ -1,0 +1,1829 @@
+// CRITERIA TEST CONSTANTS
+
+export const DATA_TYPE_COMPARATOR_EQUALS = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'Equals',
+                      value: '3',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'Equals',
+                      value: '19.99',
+                      fieldType: 'double'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'likes_boba',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'Equals',
+                      value: 'Chaina',
+                      fieldType: 'String'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_DOES_NOT_EQUAL = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'DoesNotEqual',
+                      value: '3',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'DoesNotEqual',
+                      value: '19.99',
+                      fieldType: 'double'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'likes_boba',
+                      comparatorType: 'DoesNotEqual',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_LESS_THAN = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '289',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'LessThan',
+                      value: '15',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'LessThan',
+                      value: '15',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_LESS_THAN_OR_EQUAL_TO = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '290',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'LessThanOrEqualTo',
+                      value: '17',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'LessThanOrEqualTo',
+                      value: '17',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_GREATER_THAN = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '290',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'GreaterThan',
+                      value: '50',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'GreaterThan',
+                      value: '55',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_GREATER_THAN_OR_EQUAL_TO = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '291',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'GreaterThanOrEqualTo',
+                      value: '20',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'GreaterThanOrEqualTo',
+                      value: '20',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const DATA_TYPE_COMPARATOR_IS_SET = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'eventTimeStamp',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'long'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'savings',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'double'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'saved_cars',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'double'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_EQUAL_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_Array_Equal',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'Equals',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'score',
+                      fieldType: 'double',
+                      comparatorType: 'Equals',
+                      dataType: 'user',
+                      id: 2,
+                      value: '11.5'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'timestamp',
+                      fieldType: 'long',
+                      comparatorType: 'Equals',
+                      dataType: 'user',
+                      id: 2,
+                      valueLong: 1722500215276,
+                      value: '1722500215276'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'button-clicked.animal',
+                      fieldType: 'string',
+                      comparatorType: 'Equals',
+                      dataType: 'customEvent',
+                      id: 25,
+                      value: 'giraffe'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_DOES_NOT_EQUAL_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_Array_DoesNotEqual',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'DoesNotEqual',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'score',
+                      fieldType: 'double',
+                      comparatorType: 'DoesNotEqual',
+                      dataType: 'user',
+                      id: 2,
+                      value: '11.5'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'timestamp',
+                      fieldType: 'long',
+                      comparatorType: 'DoesNotEqual',
+                      dataType: 'user',
+                      id: 2,
+                      valueLong: 1722500215276,
+                      value: '1722500215276'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'button-clicked.animal',
+                      fieldType: 'string',
+                      comparatorType: 'DoesNotEqual',
+                      dataType: 'customEvent',
+                      id: 25,
+                      value: 'giraffe'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_GREATER_THAN_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'GreaterThan',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_LESS_THAN_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'LessThan',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_GREATER_THAN_EQUAL_TO_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'GreaterThanOrEqualTo',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_LESS_THAN_EQUAL_TO_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'milestoneYears',
+                      fieldType: 'string',
+                      comparatorType: 'LessThanOrEqualTo',
+                      dataType: 'user',
+                      id: 2,
+                      value: '1997'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_CONTAINS_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'addresses',
+                      fieldType: 'string',
+                      comparatorType: 'Contains',
+                      dataType: 'user',
+                      id: 2,
+                      value: 'US'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_STARTSWITH_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'addresses',
+                      fieldType: 'string',
+                      comparatorType: 'StartsWith',
+                      dataType: 'user',
+                      id: 2,
+                      value: 'US'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const ARRAY_MATCHREGEX_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '285',
+      name: 'Criteria_EventTimeStamp_3_Long',
+      createdAt: 1722497422151,
+      updatedAt: 1722500235276,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      field: 'addresses',
+                      fieldType: 'string',
+                      comparatorType: 'MatchesRegex',
+                      dataType: 'user',
+                      id: 2,
+                      value: '^(JP|DE|GB)'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '168',
+      name: 'nested testing',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'nested'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureType',
+                      comparatorType: 'Equals',
+                      value: 'Sofa',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureColor',
+                      comparatorType: 'Equals',
+                      value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA_MULTI_LEVEL = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '425',
+      name: 'Multi level Nested field criteria',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'button-clicked.browserVisit.website.domain',
+                      comparatorType: 'Equals',
+                      value: 'https://mybrand.com/socks',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA_MULTI_LEVEL_ARRAY = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '436',
+      name: 'Criteria 2.1 - 09252024 Bug Bash',
+      createdAt: 1727286807360,
+      updatedAt: 1727445082036,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture.material.type',
+                      comparatorType: 'Contains',
+                      value: 'table',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.material.color',
+                      comparatorType: 'Equals',
+                      values: ['black']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA_MULTI_LEVEL_ARRAY_TRACK_EVENT = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '459',
+      name: 'event a.h.b=d && a.h.c=g',
+      createdAt: 1721251169153,
+      updatedAt: 1723488175352,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'TopLevelArrayObject.a.h.b',
+                      comparatorType: 'Equals',
+                      value: 'd',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'TopLevelArrayObject.a.h.c',
+                      comparatorType: 'Equals',
+                      value: 'g',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const IS_ONE_OF_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '299',
+      name: 'Criteria_Is_One_of',
+      createdAt: 1722851586508,
+      updatedAt: 1724404229481,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'Equals',
+                      values: ['China', 'Japan', 'Kenya']
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'addresses',
+                      comparatorType: 'Equals',
+                      values: ['JP', 'DE', 'GB']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const IS_NOT_ONE_OF_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '299',
+      name: 'Criteria_Is_Not_One_of',
+      createdAt: 1722851586508,
+      updatedAt: 1724404229481,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'country',
+                      comparatorType: 'DoesNotEqual',
+                      values: ['China', 'Japan', 'Kenya']
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'addresses',
+                      comparatorType: 'DoesNotEqual',
+                      values: ['JP', 'DE', 'GB']
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const CUSTOM_EVENT_SINGLE_PRIMITIVE_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '467',
+      name: 'Custom event - single primitive',
+      createdAt: 1728166585122,
+      updatedAt: 1729581351423,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'animal_found',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal_found.count',
+                      comparatorType: 'DoesNotEqual',
+                      value: '4',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const CUSTOM_EVENT_API_TEST_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '6',
+      name: 'EventCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'animal-found',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.type',
+                      comparatorType: 'Equals',
+                      value: 'cat',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.count',
+                      comparatorType: 'Equals',
+                      value: '6',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const USER_UPDATE_API_TEST_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '6',
+      name: 'UserCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureType',
+                      comparatorType: 'Equals',
+                      value: 'Sofa',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'user',
+                      field: 'furniture.furnitureColor',
+                      comparatorType: 'Equals',
+                      value: 'White',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const USER_MERGE_SCENARIO_CRITERIA = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '6',
+      name: 'EventCriteria',
+      createdAt: 1704754280210,
+      updatedAt: 1704754280210,
+      searchQuery: {
+        combinator: 'Or',
+        searchQueries: [
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'Equals',
+                      value: 'testEvent',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const NESTED_CRITERIA_MULTI_LEVEL_MORE_THAN_4_EVENTS = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '484',
+      name: 'NickBBFinalUserFlow',
+      createdAt: 1729009617581,
+      updatedAt: 1730096250121,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'likes_boba',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'cancelled_booking.details.event.name',
+                      comparatorType: 'Equals',
+                      value: 'haircut',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+// MARK:Complex Criteria
+
+export const COMPLEX_CRITERIA_1 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '290',
+      name: 'Complex Criteria Unit Test #1',
+      createdAt: 1722532861551,
+      updatedAt: 1722532861551,
+      searchQuery: {
+        combinator: 'And',
+        searchQueries: [
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'B',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'saved_cars.color',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Not',
+            searchQueries: [
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'total',
+                      comparatorType: 'LessThanOrEqualTo',
+                      value: '100',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'reason',
+                      comparatorType: 'Equals',
+                      value: 'null',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const COMPLEX_CRITERIA_2 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '291',
+      name: 'Complex Criteria Unit Test #2',
+      createdAt: 1722533473263,
+      updatedAt: 1722533473263,
+      searchQuery: {
+        combinator: 'Or',
+        searchQueries: [
+          {
+            combinator: 'Not',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'B',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'eventName',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    },
+                    {
+                      dataType: 'customEvent',
+                      field: 'saved_cars.color',
+                      comparatorType: 'IsSet',
+                      value: '',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'true',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'total',
+                      comparatorType: 'GreaterThanOrEqualTo',
+                      value: '100',
+                      fieldType: 'double'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'purchase',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'purchase',
+                      field: 'reason',
+                      comparatorType: 'DoesNotEqual',
+                      value: 'null',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+export const COMPLEX_CRITERIA_3 = {
+  count: 1,
+  criteriaSets: [
+    {
+      criteriaId: '292',
+      name: 'Complex Criteria Unit Test #3',
+      createdAt: 1722533789589,
+      updatedAt: 1722533838989,
+      searchQuery: {
+        combinator: 'Not',
+        searchQueries: [
+          {
+            combinator: 'And',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'lastName',
+                      comparatorType: 'StartsWith',
+                      value: 'A',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            combinator: 'Or',
+            searchQueries: [
+              {
+                dataType: 'user',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'user',
+                      field: 'firstName',
+                      comparatorType: 'StartsWith',
+                      value: 'C',
+                      fieldType: 'string'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.vaccinated',
+                      comparatorType: 'Equals',
+                      value: 'false',
+                      fieldType: 'boolean'
+                    }
+                  ]
+                }
+              },
+              {
+                dataType: 'customEvent',
+                searchCombo: {
+                  combinator: 'And',
+                  searchQueries: [
+                    {
+                      dataType: 'customEvent',
+                      field: 'animal-found.count',
+                      comparatorType: 'LessThan',
+                      value: '5',
+                      fieldType: 'long'
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+};
+
+// Common mock data for tests
+export const MOCK_ITEMS = {
+  MONITOR: { id: '12', name: 'monitor', price: 50, quantity: 10 },
+  COFFEE: { id: '12', name: 'coffee', price: 10, quantity: 5 },
+  MOCHA: { id: '12', name: 'Mocha', price: 90, quantity: 50 },
+  SNEAKERS: { id: '12', name: 'sneakers', price: 10, quantity: 5 },
+  SLIPPERS: { id: '13', name: 'slippers', price: 10, quantity: 3 },
+  CARAMEL: { id: '12', name: 'Caramel', price: 3, quantity: 5 },
+  SNEAKERS_QTY_2: { id: '12', name: 'sneakers', price: 10, quantity: 2 },
+  SLIPPERS_QTY_2: { id: '13', name: 'slippers', price: 10, quantity: 2 }
+} as const;
+
+export const MOCK_USER_DATA = {
+  HONDA_JAPAN: {
+    preferred_car_models: 'Honda',
+    country: 'Japan'
+  },
+  SUBARU_USA: {
+    preferred_car_models: 'Subaru',
+    country: 'USA'
+  },
+  HONDA_ONLY: {
+    preferred_car_models: 'Honda'
+  },
+  ADAM: {
+    firstName: 'Adam'
+  },
+  XCODE: {
+    firstName: 'xcode'
+  },
+  XCODE_SSR: {
+    firstName: 'xcode',
+    lastName: 'ssr'
+  },
+  ALEX_ARIS: {
+    firstName: 'Alex',
+    lastName: 'Aris'
+  }
+} as const;
+
+export const MOCK_CUSTOM_EVENTS = {
+  BUTTON_CLICKED_WELCOME: {
+    eventName: 'button-clicked',
+    dataFields: {
+      lastPageViewed: 'welcome page'
+    },
+    eventType: 'customEvent'
+  },
+  BUTTON_CLICKED_BIRTHDAY: {
+    dataFields: {
+      saved_cars: { color: 'black' },
+      'animal-found': { vaccinated: true },
+      eventName: 'birthday'
+    },
+    eventType: 'customEvent'
+  },
+  ANIMAL_FOUND_CAT: {
+    dataFields: {
+      'animal-found': {
+        type: 'cat',
+        count: 4
+      }
+    },
+    eventType: 'customEvent'
+  },
+  ANIMAL_FOUND_DOG: {
+    dataFields: {
+      'animal-found.type': 'dog',
+      'animal-found.count': 4
+    },
+    eventType: 'customEvent'
+  }
+} as const;
+
+export const MOCK_EVENTS = {
+  // Purchase events
+  PURCHASE_MONITOR: {
+    items: [MOCK_ITEMS.MONITOR],
+    total: 50,
+    eventType: 'purchase'
+  },
+  PURCHASE_COFFEE: {
+    items: [MOCK_ITEMS.COFFEE],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_SNEAKERS_SLIPPERS: {
+    items: [MOCK_ITEMS.SNEAKERS, MOCK_ITEMS.SLIPPERS],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_SNEAKERS_SLIPPERS_QTY_2: {
+    items: [MOCK_ITEMS.SNEAKERS_QTY_2, MOCK_ITEMS.SLIPPERS_QTY_2],
+    total: 2,
+    eventType: 'purchase'
+  },
+  PURCHASE_CARAMEL: {
+    items: [MOCK_ITEMS.CARAMEL],
+    total: 2,
+    eventType: 'purchase'
+  },
+
+  // Cart update events
+  CART_UPDATE_MOCHA: {
+    items: [MOCK_ITEMS.MOCHA],
+    total: 50,
+    eventType: 'cartUpdate'
+  },
+  CART_UPDATE_MOCHA_NO_TOTAL: {
+    items: [MOCK_ITEMS.MOCHA],
+    eventType: 'cartUpdate'
+  },
+
+  // Purchase events for testing
+  PURCHASE_TESTING: {
+    dataFields: { reason: 'testing', total: 30 },
+    eventType: 'purchase'
+  },
+  PURCHASE_TESTING_110: {
+    dataFields: { total: 110, reason: 'testing' },
+    eventType: 'purchase'
+  }
+} as const;
+
+export const MOCK_USER_UPDATES = {
+  HONDA_JAPAN: {
+    dataFields: MOCK_USER_DATA.HONDA_JAPAN,
+    eventType: 'user'
+  },
+  SUBARU_USA: {
+    dataFields: MOCK_USER_DATA.SUBARU_USA,
+    eventType: 'user'
+  },
+  HONDA_ONLY: {
+    dataFields: MOCK_USER_DATA.HONDA_ONLY,
+    eventType: 'user'
+  },
+  ADAM: {
+    dataFields: MOCK_USER_DATA.ADAM,
+    eventType: 'user'
+  },
+  XCODE: {
+    dataFields: MOCK_USER_DATA.XCODE,
+    eventType: 'user'
+  }
+} as const;

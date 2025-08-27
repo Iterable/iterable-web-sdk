@@ -3,10 +3,21 @@ import { baseAxiosRequest } from '../request';
 import { trackPurchase, updateCart } from './commerce';
 // import { SDK_VERSION, WEB_PLATFORM } from '../constants';
 import { createClientError } from '../utils/testUtils';
+import { setTypeOfAuthForTestingOnly } from '../testing';
 
 const mockRequest = new MockAdapter(baseAxiosRequest);
 
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
+};
+
 describe('Users Requests', () => {
+  beforeEach(() => {
+    (global as any).localStorage = localStorageMock;
+    setTypeOfAuthForTestingOnly('email');
+  });
   it('should set params and return the correct payload for updateCart', async () => {
     mockRequest.onPost('/commerce/updateCart').reply(200, {
       msg: 'hello'

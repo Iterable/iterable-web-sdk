@@ -17,7 +17,7 @@ import {
   trackInAppClose,
   trackInAppConsume,
   trackInAppOpen
-} from '../events';
+} from '../events/inapp/events';
 import { IterablePromise } from '../types';
 import { requestMessages } from './request';
 import {
@@ -603,8 +603,8 @@ export function getInAppMessages(
     return {
       request: (): IterablePromise<InAppMessageResponse> =>
         requestMessages({ payload: dupedPayload })
-          .then((response: any) => {
-            trackMessagesDelivered(
+          .then(async (response: any) => {
+            await trackMessagesDelivered(
               response.data.inAppMessages || [],
               dupedPayload.packageName
             );
@@ -665,9 +665,9 @@ export function getInAppMessages(
     user doesn't want us to paint messages automatically.
     just return the promise like normal
   */
-  return requestMessages({ payload: dupedPayload }).then((response) => {
+  return requestMessages({ payload: dupedPayload }).then(async (response) => {
     const messages = response.data.inAppMessages;
-    trackMessagesDelivered(messages || [], dupedPayload.packageName);
+    await trackMessagesDelivered(messages || [], dupedPayload.packageName);
     const withIframes = messages?.map((message) => {
       const html = message.content?.html;
       return html

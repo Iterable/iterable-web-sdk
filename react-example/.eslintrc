@@ -1,14 +1,9 @@
 {
-  "extends": [
-    "../.eslintrc",
-    "plugin:react/recommended"
-  ],
+  "extends": ["../.eslintrc", "plugin:react/recommended"],
   "rules": {
     "@typescript-eslint/no-empty-interface": "off",
     "import/no-unresolved": "off",
     "react/react-in-jsx-scope": "off"
   },
-  "ignorePatterns": [
-    "node_modules/"
-  ]
+  "ignorePatterns": ["node_modules/"]
 }

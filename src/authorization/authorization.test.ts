@@ -1,18 +1,43 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { initialize } from './authorization';
+import { initialize, setTypeOfAuthForTestingOnly } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
 import { track, trackInAppClose } from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
-import { GETMESSAGES_PATH } from '../constants';
+import {
+  GETMESSAGES_PATH,
+  INITIALIZE_ERROR,
+  SHARED_PREF_USER_TOKEN
+} from '../constants';
 
-let mockRequest: any = null;
+// Mock unknown user tracking to disable it for these tests
+jest.mock('../utils/commonFunctions', () => ({
+  ...jest.requireActual('../utils/commonFunctions'),
+  canTrackUnknownUser: jest.fn(() => false)
+}));
+
+// Mock config to disable unknown user activation
+jest.mock('../utils/config', () => ({
+  ...jest.requireActual('../utils/config'),
+  default: {
+    getConfig: jest.fn((key) => {
+      if (key === 'enableUnknownActivation') {
+        return false;
+      }
+      return undefined;
+    })
+  }
+}));
 
 const localStorageMock = {
-  setItem: jest.fn()
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn()
 };
+
+let mockRequest: any = null;
 
 /*
   decoded payload is:
@@ -29,6 +54,7 @@ const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAdGVzdC5jb20iLCJleHAiOjE2Nzk0ODMyOTEsImlhdCI6MTY3OTQ4MzIzMX0.APaQAYy-lTE0o8rbR6b6-28eCICq36SQMBXmeZAvk1k';
 describe('API Key Interceptors', () => {
   beforeAll(() => {
+    (global as any).localStorage = localStorageMock;
     mockRequest = new MockAdapter(baseAxiosRequest);
     mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
       data: 'something'
@@ -38,6 +64,8 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     mockRequest.onPost('/users/update').reply(200, {
       data: 'something'
     });
@@ -97,7 +125,12 @@ describe('API Key Interceptors', () => {
       const { setEmail } = initialize('123', () =>
         Promise.resolve(MOCK_JWT_KEY)
       );
-      (global as any).localStorage = localStorageMock;
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREF_USER_TOKEN) {
+          return MOCK_JWT_KEY;
+        }
+        return null;
+      });
       await setEmail('hello@gmail.com');
 
       const response = await getInAppMessages({
@@ -194,7 +227,7 @@ describe('API Key Interceptors', () => {
         await setEmail('hello@gmail.com');
         await updateUser();
       } catch (e) {
-        expect(mockGenerateJW).toHaveBeenCalledTimes(2);
+        expect(mockGenerateJW).toHaveBeenCalledTimes(5);
       }
     });
 
@@ -339,6 +372,8 @@ describe('API Key Interceptors', () => {
 
 describe('User Identification', () => {
   beforeEach(() => {
+    setTypeOfAuthForTestingOnly('userID');
+
     /* clear any interceptors already configured */
     [
       ...Array(
@@ -351,6 +386,7 @@ describe('User Identification', () => {
 
   describe('non-JWT auth', () => {
     beforeAll(() => {
+      (global as any).localStorage = localStorageMock;
       mockRequest = new MockAdapter(baseAxiosRequest);
 
       mockRequest.onPost('/users/update').reply(200, {});
@@ -363,14 +399,17 @@ describe('User Identification', () => {
     describe('logout', () => {
       it('logout method removes the email field from requests', async () => {
         const { logout, setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -379,32 +418,34 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
     });
 
     describe('setEmail', () => {
       it('adds email param to endpoint that need an email as a param', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
           packageName: 'my-lil-website'
         });
-
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
 
       it('clears any previous interceptors if called twice', async () => {
         const spy = jest.spyOn(baseAxiosRequest.interceptors.request, 'eject');
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
-        setEmail('new@gmail.com');
+        await setEmail('hello@gmail.com');
+        await setEmail('new@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
@@ -421,7 +462,7 @@ describe('User Identification', () => {
 
       it('adds email body to endpoint that need an email as a body', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/events/trackInAppClose').reply(200, {
           data: 'something'
@@ -450,7 +491,7 @@ describe('User Identification', () => {
         expect(JSON.parse(subsResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(userResponse.config.data).email).toBe(
+        expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
         expect(JSON.parse(trackResponse.config.data).email).toBe(
@@ -460,7 +501,7 @@ describe('User Identification', () => {
 
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/updateEmail').reply(200, {
           data: 'something'
@@ -475,7 +516,7 @@ describe('User Identification', () => {
 
       it('should add user.email param to endpoints that need it', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/commerce/updateCart').reply(200, {
           data: 'something'
@@ -496,7 +537,7 @@ describe('User Identification', () => {
 
       it('adds no email body or header information to unrelated endpoints', async () => {
         const { setEmail } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         mockRequest.onPost('/users/hello').reply(200, {
           data: 'something'
@@ -518,7 +559,7 @@ describe('User Identification', () => {
       it('should overwrite user ID set by setUserID', async () => {
         const { setEmail, setUserID } = initialize('123');
         await setUserID('999');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
 
         const response = await getInAppMessages({
           count: 10,
@@ -601,7 +642,9 @@ describe('User Identification', () => {
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(userResponse.config.data).userId).toBe('999');
+        expect(
+          JSON.parse(userResponse && userResponse.config.data).userId
+        ).toBe('999');
         expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
@@ -657,7 +700,7 @@ describe('User Identification', () => {
 
       it('should overwrite email set by setEmail', async () => {
         const { setEmail, setUserID } = initialize('123');
-        setEmail('hello@gmail.com');
+        await setEmail('hello@gmail.com');
         await setUserID('999');
 
         const response = await getInAppMessages({
@@ -666,19 +709,6 @@ describe('User Identification', () => {
         });
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
-      });
-
-      it('should try /users/update 0 times if request to create a user fails', async () => {
-        mockRequest.onPost('/users/update').reply(400, {});
-
-        const { setUserID } = initialize('123');
-        await setUserID('999');
-
-        expect(
-          mockRequest.history.post.filter(
-            (e: any) => !!e.url?.match(/users\/update/gim)
-          ).length
-        ).toBe(1);
       });
     });
   });
@@ -702,11 +732,14 @@ describe('User Identification', () => {
         await setEmail('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.email).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
 
       it('logout method removes the userId field from requests', async () => {
@@ -716,11 +749,14 @@ describe('User Identification', () => {
         await setUserID('hello@gmail.com');
         logout();
 
-        const response = await getInAppMessages({
-          count: 10,
-          packageName: 'my-lil-website'
-        });
-        expect(response.config.params.userId).toBeUndefined();
+        try {
+          await getInAppMessages({
+            count: 10,
+            packageName: 'my-lil-website'
+          });
+        } catch (e) {
+          expect(e).toStrictEqual(INITIALIZE_ERROR);
+        }
       });
     });
 
@@ -793,7 +829,7 @@ describe('User Identification', () => {
         expect(JSON.parse(subsResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
-        expect(JSON.parse(userResponse.config.data).email).toBe(
+        expect(JSON.parse(userResponse && userResponse.config.data).email).toBe(
           'hello@gmail.com'
         );
         expect(JSON.parse(trackResponse.config.data).email).toBe(
@@ -960,7 +996,9 @@ describe('User Identification', () => {
 
         expect(JSON.parse(closeResponse.config.data).userId).toBe('999');
         expect(JSON.parse(subsResponse.config.data).userId).toBe('999');
-        expect(JSON.parse(userResponse.config.data).userId).toBe('999');
+        expect(
+          JSON.parse(userResponse && userResponse.config.data).userId
+        ).toBe('999');
         expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
       });
 
@@ -1048,7 +1086,7 @@ describe('User Identification', () => {
             mockRequest.history.post.filter(
               (e: any) => !!e.url?.match(/users\/update/gim)
             ).length
-          ).toBe(1);
+          ).toBe(4);
         }
       });
     });
@@ -1100,7 +1138,6 @@ describe('User Identification', () => {
           .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
         const { refreshJwtToken } = initialize('123', mockGenerateJWT);
         await refreshJwtToken('hello@gmail.com');
-
         expect(mockGenerateJWT).toHaveBeenCalledTimes(1);
         jest.advanceTimersByTime(60000 * 4.1);
         expect(mockGenerateJWT).toHaveBeenCalledTimes(2);

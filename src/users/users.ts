@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { object, string } from 'yup';
-import { ENDPOINTS } from '../constants';
 import { IterableResponse } from '../types';
 import { baseIterableRequest } from '../request';
 import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
+import { UnknownUserEventManager } from '../unknownUserTracking/unknownUserEventManager';
+import { canTrackUnknownUser } from '../utils/commonFunctions';
+import { AUA_WARNING, ENDPOINTS } from '../constants';
 
 export const updateUserEmail = (newEmail: string) =>
   baseIterableRequest<IterableResponse>({
@@ -26,6 +28,11 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   delete (payload as any).userId;
   delete (payload as any).email;
 
+  if (canTrackUnknownUser()) {
+    const unknownUserEventManager = new UnknownUserEventManager();
+    unknownUserEventManager.trackUnknownUpdateUser(payload);
+    return Promise.reject(AUA_WARNING);
+  }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.users_update.route,

@@ -11,6 +11,8 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import styled from 'styled-components';
 import { Link } from './components/Link';
 import { LoginForm } from './components/LoginForm';
+import AUTTesting from './views/AUTTesting';
+
 import { UserProvider } from './context/Users';
 import {
   Home,
@@ -56,7 +58,12 @@ const HomeLink = styled(Link)`
     authToken,
     configOptions: {
       isEuIterableService: false,
-      dangerouslyAllowJsPopups: true
+      dangerouslyAllowJsPopups: true,
+      enableUnknownActivation: true,
+      identityResolution: {
+        replayOnVisitorToKnown: true,
+        mergeOnUnknownToKnown: true
+      }
     },
     ...(useJwt
       ? {
@@ -79,11 +86,13 @@ const HomeLink = styled(Link)`
         }
       : {})
   };
-  const { setEmail, setUserID, logout, ...rest } =
+  const { setEmail, setUserID, logout, setVisitorUsageTracked, ...rest } =
     initializeWithConfig(initializeParams);
   const refreshJwtToken = useJwt
     ? (rest as Partial<WithJWT>).refreshJwtToken
     : undefined;
+
+  const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
   const container = document.getElementById('root');
   const root = createRoot(container);
@@ -114,6 +123,10 @@ const HomeLink = styled(Link)`
               <Route
                 path="/embedded-msgs-impression-tracker"
                 element={<EmbeddedMsgsImpressionTracker />}
+              />
+              <Route
+                path="/aut-testing"
+                element={<AUTTesting setConsent={handleConsent} />}
               />
             </Routes>
           </RouteWrapper>
