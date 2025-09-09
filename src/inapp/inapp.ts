@@ -175,10 +175,24 @@ export function getInAppMessages(
 
           const throttledResize =
             messagePosition !== 'Full'
-              ? throttle(750, () => {
+              ? throttle(100, () => {
+                  const iframeBody = activeIframeDocument?.body;
+                  if (!iframeBody) return;
+
+                  /** Hide overflow to prevent scrolling */
+                  const originalOverflow = iframeBody.style.overflow;
+                  const shouldHideOverflow = originalOverflow !== 'hidden';
+                  if (shouldHideOverflow) iframeBody.style.overflow = 'hidden';
+
+                  /** Set the height of the iframe to the height of the iframe body */
                   activeIframe.style.height = `${
-                    activeIframeDocument?.body?.scrollHeight || 0
+                    iframeBody.scrollHeight || 0
                   }px`;
+
+                  /** Restore overflow after new height is set */
+                  if (shouldHideOverflow) {
+                    iframeBody.style.overflow = originalOverflow;
+                  }
                 })
               : () => null;
           global.addEventListener('resize', throttledResize);
