@@ -179,7 +179,7 @@ export function getInAppMessages(
                   const iframeBody = activeIframeDocument?.body;
                   if (!iframeBody) return;
 
-                  /** Hide overflow to prevent scrolling */
+                  /** Hide overflow to prevent scrollbar affecting height determination */
                   const originalOverflow = iframeBody.style.overflow;
                   const shouldHideOverflow = originalOverflow !== 'hidden';
                   if (shouldHideOverflow) iframeBody.style.overflow = 'hidden';

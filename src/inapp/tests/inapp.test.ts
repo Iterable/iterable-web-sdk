@@ -1252,5 +1252,64 @@ describe('getInAppMessages', () => {
       // Note: sendBeacon property is used internally by the authorization system
       // but not preserved in the mock request history, so we don't test it here
     });
+
+    it('should resize iframe and restore/hide overflow when necessary', async () => {
+      mockRequest.onGet(GETMESSAGES_PATH).reply(200, {
+        inAppMessages: [
+          {
+            ...messages[0],
+            content: {
+              ...messages[0].content,
+              html: '<div style="height: 500px">hello</div>'
+            }
+          }
+        ]
+      });
+      const { request } = getInAppMessages(
+        { count: 10, packageName: 'my-lil-website' },
+        { display: DisplayOptions.Immediate }
+      );
+      await request();
+
+      const iframe = document.getElementById(
+        'iterable-iframe'
+      ) as HTMLIFrameElement;
+      const iframeBody = iframe?.contentWindow?.document.body;
+      if (iframeBody) {
+        Object.defineProperty(iframeBody, 'scrollHeight', {
+          value: 500,
+          writable: true
+        });
+        Object.defineProperty(iframeBody, 'offsetHeight', {
+          value: 400,
+          writable: true
+        });
+        iframeBody.style.overflow = 'scroll';
+      }
+
+      global.dispatchEvent(new Event('resize'));
+      jest.advanceTimersByTime(100);
+
+      expect(iframe.style.height).toBe('500px');
+      expect(iframeBody?.style.overflow).toBe('scroll');
+
+      if (iframeBody) {
+        Object.defineProperty(iframeBody, 'scrollHeight', {
+          value: 500,
+          writable: true
+        });
+        Object.defineProperty(iframeBody, 'offsetHeight', {
+          value: 900,
+          writable: true
+        });
+        iframeBody.style.overflow = 'hidden';
+      }
+
+      global.dispatchEvent(new Event('resize'));
+      jest.advanceTimersByTime(100);
+
+      expect(iframe.style.height).toBe('500px');
+      expect(iframeBody?.style.overflow).toBe('hidden');
+    });
   });
 });
