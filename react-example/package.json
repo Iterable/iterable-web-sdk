@@ -27,7 +27,11 @@
     "lint": "eslint . --ext '.ts,.tsx'",
     "cypress": "cypress open",
     "bundle-stats": "webpack --profile --json > stats.json",
-    "webpack-analyze": "yarn bundle-stats && webpack-bundle-analyzer stats.json"
+    "webpack-analyze": "yarn bundle-stats && webpack-bundle-analyzer stats.json",
+    "playwright": "playwright test",
+    "playwright:ui": "playwright test --ui",
+    "playwright:debug": "playwright test --debug",
+    "playwright:install": "playwright install"
   },
   "devDependencies": {
     "@babel/core": "^7.5.0",
