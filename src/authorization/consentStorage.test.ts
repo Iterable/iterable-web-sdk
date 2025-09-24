@@ -70,7 +70,6 @@ jest.mock('../request', () => ({
 describe('Consent Storage in Authorization', () => {
   beforeEach(() => {
     (global as any).localStorage = localStorageMock;
-
     (global as any).window = {
       location: { hostname: 'test.example.com' }
     };
