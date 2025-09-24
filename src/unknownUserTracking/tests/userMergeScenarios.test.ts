@@ -69,14 +69,7 @@ const MOCK_JWT_KEY_WITH_ONE_MINUTE_EXPIRY =
 
 describe('UserMergeScenariosTests', () => {
   beforeAll(() => {
-    // Clear any existing localStorage mock
-    jest.clearAllMocks();
-
-    // Set up the localStorage mock using Object.defineProperty for Jest 28 compatibility
-    Object.defineProperty(global, 'localStorage', {
-      value: localStorageMock,
-      writable: true
-    });
+    (global as any).localStorage = localStorageMock;
 
     global.window = Object.create({ location: { hostname: 'google.com' } });
     mockRequest.onGet(GETMESSAGES_PATH).reply(200, {

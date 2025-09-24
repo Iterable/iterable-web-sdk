@@ -48,14 +48,7 @@ describe('UnknownUserEventManager', () => {
   const mockConfig = config as jest.Mocked<typeof config>;
 
   beforeEach(() => {
-    // Clear any existing localStorage mock
-    jest.clearAllMocks();
-
-    // Set up the localStorage mock
-    Object.defineProperty(global, 'localStorage', {
-      value: localStorageMock,
-      writable: true
-    });
+    (global as any).localStorage = localStorageMock;
 
     // Default consent setup for most tests
     localStorageMock.getItem.mockImplementation((key) => {

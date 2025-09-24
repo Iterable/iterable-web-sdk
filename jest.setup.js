@@ -21,6 +21,23 @@ Object.defineProperty(global, 'navigator', {
   }
 });
 
+const store = {};
+Object.defineProperty(globalThis, 'localStorage', {
+  value: {
+    getItem: jest.fn((key) => (key in store ? store[key] : null)),
+    setItem: jest.fn((key, value) => {
+      store[key] = value.toString();
+    }),
+    removeItem: jest.fn((key) => {
+      delete store[key];
+    }),
+    clear: jest.fn(() => {
+      Object.keys(store).forEach((key) => delete store[key]);
+    })
+  },
+  writable: true
+});
+
 Object.defineProperty(global, 'crypto', { value: webcrypto });
 
 process.env.VERSION = 'mock-version';

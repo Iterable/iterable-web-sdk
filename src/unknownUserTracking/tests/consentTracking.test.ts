@@ -44,14 +44,7 @@ describe('Consent Tracking', () => {
   const mockConfig = config as jest.Mocked<typeof config>;
 
   beforeEach(() => {
-    // Clear any existing localStorage mock
-    jest.clearAllMocks();
-
-    // Set up the localStorage mock
-    Object.defineProperty(global, 'localStorage', {
-      value: localStorageMock,
-      writable: true
-    });
+    (global as any).localStorage = localStorageMock;
 
     // Mock window and navigator
     (global as any).window = {
@@ -61,6 +54,7 @@ describe('Consent Tracking', () => {
     (global as any).navigator = { userAgent: 'test-user-agent' };
 
     unknownUserEventManager = new UnknownUserEventManager();
+    jest.clearAllMocks();
 
     // Default mocks
     mockGetTypeOfAuth.mockReturnValue(null);

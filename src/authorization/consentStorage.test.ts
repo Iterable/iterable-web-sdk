@@ -69,20 +69,14 @@ jest.mock('../request', () => ({
 
 describe('Consent Storage in Authorization', () => {
   beforeEach(() => {
-    // Clear any existing localStorage mock
-    jest.clearAllMocks();
-
-    // Set up the localStorage mock
-    Object.defineProperty(global, 'localStorage', {
-      value: localStorageMock,
-      writable: true
-    });
+    (global as any).localStorage = localStorageMock;
 
     (global as any).window = {
       location: { hostname: 'test.example.com' }
     };
     (global as any).navigator = { userAgent: 'test-user-agent' };
 
+    jest.clearAllMocks();
     // Reset Date.now to a known value
     jest.spyOn(Date, 'now').mockReturnValue(1234567890);
   });
