@@ -1,4 +1,5 @@
-/* eslint-disable no-undef */
+import { webcrypto } from 'crypto';
+
 Object.defineProperty(global, 'matchMedia', {
   writable: true,
   value: (query) => ({
@@ -19,5 +20,7 @@ Object.defineProperty(global, 'navigator', {
     userAgent: 'some-user-agent'
   }
 });
+
+Object.defineProperty(global, 'crypto', { value: webcrypto });
 
 process.env.VERSION = 'mock-version';

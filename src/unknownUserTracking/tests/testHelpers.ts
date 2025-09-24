@@ -14,7 +14,16 @@ export const createLocalStorageMock = () => ({
 // Setup localStorage mock for global use
 export const setupLocalStorageMock = () => {
   const localStorageMock = createLocalStorageMock();
-  (global as any).localStorage = localStorageMock;
+
+  // Clear any existing localStorage mock
+  jest.clearAllMocks();
+
+  // Set up the localStorage mock using Object.defineProperty for Jest 28 compatibility
+  Object.defineProperty(global, 'localStorage', {
+    value: localStorageMock,
+    writable: true
+  });
+
   return localStorageMock;
 };
 
