@@ -175,9 +175,9 @@ export const EmbeddedForm: FC<Props> = ({
     }
   };
 
-  const formAttr = { [`data-qa-${endpointName}-submit`]: true };
-  const inputAttr = { [`data-qa-${endpointName}-input`]: true };
-  const responseAttr = { [`data-qa-${endpointName}-response`]: true };
+  const formAttr = { 'data-test': `${endpointName}-form` };
+  const inputAttr = { 'data-test': `${endpointName}-input` };
+  const responseAttr = { 'data-test': `${endpointName}-response` };
 
   return (
     <>
@@ -196,7 +196,11 @@ export const EmbeddedForm: FC<Props> = ({
               />
             </>
           )}
-          <StyledButton disabled={isTrackingEvent} type="submit">
+          <StyledButton
+            disabled={isTrackingEvent}
+            type="submit"
+            data-test={`${endpointName}-submit`}
+          >
             Submit
           </StyledButton>
         </Form>

@@ -135,6 +135,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           flexDirection: 'row',
           justifyContent: 'center'
         }}
+        data-test="style-selection"
       >
         <form>
           <div>
@@ -145,6 +146,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
               value="default"
               checked={!useCustomStyles}
               onChange={() => setUseCustomStyles(false)}
+              data-test="default-styles-radio"
             />
             <label>Default OOTB Styles</label>
           </div>
@@ -156,6 +158,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
               value="custom"
               checked={useCustomStyles}
               onChange={() => setUseCustomStyles(true)}
+              data-test="custom-styles-radio"
             />
             <label>Custom OOTB Styles</label>
           </div>
@@ -169,6 +172,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           paddingBottom: 80,
           marginTop: 20
         }}
+        data-test="view-selection"
       >
         <Button
           style={{
@@ -183,6 +187,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           onClick={() => {
             setSelectedButtonIndex(0);
           }}
+          data-test="card-view-button"
         >
           Card View
         </Button>
@@ -201,6 +206,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           onClick={() => {
             setSelectedButtonIndex(1);
           }}
+          data-test="banner-view-button"
         >
           Banner View
         </Button>
@@ -217,6 +223,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
           onClick={() => {
             setSelectedButtonIndex(2);
           }}
+          data-test="notification-view-button"
         >
           Notification View
         </Button>
@@ -285,7 +292,7 @@ export const EmbeddedMsgs: FC<Props> = () => {
             }
           })
         ) : (
-          <div>No message</div>
+          <div data-test="no-message">No message</div>
         )}
       </div>
     </>

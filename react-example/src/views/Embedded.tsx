@@ -16,14 +16,14 @@ export const EmbeddedMessage: FC<Props> = () => {
 
   return (
     <>
-      <h1>Embedded Message</h1>
+      <h1 data-test="embedded-heading">Embedded Message</h1>
       <label htmlFor="item-1">UserId</label>
       <TextField
         value={userId}
         onChange={(e) => setUserId(e.target.value)}
         id="item-1"
         placeholder="e.g. phone_number"
-        data-qa-update-user-input
+        data-test="embedded-userid-input"
         required
       />
       <br />

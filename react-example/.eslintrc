@@ -14,7 +14,8 @@
         "**/jest.config.js",
         "**/webpack.config.js",
         "**/webpack.*.js",
-        "e2e/**/*"
+        "e2e/**/*",
+        "**/e2e/**/*"
       ]
     }]
   },
