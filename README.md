@@ -18,6 +18,7 @@ This SDK helps you integrate your web apps with Iterable.
 - [FAQ](#faq)
 - [Link handling](#link-handling)
 - [TypeScript](#typescript)
+- [Development and Testing](#development-and-testing)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -2705,6 +2706,39 @@ each `types.d.ts` file inside of the `./dist` directory to find what you need.
 Request and response payloads should all be available.
 
 If something is missing, please let us know.
+
+# Development and Testing
+
+## React Example Application
+
+This repository includes a React example application that demonstrates the Web SDK's functionality. The example app is located in the `react-example/` directory and includes:
+
+- Sample implementation of all major SDK features
+- Interactive UI for testing API endpoints
+- Complete integration examples for in-app messaging, embedded messages, and more
+
+To run the example application:
+
+```bash
+cd react-example
+yarn install
+yarn start
+```
+
+## E2E Testing
+
+The React example application includes comprehensive end-to-end tests using Playwright. These tests validate the SDK's functionality in a real browser environment.
+
+📖 **For detailed instructions on running and writing E2E tests, see the [E2E Testing Guide](./react-example/e2e/README.md).**
+
+Quick start:
+```bash
+cd react-example
+yarn install
+yarn playwright:install
+yarn start  # In one terminal
+yarn playwright  # In another terminal
+```
 
 # Contributing
 
