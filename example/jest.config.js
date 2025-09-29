@@ -1,4 +1,4 @@
-const { pathsToModuleNameMapper } = require('ts-jest/utils');
+const { pathsToModuleNameMapper } = require('ts-jest');
 const config = require('./tsconfig.json');
 
 const remappedPaths = pathsToModuleNameMapper(config.compilerOptions.paths, {
@@ -6,14 +6,12 @@ const remappedPaths = pathsToModuleNameMapper(config.compilerOptions.paths, {
 });
 
 module.exports = {
-  transform: {
-    '^.+\\.(t|j)sx?$': 'ts-jest'
-  },
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
   testMatch: [
     '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/**/*.{spec,test}.{js,jsx,ts,tsx}'
   ],
+  transform: { '^.+\\.(t|j)sx?$': 'ts-jest' },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleNameMapper: Object.keys(remappedPaths).reduce((acc, key) => {
     if (key === '^(.*)$') {
