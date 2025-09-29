@@ -24,10 +24,25 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://127.0.0.1:3000',
+    baseURL: 'http://localhost:8080',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry'
+    trace: 'on-first-retry',
+
+    /* Take screenshot on test failure */
+    screenshot: 'only-on-failure',
+
+    /* Record video on test failure */
+    video: 'on-first-retry',
+
+    /* Action timeout */
+    actionTimeout: 10000,
+
+    /* Navigation timeout */
+    navigationTimeout: 30000,
+
+    /* Configure testIdAttribute for getByTestId() */
+    testIdAttribute: 'data-test'
   },
 
   /* Configure projects for major browsers */

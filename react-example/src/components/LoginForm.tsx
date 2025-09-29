@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { ChangeEvent, FC, FormEvent, useState } from 'react';
 import styled from 'styled-components';
+import { IdentityResolution } from '@iterable/web-sdk';
 import { useUser } from '../context/Users';
 import { Button } from './Button';
 import { TextField } from './TextField';
@@ -37,8 +38,14 @@ const Error = styled.div`
 `;
 
 interface Props {
-  setEmail: (email: string, identityResolution?: any) => Promise<string>;
-  setUserId: (userId: string, identityResolution?: any) => Promise<string>;
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
+  setUserId: (
+    userId: string,
+    identityResolution?: IdentityResolution
+  ) => Promise<string>;
   logout: () => void;
   refreshJwt?: (authTypes: string) => Promise<string>;
 }
@@ -111,7 +118,7 @@ export const LoginForm: FC<Props> = ({
         </>
       ) : (
         <StyledDiv>
-          <Form>
+          <Form data-test="auth-type-selection">
             <div>
               <input
                 type="radio"
@@ -120,6 +127,7 @@ export const LoginForm: FC<Props> = ({
                 value="userId"
                 checked={!useEmail}
                 onChange={handleRadioChange}
+                data-test="userid-radio"
               />
               <label>UserId</label>
             </div>
@@ -131,11 +139,12 @@ export const LoginForm: FC<Props> = ({
                 value="email"
                 checked={useEmail}
                 onChange={handleRadioChange}
+                data-test="email-radio"
               />
               <label>Email</label>
             </div>
           </Form>
-          <Form onSubmit={handleSubmit} data-qa-login-form>
+          <Form onSubmit={handleSubmit} data-test="login-form">
             <StyledTextField
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 updateUser(event.target.value);
@@ -143,14 +152,18 @@ export const LoginForm: FC<Props> = ({
               value={user}
               placeholder="e.g. hello@gmail.com"
               required
-              data-qa-login-input
+              data-test="login-input"
             />
-            <Button type="submit">{isEditingUser ? 'Change' : 'Login'}</Button>
+            <Button type="submit" data-test="login-button">
+              {isEditingUser ? 'Change' : 'Login'}
+            </Button>
             {isEditingUser && (
-              <Button onClick={handleCancelEditUser}>Cancel</Button>
+              <Button onClick={handleCancelEditUser} data-test="cancel-button">
+                Cancel
+              </Button>
             )}
           </Form>
-          {error && <Error>{error}</Error>}
+          {error && <Error data-test="login-error">{error}</Error>}
         </StyledDiv>
       )}
     </>

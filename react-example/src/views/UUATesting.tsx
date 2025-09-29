@@ -24,7 +24,7 @@ interface Props {
   setConsent?: (accept: boolean) => void;
 }
 
-export const AUTTesting: FC<Props> = ({ setConsent }) => {
+export const UUATesting: FC<Props> = ({ setConsent }) => {
   const [updateCartResponse, setUpdateCartResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -199,16 +199,16 @@ export const AUTTesting: FC<Props> = ({ setConsent }) => {
     }
   };
 
-  const formAttr = { 'data-qa-track-submit': true };
-  const inputAttr = { 'data-qa-track-input': true };
-  const responseAttr = { 'data-qa-track-response': true };
+  const formAttr = { 'data-test': 'events-form' };
+  const inputAttr = { 'data-test': 'events-input' };
+  const responseAttr = { 'data-test': 'events-response' };
 
   const acceptCookie = () => setConsent(true);
 
   const declineCookie = () => setConsent(false);
 
   const renderCookieConsent = setConsent && (
-    <div id="cookie-consent-container">
+    <div id="cookie-consent-container" data-test="cookie-consent">
       <h3>We value your privacy</h3>
       <p>
         We use cookies to enhance your browsing experience, serve personalized
@@ -216,69 +216,91 @@ export const AUTTesting: FC<Props> = ({ setConsent }) => {
         you consent to our use of cookies.
       </p>
       <div>
-        <Button onClick={acceptCookie}>Accept</Button>
-        <Button onClick={declineCookie}>Decline</Button>
+        <Button onClick={acceptCookie} data-test="accept-cookies">
+          Accept
+        </Button>
+        <Button onClick={declineCookie} data-test="decline-cookies">
+          Decline
+        </Button>
       </div>
     </div>
   );
 
   return (
     <>
-      <h1>Commerce Endpoints</h1>
+      <h1 data-test="commerce-heading">Commerce Endpoints</h1>
       <Heading>POST /updateCart</Heading>
       <EndpointWrapper>
-        <Form onSubmit={handleUpdateCart} data-qa-cart-submit>
+        <Form onSubmit={handleUpdateCart} data-test="updatecart-form">
           <label htmlFor="item-1">Enter valid JSON</label>
           <TextField
             value={cartItem}
             onChange={(e) => setCartItem(e.target.value)}
             id="item-1"
             placeholder='e.g. {"items":[{"name":"piano","id":"fdsafds"}]}'
-            data-qa-cart-input
+            data-test="updatecart-input"
           />
-          <Button disabled={isUpdatingCart} type="submit">
+          <Button
+            disabled={isUpdatingCart}
+            type="submit"
+            data-test="updatecart-submit"
+          >
             Submit
           </Button>
         </Form>
-        <Response data-qa-cart-response>{updateCartResponse}</Response>
+        <Response data-test="updatecart-response">
+          {updateCartResponse}
+        </Response>
       </EndpointWrapper>
       <Heading>POST /trackPurchase</Heading>
       <EndpointWrapper>
-        <Form onSubmit={handleTrackPurchase} data-qa-purchase-submit>
+        <Form onSubmit={handleTrackPurchase} data-test="trackpurchase-form">
           <label htmlFor="item-2">Enter valid JSON</label>
           <TextField
             value={purchaseItem}
             onChange={(e) => setPurchaseItem(e.target.value)}
             id="item-2"
             placeholder='e.g. {"items":[{"id":"fdsafds","price":100}]}'
-            data-qa-purchase-input
+            data-test="trackpurchase-input"
           />
-          <Button disabled={isTrackingPurchase} type="submit">
+          <Button
+            disabled={isTrackingPurchase}
+            type="submit"
+            data-test="trackpurchase-submit"
+          >
             Submit
           </Button>
         </Form>
-        <Response data-qa-purchase-response>{trackPurchaseResponse}</Response>
+        <Response data-test="trackpurchase-response">
+          {trackPurchaseResponse}
+        </Response>
       </EndpointWrapper>
-      <h1>User Endpoint</h1>
+      <h1 data-test="user-heading">User Endpoint</h1>
       <Heading>POST /users/update</Heading>
       <EndpointWrapper>
-        <Form onSubmit={handleUpdateUser} data-qa-update-user-submit>
+        <Form onSubmit={handleUpdateUser} data-test="updateuser-form">
           <label htmlFor="item-1">Enter valid JSON here</label>
           <TextField
             value={userDataField}
             onChange={(e) => setUserDataField(e.target.value)}
             id="item-1"
             placeholder="e.g. phone_number"
-            data-qa-update-user-input
+            data-test="updateuser-input"
             required
           />
-          <Button disabled={isUpdatingUser} type="submit">
+          <Button
+            disabled={isUpdatingUser}
+            type="submit"
+            data-test="updateuser-submit"
+          >
             Submit
           </Button>
         </Form>
-        <Response data-qa-update-user-response>{updateUserResponse}</Response>
+        <Response data-test="updateuser-response">
+          {updateUserResponse}
+        </Response>
       </EndpointWrapper>
-      <h1>Events Endpoint</h1>
+      <h1 data-test="events-heading">Events Endpoint</h1>
       <Heading>POST /track</Heading>
       <EndpointWrapper>
         <Form onSubmit={handleTrack} {...formAttr}>
@@ -290,7 +312,11 @@ export const AUTTesting: FC<Props> = ({ setConsent }) => {
             placeholder='e.g. {"eventName":"button-clicked"}'
             {...inputAttr}
           />
-          <Button disabled={isTrackingEvent} type="submit">
+          <Button
+            disabled={isTrackingEvent}
+            type="submit"
+            data-test="events-submit"
+          >
             Submit
           </Button>
         </Form>
@@ -301,4 +327,4 @@ export const AUTTesting: FC<Props> = ({ setConsent }) => {
   );
 };
 
-export default AUTTesting;
+export default UUATesting;

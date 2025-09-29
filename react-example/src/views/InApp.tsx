@@ -45,7 +45,7 @@ const { request, pauseMessageStream, resumeMessageStream } = getInAppMessages(
   { display: DisplayOptions.Immediate }
 );
 
-export const InApp: FC<{}> = () => {
+export const InApp: FC = () => {
   const [isGettingMessagesRaw, setIsGettingMessagesRaw] =
     useState<boolean>(false);
   const [isGettingMessagesAuto, setIsGettingMessagesAuto] =

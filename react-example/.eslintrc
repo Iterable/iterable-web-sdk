@@ -3,7 +3,26 @@
   "rules": {
     "@typescript-eslint/no-empty-interface": "off",
     "import/no-unresolved": "off",
-    "react/react-in-jsx-scope": "off"
+    "react/react-in-jsx-scope": "off",
+    "import/no-extraneous-dependencies": ["error", {
+      "devDependencies": [
+        "**/*.test.ts",
+        "**/*.test.tsx",
+        "**/*.spec.ts", 
+        "**/*.spec.tsx",
+        "**/playwright.config.ts",
+        "**/jest.config.js",
+        "**/webpack.config.js",
+        "**/webpack.*.js",
+        "e2e/**/*",
+        "**/e2e/**/*"
+      ]
+    }]
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
   "ignorePatterns": ["node_modules/"]
 }

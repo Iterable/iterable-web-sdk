@@ -16,33 +16,41 @@ interface Props {}
 
 export const Home: FC<Props> = () => (
   <>
-    <h1>Namespace Selection</h1>
-    <Wrapper>
-      <StyledLink to="/commerce" renderAsButton>
+    <h1 data-test="nav-home">Namespace Selection</h1>
+    <Wrapper data-test="navigation-wrapper">
+      <StyledLink to="/commerce" renderAsButton data-test="nav-commerce">
         Commerce
       </StyledLink>
-      <StyledLink to="/events" renderAsButton>
+      <StyledLink to="/events" renderAsButton data-test="nav-events">
         Events
       </StyledLink>
-      <StyledLink to="/users" renderAsButton>
+      <StyledLink to="/users" renderAsButton data-test="nav-users">
         Users
       </StyledLink>
-      <StyledLink to="/inApp" renderAsButton>
+      <StyledLink to="/inApp" renderAsButton data-test="nav-inapp">
         inApp
       </StyledLink>
       {/* Note: The following components (specifically Embedded Message View Types)
       will not be supported until a later release. */}
-      <StyledLink to="/embedded-msgs" renderAsButton>
+      <StyledLink
+        to="/embedded-msgs"
+        renderAsButton
+        data-test="nav-embedded-msgs"
+      >
         Embedded Msgs
       </StyledLink>
-      <StyledLink to="/embedded" renderAsButton>
+      <StyledLink to="/embedded" renderAsButton data-test="nav-embedded">
         embedded
       </StyledLink>
-      <StyledLink to="/embedded-msgs-impression-tracker" renderAsButton>
+      <StyledLink
+        to="/embedded-msgs-impression-tracker"
+        renderAsButton
+        data-test="nav-embedded-msgs-tracker"
+      >
         Embedded msgs impressions tracker
       </StyledLink>
-      <StyledLink to="/aut-testing" renderAsButton>
-        AUT Testing
+      <StyledLink to="/uua-testing" renderAsButton data-test="nav-uua-testing">
+        UUA Testing
       </StyledLink>
     </Wrapper>
   </>
