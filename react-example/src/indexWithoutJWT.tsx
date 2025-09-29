@@ -10,7 +10,7 @@ import { Events } from './views/Events';
 import { Users } from './views/Users';
 import { InApp } from './views/InApp';
 import LoginFormWithoutJWT from './components/LoginFormWithoutJWT';
-import AUTTesting from './views/AUTTesting';
+import UUATesting from './views/UUATesting';
 import { EmbeddedMsgs } from './views/EmbeddedMsgs';
 import { EmbeddedMessage } from './views/Embedded';
 import { EmbeddedMsgsImpressionTracker } from './views/EmbeddedMsgsImpressionTracker';
@@ -91,8 +91,8 @@ const HomeLink = styled(Link)`
                 element={<EmbeddedMsgsImpressionTracker />}
               />
               <Route
-                path="/aut-testing"
-                element={<AUTTesting setConsent={handleConsent} />}
+                path="/uua-testing"
+                element={<UUATesting setConsent={handleConsent} />}
               />
             </Routes>
           </RouteWrapper>

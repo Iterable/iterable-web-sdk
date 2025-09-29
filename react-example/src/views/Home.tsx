@@ -49,8 +49,8 @@ export const Home: FC<Props> = () => (
       >
         Embedded msgs impressions tracker
       </StyledLink>
-      <StyledLink to="/aut-testing" renderAsButton data-test="nav-aut-testing">
-        AUT Testing
+      <StyledLink to="/uua-testing" renderAsButton data-test="nav-uua-testing">
+        UUA Testing
       </StyledLink>
     </Wrapper>
   </>

@@ -17,7 +17,7 @@ export class Navigation {
 
   readonly embeddedLink: Locator;
 
-  readonly autTestingLink: Locator;
+  readonly uuaTestingLink: Locator;
 
   readonly embeddedMsgsImpressionTrackerLink: Locator;
 
@@ -30,7 +30,7 @@ export class Navigation {
     this.inAppLink = page.getByTestId('nav-inapp');
     this.embeddedMsgsLink = page.getByTestId('nav-embedded-msgs');
     this.embeddedLink = page.getByTestId('nav-embedded');
-    this.autTestingLink = page.getByTestId('nav-aut-testing');
+    this.uuaTestingLink = page.getByTestId('nav-uua-testing');
     this.embeddedMsgsImpressionTrackerLink = page.getByTestId(
       'nav-embedded-msgs-tracker'
     );
@@ -71,9 +71,9 @@ export class Navigation {
     await expect(this.page).toHaveURL('http://localhost:8080/embedded');
   }
 
-  async navigateToAUTTesting() {
-    await this.autTestingLink.click();
-    await expect(this.page).toHaveURL('http://localhost:8080/aut-testing');
+  async navigateToUUATesting() {
+    await this.uuaTestingLink.click();
+    await expect(this.page).toHaveURL('http://localhost:8080/uua-testing');
   }
 
   async isNavigationVisible() {

@@ -24,7 +24,7 @@ interface Props {
   setConsent?: (accept: boolean) => void;
 }
 
-export const AUTTesting: FC<Props> = ({ setConsent }) => {
+export const UUATesting: FC<Props> = ({ setConsent }) => {
   const [updateCartResponse, setUpdateCartResponse] = useState<string>(
     'Endpoint JSON goes here'
   );
@@ -327,4 +327,4 @@ export const AUTTesting: FC<Props> = ({ setConsent }) => {
   );
 };
 
-export default AUTTesting;
+export default UUATesting;

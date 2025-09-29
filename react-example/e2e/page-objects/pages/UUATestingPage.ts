@@ -1,7 +1,7 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from '../BasePage';
 
-export class AUTTestingPage extends BasePage {
+export class UUATestingPage extends BasePage {
   // Commerce - Update Cart elements
   readonly updateCartInput: Locator;
 
@@ -76,7 +76,7 @@ export class AUTTestingPage extends BasePage {
   }
 
   async goto() {
-    await this.page.goto('http://localhost:8080/aut-testing');
+    await this.page.goto('http://localhost:8080/uua-testing');
     await this.waitForPageLoad();
   }
 

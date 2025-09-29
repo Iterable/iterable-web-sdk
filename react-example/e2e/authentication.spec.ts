@@ -27,7 +27,7 @@ test.describe('Authentication and Navigation', () => {
     await basePage.navigation.navigateToInApp();
     await basePage.navigation.navigateToEmbeddedMsgs();
     await basePage.navigation.navigateToEmbedded();
-    await basePage.navigation.navigateToAUTTesting();
+    await basePage.navigation.navigateToUUATesting();
     await basePage.navigation.navigateToHome();
   });
 
