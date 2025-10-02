@@ -2740,6 +2740,73 @@ yarn start  # In one terminal
 yarn playwright  # In another terminal
 ```
 
+## CI/CD with GitHub Actions
+
+The project uses GitHub Actions for continuous integration, including automated Playwright E2E testing across multiple browsers.
+
+### CI Pipeline Overview
+
+The CI pipeline (`/.github/workflows/ci.yml`) runs:
+
+1. **Unit Tests**: SDK build verification and Jest unit tests
+2. **E2E Tests**: Playwright tests across Chromium, Firefox, and WebKit browsers
+
+### Playwright CI Configuration
+
+The E2E tests run automatically on every push and pull request:
+
+- **Browsers**: Tests run simultaneously on Chromium, Firefox, and WebKit
+- **Environment**: Automatically configured with test API keys
+- **Reports**: Test results and screenshots are uploaded as artifacts
+- **Retry Strategy**: Failed tests are retried twice on CI
+
+### Required GitHub Secrets
+
+The repository uses these configured secrets for Playwright E2E testing in CI:
+
+- **`ITERABLE_API_KEY`**: Iterable web API key for SDK authentication during testing
+- **`JWT_SECRET`**: JWT secret associated with the API key for token generation
+
+These secrets are already configured in the repository's GitHub Actions settings. They enable the CI environment to authenticate with Iterable's API and test SDK functionality with real API endpoints.
+
+**Test Configuration Details:**
+- **Default Test User**: `websdk-playwright-test@iterable.com` is used as the default test user for CI testing
+- **Test Project**: The API_KEY uses Iterable's production test project:
+  - **Project**: Mobile SDK Test (Do Not Delete) (Project ID: 1226)
+  - **URL**: https://app.iterable.com/campaigns/manage?projectId=1226
+
+> **Note for developers**: If you need to update these secrets or configure them in a fork, go to Repository Settings → Secrets and variables → Actions and update the values accordingly.
+
+### CI Environment Configuration
+
+During CI execution, the environment is automatically configured with:
+
+```bash
+API_KEY=${{ secrets.ITERABLE_API_KEY }}
+JWT_SECRET=${{ secrets.JWT_SECRET }}
+USE_JWT=true
+LOGIN_EMAIL=websdk-playwright-test@iterable.com
+```
+
+### Features Tested in CI
+
+The automated tests cover:
+
+- **Authentication**: Login form functionality and user management
+- **Navigation**: All app sections (Commerce, Events, Users, InApp, Embedded)
+- **UUA Testing**: Unknown user activation and consent management
+- **Core SDK Integration**: Proper initialization and configuration
+
+### Accessing CI Results
+
+After CI runs, you can:
+
+- View test results in the GitHub Actions tab
+- Download test reports and screenshots from artifacts
+- Debug failed tests using uploaded traces and videos
+
+For detailed troubleshooting and local development setup, see the [E2E Testing Guide](./react-example/e2e/README.md).
+
 # Contributing
 
 Looking to contribute? Please see the [contributing instructions here](./CONTRIBUTING.md) 
