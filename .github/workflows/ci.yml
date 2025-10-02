@@ -61,7 +61,7 @@ jobs:
           }
       - name: Install Playwright browsers
         working-directory: ./react-example
-        run: yarn playwright install --with-deps ${{ matrix.browser }}
+        run: yarn playwright:install --with-deps
       - name: Create environment configuration
         working-directory: ./react-example
         run: |
@@ -78,7 +78,7 @@ jobs:
       - name: Start React example server
         working-directory: ./react-example
         run: |
-          npx webpack serve --config webpack.config.js --port 8080 &
+          yarn webpack serve --config webpack.config.js --port 8080 &
           for i in {1..15}; do
             if curl -f http://localhost:8080 >/dev/null 2>&1; then
               echo "Server is ready"
