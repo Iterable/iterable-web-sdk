@@ -4,7 +4,8 @@
 # source: https://github.com/actions/starter-workflows/blob/main/ci/node.js.yml
 
 name: ci
-
+permissions:
+  contents: read
 on:
   push:
     branches:
