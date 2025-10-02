@@ -35,7 +35,7 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 20
 
     strategy:
       matrix:
@@ -72,13 +72,16 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json', 'react-example/playwright.config.ts') }}
+          key: ${{ runner.os }}-playwright-${{ matrix.browser }}-v${{ hashFiles('react-example/package.json', 'react-example/playwright.config.ts') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json') }}-
+            ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-
-      - name: Install Playwright browsers
+      - name: Install Playwright browsers (browser-specific)
         working-directory: ./react-example
-        run: yarn playwright:install --with-deps
+        run: |
+          echo "📥 Installing only ${{ matrix.browser }} browser..."
+          yarn playwright install ${{ matrix.browser }} --with-deps
+          echo "✅ Browser installation completed"
       - name: Create environment configuration
         working-directory: ./react-example
         run: |
@@ -116,10 +119,9 @@ jobs:
       - name: Run Playwright tests
         working-directory: ./react-example
         run: |
-          yarn playwright test --project=${{ matrix.browser }} --reporter=github
+          yarn playwright test --project=${{ matrix.browser }}
         env:
           CI: true
-          PLAYWRIGHT_TIMEOUT: 30000
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
