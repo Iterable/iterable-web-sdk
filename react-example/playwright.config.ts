@@ -17,10 +17,17 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 1 : undefined,
+  /* Optimized worker count for CI vs local development */
+  workers: process.env.CI ? 4 : undefined,
+  /* Global timeout - optimized for CI performance */
+  timeout: process.env.CI ? 45000 : 30000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['html'],
+    ['github'],
+    ['json', { outputFile: 'test-results/results.json' }],
+    ['junit', { outputFile: 'test-results/results.xml' }]
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
@@ -35,31 +42,52 @@ export default defineConfig({
     /* Record video on test failure */
     video: 'on-first-retry',
 
-    /* Action timeout */
-    actionTimeout: 10000,
+    /* Action timeout - optimized for CI performance */
+    actionTimeout: 8000,
 
-    /* Navigation timeout */
-    navigationTimeout: 30000,
+    /* Navigation timeout - optimized for CI performance */
+    navigationTimeout: 25000,
 
     /* Configure testIdAttribute for getByTestId() */
     testIdAttribute: 'data-test'
   },
 
-  /* Configure projects for major browsers */
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: {
+        ...devices['Desktop Chrome'],
+        /* Minimal CI flags - only proven reliable ones */
+        launchOptions: process.env.CI
+          ? {
+              args: [
+                '--no-sandbox', // Essential for CI
+                '--disable-dev-shm-usage' // Prevent /dev/shm issues
+              ]
+            }
+          : undefined
+      }
     },
 
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
+      use: {
+        ...devices['Desktop Firefox'],
+        /* Firefox works well with minimal flags */
+        launchOptions: process.env.CI
+          ? {
+              args: ['--headless'] // Only flag needed for Firefox CI
+            }
+          : undefined
+      }
     },
 
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
+      use: {
+        ...devices['Desktop Safari']
+        // WebKit works best with NO flags - prevents crashes
+      }
     }
   ]
 });

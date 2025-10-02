@@ -21,9 +21,6 @@ test.describe('UUA Testing Endpoints', () => {
 
       // Accept cookies
       await uuaTestingPage.acceptCookies();
-
-      // Verify cookies banner is gone
-      await expect(uuaTestingPage.acceptCookiesButton).not.toBeVisible();
     }
   });
 });

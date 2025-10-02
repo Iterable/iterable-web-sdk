@@ -16,7 +16,7 @@ export class BasePage {
   }
 
   async goto() {
-    await this.page.goto('http://localhost:8080/');
+    await this.page.goto('/');
   }
 
   async waitForPageLoad() {
