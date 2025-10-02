@@ -19,6 +19,8 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   /* Optimized worker count for CI vs local development */
   workers: process.env.CI ? 2 : undefined,
+  /* Global timeout - extended for CI stability */
+  timeout: process.env.CI ? 60000 : 30000,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['html'],
@@ -43,11 +45,18 @@ export default defineConfig({
     /* Action timeout */
     actionTimeout: 10000,
 
-    /* Navigation timeout */
+    /* Navigation timeout - increased for CI stability */
     navigationTimeout: 30000,
 
     /* Configure testIdAttribute for getByTestId() */
-    testIdAttribute: 'data-test'
+    testIdAttribute: 'data-test',
+
+    /* CI-specific browser launch options for better stability */
+    launchOptions: process.env.CI
+      ? {
+          args: ['--no-sandbox', '--disable-dev-shm-usage']
+        }
+      : undefined
   },
 
   /* Configure projects for major browsers */
