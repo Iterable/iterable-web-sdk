@@ -52,7 +52,13 @@ jobs:
       - run: yarn prepublishOnly
       - name: Install React example dependencies
         working-directory: ./react-example
-        run: yarn install --frozen-lockfile
+        run: |
+          # Try frozen lockfile first, fallback to regeneration if corrupted
+          yarn install --frozen-lockfile || {
+            echo "Lockfile corrupted, regenerating..."
+            rm yarn.lock
+            yarn install
+          }
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: yarn playwright install --with-deps ${{ matrix.browser }}
