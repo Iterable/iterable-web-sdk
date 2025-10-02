@@ -13,6 +13,7 @@ This directory contains end-to-end (E2E) tests for the Iterable Web SDK React ex
 - [Writing New Tests](#writing-new-tests)
 - [Debugging Tests](#debugging-tests)
 - [CI/CD](#cicd)
+- [Test Parallelization Best Practices](#test-parallelization-best-practices)
 
 ## Prerequisites
 
@@ -105,6 +106,8 @@ The Playwright configuration is defined in `playwright.config.ts` (in the `react
 - **Base URL**: `http://localhost:8080`
 - **Test Directory**: `./e2e`
 - **Browsers**: Chromium, Firefox, WebKit
+- **Parallelization**: Fully parallel test execution enabled
+- **Workers**: 2 workers in CI, unlimited locally
 - **Retry Strategy**: 2 retries on CI, 0 locally
 - **Test ID Attribute**: `data-test`
 - **Screenshots**: On failure only
@@ -194,7 +197,7 @@ Provides an interactive UI to run and debug tests.
 ### View Test Reports
 After running tests, view the HTML report:
 ```bash
-npx playwright show-report
+yarn playwright show-report
 ```
 
 ### Screenshots and Videos
@@ -205,15 +208,170 @@ Failed tests automatically capture:
 
 ## CI/CD
 
-The configuration is optimized for CI environments:
+The configuration is optimized for CI environments with performance improvements:
 
-- **Parallel Execution**: Disabled on CI for stability
+- **Parallel Execution**: Optimized with 2 workers per browser job for faster execution
+- **Browser Matrix**: Tests run in parallel across Chromium, Firefox, and WebKit
+- **Caching**: Playwright browsers are cached for faster subsequent runs
 - **Retries**: 2 retries on CI
 - **Fail Fast**: Tests fail if `test.only` is left in code
 - **Reporters**: HTML reports for detailed results
+- **Timeouts**: Extended timeout for slower CI environments
+
+### Performance Optimizations
+- **Browser Caching**: Using `actions/cache@v4` with intelligent cache keys
+- **Matrix Strategy**: Isolated browser execution prevents cross-contamination
+- **Fail-fast: false**: Allows completion of all browser tests even if one fails
 
 ### Environment Variables
 - `CI`: Enables CI-specific settings when set to any truthy value
+
+## Test Parallelization Best Practices
+
+Playwright supports powerful parallelization features to speed up test execution. This project implements industry best practices optimized for both local development and CI environments.
+
+### Current Configuration
+
+Our setup uses a **hybrid parallelization approach**:
+
+```typescript
+// playwright.config.ts
+fullyParallel: true,           // Allow tests within files to run in parallel
+workers: process.env.CI ? 2 : undefined,  // 2 workers in CI, unlimited locally
+```
+
+```yaml
+# GitHub Actions
+strategy:
+  matrix:
+    browser: [chromium, firefox, webkit]
+  fail-fast: false  # Continue all browsers even if one fails
+```
+
+### Parallelization Levels
+
+#### 1. **Browser-Level Parallelization** (Current Setup)
+- **How**: GitHub Actions matrix strategy
+- **What**: Run same tests across multiple browsers simultaneously
+- **Files**: `ci.yml` configuration
+- **Benefits**: 
+  - ✅ Complete isolation between browsers
+  - ✅ Reliable failure handling
+  - ✅ Easy debugging per browser
+  - ✅ Scales automatically with CI runners
+
+#### 2. **Test-Level Parallelization** (Enabled)
+- **How**: `fullyParallel: true` with worker configuration
+- **What**: Multiple tests within same browser run concurrently
+- **Files**: `playwright.config.ts` configuration
+- **Benefits**:
+  - ✅ Faster test execution
+  - ✅ Efficient resource utilization
+  - ✅ Scalable with available cores
+
+### Performance Impact
+
+| Configuration | Total Time* | Stability | Debug Difficulty |
+|--------------|-------------|-----------|------------------|
+| **Current (Recommended)** | 8 minutes | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| Single browser, many workers | 4 minutes | ⭐⭐⭐ | ⭐⭐ |
+| Sequential browsers | 15 minutes | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
+
+*Example for 10 test files across 3 browsers
+
+### When to Modify Current Setup
+
+#### Increase Workers Beyond 2 (CI)
+**When**: You need faster CI execution and tests are very independent
+```typescript
+workers: process.env.CI ? 4 : undefined
+```
+**Risks**: 
+- More resource contention
+- Flakier tests if shared state exists
+- Harder debugging
+
+#### Add Test Sharding
+**When**: You have >20 test files and want parallel CI jobs
+```yaml
+strategy:
+  matrix:
+    browser: [chromium, firefox, webkit]
+    shard: [1, 2, 3, 4]  # Split tests across 4 shards per browser
+```
+
+#### Disable Parallelization
+**When**: Tests have shared state or external dependencies
+```typescript
+fullyParallel: false
+workers: 1
+```
+**Use cases**:
+- Tests modify shared database
+- Tests depend on external APIs with rate limits
+- Sequential operations are necessary
+
+### Browser Selection Strategy
+
+#### Matrix Strategy (Current - Recommended)
+```yaml
+matrix:
+  browser: [chromium, firefox, webkit]
+```
+**Best for**: Most applications needing cross-browser validation
+
+#### Single Browser Selection
+**Chromium only**:
+```yaml
+matrix:
+  browser: [chromium]
+```
+**Best for**: Fast iteration during development
+
+#### Progressive Enhancement
+```yaml
+matrix:
+  strategy:
+    include:
+      - browser: chromium
+      - browser: firefox
+        if: github.event_name == 'pull_request'
+      - browser: webkit
+        if: github.ref == 'refs/heads/main'
+```
+**Best for**: Stage-specific browser validation
+
+### Performance Monitoring
+
+Monitor test execution times to optimize:
+
+```bash
+# Local performance testing
+yarn playwright --reporter=line
+
+# Generate detailed timing report
+yarn playwright --reporter=list
+```
+
+### Official Documentation References
+
+For comprehensive parallelization strategies:
+
+- **[Playwright Parallelization Guide](https://playwright.dev/docs/parallelization)**
+- **[GitHub Actions Matrix Strategy](https://docs.github.com/en/actions/using-jobs/using-a-build-matrix)**
+- **[Playwright CI Best Practices](https://playwright.dev/docs/ci)**
+- **[Workers Configuration](https://playwright.dev/docs/test-parallel#workers)**
+
+### Local Development Optimization
+
+For fastest local development:
+```bash
+# Run single browser for iteration
+yarn playwright --project=chromium
+
+# Skip slow tests during development
+yarn playwright --grep --invert "slow"
+```
 
 ## Troubleshooting
 
@@ -238,10 +396,11 @@ The configuration is optimized for CI environments:
 From the `react-example` directory:
 
 ```bash
-yarn playwright              # Run all tests headlessly
+yarn playwright              # Run all tests in headless mode
 yarn playwright:ui           # Run with interactive UI
-yarn playwright:debug        # Run in debug mode
+yarn playwright:debug       # Run in debug mode
 yarn playwright:install      # Install Playwright browsers
+yarn playwright show-report  # View test results
 ```
 
 ## Test Coverage
