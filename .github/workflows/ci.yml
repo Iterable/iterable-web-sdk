@@ -69,6 +69,7 @@ jobs:
           API_KEY=${{ secrets.ITERABLE_API_KEY }}
           JWT_SECRET=${{ secrets.JWT_SECRET }}
           USE_JWT=true
+          JWT_GENERATOR=https://jwt-generator.stg-itbl.co/generate
           LOGIN_EMAIL=websdk-playwright-test@iterable.com
           EOF
       - name: Build React example app
