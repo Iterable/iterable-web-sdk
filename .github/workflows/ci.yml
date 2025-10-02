@@ -35,7 +35,7 @@ jobs:
 
   e2e-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     strategy:
       matrix:
@@ -44,13 +44,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - name: Use Node.js 18.12.0
+      - name: Setup Node.js
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           node-version: "18.12.0"
           cache: "yarn"
-      - run: yarn install --frozen-lockfile
-      - run: yarn prepublishOnly
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
+          yarn prepublishOnly
       - name: Cache React dependencies
         uses: actions/cache@v4
         with:
@@ -76,11 +78,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-
-      - name: Install Playwright browsers (browser-specific)
+      - name: Install Playwright browsers (optimized)
         working-directory: ./react-example
         run: |
-          echo "📥 Installing only ${{ matrix.browser }} browser..."
-          yarn playwright install ${{ matrix.browser }} --with-deps
+          echo "📥 Installing ${{ matrix.browser }} browser..."
+
+          # Use conditional installation based on cache status
+          if [ "${{ steps.playwright-cache.outputs.cache-hit }}" == "true" ]; then
+            echo "Cache hit! Installing browser only (no deps)..."
+            yarn playwright install ${{ matrix.browser }}
+          else
+            echo "Cache miss. Installing browser + dependencies..."
+            yarn playwright install ${{ matrix.browser }} --with-deps
+          fi
+
           echo "✅ Browser installation completed"
       - name: Create environment configuration
         working-directory: ./react-example
