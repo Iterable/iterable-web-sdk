@@ -79,9 +79,6 @@ jobs:
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: yarn playwright:install --with-deps
-      - name: Install server management tools
-        working-directory: ./react-example
-        run: yarn add -D wait-on
       - name: Create environment configuration
         working-directory: ./react-example
         run: |
@@ -102,16 +99,20 @@ jobs:
           SERVER_PID=$!
           echo "Started server with PID: $SERVER_PID"
 
-          # Wait for server to be ready with proper health check
-          yarn wait-on http://localhost:8080 --timeout 60000
-
-          # Verify server health
-          curl -f http://localhost:8080 > /dev/null || {
-            echo "❌ Server health check failed"
-            ps aux | grep webpack
-            exit 1
-          }
-          echo "✅ Server is ready and healthy"
+          # Wait for server to be ready with built-in health check
+          for i in {1..12}; do
+            if curl -f http://localhost:8080 >/dev/null 2>&1; then
+              echo "✅ Server is ready and healthy"
+              break
+            fi
+            if [ $i -eq 12 ]; then
+              echo "❌ Server failed to start after 60 seconds"
+              ps aux | grep webpack
+              exit 1
+            fi
+            echo "Waiting for server... (attempt $i/12)"
+            sleep 5
+          done
       - name: Run Playwright tests
         working-directory: ./react-example
         run: |
