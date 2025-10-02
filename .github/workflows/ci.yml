@@ -81,7 +81,7 @@ jobs:
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-v2-
       # Browser-specific installation strategy
-      - name: Install Playwright browsers (optimized)
+      - name: Install Playwright browsers
         working-directory: ./react-example
         run: |
           echo "📥 Installing ${{ matrix.browser }} browser..."
