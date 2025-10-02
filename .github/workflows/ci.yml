@@ -51,6 +51,13 @@ jobs:
           cache: "yarn"
       - run: yarn install --frozen-lockfile
       - run: yarn prepublishOnly
+      - name: Cache React dependencies
+        uses: actions/cache@v4
+        with:
+          path: react-example/node_modules
+          key: ${{ runner.os }}-react-deps-${{ hashFiles('react-example/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-react-deps-
       - name: Install React example dependencies
         working-directory: ./react-example
         run: |
@@ -64,15 +71,17 @@ jobs:
         uses: actions/cache@v4
         id: playwright-cache
         with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-${{ hashFiles('**/playwright.config.ts') }}
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json', 'react-example/playwright.config.ts') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json', '**/yarn.lock') }}-
+            ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json') }}-
             ${{ runner.os }}-playwright-
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: yarn playwright:install --with-deps
+      - name: Install server management tools
+        working-directory: ./react-example
+        run: yarn add -D wait-on
       - name: Create environment configuration
         working-directory: ./react-example
         run: |
@@ -89,24 +98,27 @@ jobs:
       - name: Start React example server
         working-directory: ./react-example
         run: |
-          yarn webpack serve --config webpack.config.js --port 8080 &
-          for i in {1..15}; do
-            if curl -f http://localhost:8080 >/dev/null 2>&1; then
-              echo "Server is ready"
-              break
-            fi
-            if [ $i -eq 15 ]; then
-              echo "Server failed to start after 75 seconds"
-              exit 1
-            fi
-            echo "Waiting for server... (attempt $i/15)"
-            sleep 5
-          done
+          yarn webpack serve --config webpack.config.js --port 8080 --host 0.0.0.0 &
+          SERVER_PID=$!
+          echo "Started server with PID: $SERVER_PID"
+
+          # Wait for server to be ready with proper health check
+          yarn wait-on http://localhost:8080 --timeout 60000
+
+          # Verify server health
+          curl -f http://localhost:8080 > /dev/null || {
+            echo "❌ Server health check failed"
+            ps aux | grep webpack
+            exit 1
+          }
+          echo "✅ Server is ready and healthy"
       - name: Run Playwright tests
         working-directory: ./react-example
-        run: yarn playwright test --project=${{ matrix.browser }}
+        run: |
+          yarn playwright test --project=${{ matrix.browser }} --reporter=github
         env:
           CI: true
+          PLAYWRIGHT_TIMEOUT: 30000
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
@@ -114,3 +126,17 @@ jobs:
           name: playwright-report-${{ matrix.browser }}
           path: react-example/playwright-report/
           retention-days: 30
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.browser }}
+          path: react-example/test-results/
+          retention-days: 7
+      - name: Cleanup server processes
+        if: always()
+        run: |
+          echo "🧹 Cleaning up server processes..."
+          pkill -f "webpack serve" || true
+          pkill -f "node.*webpack" || true
+          echo "✅ Cleanup completed"
