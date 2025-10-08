@@ -4,7 +4,8 @@
 # source: https://github.com/actions/starter-workflows/blob/main/ci/node.js.yml
 
 name: ci
-
+permissions:
+  contents: read
 on:
   push:
     branches:
@@ -20,8 +21,8 @@ jobs:
       - name: Use Node.js 18.12.0
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
-          node-version: '18.12.0'
-          cache: 'yarn'
+          node-version: "18.12.0"
+          cache: "yarn"
       - run: yarn install --frozen-lockfile
       - run: yarn prepublishOnly
       - run: node index.node.js
@@ -31,3 +32,178 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
       - run: yarn check-deps
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: "18.12.0"
+          cache: "yarn"
+      - name: Install dependencies
+        run: |
+          yarn install --frozen-lockfile
+          yarn prepublishOnly
+      - name: Cache React dependencies
+        uses: actions/cache@v4
+        with:
+          path: react-example/node_modules
+          key: ${{ runner.os }}-react-deps-${{ hashFiles('react-example/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-react-deps-
+      - name: Install React example dependencies
+        working-directory: ./react-example
+        run: |
+          # Try frozen lockfile first, fallback to regeneration if corrupted
+          yarn install --frozen-lockfile || {
+            echo "Lockfile corrupted, regenerating..."
+            rm yarn.lock
+            yarn install
+          }
+      # Advanced browser caching strategy
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-v2-${{ matrix.browser }}-${{ hashFiles('react-example/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-v2-${{ matrix.browser }}-
+            ${{ runner.os }}-playwright-${{ matrix.browser }}-
+            ${{ runner.os }}-playwright-v2-
+      # Browser-specific installation strategy
+      - name: Install Playwright browsers
+        working-directory: ./react-example
+        run: |
+          echo "📥 Installing ${{ matrix.browser }} browser..."
+
+          # Smart installation based on browser type and cache status
+          cache_hit="${{ steps.playwright-cache.outputs.cache-hit }}"
+
+          if [ "$cache_hit" = "true" ]; then
+            echo "Cache hit: Installing browser only..."
+            yarn playwright install ${{ matrix.browser }}
+          elif [ "${{ matrix.browser }}" = "webkit" ]; then
+            echo "Cache miss + WebKit: Installing with dependencies..."
+            yarn playwright install ${{ matrix.browser }} --with-deps
+          elif [ "${{ matrix.browser }}" = "firefox" ]; then
+            echo "Cache miss + Firefox: Installing with dependencies..."
+            yarn playwright install ${{ matrix.browser }} --with-deps
+          else
+            echo "Cache miss + Chromium: Installing browser only..."
+            yarn playwright install ${{ matrix.browser }}
+          fi
+      # WebKit-specific dependency fix (Ubuntu 22.04 compatibility)
+      - name: Fix WebKit dependencies
+        if: matrix.browser == 'webkit'
+        run: |
+          echo "🔧 Applying WebKit Ubuntu 22.04 fixes..."
+          sudo apt-get update -qq
+          # Install the exact library versions WebKit needs
+          sudo apt-get install -y libwoff2-1.1.0 libwoff2dec1 fonts-liberation || true
+          echo "✅ WebKit dependencies updated"
+
+      # Browser environment setup (flags now handled by Playwright config)
+      - name: Setup browser environment
+        run: |
+          echo "🚀 Browser environment configured via Playwright config"
+          echo "✅ CI-optimized browser launch parameters will be applied automatically"
+      - name: Create environment configuration
+        working-directory: ./react-example
+        run: |
+          cat > .env << 'EOF'
+          API_KEY=${{ secrets.ITERABLE_API_KEY }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          USE_JWT=true
+          JWT_GENERATOR=https://jwt-generator.stg-itbl.co/generate
+          LOGIN_EMAIL=websdk-playwright-test@iterable.com
+          EOF
+      - name: Build React example app
+        working-directory: ./react-example
+        run: yarn build
+      # Enhanced server startup with better resource management
+      - name: Start React example server
+        working-directory: ./react-example
+        run: |
+          echo "🚀 Starting React server..."
+
+          # Set Node.js memory limits for better stability
+          export NODE_OPTIONS="--max-old-space-size=4096"
+
+          # Start server with optimized settings
+          yarn webpack serve --config webpack.config.js --port 8080 --host 0.0.0.0 &
+          SERVER_PID=$!
+          echo "Server started with PID: $SERVER_PID"
+
+          # Enhanced health check with better error reporting
+          for i in {1..20}; do
+            if curl -f http://localhost:8080 >/dev/null 2>&1; then
+              echo "✅ Server ready after ${i} attempts ($(($i*3)) seconds)"
+              break
+            fi
+            if [ $i -eq 20 ]; then
+              echo "❌ Server startup failed after 60 seconds"
+              echo "📋 Debug information:"
+              ps aux | grep webpack || true
+              netstat -tulpn | grep 8080 || true
+              curl -v http://localhost:8080 || true
+              exit 1
+            fi
+            sleep 3
+            echo "Server startup attempt $i/20..."
+          done
+      # Enhanced test execution with browser-specific optimizations
+      - name: Run Playwright tests
+        working-directory: ./react-example
+        run: |
+          yarn playwright test --project=${{ matrix.browser }}
+        env:
+          CI: true
+          # Browser-specific environment variables
+          DISPLAY: :99 # Virtual display for browsers
+          # WebKit library path configuration
+          LD_LIBRARY_PATH: $HOME/.cache/ms-playwright/${{ matrix.browser }}-*/minibrowser-wpe/lib:$LD_LIBRARY_PATH
+      # Enhanced artifact management
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ matrix.browser }}-${{ github.run_number }}
+          path: react-example/playwright-report/
+          retention-days: 14
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.browser }}-${{ github.run_number }}
+          path: react-example/test-results/
+          retention-days: 7
+      # Comprehensive cleanup with port management
+      - name: Cleanup server processes
+        if: always()
+        run: |
+          echo "🧹 Cleaning up server processes..."
+
+          # Kill all processes using port 8080
+          sudo lsof -ti:8080 | xargs -r sudo kill -9 || true
+
+          # Kill by process names
+          pkill -f "webpack serve" || true
+          pkill -f "node.*webpack" || true
+
+          # Kill any remaining browser processes
+          pkill -f "chrome" || true
+          pkill -f "firefox" || true
+          pkill -f "webkit" || true
+
+          echo "✅ Cleanup completed"
