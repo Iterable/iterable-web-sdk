@@ -99,7 +99,9 @@ export class UUATestingPage extends BasePage {
 
   async submitUpdateCart() {
     await this.updateCartSubmit.click();
-    await this.page.waitForTimeout(1000); // Wait for response
+    await expect(this.updateCartResponse).not.toHaveText(
+      'Endpoint JSON goes here'
+    );
   }
 
   async getUpdateCartResponse() {
@@ -117,7 +119,9 @@ export class UUATestingPage extends BasePage {
 
   async submitTrackPurchase() {
     await this.trackPurchaseSubmit.click();
-    await this.page.waitForTimeout(1000); // Wait for response
+    await expect(this.trackPurchaseResponse).not.toHaveText(
+      'Endpoint JSON goes here'
+    );
   }
 
   async getTrackPurchaseResponse() {
@@ -135,7 +139,9 @@ export class UUATestingPage extends BasePage {
 
   async submitUserUpdate() {
     await this.userUpdateSubmit.click();
-    await this.page.waitForTimeout(1000); // Wait for response
+    await expect(this.userUpdateResponse).not.toHaveText(
+      'Endpoint JSON goes here'
+    );
   }
 
   async getUserUpdateResponse() {
@@ -153,7 +159,7 @@ export class UUATestingPage extends BasePage {
 
   async submitEvents() {
     await this.eventsSubmit.click();
-    await this.page.waitForTimeout(1000); // Wait for response
+    await expect(this.eventsResponse).not.toHaveText('Endpoint JSON goes here');
   }
 
   async getEventsResponse() {
