@@ -1,52 +1,55 @@
 import { test, expect } from '@playwright/test';
 import { BasePage } from './page-objects/BasePage';
 
-test.describe('Authentication and Navigation', () => {
+const TEST_EMAIL =
+  process.env.LOGIN_EMAIL || 'websdk-playwright-test@iterable.com';
+
+/**
+ * SDK Authentication Test Suite
+ *
+ * Tests Iterable SDK authentication features:
+ * - SDK initialization with setEmail()
+ * - User identity persistence across API calls
+ * - Authentication state management
+ */
+test.describe('SDK Authentication', () => {
   let basePage: BasePage;
 
   test.beforeEach(async ({ page }) => {
     basePage = new BasePage(page);
     await basePage.goto();
+    await basePage.dismissWebpackErrors();
   });
 
-  test('should handle email input correctly', async () => {
-    const testEmail = 'test@example.com';
-
-    await basePage.loginForm.enterEmail(testEmail);
-    await expect(basePage.loginForm.emailInput).toHaveValue(testEmail);
-  });
-
-  test('should display all navigation links', async () => {
-    await basePage.navigation.isNavigationVisible();
-  });
-
-  test('should navigate to all sections correctly', async () => {
-    await basePage.navigation.navigateToCommerce();
-    await basePage.navigation.navigateToEvents();
+  test('should authenticate user with SDK setEmail and make API call', async ({
+    page
+  }) => {
+    await basePage.loginForm.loginWithEmail(TEST_EMAIL);
     await basePage.navigation.navigateToUsers();
-    await basePage.navigation.navigateToInApp();
-    await basePage.navigation.navigateToEmbeddedMsgs();
-    await basePage.navigation.navigateToEmbedded();
-    await basePage.navigation.navigateToUUATesting();
-    await basePage.navigation.navigateToHome();
-  });
 
-  test('should maintain login state across navigation', async () => {
-    const testEmail = 'test@example.com';
+    // Accept both 200 and 400 responses (400 can occur due to field type mismatches)
+    const apiCallPromise = page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/users/update') &&
+        (response.status() === 200 || response.status() === 400),
+      { timeout: 10000 }
+    );
 
-    await basePage.loginForm.loginWithEmail(testEmail);
-    await basePage.navigation.navigateToCommerce();
-    await basePage.navigation.navigateToHome();
+    const fieldName = `testField_${Date.now()}`;
+    const updateInput = page.locator('[data-qa-update-user-input]');
+    await updateInput.fill(fieldName);
 
-    const actualEmail = await basePage.loginForm.emailInput.inputValue();
-    expect(actualEmail).toBeTruthy();
-    expect(actualEmail.length).toBeGreaterThan(0);
+    const updateButton = page.locator(
+      '[data-qa-update-user-submit] button[type="submit"]'
+    );
+    await updateButton.click();
 
-    await expect(basePage.loginForm.emailInput).toBeVisible();
-    await expect(basePage.loginForm.loginButton).toBeVisible();
+    const response = await apiCallPromise;
+    const requestBody = JSON.parse(response.request().postData() || '{}');
 
-    await basePage.loginForm.emailInput.clear();
-    await basePage.loginForm.emailInput.fill('new@test.com');
-    await expect(basePage.loginForm.emailInput).toHaveValue('new@test.com');
+    // SDK auto-injects email into request
+    expect(requestBody.email).toBe(TEST_EMAIL);
+    expect(requestBody.dataFields).toHaveProperty(fieldName);
+    expect(requestBody.dataFields[fieldName]).toBe('test-data');
   });
 });

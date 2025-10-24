@@ -13,11 +13,28 @@ type Action = 'user_update';
 
 type ActionWrapper = { type: Action; data: string };
 
-const initialState = '';
+const STORAGE_KEY = 'iterable_logged_in_user';
+
+const getInitialState = (): string => {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored || '';
+  }
+  return '';
+};
+
+const initialState = getInitialState();
 
 export const reducer: Reducer<State, ActionWrapper> = (state, action) => {
   switch (action.type) {
     case 'user_update':
+      if (typeof window !== 'undefined') {
+        if (action.data) {
+          localStorage.setItem(STORAGE_KEY, action.data);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
       return action.data;
 
     default:
