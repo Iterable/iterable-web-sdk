@@ -36,6 +36,9 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.44.0-jammy
+      options: --user 1001
 
     strategy:
       matrix:
@@ -64,26 +67,10 @@ jobs:
         working-directory: ./react-example
         run: yarn install --frozen-lockfile
 
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json', 'react-example/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install browser system dependencies
-        working-directory: ./react-example
-        run: |
-          echo "🔧 Installing ${{ matrix.browser }} system dependencies..."
-          sudo npx playwright install-deps ${{ matrix.browser }}
-          echo "✅ System dependencies installed"
-
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: |
-          echo "📥 Installing ${{ matrix.browser }} browser binary..."
+          echo "📥 Installing ${{ matrix.browser }} browser (dependencies already in Docker image)..."
           yarn playwright install ${{ matrix.browser }}
           echo "✅ Browser installed"
       - name: Create environment configuration
