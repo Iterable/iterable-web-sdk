@@ -62,49 +62,30 @@ jobs:
             ${{ runner.os }}-react-deps-
       - name: Install React example dependencies
         working-directory: ./react-example
-        run: |
-          # Try frozen lockfile first, fallback to regeneration if corrupted
-          yarn install --frozen-lockfile || {
-            echo "Lockfile corrupted, regenerating..."
-            rm yarn.lock
-            yarn install
-          }
-      # Advanced browser caching strategy
+        run: yarn install --frozen-lockfile
+
       - name: Cache Playwright browsers
         uses: actions/cache@v4
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-v2-${{ matrix.browser }}-${{ hashFiles('react-example/yarn.lock') }}
+          key: ${{ runner.os }}-playwright-${{ hashFiles('react-example/package.json', 'react-example/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-playwright-v2-${{ matrix.browser }}-
-            ${{ runner.os }}-playwright-${{ matrix.browser }}-
-            ${{ runner.os }}-playwright-v2-
-      # Browser-specific installation strategy
-      # Install system dependencies FIRST (requires sudo)
+            ${{ runner.os }}-playwright-
+
       - name: Install browser system dependencies
-        if: matrix.browser == 'webkit' || matrix.browser == 'firefox'
         working-directory: ./react-example
         run: |
           echo "🔧 Installing ${{ matrix.browser }} system dependencies..."
-          # install-deps must run with sudo to install system packages
           sudo npx playwright install-deps ${{ matrix.browser }}
           echo "✅ System dependencies installed"
 
-      # Then install browser binaries (no sudo needed)
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: |
           echo "📥 Installing ${{ matrix.browser }} browser binary..."
-          # Install browser only - dependencies already installed above
           yarn playwright install ${{ matrix.browser }}
           echo "✅ Browser installed"
-
-      # Browser environment setup (flags now handled by Playwright config)
-      - name: Setup browser environment
-        run: |
-          echo "🚀 Browser environment configured via Playwright config"
-          echo "✅ CI-optimized browser launch parameters will be applied automatically"
       - name: Create environment configuration
         working-directory: ./react-example
         run: |
@@ -116,49 +97,30 @@ jobs:
       - name: Build React example app
         working-directory: ./react-example
         run: yarn build
-      # Enhanced server startup with better resource management
       - name: Start React example server
         working-directory: ./react-example
         run: |
           echo "🚀 Starting React server..."
-
-          # Set Node.js memory limits for better stability
-          export NODE_OPTIONS="--max-old-space-size=4096"
-
-          # Start server with optimized settings
           yarn webpack serve --config webpack.config.js --port 8080 --host 0.0.0.0 &
-          SERVER_PID=$!
-          echo "Server started with PID: $SERVER_PID"
 
-          # Enhanced health check with better error reporting
-          for i in {1..20}; do
+          # Wait for server to be ready
+          for i in {1..30}; do
             if curl -f http://localhost:8080 >/dev/null 2>&1; then
-              echo "✅ Server ready after ${i} attempts ($(($i*3)) seconds)"
+              echo "✅ Server ready after ${i} attempts"
               break
             fi
-            if [ $i -eq 20 ]; then
-              echo "❌ Server startup failed after 60 seconds"
-              echo "📋 Debug information:"
-              ps aux | grep webpack || true
-              netstat -tulpn | grep 8080 || true
-              curl -v http://localhost:8080 || true
+            if [ $i -eq 30 ]; then
+              echo "❌ Server startup failed"
               exit 1
             fi
-            sleep 3
-            echo "Server startup attempt $i/20..."
+            sleep 2
           done
-      # Enhanced test execution with browser-specific optimizations
       - name: Run Playwright tests
         working-directory: ./react-example
-        run: |
-          yarn playwright test --project=${{ matrix.browser }}
+        run: yarn playwright test --project=${{ matrix.browser }}
         env:
           CI: true
-          # Browser-specific environment variables
-          DISPLAY: :99 # Virtual display for browsers
-          # WebKit library path configuration
-          LD_LIBRARY_PATH: $HOME/.cache/ms-playwright/${{ matrix.browser }}-*/minibrowser-wpe/lib:$LD_LIBRARY_PATH
-      # Enhanced artifact management
+
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
@@ -174,7 +136,7 @@ jobs:
           name: test-results-${{ matrix.browser }}-${{ github.run_number }}
           path: react-example/test-results/
           retention-days: 7
-      # Comprehensive cleanup with port management
+
       - name: Cleanup server processes
         if: always()
         run: |
