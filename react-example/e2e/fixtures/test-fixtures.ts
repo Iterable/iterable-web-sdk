@@ -13,9 +13,7 @@
 import { test as base } from '@playwright/test';
 import { BasePage } from '../page-objects/BasePage';
 import { InAppPage } from '../page-objects/pages/InAppPage';
-
-const TEST_EMAIL =
-  process.env.LOGIN_EMAIL || 'websdk-playwright-test@iterable.com';
+import { TEST_EMAIL } from '../utils/test-constants';
 
 type CustomFixtures = {
   basePage: BasePage;

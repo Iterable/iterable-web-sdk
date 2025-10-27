@@ -1,8 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { BasePage } from './page-objects/BasePage';
-
-const TEST_EMAIL =
-  process.env.LOGIN_EMAIL || 'websdk-playwright-test@iterable.com';
+import { TEST_EMAIL } from './utils/test-constants';
 
 /**
  * SDK Authentication Test Suite

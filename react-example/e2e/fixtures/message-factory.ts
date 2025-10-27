@@ -3,40 +3,11 @@
  * Follows Playwright best practices - DRY, reusable, maintainable
  */
 
+import type { InAppMessage } from '@iterable/web-sdk';
 import { MessageTemplates } from './message-templates';
 
-export interface InAppMessage {
-  messageId: string;
-  campaignId: number;
-  createdAt: number;
-  expiresAt: number;
-  content: {
-    html: string;
-    payload: Record<string, unknown>;
-    inAppDisplaySettings: {
-      top: { displayOption: string };
-      right: { percentage: number };
-      bottom: { displayOption: string };
-      left: { percentage: number };
-      shouldAnimate: boolean;
-      bgColor?: { alpha: number; hex: string };
-    };
-    webInAppDisplaySettings: { position: string };
-  };
-  customPayload: Record<string, unknown>;
-  trigger: { type: string };
-  saveToInbox: boolean;
-  inboxMetadata: {
-    title: string;
-    subtitle: string;
-    icon: string;
-  };
-  priorityLevel: number;
-  read: boolean;
-  jsonOnly: boolean;
-  typeOfContent: string;
-  messageType: string;
-}
+// Re-export InAppMessage type for convenience
+export type { InAppMessage };
 
 const defaultDisplaySettings = {
   top: { displayOption: 'AutoExpand' },

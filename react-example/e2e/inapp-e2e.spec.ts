@@ -1,9 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { BasePage } from './page-objects/BasePage';
 import { InAppPage } from './page-objects/pages/InAppPage';
-
-const TEST_EMAIL =
-  process.env.LOGIN_EMAIL || 'websdk-playwright-test@iterable.com';
+import { TEST_EMAIL } from './utils/test-constants';
 
 /**
  * In-App Messaging E2E Tests
@@ -158,7 +156,8 @@ test.describe('In-App Messaging - E2E (Real API)', () => {
       .first();
     if (await closeButton.isVisible({ timeout: 2000 }).catch(() => false)) {
       await closeButton.click();
-      await page.waitForTimeout(500);
+      // Wait for iframe to be removed
+      await expect(page.locator('iframe#iterable-iframe')).not.toBeAttached();
     }
 
     await inAppPage.pauseButton.click();
@@ -184,7 +183,8 @@ test.describe('In-App Messaging - E2E (Real API)', () => {
         .first();
       if (await closeButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         await closeButton.click();
-        await page.waitForTimeout(500);
+        // Wait for iframe to be removed
+        await expect(iframe).not.toBeAttached();
       }
     }
 
