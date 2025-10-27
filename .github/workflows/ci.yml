@@ -81,36 +81,24 @@ jobs:
             ${{ runner.os }}-playwright-${{ matrix.browser }}-
             ${{ runner.os }}-playwright-v2-
       # Browser-specific installation strategy
+      # Install system dependencies FIRST (requires sudo)
+      - name: Install browser system dependencies
+        if: matrix.browser == 'webkit' || matrix.browser == 'firefox'
+        working-directory: ./react-example
+        run: |
+          echo "🔧 Installing ${{ matrix.browser }} system dependencies..."
+          # install-deps must run with sudo to install system packages
+          sudo npx playwright install-deps ${{ matrix.browser }}
+          echo "✅ System dependencies installed"
+
+      # Then install browser binaries (no sudo needed)
       - name: Install Playwright browsers
         working-directory: ./react-example
         run: |
-          echo "📥 Installing ${{ matrix.browser }} browser..."
-
-          # Smart installation based on browser type and cache status
-          cache_hit="${{ steps.playwright-cache.outputs.cache-hit }}"
-
-          if [ "$cache_hit" = "true" ]; then
-            echo "Cache hit: Installing browser only..."
-            yarn playwright install ${{ matrix.browser }}
-          elif [ "${{ matrix.browser }}" = "webkit" ]; then
-            echo "Cache miss + WebKit: Installing with dependencies..."
-            yarn playwright install ${{ matrix.browser }} --with-deps
-          elif [ "${{ matrix.browser }}" = "firefox" ]; then
-            echo "Cache miss + Firefox: Installing with dependencies..."
-            yarn playwright install ${{ matrix.browser }} --with-deps
-          else
-            echo "Cache miss + Chromium: Installing browser only..."
-            yarn playwright install ${{ matrix.browser }}
-          fi
-      # WebKit-specific dependency fix (Ubuntu 22.04 compatibility)
-      - name: Fix WebKit dependencies
-        if: matrix.browser == 'webkit'
-        run: |
-          echo "🔧 Applying WebKit Ubuntu 22.04 fixes..."
-          sudo apt-get update -qq
-          # Install the exact library versions WebKit needs
-          sudo apt-get install -y libwoff2-1.1.0 libwoff2dec1 fonts-liberation || true
-          echo "✅ WebKit dependencies updated"
+          echo "📥 Installing ${{ matrix.browser }} browser binary..."
+          # Install browser only - dependencies already installed above
+          yarn playwright install ${{ matrix.browser }}
+          echo "✅ Browser installed"
 
       # Browser environment setup (flags now handled by Playwright config)
       - name: Setup browser environment
