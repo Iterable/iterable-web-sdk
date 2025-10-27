@@ -156,8 +156,10 @@ test.describe('In-App Messaging - E2E (Real API)', () => {
       .first();
     if (await closeButton.isVisible({ timeout: 2000 }).catch(() => false)) {
       await closeButton.click();
-      // Wait for iframe to be removed
-      await expect(page.locator('iframe#iterable-iframe')).not.toBeAttached();
+      // Wait for iframe to be removed (longer timeout for WebKit in CI)
+      await expect(page.locator('iframe#iterable-iframe')).not.toBeAttached({
+        timeout: 10000
+      });
     }
 
     await inAppPage.pauseButton.click();
@@ -183,8 +185,8 @@ test.describe('In-App Messaging - E2E (Real API)', () => {
         .first();
       if (await closeButton.isVisible({ timeout: 2000 }).catch(() => false)) {
         await closeButton.click();
-        // Wait for iframe to be removed
-        await expect(iframe).not.toBeAttached();
+        // Wait for iframe to be removed (longer timeout for WebKit in CI)
+        await expect(iframe).not.toBeAttached({ timeout: 10000 });
       }
     }
 

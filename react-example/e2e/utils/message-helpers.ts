@@ -67,12 +67,10 @@ export class MessageHelpers {
 
   /**
    * Wait for iframe to be visible and return it
-   *
-   * Uses web-first assertion instead of hard timeout
    */
   static async waitForMessageIframe(page: Page): Promise<FrameLocator> {
     const iframe = MessageHelpers.getMessageIframe(page);
-    await expect(iframe.locator('body')).toBeVisible({ timeout: 5000 });
+    await expect(iframe.locator('body')).toBeVisible({ timeout: 10000 });
     return iframe;
   }
 
