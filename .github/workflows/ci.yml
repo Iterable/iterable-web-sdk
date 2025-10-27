@@ -121,10 +121,8 @@ jobs:
         working-directory: ./react-example
         run: |
           cat > .env << 'EOF'
-          API_KEY=${{ secrets.ITERABLE_API_KEY }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          USE_JWT=true
-          JWT_GENERATOR=https://jwt-generator.stg-itbl.co/generate
+          API_KEY=${{ secrets.ITERABLE_NO_JWT_API_KEY }}
+          USE_JWT=false
           LOGIN_EMAIL=websdk-playwright-test@iterable.com
           EOF
       - name: Build React example app
