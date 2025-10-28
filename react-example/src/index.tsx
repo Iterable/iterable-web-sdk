@@ -94,6 +94,18 @@ const HomeLink = styled(Link)`
 
   const handleConsent = (consent?: boolean) => setVisitorUsageTracked(consent);
 
+  // Restore user from localStorage and re-authenticate SDK on page load
+  // This runs synchronously before React renders to ensure SDK is properly initialized
+  const STORAGE_KEY = 'iterable_logged_in_user';
+  const storedUser = localStorage.getItem(STORAGE_KEY);
+  if (storedUser) {
+    setEmail(storedUser).catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error('Failed to restore user session:', error);
+      localStorage.removeItem(STORAGE_KEY);
+    });
+  }
+
   const container = document.getElementById('root');
   const root = createRoot(container);
   root.render(

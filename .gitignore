@@ -13,3 +13,4 @@ browserstack.json
 .DS_Store
 stats.json
 .idea
+.cursor

@@ -46,7 +46,18 @@ export class LoginForm {
   async loginWithEmail(email: string) {
     await this.selectEmailAuth();
     await this.enterEmail(email);
-    await this.clickLogin();
+
+    // Click login and wait for the form to disappear (replaced by "Logged in as..." button)
+    await Promise.all([
+      this.page.waitForFunction(
+        () => {
+          const button = document.querySelector('[data-test="login-button"]');
+          return !button || !button.textContent?.includes('Login');
+        },
+        { timeout: 10000 }
+      ),
+      this.clickLogin()
+    ]);
   }
 
   async isErrorMessageVisible() {
