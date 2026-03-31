@@ -37,6 +37,14 @@ module.exports = {
     static: {
       directory: './dist'
     },
+    proxy: [
+      {
+        context: ['/generate'],
+        target: 'https://jwt-generator.stg-itbl.co',
+        changeOrigin: true,
+        secure: true
+      }
+    ],
     client: {
       overlay: {
         errors: true,
