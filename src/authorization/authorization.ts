@@ -277,11 +277,7 @@ const addEmailToRequest = (email: string) => {
         body: true,
         current: false,
         nestedUser: false
-      }) &&
-      !config?.url?.includes('/events/trackInAppDelivery') &&
-      !config?.url?.includes('/events/trackInAppClick') &&
-      !config?.url?.includes('/events/trackInAppOpen') &&
-      !config?.url?.includes('/events/inAppConsume')
+      })
     ) {
       return {
         ...config,

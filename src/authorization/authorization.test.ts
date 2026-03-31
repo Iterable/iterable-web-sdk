@@ -3,7 +3,14 @@ import MockAdapter from 'axios-mock-adapter';
 import { initialize, setTypeOfAuthForTestingOnly } from './authorization';
 import { baseAxiosRequest } from '../request';
 import { getInAppMessages } from '../inapp';
-import { track, trackInAppClose } from '../events';
+import {
+  track,
+  trackInAppClose,
+  trackInAppDelivery,
+  trackInAppOpen,
+  trackInAppClick,
+  trackInAppConsume
+} from '../events';
 import { updateSubscriptions, updateUser, updateUserEmail } from '../users';
 import { trackPurchase, updateCart } from '../commerce';
 import {
@@ -499,6 +506,55 @@ describe('User Identification', () => {
         );
       });
 
+      it('adds email body to in-app event endpoints (trackInAppDelivery, trackInAppOpen, trackInAppClick, inAppConsume)', async () => {
+        const { setEmail } = initialize('123');
+        await setEmail('hello@gmail.com');
+
+        mockRequest.onPost('/events/trackInAppDelivery').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/trackInAppOpen').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/trackInAppClick').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/inAppConsume').reply(200, {
+          data: 'something'
+        });
+
+        const deliveryResponse = await trackInAppDelivery({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const openResponse = await trackInAppOpen({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const clickResponse = await trackInAppClick({
+          messageId: '123',
+          clickedUrl: 'https://example.com',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const consumeResponse = await trackInAppConsume({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+
+        expect(JSON.parse(deliveryResponse.config.data).email).toBe(
+          'hello@gmail.com'
+        );
+        expect(JSON.parse(openResponse.config.data).email).toBe(
+          'hello@gmail.com'
+        );
+        expect(JSON.parse(clickResponse.config.data).email).toBe(
+          'hello@gmail.com'
+        );
+        expect(JSON.parse(consumeResponse.config.data).email).toBe(
+          'hello@gmail.com'
+        );
+      });
+
       it('adds currentEmail body to endpoint that need an currentEmail as a body', async () => {
         const { setEmail } = initialize('123');
         await setEmail('hello@gmail.com');
@@ -646,6 +702,47 @@ describe('User Identification', () => {
           JSON.parse(userResponse && userResponse.config.data).userId
         ).toBe('999');
         expect(JSON.parse(trackResponse.config.data).userId).toBe('999');
+      });
+
+      it('adds userId body to in-app event endpoints (trackInAppDelivery, trackInAppOpen, trackInAppClick, inAppConsume)', async () => {
+        const { setUserID } = initialize('123');
+        await setUserID('999');
+
+        mockRequest.onPost('/events/trackInAppDelivery').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/trackInAppOpen').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/trackInAppClick').reply(200, {
+          data: 'something'
+        });
+        mockRequest.onPost('/events/inAppConsume').reply(200, {
+          data: 'something'
+        });
+
+        const deliveryResponse = await trackInAppDelivery({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const openResponse = await trackInAppOpen({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const clickResponse = await trackInAppClick({
+          messageId: '123',
+          clickedUrl: 'https://example.com',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+        const consumeResponse = await trackInAppConsume({
+          messageId: '123',
+          deviceInfo: { appPackageName: 'my-lil-website' }
+        });
+
+        expect(JSON.parse(deliveryResponse.config.data).userId).toBe('999');
+        expect(JSON.parse(openResponse.config.data).userId).toBe('999');
+        expect(JSON.parse(clickResponse.config.data).userId).toBe('999');
+        expect(JSON.parse(consumeResponse.config.data).userId).toBe('999');
       });
 
       it('adds currentUserId body to endpoint that need an currentUserId as a body', async () => {
