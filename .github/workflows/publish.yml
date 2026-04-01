@@ -12,13 +12,15 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - name: Use Node.js 18.12.0
-        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: '18.12.0'
+          node-version: '22'
           cache: 'yarn'
           registry-url: 'https://registry.npmjs.org'
+      - name: Update npm for OIDC support
+        run: npm install -g npm@latest
       - run: yarn install --frozen-lockfile
       - run: yarn test
       - run: yarn build
