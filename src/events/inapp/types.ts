@@ -15,6 +15,7 @@ export interface InAppEventRequestParams {
     location?: string;
   };
   closeAction?: string;
+  deleteAction?: string;
   deviceInfo: {
     appPackageName: string; // customer-defined name
   };
