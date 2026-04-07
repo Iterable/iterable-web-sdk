@@ -34,6 +34,7 @@ import {
   SHARED_PREF_EMAIL,
   SHARED_PREF_USER_ID
 } from '../constants';
+import { safeGetItem, safeSetItem, safeRemoveItem } from '../utils/safeStorage';
 import { baseIterableRequest } from '../request';
 import { getTypeOfAuth } from '../utils/typeOfAuth';
 import { IterableResponse } from '../types';
@@ -103,7 +104,7 @@ export function isUnknownUsageTracked(): boolean {
   if (!isEnabled) return false;
 
   // Also check if user has given consent (consent timestamp exists)
-  const consentTimestamp = localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+  const consentTimestamp = safeGetItem(SHARED_PREF_CONSENT_TIMESTAMP);
   return consentTimestamp !== null;
 }
 
@@ -114,9 +115,7 @@ export class UnknownUserEventManager {
 
       if (!unknownUsageTracked) return;
 
-      const strUnknownSessionInfo = localStorage.getItem(
-        SHARED_PREFS_UNKNOWN_SESSIONS
-      );
+      const strUnknownSessionInfo = safeGetItem(SHARED_PREFS_UNKNOWN_SESSIONS);
       let unknownSessionInfo: {
         itbl_unknown_sessions?: {
           number_of_sessions?: number;
@@ -145,10 +144,7 @@ export class UnknownUserEventManager {
         itbl_unknown_sessions: unknownSessionInfo.itbl_unknown_sessions
       };
 
-      localStorage.setItem(
-        SHARED_PREFS_UNKNOWN_SESSIONS,
-        JSON.stringify(outputObject)
-      );
+      safeSetItem(SHARED_PREFS_UNKNOWN_SESSIONS, JSON.stringify(outputObject));
     } catch (error) {
       console.error('Error updating unknown session:', error);
     }
@@ -168,10 +164,7 @@ export class UnknownUserEventManager {
       .then((response) => {
         const criteriaData: any = response.data;
         if (criteriaData) {
-          localStorage.setItem(
-            SHARED_PREFS_CRITERIA,
-            JSON.stringify(criteriaData)
-          );
+          safeSetItem(SHARED_PREFS_CRITERIA, JSON.stringify(criteriaData));
         }
       })
       .catch((e) => {
@@ -220,11 +213,9 @@ export class UnknownUserEventManager {
   }
 
   private checkCriteriaCompletion(): string | null {
-    const criteriaData = localStorage.getItem(SHARED_PREFS_CRITERIA);
-    const localStoredEventList = localStorage.getItem(
-      SHARED_PREFS_EVENT_LIST_KEY
-    );
-    const localStoredUserUpdate = localStorage.getItem(
+    const criteriaData = safeGetItem(SHARED_PREFS_CRITERIA);
+    const localStoredEventList = safeGetItem(SHARED_PREFS_EVENT_LIST_KEY);
+    const localStoredUserUpdate = safeGetItem(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY
     );
     try {
@@ -248,17 +239,15 @@ export class UnknownUserEventManager {
 
     if (!unknownUsageTracked) return;
 
-    let userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+    let userData = safeGetItem(SHARED_PREFS_UNKNOWN_SESSIONS);
 
     // If no session data exists, create it first
     if (!userData) {
       this.updateUnknownSession();
-      userData = localStorage.getItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+      userData = safeGetItem(SHARED_PREFS_UNKNOWN_SESSIONS);
     }
 
-    const strUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+    const strUserUpdate = safeGetItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
     const dataFields = strUserUpdate ? JSON.parse(strUserUpdate) : {};
 
     delete dataFields[SHARED_PREFS_EVENT_TYPE];
@@ -317,14 +306,12 @@ export class UnknownUserEventManager {
   }
 
   async syncEvents() {
-    const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
+    const strTrackEventList = safeGetItem(SHARED_PREFS_EVENT_LIST_KEY);
     const trackEventList = strTrackEventList
       ? JSON.parse(strTrackEventList)
       : [];
 
-    const strUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+    const strUserUpdate = safeGetItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
     const userUpdateObject = strUserUpdate ? JSON.parse(strUserUpdate) : {};
 
     if (trackEventList.length) {
@@ -387,9 +374,7 @@ export class UnknownUserEventManager {
       if (replayEnabled) {
         try {
           if (isUserKnown === true) {
-            const unknownUserCreated = localStorage.getItem(
-              SHARED_PREF_UNKNOWN_USER_ID
-            );
+            const unknownUserCreated = safeGetItem(SHARED_PREF_UNKNOWN_USER_ID);
             if (!unknownUserCreated) {
               await this.trackConsent(true);
             }
@@ -407,9 +392,9 @@ export class UnknownUserEventManager {
   }
 
   removeUnknownSessionCriteriaData() {
-    localStorage.removeItem(SHARED_PREFS_UNKNOWN_SESSIONS);
-    localStorage.removeItem(SHARED_PREFS_EVENT_LIST_KEY);
-    localStorage.removeItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
+    safeRemoveItem(SHARED_PREFS_UNKNOWN_SESSIONS);
+    safeRemoveItem(SHARED_PREFS_EVENT_LIST_KEY);
+    safeRemoveItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
   }
 
   private async storeEventListToLocalStorage(newDataObject: UnknownEventData) {
@@ -417,7 +402,7 @@ export class UnknownUserEventManager {
 
     if (!unknownUsageTracked) return;
 
-    const strTrackEventList = localStorage.getItem(SHARED_PREFS_EVENT_LIST_KEY);
+    const strTrackEventList = safeGetItem(SHARED_PREFS_EVENT_LIST_KEY);
     let previousDataArray = [];
 
     if (strTrackEventList) {
@@ -439,10 +424,7 @@ export class UnknownUserEventManager {
       );
     }
 
-    localStorage.setItem(
-      SHARED_PREFS_EVENT_LIST_KEY,
-      JSON.stringify(previousDataArray)
-    );
+    safeSetItem(SHARED_PREFS_EVENT_LIST_KEY, JSON.stringify(previousDataArray));
     const criteriaId = this.checkCriteriaCompletion();
     if (criteriaId !== null) {
       this.createUnknownUser(criteriaId);
@@ -456,9 +438,7 @@ export class UnknownUserEventManager {
 
     if (!unknownUsageTracked) return;
 
-    const strUserUpdate = localStorage.getItem(
-      SHARED_PREFS_USER_UPDATE_OBJECT_KEY
-    );
+    const strUserUpdate = safeGetItem(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
     let userUpdateObject = {};
 
     if (strUserUpdate) {
@@ -470,7 +450,7 @@ export class UnknownUserEventManager {
       ...newDataObject
     };
 
-    localStorage.setItem(
+    safeSetItem(
       SHARED_PREFS_USER_UPDATE_OBJECT_KEY,
       JSON.stringify(userUpdateObject)
     );
@@ -547,7 +527,7 @@ export class UnknownUserEventManager {
 
   // Consent tracking methods
   getConsentTimestamp(): string | null {
-    return localStorage.getItem(SHARED_PREF_CONSENT_TIMESTAMP);
+    return safeGetItem(SHARED_PREF_CONSENT_TIMESTAMP);
   }
 
   hasConsent(): boolean {
@@ -559,21 +539,21 @@ export class UnknownUserEventManager {
 
     // First priority: actual user credentials from login/signup
     if (typeOfAuth === 'email') {
-      const email = localStorage.getItem(SHARED_PREF_EMAIL);
+      const email = safeGetItem(SHARED_PREF_EMAIL);
       if (email) {
         return { email };
       }
     }
 
     if (typeOfAuth === 'userID') {
-      const userId = localStorage.getItem(SHARED_PREF_USER_ID);
+      const userId = safeGetItem(SHARED_PREF_USER_ID);
       if (userId) {
         return { userId };
       }
     }
 
     // Fallback: generated unknown user ID (for scenario 1: after /session call)
-    const unknownUserId = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
+    const unknownUserId = safeGetItem(SHARED_PREF_UNKNOWN_USER_ID);
     if (unknownUserId) {
       return { userId: unknownUserId };
     }
@@ -608,7 +588,7 @@ export class UnknownUserEventManager {
       });
 
       // Remove consent timestamp after successful call
-      localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+      safeRemoveItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
       return response;
     } catch (error) {

@@ -1,22 +1,23 @@
 import { SHARED_PREF_USER_TOKEN } from '../constants';
+import { safeGetItem, safeSetItem, safeRemoveItem } from './safeStorage';
 
 class AuthorizationToken {
   public token: string | null = null;
 
   setToken(token: string) {
     this.token = token;
-    localStorage.setItem(SHARED_PREF_USER_TOKEN, token);
+    safeSetItem(SHARED_PREF_USER_TOKEN, token);
   }
 
   getToken(): string | null {
     return this.token && this.token.length > 0
       ? this.token
-      : localStorage.getItem(SHARED_PREF_USER_TOKEN);
+      : safeGetItem(SHARED_PREF_USER_TOKEN);
   }
 
   clearToken() {
     this.token = null;
-    localStorage.removeItem(SHARED_PREF_USER_TOKEN);
+    safeRemoveItem(SHARED_PREF_USER_TOKEN);
   }
 }
 
