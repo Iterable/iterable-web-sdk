@@ -286,11 +286,12 @@ const mediaQueryXl = global?.matchMedia?.('(min-width: 1301px)');
 const generateSecuredIFrame = () => {
   const iframe = document.createElement('iframe');
   iframe.setAttribute('id', 'iterable-iframe');
-  // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
-  // event handlers on elements in it preventing our custom link handling
+  // allow-scripts is needed so that click event handlers work inside the iframe
+  // (especially in Safari, which blocks all JS in sandboxed iframes without it).
+  // allow-popups and allow-top-navigation enable links to navigate or open new tabs.
   iframe.setAttribute(
     'sandbox',
-    `allow-same-origin allow-popups allow-top-navigation ${
+    `allow-same-origin allow-scripts allow-popups allow-top-navigation ${
       config.getConfig('dangerouslyAllowJsPopups')
         ? 'allow-popups-to-escape-sandbox'
         : ''

@@ -2656,7 +2656,7 @@ const SomeComponent = () => {
 ### Safari: Allowing JavaScript execution in tabs opened by in-app message link clicks
 
 To display an in-app message, Iterable's Web SDK uses an `iframe` on which the
-`sandbox` attribute is set to `allow-same-origin allow-popups allow-top-navigation`. 
+`sandbox` attribute is set to `allow-same-origin allow-scripts allow-popups allow-top-navigation`. 
 On Safari, this configuration blocks JavaScript execution in tabs that open because 
 of link clicks in the `iframe`.
 
