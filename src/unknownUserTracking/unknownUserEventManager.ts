@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { v4 as uuidv4 } from 'uuid';
+import { generateUUID } from '../utils/generateUUID';
 import {
   UpdateCartRequestParams,
   TrackPurchaseRequestParams,
@@ -263,7 +263,7 @@ export class UnknownUserEventManager {
 
     delete dataFields[SHARED_PREFS_EVENT_TYPE];
 
-    const userId = uuidv4();
+    const userId = generateUUID();
 
     if (userData) {
       const userSessionInfo = JSON.parse(userData);

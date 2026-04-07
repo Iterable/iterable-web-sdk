@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
-import { v4 as uuidv4 } from 'uuid';
+import { generateUUID } from '../utils/generateUUID';
 import { trackEmbeddedSession } from '../events/embedded/events';
 import { IterableEmbeddedSessionRequestPayload } from '..';
 
@@ -14,7 +14,7 @@ class EmbeddedSession {
   constructor(start?: Date, end?: Date) {
     this.start = start;
     this.end = end;
-    this.id = uuidv4();
+    this.id = generateUUID();
   }
 }
 
