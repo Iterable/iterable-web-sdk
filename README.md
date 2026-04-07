@@ -137,7 +137,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 
 Notes:
 
-- The SDK does not track `inAppDelete` events.
+- The SDK supports generating `inAppDelete` events by passing `deleteAction` to `trackInAppConsume`.
 
 - :rotating_light: Due to a limitation in WebKit (which affects iOS web browsers,
   like Safari), in-app messages displayed in an iOS web browser browser can't 
@@ -859,7 +859,7 @@ See also:
 
 ## `trackInAppConsume`
 
-Deletes an in-app message from the server by calling [`POST /api/events/trackInAppConsume`](https://support.iterable.com/hc/articles/204780579#post-api-events-inappconsume).
+Deletes an in-app message from the server by calling [`POST /api/events/trackInAppConsume`](https://support.iterable.com/hc/articles/204780579#post-api-events-inappconsume). Pass `deleteAction` to generate an `inAppDelete` event.
 
 ```ts
 const trackInAppConsume = (
@@ -1408,6 +1408,7 @@ interface InAppEventRequestParams {
     location?: string;
   };
   closeAction?: string;
+  deleteAction?: string;
   deviceInfo: {
     appPackageName: string; 
   };

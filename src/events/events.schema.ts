@@ -18,6 +18,7 @@ export const eventRequestSchema = object().shape({
     location: string()
   }),
   closeAction: string(),
+  deleteAction: string(),
   deviceInfo: object()
     .shape({
       deviceId: string().required(),
