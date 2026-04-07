@@ -23,6 +23,7 @@ import {
 import { IdentityResolution, Options, config } from '../utils/config';
 import { getTypeOfAuth, setTypeOfAuth, TypeOfAuth } from '../utils/typeOfAuth';
 import AuthorizationToken from '../utils/authorizationToken';
+import { safeLocalStorage } from '../utils/localStorage';
 import {
   cancelAxiosRequestAndMakeFetch,
   getEpochDifferenceInMS,
@@ -93,7 +94,7 @@ const doesRequestUrlContain = (routeConfig: RouteConfig) =>
 const addUserIdToRequest = (userId: string) => {
   setTypeOfAuth('userID');
   authIdentifier = userId;
-  localStorage.setItem(SHARED_PREF_USER_ID, userId);
+  safeLocalStorage.setItem(SHARED_PREF_USER_ID, userId);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -217,18 +218,18 @@ export const setUnknownUserId = async (userId: string) => {
   }
 
   addUserIdToRequest(userId);
-  localStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
+  safeLocalStorage.setItem(SHARED_PREF_UNKNOWN_USER_ID, userId);
 };
 
 registerUnknownUserIdSetter(setUnknownUserId);
 
 const clearUnknownUser = () => {
-  localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+  safeLocalStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
 };
 
 const getUnknownUserId = () => {
   if (config.getConfig('enableUnknownActivation')) {
-    const unknownUser = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
+    const unknownUser = safeLocalStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
     return unknownUser === undefined ? null : unknownUser;
   }
   return null;
@@ -242,7 +243,7 @@ const initializeUserId = (userId: string) => {
 const addEmailToRequest = (email: string) => {
   setTypeOfAuth('email');
   authIdentifier = email;
-  localStorage.setItem(SHARED_PREF_EMAIL, email);
+  safeLocalStorage.setItem(SHARED_PREF_EMAIL, email);
 
   if (typeof userInterceptor === 'number') {
     baseAxiosRequest.interceptors.request.eject(userInterceptor);
@@ -621,9 +622,9 @@ export function initialize(
         unknownUserManager.removeUnknownSessionCriteriaData();
         setTypeOfAuth(null);
         authIdentifier = null;
-        localStorage.removeItem(SHARED_PREF_EMAIL);
-        localStorage.removeItem(SHARED_PREF_USER_ID);
-        localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+        safeLocalStorage.removeItem(SHARED_PREF_EMAIL);
+        safeLocalStorage.removeItem(SHARED_PREF_USER_ID);
+        safeLocalStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -652,14 +653,14 @@ export function initialize(
         /* if consent is true, we want to clear unknown user data and start tracking */
         if (consent) {
           unknownUserManager.removeUnknownSessionCriteriaData();
-          localStorage.removeItem(SHARED_PREFS_CRITERIA);
+          safeLocalStorage.removeItem(SHARED_PREFS_CRITERIA);
 
           // Store consent timestamp when user grants consent
-          const existingConsent = localStorage.getItem(
+          const existingConsent = safeLocalStorage.getItem(
             SHARED_PREF_CONSENT_TIMESTAMP
           );
           if (!existingConsent) {
-            localStorage.setItem(
+            safeLocalStorage.setItem(
               SHARED_PREF_CONSENT_TIMESTAMP,
               Date.now().toString()
             );
@@ -671,9 +672,9 @@ export function initialize(
           if (unknownUsageTracked) {
             unknownUserManager.removeUnknownSessionCriteriaData();
 
-            localStorage.removeItem(SHARED_PREFS_CRITERIA);
-            localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
-            localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+            safeLocalStorage.removeItem(SHARED_PREFS_CRITERIA);
+            safeLocalStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+            safeLocalStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
             setTypeOfAuth(null);
             authIdentifier = null;
@@ -1066,9 +1067,9 @@ export function initialize(
       unknownUserManager.removeUnknownSessionCriteriaData();
       setTypeOfAuth(null);
       authIdentifier = null;
-      localStorage.removeItem(SHARED_PREF_EMAIL);
-      localStorage.removeItem(SHARED_PREF_USER_ID);
-      localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+      safeLocalStorage.removeItem(SHARED_PREF_EMAIL);
+      safeLocalStorage.removeItem(SHARED_PREF_USER_ID);
+      safeLocalStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
       /* clear fetched in-app messages */
       clearMessages();
 
@@ -1116,14 +1117,14 @@ export function initialize(
       /* if consent is true, we want to clear unknown user data and start tracking */
       if (consent) {
         unknownUserManager.removeUnknownSessionCriteriaData();
-        localStorage.removeItem(SHARED_PREFS_CRITERIA);
+        safeLocalStorage.removeItem(SHARED_PREFS_CRITERIA);
 
         // Store consent timestamp when user grants consent
-        const existingConsent = localStorage.getItem(
+        const existingConsent = safeLocalStorage.getItem(
           SHARED_PREF_CONSENT_TIMESTAMP
         );
         if (!existingConsent) {
-          localStorage.setItem(
+          safeLocalStorage.setItem(
             SHARED_PREF_CONSENT_TIMESTAMP,
             Date.now().toString()
           );
@@ -1135,9 +1136,9 @@ export function initialize(
         if (unknownUsageTracked) {
           unknownUserManager.removeUnknownSessionCriteriaData();
 
-          localStorage.removeItem(SHARED_PREFS_CRITERIA);
-          localStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
-          localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+          safeLocalStorage.removeItem(SHARED_PREFS_CRITERIA);
+          safeLocalStorage.removeItem(SHARED_PREF_UNKNOWN_USER_ID);
+          safeLocalStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
 
           setTypeOfAuth(null);
           authIdentifier = null;
