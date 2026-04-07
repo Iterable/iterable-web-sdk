@@ -36,7 +36,8 @@ class IterableActionRunnerImpl {
       }
     }
 
-    window.open(uri, '_blank');
+    const target = IterableConfig.openLinksInNewTab ? '_blank' : '_self';
+    window.open(uri, target);
 
     return true;
   }
