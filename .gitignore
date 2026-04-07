@@ -1,6 +1,7 @@
 node_modules
 dist
 /index.js
+/index.esm.js
 /index.node.js
 .env
 coverage
