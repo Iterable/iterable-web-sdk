@@ -392,7 +392,7 @@ describe('Events Requests', () => {
     }
   });
 
-  it('should not send up passed email or userId params', async () => {
+  it('should preserve email and userId in inApp payloads and strip them from non-inApp events', async () => {
     (global as any).localStorage = localStorageMock;
     const trackResponse = await track({
       email: 'hello@gmail.com',
@@ -471,8 +471,10 @@ describe('Events Requests', () => {
       JSON.parse(trackResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
 
-    expect(JSON.parse(trackClickResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackClickResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackClickResponse.config.data).email).toBe(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackClickResponse.config.data).userId).toBe('1234');
     expect(
       JSON.parse(trackClickResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
@@ -480,8 +482,10 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
 
-    expect(JSON.parse(trackCloseResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackCloseResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackCloseResponse.config.data).email).toBe(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackCloseResponse.config.data).userId).toBe('1234');
     expect(
       JSON.parse(trackCloseResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
@@ -489,8 +493,10 @@ describe('Events Requests', () => {
       WEB_PLATFORM
     );
 
-    expect(JSON.parse(trackConsumeResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackConsumeResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackConsumeResponse.config.data).email).toBe(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackConsumeResponse.config.data).userId).toBe('1234');
     expect(
       JSON.parse(trackConsumeResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
@@ -498,10 +504,10 @@ describe('Events Requests', () => {
       JSON.parse(trackConsumeResponse.config.data).deviceInfo.platform
     ).toBe(WEB_PLATFORM);
 
-    expect(JSON.parse(trackDeliveryResponse.config.data).email).toBeUndefined();
-    expect(
-      JSON.parse(trackDeliveryResponse.config.data).userId
-    ).toBeUndefined();
+    expect(JSON.parse(trackDeliveryResponse.config.data).email).toBe(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackDeliveryResponse.config.data).userId).toBe('1234');
     expect(
       JSON.parse(trackDeliveryResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
@@ -509,8 +515,10 @@ describe('Events Requests', () => {
       JSON.parse(trackDeliveryResponse.config.data).deviceInfo.platform
     ).toBe(WEB_PLATFORM);
 
-    expect(JSON.parse(trackOpenResponse.config.data).email).toBeUndefined();
-    expect(JSON.parse(trackOpenResponse.config.data).userId).toBeUndefined();
+    expect(JSON.parse(trackOpenResponse.config.data).email).toBe(
+      'hello@gmail.com'
+    );
+    expect(JSON.parse(trackOpenResponse.config.data).userId).toBe('1234');
     expect(
       JSON.parse(trackOpenResponse.config.data).deviceInfo.appPackageName
     ).toBe('my-lil-site');
