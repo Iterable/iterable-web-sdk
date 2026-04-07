@@ -50,7 +50,7 @@
     "install:all": "yarn && cd example && yarn && cd ../react-example && yarn",
     "start:all": "concurrently \"yarn start\" \"cd example && yarn start\" -n 'module,website' -k",
     "start:all:react": "concurrently \"yarn start\" \"cd react-example && yarn start\" -n 'module,website' -k",
-    "build": "ttsc && babel src --out-dir ./dist --extensions '.ts,.tsx' && webpack",
+    "build": "ttsc && babel src --out-dir ./dist --extensions \".ts,.tsx\" && webpack && yarn build:esm",
     "build:node": "yarn build --config webpack.node.config.js",
     "test": "jest --config jest.config.js --coverage",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"src/**/*.{js}\" \"example/src/**/*.{ts,tsx}\" \"example/src/**/*.{js}\" \"react-example/src/**/*.{ts,tsx}\" \"react-example/src/**/*.{js}\" --no-error-on-unmatched-pattern",
@@ -58,7 +58,8 @@
     "typecheck": "ttsc --noEmit true --emitDeclarationOnly false",
     "check-deps": "madge --extensions js,ts --circular dist",
     "prepublishOnly": "yarn lint && yarn typecheck && yarn format && yarn build && yarn build:node",
-    "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +"
+    "clean": "find . -name \"node_modules\" -exec rm -rf '{}' +",
+    "build:esm": "ttsc -p tsconfig.esm.json"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -122,5 +123,21 @@
       "prettier --write",
       "eslint"
     ]
+  },
+  "module": "./dist/esm/index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/esm/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./index.node.js"
+      },
+      "browser": "./index.js",
+      "default": "./index.node.js"
+    },
+    "./package.json": "./package.json"
   }
 }
