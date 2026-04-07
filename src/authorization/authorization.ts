@@ -1192,6 +1192,21 @@ export function initializeWithConfig(initializeParams: InitializeParams) {
     : initialize(authToken);
 }
 
+/**
+ * Updates the JWT generator function used by the SDK.
+ *
+ * This is useful when the outer context that the `generateJWT` callback
+ * closes over changes after `initialize()` has already been called
+ * (e.g., when an upstream auth token is refreshed).
+ *
+ * @param newGenerateJWT - A function that returns a Promise resolving to a JWT string.
+ */
+export function setGenerateJWT(
+  newGenerateJWT: (payload: GenerateJWTPayload) => Promise<string>
+) {
+  generateJWTGlobal = newGenerateJWT;
+}
+
 export function setTypeOfAuthForTestingOnly(authType: TypeOfAuth) {
   if (!authType) {
     setTypeOfAuth(null);
