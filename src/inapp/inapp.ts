@@ -19,6 +19,7 @@ import {
   trackInAppOpen
 } from '../events/inapp/events';
 import { IterablePromise } from '../types';
+import { config } from '../utils/config';
 import { requestMessages } from './request';
 import {
   DisplayOptions,
@@ -274,8 +275,12 @@ export function getInAppMessages(
           }
 
           const ua = navigator.userAgent;
-          const isSafari =
+          const isSafariUA =
             !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+          // When allowIframeScripts is enabled, Safari can execute JS in iframes
+          // so we don't need the Safari-specific workarounds
+          const isSafari =
+            isSafariUA && !config.getConfig('allowIframeScripts');
 
           /**
            * We allow users to dismiss messages by clicking outside of the

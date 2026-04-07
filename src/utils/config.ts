@@ -11,6 +11,7 @@ export type Options = {
   enableUnknownActivation: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
+  allowIframeScripts: boolean;
   eventThresholdLimit?: number;
   onUnknownUserCreated?: (userId: string) => void;
   identityResolution?: IdentityResolution;
@@ -23,6 +24,7 @@ const _config = () => {
     enableUnknownActivation: false,
     isEuIterableService: false,
     dangerouslyAllowJsPopups: false,
+    allowIframeScripts: false,
     eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,
     identityResolution: {
       replayOnVisitorToKnown: true,

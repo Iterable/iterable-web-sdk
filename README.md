@@ -1947,6 +1947,7 @@ type Options = {
   enableUnknownActivation: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
+  allowIframeScripts: boolean;
   eventThresholdLimit?: number;
   onUnknownUserCreated?: (userId: string) => void;
   identityResolution?: {
@@ -2697,6 +2698,43 @@ For more information, see:
 
 - [MDN docs for `allow-popups-to-escape-sandbox`](https://developer.mozilla.org/docs/Web/HTML/Element/iframe#allow-popups-to-escape-sandbox)
 - [Can I Use? `allow-popups-to-escape-sandbox`](https://caniuse.com/mdn-html_elements_iframe_sandbox_allow-popups-to-escape-sandbox)
+
+### Safari: Enabling full in-app message functionality
+
+By default, Safari blocks JavaScript execution inside the sandboxed `iframe`
+used to display in-app messages. This prevents click tracking, `action://`
+link support, and proper close button behavior in Safari.
+
+To enable full functionality in Safari, set `allowIframeScripts` to `true`
+in the configuration options. This adds `allow-scripts` to the iframe sandbox
+attribute, allowing Safari to execute JavaScript event handlers inside the
+iframe just like Chrome and Firefox.
+
+```ts
+import { initializeWithConfig } from '@iterable/web-sdk';
+
+const { clearRefresh, setEmail, setUserID, logout } = initializeWithConfig({
+  authToken: '<<YOUR_API_KEY>>',
+  configOptions: {
+    allowIframeScripts: true,
+  },
+  generateJWT: ({ email, userID }) =>
+    yourAsyncJWTGeneratorMethod({ email, userID }).then(
+      ({ jwt_token }) => jwt_token
+    )
+});
+```
+
+When this option is enabled:
+
+- **Click tracking** works in Safari (previously not tracked)
+- **`action://` links** work in Safari (previously non-functional)
+- **Close buttons** render inside the iframe as expected
+- **`isRequiredToDismissMessage`** is properly honored in Safari
+
+Since in-app message content is authored by you through the Iterable platform,
+the security risk of enabling scripts is minimal. However, if your messages
+include user-generated content, evaluate the risk before enabling this option.
 
 # TypeScript
 

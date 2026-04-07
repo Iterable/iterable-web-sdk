@@ -288,13 +288,15 @@ const generateSecuredIFrame = () => {
   iframe.setAttribute('id', 'iterable-iframe');
   // allow-popups and allow-top-navigation is to enable links for Safari since the iframe will block
   // event handlers on elements in it preventing our custom link handling
+  // allow-scripts is optionally enabled via allowIframeScripts config to support
+  // click tracking and action:// links in Safari
   iframe.setAttribute(
     'sandbox',
     `allow-same-origin allow-popups allow-top-navigation ${
       config.getConfig('dangerouslyAllowJsPopups')
         ? 'allow-popups-to-escape-sandbox'
         : ''
-    }`
+    } ${config.getConfig('allowIframeScripts') ? 'allow-scripts' : ''}`.trim()
   );
   /*
     _display: none_ would remove the ability to set event handlers on elements
