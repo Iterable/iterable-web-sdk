@@ -71,6 +71,7 @@ describe('API Key Interceptors', () => {
   });
 
   beforeEach(() => {
+    jest.clearAllTimers();
     setTypeOfAuthForTestingOnly('userID');
 
     mockRequest.onPost('/users/update').reply(200, {
@@ -1190,6 +1191,7 @@ describe('User Identification', () => {
 
     describe('refreshJwtToken', () => {
       beforeEach(() => {
+        jest.clearAllTimers();
         mockRequest.resetHistory();
       });
 

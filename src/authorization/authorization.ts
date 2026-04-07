@@ -41,13 +41,15 @@ let authIdentifier: null | string = null;
 let userInterceptor: number | null = null;
 let authInterceptor: number | null = null;
 let apiKey: null | string = null;
-let generateJWTGlobal: any = null;
 const unknownUserManager = new UnknownUserEventManager();
 
 export interface GenerateJWTPayload {
   email?: string;
   userID?: string;
 }
+
+type GenerateJWTFunction = (payload: GenerateJWTPayload) => Promise<string>;
+let generateJWTGlobal: GenerateJWTFunction | null = null;
 
 export interface WithJWT {
   setEmail: (
@@ -61,6 +63,9 @@ export interface WithJWT {
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
   clearRefresh: () => void;
+  setGenerateJWT: (
+    newGenerateJWT: (payload: GenerateJWTPayload) => Promise<string>
+  ) => void;
   setVisitorUsageTracked: (consent: boolean) => void;
   clearVisitorEventsAndUserData: () => void;
 }
@@ -395,7 +400,7 @@ export function initialize(
   generateJWT?: (payload: GenerateJWTPayload) => Promise<string>
 ) {
   apiKey = authToken;
-  generateJWTGlobal = generateJWT;
+  generateJWTGlobal = generateJWT ?? null;
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -706,7 +711,7 @@ export function initialize(
       baseAxiosRequest.interceptors.response.eject(responseInterceptor);
     }
 
-    return generateJWT(payload)
+    return (generateJWTGlobal as GenerateJWTFunction)(payload)
       .then((token) => {
         const authorizationToken = new AuthorizationToken();
         authorizationToken.setToken(token);
@@ -768,7 +773,9 @@ export function initialize(
                     ? { email: newEmail }
                     : { userID: authIdentifier ?? '' };
 
-                return generateJWT(payloadToPass).then((newToken) => {
+                return (generateJWTGlobal as GenerateJWTFunction)(
+                  payloadToPass
+                ).then((newToken) => {
                   const authorizationToken = new AuthorizationToken();
                   authorizationToken.setToken(newToken);
 
@@ -862,7 +869,7 @@ export function initialize(
               key if the Iterable API told us the JWT is invalid.
             */
             if (error?.response?.status === 401) {
-              return generateJWT(payload)
+              return (generateJWTGlobal as GenerateJWTFunction)(payload)
                 .then((newToken) => {
                   const authorizationToken = new AuthorizationToken();
                   authorizationToken.setToken(newToken);
@@ -1111,6 +1118,11 @@ export function initialize(
           console.warn('Could not refresh JWT. Try Refresh the JWT again.');
         }
       });
+    },
+    setGenerateJWT: (
+      newGenerateJWT: (payload: GenerateJWTPayload) => Promise<string>
+    ) => {
+      generateJWTGlobal = newGenerateJWT;
     },
     setVisitorUsageTracked: (consent: boolean) => {
       /* if consent is true, we want to clear unknown user data and start tracking */
