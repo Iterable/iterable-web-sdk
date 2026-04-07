@@ -313,6 +313,34 @@ describe('Events Requests', () => {
     }
   });
 
+  it('should not mutate the caller payload object', async () => {
+    setTypeOfAuthForTestingOnly('email');
+    const payload: any = {
+      messageId: '123',
+      email: 'test@example.com',
+      userId: 'user123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    };
+    await trackInAppOpen(payload);
+    expect(payload.email).toBe('test@example.com');
+    expect(payload.userId).toBe('user123');
+  });
+
+  it('should exclude email and userId from request data', async () => {
+    setTypeOfAuthForTestingOnly('email');
+    const payload: any = {
+      messageId: '123',
+      email: 'test@example.com',
+      userId: 'user123',
+      deviceInfo: { appPackageName: 'my-lil-site' }
+    };
+    const response = await trackInAppOpen(payload);
+    const data = JSON.parse(response.config.data);
+    expect(data.email).toBeUndefined();
+    expect(data.userId).toBeUndefined();
+    expect(data.messageId).toBe('123');
+  });
+
   it('return the correct payload for embedded message received', async () => {
     const response = await trackEmbeddedReceived('abc123', 'packageName');
     expect(JSON.parse(response.config.data).messageId).toBe('abc123');

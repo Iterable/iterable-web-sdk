@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import { baseIterableRequest } from '../../request';
 import { InAppEventRequestParams } from './types';
 import { IterableResponse } from '../../types';
@@ -6,15 +5,16 @@ import { ENDPOINTS, WEB_PLATFORM } from '../../constants';
 import { eventRequestSchema } from './events.schema';
 
 export const trackInAppClose = (payload: InAppEventRequestParams) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  /* strip email/userId without mutating the caller's object;
+     the interceptor adds the correct identity from SDK state */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const { email, userId, ...rest } = payload as any;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_close.route,
     data: {
-      ...payload,
+      ...rest,
       deviceInfo: {
         ...payload.deviceInfo,
         platform: WEB_PLATFORM,
@@ -33,15 +33,14 @@ export const trackInAppOpen = (
     'clickedUrl' | 'inboxSessionId' | 'closeAction'
   >
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const { email, userId, ...rest } = payload as any;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_open.route,
     data: {
-      ...payload,
+      ...rest,
       deviceInfo: {
         ...payload.deviceInfo,
         platform: WEB_PLATFORM,
@@ -62,16 +61,15 @@ export const trackInAppClick = (
   payload: Omit<InAppEventRequestParams, 'inboxSessionId' | 'closeAction'>,
   sendBeacon = false
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const { email, userId, ...rest } = payload as any;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_click.route,
     sendBeacon,
     data: {
-      ...payload,
+      ...rest,
       deviceInfo: {
         ...payload.deviceInfo,
         platform: WEB_PLATFORM,
@@ -90,15 +88,14 @@ export const trackInAppDelivery = (
     'clickedUrl' | 'closeAction' | 'inboxSessionId'
   >
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const { email, userId, ...rest } = payload as any;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_delivery.route,
     data: {
-      ...payload,
+      ...rest,
       deviceInfo: {
         ...payload.deviceInfo,
         platform: WEB_PLATFORM,
@@ -121,15 +118,14 @@ export const trackInAppConsume = (
     'clickedUrl' | 'closeAction' | 'inboxSessionId'
   >
 ) => {
-  /* a customer could potentially send these up if they're not using TypeScript */
-  delete (payload as any).userId;
-  delete (payload as any).email;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+  const { email, userId, ...rest } = payload as any;
 
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
     url: ENDPOINTS.track_app_consume.route,
     data: {
-      ...payload,
+      ...rest,
       deviceInfo: {
         ...payload.deviceInfo,
         platform: WEB_PLATFORM,
