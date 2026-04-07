@@ -50,7 +50,7 @@ export interface InAppMessage {
     };
     webInAppDisplaySettings: WebInAppDisplaySettings;
   };
-  customPayload: Record<string, any>;
+  customPayload?: Record<string, any>;
   trigger: { type: string };
   saveToInbox: boolean;
   inboxMetadata: {
