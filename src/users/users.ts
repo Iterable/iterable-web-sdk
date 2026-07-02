@@ -38,7 +38,8 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
     url: ENDPOINTS.users_update.route,
     data: {
       ...payload,
-      preferUserId: true
+      /* default to true, but allow the caller to override */
+      preferUserId: payload.preferUserId ?? true
     },
     validation: {
       data: updateUserSchema

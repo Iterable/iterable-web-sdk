@@ -504,7 +504,8 @@ export class UnknownUserEventManager {
         ...payload,
         user: {
           ...payload.user,
-          preferUserId: true
+          /* default to true, but allow the caller to override */
+          preferUserId: payload.user?.preferUserId ?? true
         }
       },
       validation: {
@@ -520,7 +521,8 @@ export class UnknownUserEventManager {
         ...payload,
         user: {
           ...payload.user,
-          preferUserId: true
+          /* default to true, but allow the caller to override */
+          preferUserId: payload.user?.preferUserId ?? true
         }
       },
       validation: {
@@ -535,7 +537,8 @@ export class UnknownUserEventManager {
         url: ENDPOINTS.users_update.route,
         data: {
           ...payload,
-          preferUserId: true
+          /* default to true, but allow the caller to override */
+          preferUserId: payload.preferUserId ?? true
         },
         validation: {
           data: updateUserSchema
