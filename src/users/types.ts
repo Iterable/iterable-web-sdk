@@ -12,6 +12,7 @@ export interface GetUserResponse {
 
 export interface UpdateUserParams {
   dataFields?: Record<string, any>;
+  preferUserId?: boolean;
   mergeNestedObjects?: boolean;
 }
 

@@ -48,6 +48,29 @@ describe('Users Requests', () => {
     expect(response.data.msg).toBe('hello');
   });
 
+  it('should respect a caller-provided preferUserId of false for updateCart', async () => {
+    mockRequest.onPost('/commerce/updateCart').reply(200, {
+      msg: 'hello'
+    });
+
+    const response = await updateCart({
+      user: {
+        preferUserId: false
+      },
+      items: [
+        {
+          id: 'fdsafds',
+          name: 'banana',
+          quantity: 2,
+          price: 12
+        }
+      ]
+    });
+
+    expect(JSON.parse(response.config.data).user.preferUserId).toBe(false);
+    expect(response.data.msg).toBe('hello');
+  });
+
   it('should reject updateCart on bad params', async () => {
     try {
       await updateCart({
@@ -90,6 +113,23 @@ describe('Users Requests', () => {
     expect(JSON.parse(response.config.data).total).toBe(100);
     expect(JSON.parse(response.config.data).items).toEqual([]);
     expect(JSON.parse(response.config.data).user.preferUserId).toBe(true);
+    expect(response.data.msg).toBe('hello');
+  });
+
+  it('should respect a caller-provided preferUserId of false for trackPurchase', async () => {
+    mockRequest.onPost('/commerce/trackPurchase').reply(200, {
+      msg: 'hello'
+    });
+
+    const response = await trackPurchase({
+      user: {
+        preferUserId: false
+      },
+      items: [],
+      total: 100
+    });
+
+    expect(JSON.parse(response.config.data).user.preferUserId).toBe(false);
     expect(response.data.msg).toBe('hello');
   });
 
