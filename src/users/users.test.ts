@@ -36,6 +36,22 @@ describe('Users Requests', () => {
     expect(response && response.data.msg).toBe('hello');
   });
 
+  it('should respect a caller-provided preferUserId of false for updateUser', async () => {
+    mockRequest.onPost('/users/update').reply(200, {
+      msg: 'hello'
+    });
+
+    const response = await updateUser({
+      dataFields: {},
+      preferUserId: false
+    });
+
+    expect(JSON.parse(response && response.config.data).preferUserId).toBe(
+      false
+    );
+    expect(response && response.data.msg).toBe('hello');
+  });
+
   it('should reject updateUser on bad params', async () => {
     try {
       await updateUser({
@@ -51,6 +67,11 @@ describe('Users Requests', () => {
               'dataFields must be a `object` type, but the final value was: `null` (cast from the value `"string"`).\n' +
               ' If "null" is intended as an empty value be sure to mark the schema as `.nullable()`',
             field: 'dataFields'
+          },
+          {
+            error:
+              'preferUserId must be a `boolean` type, but the final value was: `"string"`.',
+            field: 'preferUserId'
           },
           {
             error:

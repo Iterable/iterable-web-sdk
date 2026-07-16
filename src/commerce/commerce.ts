@@ -26,7 +26,8 @@ export const updateCart = (payload: UpdateCartRequestParams) => {
       ...payload,
       user: {
         ...payload.user,
-        preferUserId: true
+        /* default to true, but allow the caller to override */
+        preferUserId: payload.user?.preferUserId ?? true
       }
     },
     validation: {
@@ -54,7 +55,8 @@ export const trackPurchase = (payload: TrackPurchaseRequestParams) => {
       ...payload,
       user: {
         ...payload.user,
-        preferUserId: true
+        /* default to true, but allow the caller to override */
+        preferUserId: payload.user?.preferUserId ?? true
       }
     },
     validation: {
