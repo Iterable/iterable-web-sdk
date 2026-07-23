@@ -99,7 +99,7 @@ export function registerUnknownUserIdSetter(
 
 export function isUnknownUsageTracked(): boolean {
   // Check both configuration AND user consent
-  const isEnabled = config.getConfig('enableUnknownActivation') || false;
+  const isEnabled = config.getConfig('enableUnknownUserActivation') || false;
   if (!isEnabled) return false;
 
   // Also check if user has given consent (consent timestamp exists)
@@ -119,6 +119,10 @@ export class UnknownUserEventManager {
       );
       let unknownSessionInfo: {
         itbl_unknown_sessions?: {
+          totalUnknownSessionCount?: number;
+          firstUnknownSession?: number;
+          lastUnknownSession?: number;
+          // Legacy snake_case keys, read for one-shot migration only.
           number_of_sessions?: number;
           first_session?: number;
           last_session?: number;
@@ -129,20 +133,20 @@ export class UnknownUserEventManager {
         unknownSessionInfo = JSON.parse(strUnknownSessionInfo);
       }
 
-      // Update existing values or set them if they don't exist
-      unknownSessionInfo.itbl_unknown_sessions =
-        unknownSessionInfo.itbl_unknown_sessions || {};
-      unknownSessionInfo.itbl_unknown_sessions.number_of_sessions =
-        (unknownSessionInfo.itbl_unknown_sessions.number_of_sessions || 0) + 1;
-      unknownSessionInfo.itbl_unknown_sessions.first_session =
-        unknownSessionInfo.itbl_unknown_sessions.first_session ||
-        this.getCurrentTime();
-      unknownSessionInfo.itbl_unknown_sessions.last_session =
+      const inner = unknownSessionInfo.itbl_unknown_sessions || {};
+      const previousCount =
+        inner.totalUnknownSessionCount ?? inner.number_of_sessions ?? 0;
+      const previousFirst =
+        inner.firstUnknownSession ??
+        inner.first_session ??
         this.getCurrentTime();
 
-      // Update the structure to the desired format
       const outputObject = {
-        itbl_unknown_sessions: unknownSessionInfo.itbl_unknown_sessions
+        itbl_unknown_sessions: {
+          totalUnknownSessionCount: previousCount + 1,
+          firstUnknownSession: previousFirst,
+          lastUnknownSession: this.getCurrentTime()
+        }
       };
 
       localStorage.setItem(
@@ -282,11 +286,18 @@ export class UnknownUserEventManager {
           platform: WEB_PLATFORM
         },
         unknownSessionContext: {
-          totalUnknownSessionCount: userDataJson.number_of_sessions || 0,
+          totalUnknownSessionCount:
+            userDataJson.totalUnknownSessionCount ??
+            userDataJson.number_of_sessions ??
+            0,
           lastUnknownSession:
-            userDataJson.last_session || this.getCurrentTime(),
+            userDataJson.lastUnknownSession ??
+            userDataJson.last_session ??
+            this.getCurrentTime(),
           firstUnknownSession:
-            userDataJson.first_session || this.getCurrentTime(),
+            userDataJson.firstUnknownSession ??
+            userDataJson.first_session ??
+            this.getCurrentTime(),
           matchedCriteriaId: parseInt(criteriaId, 10)
         }
       };
