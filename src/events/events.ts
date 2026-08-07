@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { ENDPOINTS, AUA_WARNING } from '../constants';
+import { ENDPOINTS, UUA_WARNING } from '../constants';
 import { baseIterableRequest } from '../request';
 import { InAppTrackRequestParams } from './inapp/types';
 import { IterableResponse } from '../types';
@@ -14,7 +14,7 @@ export const track = (payload: InAppTrackRequestParams) => {
   if (canTrackUnknownUser()) {
     const unknownUserEventManager = new UnknownUserEventManager();
     unknownUserEventManager.trackUnknownEvent(payload);
-    return Promise.reject(AUA_WARNING);
+    return Promise.reject(UUA_WARNING);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',

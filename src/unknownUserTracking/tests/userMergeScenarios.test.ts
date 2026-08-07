@@ -121,7 +121,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
             mergeOnUnknownToKnown: false
@@ -159,7 +159,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -199,7 +199,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -252,7 +252,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -306,7 +306,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -362,7 +362,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true
+          enableUnknownUserActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -398,7 +398,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -458,7 +458,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -513,7 +513,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -559,7 +559,7 @@ describe('UserMergeScenariosTests', () => {
       const { setUserID, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -594,7 +594,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: false,
             mergeOnUnknownToKnown: false
@@ -632,7 +632,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -673,7 +673,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true
+          enableUnknownUserActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -732,7 +732,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -786,7 +786,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true
+          enableUnknownUserActivation: true
         }
       });
       logout(); // logout to remove logged in users before this test
@@ -822,7 +822,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -884,7 +884,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true
@@ -923,7 +923,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: false
@@ -985,7 +985,7 @@ describe('UserMergeScenariosTests', () => {
       const { setEmail, logout } = initializeWithConfig({
         authToken: '123',
         configOptions: {
-          enableUnknownActivation: true,
+          enableUnknownUserActivation: true,
           identityResolution: {
             replayOnVisitorToKnown: true,
             mergeOnUnknownToKnown: true

@@ -286,7 +286,8 @@ export const SHARED_PREFS_EVENT_LIST_KEY = 'itbl_event_list';
 export const SHARED_PREFS_USER_UPDATE_OBJECT_KEY = 'itbl_user_update_object';
 export const SHARED_PREFS_CRITERIA = 'criteria';
 export const SHARED_PREFS_UNKNOWN_SESSIONS = 'itbl_unknown_sessions';
-export const SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
+export const SHARED_PREF_UNKNOWN_USER_ID = 'itbl_userid_unknown';
+export const LEGACY_SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
 export const SHARED_PREF_UNKNOWN_USAGE_TRACKED = 'itbl_unknown_usage_tracked';
 export const SHARED_PREF_CONSENT_TIMESTAMP = 'itbl_consent_timestamp';
 export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
@@ -313,6 +314,9 @@ export const PURCHASE_ITEM_PREFIX = `${PURCHASE_ITEM}.`;
 export const INITIALIZE_ERROR = new Error(
   'Iterable SDK must be initialized with an API key and user email/userId before calling SDK methods'
 );
-export const AUA_WARNING = new Error(
+export const UUA_WARNING = new Error(
   'This event was stored locally because you have Unknown User Activation enabled. If this was unintentional, please check your SDK configuration settings.'
 );
+
+/** @deprecated Use `UUA_WARNING` instead. */
+export const AUA_WARNING = UUA_WARNING;
