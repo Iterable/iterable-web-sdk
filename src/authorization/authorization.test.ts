@@ -378,6 +378,11 @@ describe('API Key Interceptors', () => {
 });
 
 describe('User Identification', () => {
+  const getUsersUpdatePayloads = () =>
+    mockRequest.history.post
+      .filter((e: any) => !!e.url?.match(/users\/update/gim))
+      .map((e: any) => JSON.parse(e.data));
+
   beforeEach(() => {
     setTypeOfAuthForTestingOnly('userID');
 
@@ -807,6 +812,26 @@ describe('User Identification', () => {
         expect(response.config.params.email).toBeUndefined();
         expect(response.config.params.userId).toBe('999');
       });
+
+      it('defaults preferUserId to true on the identify-time users/update call', async () => {
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setUserID } = initialize('123');
+        await setUserID('999');
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(true);
+      });
+
+      it('passes preferUserId false through tryUser to users/update', async () => {
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setUserID } = initialize('123');
+        await setUserID('999', undefined, false);
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(false);
+      });
     });
   });
 
@@ -1011,6 +1036,32 @@ describe('User Identification', () => {
         expect(response.config.params.userId).toBeUndefined();
         expect(response.config.params.email).toBe('hello@gmail.com');
       });
+
+      it('defaults preferUserId to true on the identify-time users/update call', async () => {
+        mockRequest.resetHistory();
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setEmail } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+        await setEmail('hello@gmail.com');
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(true);
+      });
+
+      it('passes preferUserId false through tryUser to users/update', async () => {
+        mockRequest.resetHistory();
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setEmail } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+        await setEmail('hello@gmail.com', undefined, false);
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(false);
+      });
     });
 
     describe('setUserID', () => {
@@ -1185,6 +1236,30 @@ describe('User Identification', () => {
             ).length
           ).toBe(4);
         }
+      });
+
+      it('defaults preferUserId to true on the identify-time users/update call', async () => {
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setUserID } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+        await setUserID('999');
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(true);
+      });
+
+      it('passes preferUserId false through tryUser to users/update', async () => {
+        mockRequest.onPost('/users/update').reply(200, {});
+        const { setUserID } = initialize('123', () =>
+          Promise.resolve(MOCK_JWT_KEY)
+        );
+        await setUserID('999', undefined, false);
+
+        const payloads = getUsersUpdatePayloads();
+        expect(payloads.length).toBeGreaterThan(0);
+        expect(payloads[0].preferUserId).toBe(false);
       });
     });
 
