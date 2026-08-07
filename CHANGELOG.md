@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
+
+## [2.3.1]
 ### Fixes
 - Pass `preferUserId` through `setUserID` and JWT `setEmail` into the identify-time `/users/update` call (`tryUser`), so callers can opt out of user creation when identifying a user (SDK-563).
 
