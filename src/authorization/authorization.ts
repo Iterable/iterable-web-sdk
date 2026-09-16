@@ -52,11 +52,13 @@ export interface GenerateJWTPayload {
 export interface WithJWT {
   setEmail: (
     email: string,
-    identityResolution?: IdentityResolution
+    identityResolution?: IdentityResolution,
+    preferUserId?: boolean
   ) => Promise<string>;
   setUserID: (
     userId: string,
-    identityResolution?: IdentityResolution
+    identityResolution?: IdentityResolution,
+    preferUserId?: boolean
   ) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
@@ -72,7 +74,8 @@ export interface WithoutJWT {
   ) => Promise<string>;
   setUserID: (
     userId: string,
-    identityResolution?: IdentityResolution
+    identityResolution?: IdentityResolution,
+    preferUserId?: boolean
   ) => Promise<string>;
   logout: () => void;
   setNewAuthToken: (newToken?: string) => void;
@@ -464,12 +467,12 @@ export function initialize(
 
   const handleTokenExpiration = createTokenExpirationTimer();
 
-  const tryUser = () => {
+  const tryUser = (preferUserId?: boolean) => {
     let createUserAttempts = 0;
 
     return async function tryUserNTimes(): Promise<any> {
       try {
-        return await updateUser({});
+        return await updateUser({ preferUserId });
       } catch (e) {
         if (createUserAttempts < RETRY_USER_ATTEMPTS) {
           createUserAttempts += 1;
@@ -587,7 +590,8 @@ export function initialize(
       },
       setUserID: async (
         userId: string,
-        identityResolution?: IdentityResolution
+        identityResolution?: IdentityResolution,
+        preferUserId?: boolean
       ) => {
         clearMessages();
         try {
@@ -596,7 +600,7 @@ export function initialize(
 
           // Initialize user authentication first, then create user profile
           initializeUserId(userId);
-          await tryUser()();
+          await tryUser(preferUserId)();
 
           const result = await tryMergeUser(userId, false, merge);
           if (result.success) {
@@ -963,7 +967,8 @@ export function initialize(
     },
     setEmail: async (
       email: string,
-      identityResolution?: IdentityResolution
+      identityResolution?: IdentityResolution,
+      preferUserId?: boolean
     ) => {
       /* clear previous user */
       clearMessages();
@@ -978,7 +983,7 @@ export function initialize(
               initializeEmailUser(email);
 
               // Create user profile first before attempting merge
-              await tryUser()();
+              await tryUser(preferUserId)();
 
               const result = await tryMergeUser(email, true, merge);
               if (result.success) {
@@ -1014,7 +1019,8 @@ export function initialize(
     },
     setUserID: async (
       userId: string,
-      identityResolution?: IdentityResolution
+      identityResolution?: IdentityResolution,
+      preferUserId?: boolean
     ) => {
       clearMessages();
       try {
@@ -1028,7 +1034,7 @@ export function initialize(
               initializeUserId(userId);
 
               // Create user profile after authentication is set up
-              await tryUser()();
+              await tryUser(preferUserId)();
 
               const result = await tryMergeUser(userId, false, merge);
               if (result.success) {
