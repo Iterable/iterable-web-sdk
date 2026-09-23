@@ -2,8 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
-
 ## [Unreleased]
+
+## [2.3.2]
 ### Fixes
 - Bumped `axios` to v1.18.0 to resolve the outstanding prototype pollution, proxy bypass, and denial of service advisories reported against v1.14.0.
 
