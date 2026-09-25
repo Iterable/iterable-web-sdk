@@ -8,7 +8,11 @@ import { setTypeOfAuthForTestingOnly } from '../../testing';
 import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
 import { baseAxiosRequest } from '../../request';
 import { createClientError } from '../../utils/testUtils';
-import { getInAppMessages, clearMessages } from '../inapp';
+import {
+  getInAppMessages,
+  clearMessages,
+  webkitBlocksIframeHandlers
+} from '../inapp';
 import { DisplayOptions, HandleLinks } from '../types';
 
 jest.mock('../../utils/srSpeak', () => ({
@@ -1311,5 +1315,27 @@ describe('getInAppMessages', () => {
       expect(iframe.style.height).toBe('500px');
       expect(iframeBody?.style.overflow).toBe('hidden');
     });
+  });
+});
+
+describe('webkitBlocksIframeHandlers', () => {
+  it('returns false when a click listener on the iframe document runs', () => {
+    const doc = document.implementation.createHTMLDocument('probe');
+    expect(webkitBlocksIframeHandlers(doc)).toBe(false);
+  });
+
+  it('returns true when the listener does not run', () => {
+    const doc = document.implementation.createHTMLDocument('probe');
+    const realCreate = doc.createElement.bind(doc);
+    doc.createElement = ((tag: string) => {
+      const el = realCreate(tag);
+      el.addEventListener = () => undefined;
+      return el;
+    }) as typeof doc.createElement;
+    expect(webkitBlocksIframeHandlers(doc)).toBe(true);
+  });
+
+  it('returns true when there is no iframe document', () => {
+    expect(webkitBlocksIframeHandlers(null)).toBe(true);
   });
 });

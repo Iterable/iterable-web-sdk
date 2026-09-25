@@ -3,6 +3,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
+### Fixes
+- Detect WebKit from the in-app iframe instead of the user agent, so Chrome on iOS and other iOS browsers that do not identify as Safari can dismiss in-browser messages (SDK-762).
 
 ## [2.3.2]
 ### Fixes
