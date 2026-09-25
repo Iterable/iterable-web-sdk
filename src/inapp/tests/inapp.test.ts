@@ -5,7 +5,13 @@ import MockAdapter from 'axios-mock-adapter';
 import { messages } from '../../__data__/inAppMessages';
 import { initialize } from '../../authorization';
 import { setTypeOfAuthForTestingOnly } from '../../testing';
-import { GETMESSAGES_PATH, SDK_VERSION, WEB_PLATFORM } from '../../constants';
+import {
+  ABSOLUTE_DISMISS_BUTTON_ID,
+  CLOSE_X_BUTTON_ID,
+  GETMESSAGES_PATH,
+  SDK_VERSION,
+  WEB_PLATFORM
+} from '../../constants';
 import { baseAxiosRequest } from '../../request';
 import { createClientError } from '../../utils/testUtils';
 import {
@@ -422,6 +428,85 @@ describe('getInAppMessages', () => {
       closeButton?.dispatchEvent(clickEvent);
 
       expect(document.getElementById('iterable-iframe')).toBe(null);
+    });
+
+    it('puts the SDK close button on the parent page when Chrome on iOS cannot bind iframe handlers', async () => {
+      const previousUa = navigator.userAgent;
+      (navigator as Navigator & { userAgent: string }).userAgent =
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/140.0.7339.101 Mobile/15E148 Safari/604.1';
+
+      // jsdom gives the iframe its own Document, so the probe has to be
+      // blocked on that document. Drop listeners on divs created there.
+      const originalAppend = HTMLElement.prototype.appendChild;
+      const restorers: (() => void)[] = [];
+      HTMLElement.prototype.appendChild = function appendChild<T extends Node>(
+        this: HTMLElement,
+        node: T
+      ): T {
+        const result = originalAppend.call(this, node) as T;
+        if (node instanceof HTMLIFrameElement && node.contentWindow) {
+          const innerWindow = node.contentWindow as Window & {
+            Document: typeof Document;
+          };
+          const innerProto = innerWindow.Document.prototype;
+          const innerCreate = innerProto.createElement;
+          innerProto.createElement = function createElement(
+            this: Document,
+            tag: string,
+            options?: ElementCreationOptions
+          ) {
+            const el = innerCreate.call(this, tag, options);
+            if (String(tag).toLowerCase() === 'div') {
+              el.addEventListener = () => undefined;
+            }
+            return el;
+          } as typeof innerProto.createElement;
+          restorers.push(() => {
+            innerProto.createElement = innerCreate;
+          });
+        }
+        return result;
+      };
+
+      try {
+        const { request } = getInAppMessages(
+          {
+            count: 10,
+            packageName: 'my-lil-website',
+            closeButton: { isRequiredToDismissMessage: true }
+          },
+          { display: DisplayOptions.Immediate }
+        );
+        await request();
+        jest.advanceTimersByTime(100);
+
+        const frame = document.getElementById(
+          'iterable-iframe'
+        ) as HTMLIFrameElement;
+        const closeButton = document.getElementById(CLOSE_X_BUTTON_ID);
+        const dismissLayer = document.getElementById(
+          ABSOLUTE_DISMISS_BUTTON_ID
+        );
+
+        expect(closeButton).not.toBeNull();
+        expect(closeButton?.parentElement).toBe(document.body);
+        expect(
+          frame.contentDocument?.getElementById(CLOSE_X_BUTTON_ID)
+        ).toBeNull();
+        expect(dismissLayer?.parentElement).toBe(document.body);
+        expect(
+          frame.contentDocument?.getElementById(ABSOLUTE_DISMISS_BUTTON_ID)
+        ).toBeNull();
+
+        document
+          .querySelector('[data-test-overlay]')
+          ?.dispatchEvent(new MouseEvent('click'));
+        expect(document.getElementById('iterable-iframe')).toBeNull();
+      } finally {
+        restorers.forEach((restore) => restore());
+        HTMLElement.prototype.appendChild = originalAppend;
+        (navigator as Navigator & { userAgent: string }).userAgent = previousUa;
+      }
     });
 
     it('should paint next message to the DOM after 30s after first is dismissed', async () => {
