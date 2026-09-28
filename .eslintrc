@@ -56,6 +56,14 @@
       "single"
     ]
   },
+  "overrides": [
+    {
+      "files": ["e2e/**/*.ts", "playwright.config.ts"],
+      "rules": {
+        "import/no-extraneous-dependencies": "off"
+      }
+    }
+  ],
   "settings": {
     "import/resolver": {
       "node": {

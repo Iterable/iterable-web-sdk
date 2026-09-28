@@ -43,6 +43,23 @@ import {
   wrapWithIFrame
 } from './utils';
 
+/**
+ * WebKit does not run listeners inside an iframe sandboxed without allow-scripts.
+ * Returns true when a click listener on that document does not run.
+ */
+export const webkitBlocksIframeHandlers = (
+  doc: Document | null | undefined
+): boolean => {
+  if (!doc) return true;
+  let fired = false;
+  const probe = doc.createElement('div');
+  probe.addEventListener('click', () => {
+    fired = true;
+  });
+  probe.dispatchEvent(new MouseEvent('click'));
+  return !fired;
+};
+
 let parsedMessages: InAppMessage[] = [];
 let timer: NodeJS.Timeout | null = null;
 let messageIndex = 0;
@@ -274,14 +291,23 @@ export function getInAppMessages(
           }
 
           const ua = navigator.userAgent;
-          const isSafari =
+          const uaSaysSafari =
             !!ua.match(/safari/i) && !ua.match(/chrome|chromium|crios/i);
+
+          /**
+           * Chrome on iOS (CriOS) and in-app browsers fail the check above but
+           * still run WebKit, which does not run listeners inside an iframe
+           * sandboxed without allow-scripts. Ask the iframe. Real Safari keeps
+           * the user-agent result so we do not dispatch a probe event there.
+           */
+          const isSafari =
+            uaSaysSafari || webkitBlocksIframeHandlers(activeIframeDocument);
 
           /**
            * We allow users to dismiss messages by clicking outside of the
            * message not only when isRequiredToDismissMessage is not true
-           * but also when browser is detected to be Safari, regardless of
-           * whether isRequiredToDismissMessage is true. Safari blocks
+           * but also when listeners inside the iframe will not run, regardless of
+           * whether isRequiredToDismissMessage is true. WebKit blocks
            * all bound event handlers and so we cannot execute Javascript
            * to listen for click events. As such, we should not prevent users
            * from being able to dismiss the message by clicking outside of it.

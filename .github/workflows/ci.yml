@@ -33,6 +33,32 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
       - run: yarn check-deps
 
+  webkit-dismiss:
+    name: Chrome on iOS dismiss
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-jammy
+      options: --user 1001
+
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Setup Node.js
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: "18.12.0"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Build the browser bundle
+        run: yarn webpack
+      - name: Install Playwright browsers
+        run: yarn playwright install webkit chromium
+      - name: Run the Chrome on iOS dismiss test
+        run: yarn test:webkit
+        env:
+          CI: true
+
   e2e-tests:
     runs-on: ubuntu-latest
     timeout-minutes: 15
