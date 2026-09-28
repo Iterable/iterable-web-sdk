@@ -435,8 +435,10 @@ describe('getInAppMessages', () => {
       (navigator as Navigator & { userAgent: string }).userAgent =
         'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/140.0.7339.101 Mobile/15E148 Safari/604.1';
 
-      // jsdom gives the iframe its own Document, so the probe has to be
-      // blocked on that document. Drop listeners on divs created there.
+      // jsdom runs listeners inside a sandboxed iframe, so this stub only
+      // locks the parent-page branch after the detector returns true.
+      // e2e/crios-close-button.spec.ts is the WebKit check.
+      // Drop listeners on divs created in the iframe document.
       const originalAppend = HTMLElement.prototype.appendChild;
       const restorers: (() => void)[] = [];
       HTMLElement.prototype.appendChild = function appendChild<T extends Node>(
