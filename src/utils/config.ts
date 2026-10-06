@@ -8,7 +8,12 @@ export type IdentityResolution = {
 export type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
-  enableUnknownActivation: boolean;
+  enableUnknownUserActivation: boolean;
+  /**
+   * @deprecated Use `enableUnknownUserActivation` instead. This alias is kept
+   * for backward compatibility and will be removed in the next major version.
+   */
+  enableUnknownActivation?: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
@@ -20,7 +25,7 @@ const _config = () => {
   let options: Options = {
     logLevel: 'none',
     baseURL: BASE_URL,
-    enableUnknownActivation: false,
+    enableUnknownUserActivation: false,
     isEuIterableService: false,
     dangerouslyAllowJsPopups: false,
     eventThresholdLimit: DEFAULT_EVENT_THRESHOLD_LIMIT,
@@ -35,9 +40,20 @@ const _config = () => {
   return {
     getConfig,
     setConfig: (newOptions: Partial<Options>) => {
+      const { enableUnknownActivation, ...rest } = newOptions;
+      if (
+        enableUnknownActivation !== undefined &&
+        rest.enableUnknownUserActivation === undefined
+      ) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          '[Iterable] `enableUnknownActivation` is deprecated. Use `enableUnknownUserActivation` instead.'
+        );
+        rest.enableUnknownUserActivation = enableUnknownActivation;
+      }
       options = {
         ...options,
-        ...newOptions,
+        ...rest,
         identityResolution: {
           ...options.identityResolution,
           ...newOptions.identityResolution

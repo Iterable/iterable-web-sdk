@@ -1944,7 +1944,7 @@ Configuration options to pass to [`initializeWithConfig`](#initializewithconfig)
 type Options = {
   logLevel: 'none' | 'verbose';
   baseURL: string;
-  enableUnknownActivation: boolean;
+  enableUnknownUserActivation: boolean;
   isEuIterableService: boolean;
   dangerouslyAllowJsPopups: boolean;
   eventThresholdLimit?: number;
@@ -2460,7 +2460,7 @@ import { initializeWithConfig } from '@iterable/web-sdk';
 const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserData } = initializeWithConfig({
   authToken: '<YOUR_API_KEY>',
   configOptions: {
-    enableUnknownActivation: true,
+    enableUnknownUserActivation: true,
     identityResolution: {
       mergeOnUnknownToKnown: true,      // default
       replayOnVisitorToKnown: true      // default
@@ -2487,7 +2487,7 @@ const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserDa
 ### Persistence and restoration across sessions
 
 - Storage: the unknown user id is stored in `localStorage` under a project-scoped key. It has no TTL and persists across reloads and restarts until explicitly cleared.
-- Automatic restoration: on initialize (with `enableUnknownActivation: true`), the SDK restores the unknown id from storage and automatically applies it to outgoing requests for supported endpoints.
+- Automatic restoration: on initialize (with `enableUnknownUserActivation: true`), the SDK restores the unknown id from storage and automatically applies it to outgoing requests for supported endpoints.
 - JWT mode: when using a JWT-enabled API key and consent is present, the SDK generates a JWT for the restored unknown id and attaches it so requests are authenticated.
 - Lifecycle end: the unknown id is cleared when you identify (merge then clear), revoke consent via `setVisitorUsageTracked(false)`, call `clearVisitorEventsAndUserData()`, or when browser storage is cleared.
 
@@ -2495,7 +2495,9 @@ const { setEmail, setUserID, setVisitorUsageTracked, clearVisitorEventsAndUserDa
 
 ```ts
 type Options = {
-  enableUnknownActivation: boolean;               // Enable UUA (default: false)
+  enableUnknownUserActivation: boolean;           // Enable UUA (default: false)
+  /** @deprecated Use `enableUnknownUserActivation` instead. */
+  enableUnknownActivation?: boolean;
   eventThresholdLimit?: number;                  // Queue flush threshold (default provided by SDK)
   onUnknownUserCreated?: (userId: string) => void; // Callback when unknown user id is created
   identityResolution?: {
@@ -2509,7 +2511,7 @@ type Options = {
 ### Logic flow (what happens under the hood)
 
 1. Initialization
-   - When `enableUnknownActivation` is true, SDK fetches unknown user criteria and starts an unknown session.
+   - When `enableUnknownUserActivation` is true, SDK fetches unknown user criteria and starts an unknown session.
    - If an unknown user id exists in storage, SDK restores it and authenticates appropriately.
  2. Event collection (unknown)
    - When consent is set via `setVisitorUsageTracked(true)`, SDK queues unknown events locally.
@@ -2521,7 +2523,7 @@ type Options = {
 4. Replay (optional)
    - If `replayOnVisitorToKnown` is true, SDK replays queued unknown events under the known identity and clears the unknown queue.
 5. Cleanup
-   - After merge attempt (successful or skipped), SDK clears the stored unknown user id and related anonymous state.
+   - After merge attempt (successful or skipped), SDK clears the stored unknown user id and related unknown state.
 
 Notes:
 - UUA works for Events, In-App, Embedded, Commerce, and Users APIs; the SDK ensures requests are authenticated correctly pre/post identification.

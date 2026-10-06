@@ -7,6 +7,7 @@ import {
   IS_PRODUCTION,
   STATIC_HEADERS,
   SHARED_PREF_UNKNOWN_USER_ID,
+  LEGACY_SHARED_PREF_UNKNOWN_USER_ID,
   RouteConfig,
   SHARED_PREFS_CRITERIA,
   SHARED_PREF_CONSENT_TIMESTAMP,
@@ -14,6 +15,7 @@ import {
   SHARED_PREF_USER_ID,
   RETRY_USER_ATTEMPTS
 } from '../constants';
+import { migrateLegacyKey } from '../utils/commonFunctions';
 import { UnknownUserMerge } from '../unknownUserTracking/unknownUserMerge';
 import {
   UnknownUserEventManager,
@@ -230,7 +232,7 @@ const clearUnknownUser = () => {
 };
 
 const getUnknownUserId = () => {
-  if (config.getConfig('enableUnknownActivation')) {
+  if (config.getConfig('enableUnknownUserActivation')) {
     const unknownUser = localStorage.getItem(SHARED_PREF_UNKNOWN_USER_ID);
     return unknownUser === undefined ? null : unknownUser;
   }
@@ -344,7 +346,7 @@ const initializeEmailUser = (email: string) => {
 };
 
 const syncEvents = () => {
-  if (config.getConfig('enableUnknownActivation')) {
+  if (config.getConfig('enableUnknownUserActivation')) {
     unknownUserManager.syncEvents();
   }
 };
@@ -353,7 +355,7 @@ const handleConsentTracking = (
   isUserKnown = false,
   isMergeOperation = false
 ) => {
-  if (config.getConfig('enableUnknownActivation')) {
+  if (config.getConfig('enableUnknownUserActivation')) {
     unknownUserManager.handleConsentTracking(isUserKnown, isMergeOperation);
   }
 };
@@ -399,6 +401,11 @@ export function initialize(
 ) {
   apiKey = authToken;
   generateJWTGlobal = generateJWT;
+  // One-shot migration from the legacy non-prefixed unknown user id key.
+  migrateLegacyKey(
+    LEGACY_SHARED_PREF_UNKNOWN_USER_ID,
+    SHARED_PREF_UNKNOWN_USER_ID
+  );
   const logLevel = config.getConfig('logLevel');
   if (!generateJWT && IS_PRODUCTION) {
     /* only let people use non-JWT mode if running the app locally */
@@ -488,7 +495,7 @@ export function initialize(
 
   const enableUnknownTracking = () => {
     try {
-      if (config.getConfig('enableUnknownActivation')) {
+      if (config.getConfig('enableUnknownUserActivation')) {
         unknownUserManager.getUnknownCriteria();
         unknownUserManager.updateUnknownSession();
         const unknownUserId = getUnknownUserId();
@@ -507,14 +514,16 @@ export function initialize(
     isEmail: boolean,
     merge?: boolean
   ): Promise<{ success: boolean; mergePerformed: boolean }> => {
-    const enableUnknownActivation = config.getConfig('enableUnknownActivation');
+    const enableUnknownUserActivation = config.getConfig(
+      'enableUnknownUserActivation'
+    );
     const destinationUserId = isEmail ? null : emailOrUserId;
     const destinationEmail = isEmail ? emailOrUserId : null;
 
     // Only merge if there's an unknown user that was successfully created via /session
     const unknownUserId = getUnknownUserId();
 
-    if (unknownUserId !== null && merge && enableUnknownActivation) {
+    if (unknownUserId !== null && merge && enableUnknownUserActivation) {
       const unknownUserMerge = new UnknownUserMerge();
       try {
         await unknownUserMerge.mergeUnknownUser(

@@ -65,7 +65,7 @@ describe('Consent Tracking', () => {
           mergeOnUnknownToKnown: true
         };
       }
-      if (key === 'enableUnknownActivation') {
+      if (key === 'enableUnknownUserActivation') {
         return true;
       }
       return undefined;

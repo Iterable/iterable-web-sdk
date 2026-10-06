@@ -60,7 +60,7 @@ describe('UnknownUserEventManager', () => {
 
     // Mock config for unknown user activation
     mockConfig.getConfig.mockImplementation((key) => {
-      if (key === 'enableUnknownActivation') {
+      if (key === 'enableUnknownUserActivation') {
         return true;
       }
       return undefined;
@@ -101,6 +101,38 @@ describe('UnknownUserEventManager', () => {
       SHARED_PREFS_UNKNOWN_SESSIONS,
       expect.stringContaining('itbl_unknown_sessions')
     );
+  });
+
+  it('should migrate legacy snake_case session fields to camelCase', () => {
+    (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+      if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+        return JSON.stringify({
+          itbl_unknown_sessions: {
+            number_of_sessions: 3,
+            first_session: 100,
+            last_session: 200
+          }
+        });
+      }
+      if (key === SHARED_PREF_CONSENT_TIMESTAMP) return '1234567890';
+      return null;
+    });
+
+    unknownUserEventManager.updateUnknownSession();
+
+    const setCall = (localStorage.setItem as jest.Mock).mock.calls.find(
+      ([key]) => key === SHARED_PREFS_UNKNOWN_SESSIONS
+    );
+    expect(setCall).toBeDefined();
+    const written = JSON.parse(setCall[1]);
+    expect(written.itbl_unknown_sessions).toEqual({
+      totalUnknownSessionCount: 4,
+      firstUnknownSession: 100,
+      lastUnknownSession: expect.any(Number)
+    });
+    expect(written.itbl_unknown_sessions.number_of_sessions).toBeUndefined();
+    expect(written.itbl_unknown_sessions.first_session).toBeUndefined();
+    expect(written.itbl_unknown_sessions.last_session).toBeUndefined();
   });
 
   it('should set criteria data in localStorage when baseIterableRequest succeeds', async () => {
@@ -826,105 +858,107 @@ describe('UnknownUserEventManager', () => {
         })
       );
 
-             // Should call updateUser for the user data
-       expect(mockBaseIterableRequest).toHaveBeenCalledWith(
-         expect.objectContaining({
-           method: 'POST',
-           url: expect.stringContaining('/users/update'),
-           data: expect.objectContaining({
-             dataFields: {
-               firstName: 'John',
-               lastName: 'Doe'
-             }
-           })
-         })
-       );
-     });
+      // Should call updateUser for the user data
+      expect(mockBaseIterableRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: expect.stringContaining('/users/update'),
+          data: expect.objectContaining({
+            dataFields: {
+              firstName: 'John',
+              lastName: 'Doe'
+            }
+          })
+        })
+      );
+    });
 
-     it('should replay profile events when criteria are met and createUnknownUser is called', async () => {
-       const userUpdateData = {
-         firstName: 'John',
-         lastName: 'Doe',
-         age: 30,
-         eventType: 'userUpdate'
-       };
+    it('should replay profile events when criteria are met and createUnknownUser is called', async () => {
+      const userUpdateData = {
+        firstName: 'John',
+        lastName: 'Doe',
+        age: 30,
+        eventType: 'userUpdate'
+      };
 
-       // Mock localStorage to simulate stored user update data
-       (localStorage.getItem as jest.Mock).mockImplementation((key) => {
-         if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
-           return JSON.stringify(userUpdateData);
-         }
-         if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
-           return JSON.stringify({
-             itbl_unknown_sessions: {
-               number_of_sessions: 1,
-               first_session: 123456789,
-               last_session: 123456789
-             }
-           });
-         }
-         if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
-           return 'true';
-         }
-         if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
-           return '1234567890'; // Mock consent timestamp
-         }
-         if (key === SHARED_PREFS_EVENT_LIST_KEY) {
-           return JSON.stringify([]);
-         }
-         return null;
-       });
+      // Mock localStorage to simulate stored user update data
+      (localStorage.getItem as jest.Mock).mockImplementation((key) => {
+        if (key === SHARED_PREFS_USER_UPDATE_OBJECT_KEY) {
+          return JSON.stringify(userUpdateData);
+        }
+        if (key === SHARED_PREFS_UNKNOWN_SESSIONS) {
+          return JSON.stringify({
+            itbl_unknown_sessions: {
+              number_of_sessions: 1,
+              first_session: 123456789,
+              last_session: 123456789
+            }
+          });
+        }
+        if (key === SHARED_PREF_UNKNOWN_USAGE_TRACKED) {
+          return 'true';
+        }
+        if (key === SHARED_PREF_CONSENT_TIMESTAMP) {
+          return '1234567890'; // Mock consent timestamp
+        }
+        if (key === SHARED_PREFS_EVENT_LIST_KEY) {
+          return JSON.stringify([]);
+        }
+        return null;
+      });
 
-       // Mock window object for the test
-       global.window = Object.create({
-         location: { hostname: 'test.example.com' },
-         navigator: { userAgent: 'test-user-agent' }
-       });
+      // Mock window object for the test
+      global.window = Object.create({
+        location: { hostname: 'test.example.com' },
+        navigator: { userAgent: 'test-user-agent' }
+      });
 
-       // Mock successful session creation response
-       mockBaseIterableRequest.mockResolvedValue({
-         status: 200,
-         data: { success: true }
-       } as any);
+      // Mock successful session creation response
+      mockBaseIterableRequest.mockResolvedValue({
+        status: 200,
+        data: { success: true }
+      } as any);
 
-       // Call createUnknownUser to simulate criteria being met
-       await unknownUserEventManager.createUnknownUser('123');
+      // Call createUnknownUser to simulate criteria being met
+      await unknownUserEventManager.createUnknownUser('123');
 
-       // Verify that the session endpoint was called
-       expect(mockBaseIterableRequest).toHaveBeenCalledWith(
-         expect.objectContaining({
-           method: 'POST',
-           url: expect.stringContaining('/unknownuser/events/session'),
-           data: expect.objectContaining({
-             user: expect.objectContaining({
-               dataFields: {
-                 firstName: 'John',
-                 lastName: 'Doe',
-                 age: 30
-               }
-             })
-           })
-         })
-       );
+      // Verify that the session endpoint was called
+      expect(mockBaseIterableRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: expect.stringContaining('/unknownuser/events/session'),
+          data: expect.objectContaining({
+            user: expect.objectContaining({
+              dataFields: {
+                firstName: 'John',
+                lastName: 'Doe',
+                age: 30
+              }
+            })
+          })
+        })
+      );
 
-       // Verify that the /users/update endpoint was also called during syncEvents
-       expect(mockBaseIterableRequest).toHaveBeenCalledWith(
-         expect.objectContaining({
-           method: 'POST',
-           url: expect.stringContaining('/users/update'),
-           data: expect.objectContaining({
-             dataFields: {
-               firstName: 'John',
-               lastName: 'Doe',
-               age: 30
-             },
-             preferUserId: true
-           })
-         })
-       );
+      // Verify that the /users/update endpoint was also called during syncEvents
+      expect(mockBaseIterableRequest).toHaveBeenCalledWith(
+        expect.objectContaining({
+          method: 'POST',
+          url: expect.stringContaining('/users/update'),
+          data: expect.objectContaining({
+            dataFields: {
+              firstName: 'John',
+              lastName: 'Doe',
+              age: 30
+            },
+            preferUserId: true
+          })
+        })
+      );
 
-       // Verify that the user update data was removed after syncing
-       expect(localStorage.removeItem).toHaveBeenCalledWith(SHARED_PREFS_USER_UPDATE_OBJECT_KEY);
-     });
-   });
+      // Verify that the user update data was removed after syncing
+      expect(localStorage.removeItem).toHaveBeenCalledWith(
+        SHARED_PREFS_USER_UPDATE_OBJECT_KEY
+      );
+    });
+  });
 });

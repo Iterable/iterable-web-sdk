@@ -171,7 +171,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableUnknownActivation: true }
+      configOptions: { enableUnknownUserActivation: true }
     });
     logout(); // logout to remove logged in users before this test
     setTypeOfAuth(null); // Explicitly set type of auth to null after logout
@@ -282,7 +282,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableUnknownActivation: true }
+      configOptions: { enableUnknownUserActivation: true }
     });
     logout(); // logout to remove logged in users before this test
     setTypeOfAuth(null); // Explicitly set type of auth to null after logout
@@ -385,7 +385,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableUnknownActivation: true }
+      configOptions: { enableUnknownUserActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 
@@ -468,7 +468,7 @@ describe('validateCustomEventUserUpdateAPI', () => {
 
     const { setUserID, logout } = initializeWithConfig({
       authToken: '123',
-      configOptions: { enableUnknownActivation: true }
+      configOptions: { enableUnknownUserActivation: true }
     });
     logout(); // logout to remove logged in users before this test
 

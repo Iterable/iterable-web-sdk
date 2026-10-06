@@ -11,4 +11,34 @@ describe('Config', () => {
     expect(config.getConfig('logLevel')).toBe('verbose');
     expect(config.getConfig('baseURL')).toBe('https://google.com');
   });
+
+  describe('enableUnknownActivation deprecation alias', () => {
+    let warnSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+      config.setConfig({ enableUnknownUserActivation: false });
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it('forwards legacy enableUnknownActivation to enableUnknownUserActivation', () => {
+      config.setConfig({ enableUnknownActivation: true });
+      expect(config.getConfig('enableUnknownUserActivation')).toBe(true);
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('enableUnknownActivation')
+      );
+    });
+
+    it('prefers enableUnknownUserActivation when both are supplied', () => {
+      config.setConfig({
+        enableUnknownActivation: false,
+        enableUnknownUserActivation: true
+      });
+      expect(config.getConfig('enableUnknownUserActivation')).toBe(true);
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+  });
 });
