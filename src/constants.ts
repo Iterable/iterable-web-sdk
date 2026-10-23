@@ -290,6 +290,7 @@ export const SHARED_PREF_UNKNOWN_USER_ID = 'unknown_userId';
 export const SHARED_PREF_UNKNOWN_USAGE_TRACKED = 'itbl_unknown_usage_tracked';
 export const SHARED_PREF_CONSENT_TIMESTAMP = 'itbl_consent_timestamp';
 export const SHARED_PREF_USER_TOKEN = 'itbl_auth_token';
+export const SHARED_PREF_USER_UPDATED = 'itbl_user_updated';
 
 export const KEY_EVENT_NAME = 'eventName';
 export const KEY_CREATED_AT = 'createdAt';

@@ -4,6 +4,7 @@ describe('Config', () => {
   it('should get config', () => {
     expect(config.getConfig('logLevel')).toBe('none');
     expect(config.getConfig('baseURL')).toBe('https://api.iterable.com/api');
+    expect(config.getConfig('autoUserUpdate')).toBe(true);
   });
 
   it('should set config', () => {

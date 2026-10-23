@@ -14,6 +14,7 @@ export type Options = {
   eventThresholdLimit?: number;
   onUnknownUserCreated?: (userId: string) => void;
   identityResolution?: IdentityResolution;
+  autoUserUpdate: boolean | 'oncePerUser';
 };
 
 const _config = () => {
@@ -27,7 +28,8 @@ const _config = () => {
     identityResolution: {
       replayOnVisitorToKnown: true,
       mergeOnUnknownToKnown: true
-    }
+    },
+    autoUserUpdate: true
   };
 
   const getConfig = <K extends keyof Options>(option: K) => options[option];
