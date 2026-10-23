@@ -3,6 +3,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
+### Updates
+- Added the `autoUserUpdate` config option to control the `users/update` call made by `setUserID` and JWT `setEmail`. `'oncePerUser'` sends it once per user per browser until `logout`, and `false` turns it off. The default, `true`, keeps the current behavior (SDK-128).
+
+### Fixes
+- Fixed the `updateUser` endpoint name and the `setEmail`/`setUserID` signatures in the README.
 
 ## [2.3.3]
 ### Fixes
