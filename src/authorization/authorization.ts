@@ -33,6 +33,12 @@ import {
   validateTokenTime
 } from './utils';
 import { updateUser } from '../users';
+import {
+  UserIdentityType,
+  clearUserUpdated,
+  markUserUpdated,
+  shouldAutoUpdateUser
+} from './autoUserUpdate';
 import { baseAxiosRequest } from '../request';
 import { clearMessages } from '../inapp';
 
@@ -486,6 +492,16 @@ export function initialize(
     };
   };
 
+  const autoUpdateUser = async (
+    type: UserIdentityType,
+    identity: string,
+    preferUserId?: boolean
+  ) => {
+    if (!shouldAutoUpdateUser(type, identity)) return;
+    await tryUser(preferUserId)();
+    markUserUpdated(type, identity);
+  };
+
   const enableUnknownTracking = () => {
     try {
       if (config.getConfig('enableUnknownActivation')) {
@@ -600,7 +616,7 @@ export function initialize(
 
           // Initialize user authentication first, then create user profile
           initializeUserId(userId);
-          await tryUser(preferUserId)();
+          await autoUpdateUser('userID', userId, preferUserId);
 
           const result = await tryMergeUser(userId, false, merge);
           if (result.success) {
@@ -628,6 +644,7 @@ export function initialize(
         localStorage.removeItem(SHARED_PREF_EMAIL);
         localStorage.removeItem(SHARED_PREF_USER_ID);
         localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+        clearUserUpdated();
         /* clear fetched in-app messages */
         clearMessages();
 
@@ -983,7 +1000,7 @@ export function initialize(
               initializeEmailUser(email);
 
               // Create user profile first before attempting merge
-              await tryUser(preferUserId)();
+              await autoUpdateUser('email', email, preferUserId);
 
               const result = await tryMergeUser(email, true, merge);
               if (result.success) {
@@ -1034,7 +1051,7 @@ export function initialize(
               initializeUserId(userId);
 
               // Create user profile after authentication is set up
-              await tryUser(preferUserId)();
+              await autoUpdateUser('userID', userId, preferUserId);
 
               const result = await tryMergeUser(userId, false, merge);
               if (result.success) {
@@ -1075,6 +1092,7 @@ export function initialize(
       localStorage.removeItem(SHARED_PREF_EMAIL);
       localStorage.removeItem(SHARED_PREF_USER_ID);
       localStorage.removeItem(SHARED_PREF_CONSENT_TIMESTAMP);
+      clearUserUpdated();
       /* clear fetched in-app messages */
       clearMessages();
 

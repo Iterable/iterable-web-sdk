@@ -130,7 +130,7 @@ Iterable's API, see the [API Overview](https://support.iterable.com/hc/articles/
 | [`trackPurchase`](#trackPurchase)                                                 | Tracks a `purchase` event by calling [`POST /api/commerce/trackPurchase`](https://support.iterable.com/hc/articles/204780579#post-api-commerce-trackpurchase). |
 | [`updateCart`](#updateCart)                                                       | Updates the shopping cart items on the user's Iterable profile by calling [`POST /api/commerce/updateCart`](https://support.iterable.com/hc/articles/204780579#post-api-commerce-updatecart). |
 | [`updateSubscriptions`](#updateSubscriptions)                                     | Updates the user's subscriptions by calling [`POST /api/users/updateSubscriptions`](https://support.iterable.com/hc/articles/204780579#post-api-users-updatesubscriptions). |
-| [`updateUser`](#updateUser)                                                       | Updates the data on a user's Iterable profile by calling [`POST /api/users/updateUser`](https://support.iterable.com/hc/articles/204780579#post-api-users-update). |
+| [`updateUser`](#updateUser)                                                       | Updates the data on a user's Iterable profile by calling [`POST /api/users/update`](https://support.iterable.com/hc/articles/204780579#post-api-users-update). |
 | [`updateUserEmail`](#updateUserEmail)                                             | Updates the current user's `email` by calling [`POST /api/users/updateEmail`](https://support.iterable.com/hc/articles/204780579#post-api-users-updateemail). Causes the SDK to fetch a JWT for the new email address. |
 | [`setVisitorUsageTracked`](#setVisitorUsageTracked)                                 | Enables or disables unknown visitor tracking based on user consent (UUA). Returned by `initialize`/`initializeWithConfig`. |
 | [`clearVisitorEventsAndUserData`](#clearVisitorEventsAndUserData)                 | Clears unknown visitor session data and queued events (UUA). Returned by `initialize`/`initializeWithConfig`. |
@@ -420,8 +420,9 @@ parameter. Returns methods you can use to identify the current user, work with
 JWT tokens, and log the user out (see [`WithJWT`](#withjwt)).
 
 The configuration options you can pass to this function are useful if you
-need to [point the SDK to Iterable's EU API endpoints](#iterables-european-data-center-eudc) 
-or [allow JavaScript execution in Safari tabs](#safari-allowing-javascript-execution-in-tabs-opened-by-in-app-message-link-clicks).
+need to [point the SDK to Iterable's EU API endpoints](#iterables-european-data-center-eudc), 
+[allow JavaScript execution in Safari tabs](#safari-allowing-javascript-execution-in-tabs-opened-by-in-app-message-link-clicks),
+or [reduce the `users/update` calls the SDK makes when you identify a user](#options).
 
 ```ts
 function initializeWithConfig(initializeParams: WithJWTParams): WithJWT;
@@ -1034,7 +1035,11 @@ See also:
 
 ## `updateUser`
 
-Updates the data on a user's Iterable profile by calling [`POST /api/users/updateUser`](https://support.iterable.com/hc/articles/204780579#post-api-users-update).
+Updates the data on a user's Iterable profile by calling [`POST /api/users/update`](https://support.iterable.com/hc/articles/204780579#post-api-users-update).
+
+If you set [`autoUserUpdate`](#options) to `false`, create the user's profile
+yourself: call `updateUser` after `setUserID` or `setEmail` resolves, or create
+the profile from your server.
 
 ```ts
 const updateUser = (payload: UpdateUserParams = {}): IterablePromise<IterableResponse>
@@ -1953,8 +1958,26 @@ type Options = {
     mergeOnUnknownToKnown?: boolean;
     replayOnVisitorToKnown?: boolean;
   };
+  autoUserUpdate: boolean | 'oncePerUser';
 };
 ```
+
+`autoUserUpdate` controls the `POST /api/users/update` call the SDK makes to
+create the user's profile when you call `setUserID`, or `setEmail` with a JWT
+enabled API key:
+
+- `true` (default) – Calls `users/update` every time you identify the user.
+- `'oncePerUser'` – Calls `users/update` the first time you identify a user in
+  this browser, then skips it for the same user until `logout`. Use this if
+  your site reloads the page on navigation and identifies the user on every
+  page load. If the call fails, the SDK tries again the next time you identify
+  the user.
+- `false` – Never calls `users/update` when you identify the user. You are
+  responsible for creating the user's profile, by calling
+  [`updateUser`](#updateuser) after `setUserID` or `setEmail` resolves, or from
+  your server. Until the profile exists, in-app and embedded message requests
+  can fail, for example in userID-based and hybrid projects, or when you
+  identify users with `setUserID`.
 
 ## `OutOfTheBoxButton`
 
@@ -2101,8 +2124,16 @@ Return value from [`initialize`](#initialize) and [`initializeWithConfig`](#init
 ```ts
 interface WithJWT {
   clearRefresh: () => void;
-  setEmail: (email: string) => Promise<string>;
-  setUserID: (userId: string) => Promise<string>;
+  setEmail: (
+    email: string,
+    identityResolution?: IdentityResolution,
+    preferUserId?: boolean
+  ) => Promise<string>;
+  setUserID: (
+    userId: string,
+    identityResolution?: IdentityResolution,
+    preferUserId?: boolean
+  ) => Promise<string>;
   logout: () => void;
   refreshJwtToken: (authTypes: string) => Promise<string>;
   setVisitorUsageTracked: (consent: boolean) => void;
@@ -2115,14 +2146,21 @@ Definitions:
 - `clearRefresh` – Clears the JWT refresh timer.
 - `setEmail` – Identifies the current user by `email`, and fetches a valid JWT 
   token by calling the `generateJWT` function passed to [`initialize`](#initialize) 
-  or [`initializeWithConfig`](#initializeWithConfig).
+  or [`initializeWithConfig`](#initializeWithConfig). Then calls
+  `POST /api/users/update` to create the user's profile, as controlled by
+  [`autoUserUpdate`](#options).
 - `setUserID` - Identifies the current user by `userId`, and fetches a valid JWT 
   token by calling the `generateJWT` function passed to [`initialize`](#initialize) 
-  or [`initializeWithConfig`](#initializeWithConfig).
+  or [`initializeWithConfig`](#initializeWithConfig). Then calls
+  `POST /api/users/update` to create the user's profile, as controlled by
+  [`autoUserUpdate`](#options).
 - `refreshJwtToken` – Manually refreshes the JWT token for the signed-in user.
 - `logout` – Signs the current user out of the SDK.
 - `setVisitorUsageTracked` – Enables/disables unknown visitor tracking based on user consent.
 - `clearVisitorEventsAndUserData` – Clears unknown visitor session data and queued events.
+
+`setEmail` and `setUserID` pass `preferUserId` (default `true`) to their
+`users/update` call.
 
 ## `WithJWTParams`
 
