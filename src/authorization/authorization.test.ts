@@ -30,7 +30,7 @@ jest.mock('../utils/config', () => ({
   ...jest.requireActual('../utils/config'),
   default: {
     getConfig: jest.fn((key) => {
-      if (key === 'enableUnknownActivation') {
+      if (key === 'enableUnknownUserActivation') {
         return false;
       }
       return undefined;

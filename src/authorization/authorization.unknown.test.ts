@@ -26,7 +26,7 @@ import { updateUser } from '../users';
 
 jest.mock('../utils/config', () => {
   const getConfig = (key: string) => {
-    if (key === 'enableUnknownActivation') return true;
+    if (key === 'enableUnknownUserActivation') return true;
     if (key === 'baseURL') return 'https://api.iterable.com';
     if (key === 'logLevel') return 'none';
     if (key === 'identityResolution') {

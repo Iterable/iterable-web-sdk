@@ -59,7 +59,7 @@ const HomeLink = styled(Link)`
     configOptions: {
       isEuIterableService: false,
       dangerouslyAllowJsPopups: true,
-      enableUnknownActivation: true,
+      enableUnknownUserActivation: true,
       identityResolution: {
         replayOnVisitorToKnown: true,
         mergeOnUnknownToKnown: true

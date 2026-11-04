@@ -6,7 +6,7 @@ import { UpdateSubscriptionParams, UpdateUserParams } from './types';
 import { updateSubscriptionsSchema, updateUserSchema } from './users.schema';
 import { UnknownUserEventManager } from '../unknownUserTracking/unknownUserEventManager';
 import { canTrackUnknownUser } from '../utils/commonFunctions';
-import { AUA_WARNING, ENDPOINTS } from '../constants';
+import { UUA_WARNING, ENDPOINTS } from '../constants';
 
 export const updateUserEmail = (newEmail: string) =>
   baseIterableRequest<IterableResponse>({
@@ -31,7 +31,7 @@ export const updateUser = (payloadParam: UpdateUserParams = {}) => {
   if (canTrackUnknownUser()) {
     const unknownUserEventManager = new UnknownUserEventManager();
     unknownUserEventManager.trackUnknownUpdateUser(payload);
-    return Promise.reject(AUA_WARNING);
+    return Promise.reject(UUA_WARNING);
   }
   return baseIterableRequest<IterableResponse>({
     method: 'POST',
