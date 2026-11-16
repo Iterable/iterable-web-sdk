@@ -7,6 +7,10 @@ on:
         description: 'Version number (e.g., 2.3.0 or 2.3.0-beta1)'
         required: true
         type: string
+      ticket:
+        description: 'Jira ticket number (e.g., 1234 for SDK-1234)'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,70 +20,62 @@ jobs:
   prepare-release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.ITERABLE_SDK_RELEASE_APP_ID }}
+          private-key: ${{ secrets.ITERABLE_SDK_RELEASE_APP_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: Validate version format
+        run: |
+          if ! [[ "${{ github.event.inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "::error::Invalid version format. Use semantic versioning (e.g., 2.3.0 or 2.3.0-beta1)"
+            exit 1
+          fi
 
       - name: Update Changelog
         id: update_changelog
         run: |
+          version="${{ github.event.inputs.version }}"
           changelog_file="CHANGELOG.md"
 
-          # Function to extract content between two patterns, including the first pattern
-          extract_between() {
-            awk "/^## \[$1\]/{p=1;print;next} /^## \[/{p=0} p" "$3"
-          }
-
-          # Get the unreleased content
-          unreleased_content=$(extract_between "Unreleased" "[0-9]" "$changelog_file")
+          unreleased_content=$(awk '/^## \[Unreleased\]/{p=1;next} /^## \[/{p=0} p' "$changelog_file")
 
           if [ -z "$unreleased_content" ]; then
-            echo "No unreleased changes found in $changelog_file"
+            echo "::error::No unreleased changes found in $changelog_file. Add release notes to the [Unreleased] section before running this workflow."
             exit 1
           fi
 
-          # Get the current version
-          current_version=$(grep -oP "^## \[\K[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9]+)?(?=\])" "$changelog_file" | head -n1)
-          new_version="${{ github.event.inputs.version }}"
+          notes_file="$RUNNER_TEMP/release-notes.md"
+          printf '%s' "$unreleased_content" > "$notes_file"
 
-          # Validate version format (includes beta versions)
-          if ! [[ $new_version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
-            echo "Invalid version format. Please use semantic versioning (e.g., 2.3.0 or 2.3.0-beta1)"
-            exit 1
-          fi
-
-          echo "new_version=${new_version}" >> $GITHUB_OUTPUT
-
-          # Create temporary file
           temp_file=$(mktemp)
-
-          # Preserve header and write new content
           {
-            # Preserve the header (first 4 lines)
             head -n 4 "$changelog_file"
             echo "## [Unreleased]"
             echo ""
-            echo "## [$new_version]"
-            # Drop the leading "## [Unreleased]" header from the extracted content
+            echo "## [$version]"
             echo "$unreleased_content" | tail -n +2
             echo ""
-            # Get the rest of the file starting from the first version entry
             sed -n '/^## \[[0-9]/,$p' "$changelog_file"
           } > "$temp_file"
-
-          # Replace original file
           mv "$temp_file" "$changelog_file"
 
-      - name: Update Version
+      - name: Bump package.json version
         run: npm --no-git-tag-version --allow-same-version version "${{ github.event.inputs.version }}"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@4e1beaa7521e8b457b572c090b25bd3db56bf1c5 # v5
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Prepare for Release ${{ steps.update_changelog.outputs.new_version }}"
+          token: ${{ steps.app-token.outputs.token }}
+          title: "SDK-${{ github.event.inputs.ticket }}: Prepare for Release ${{ github.event.inputs.version }}"
           body: |
-            # Prepare for Release ${{ steps.update_changelog.outputs.new_version }}
+            # Prepare for Release ${{ github.event.inputs.version }}
 
             ## SDK Release Checklist
             - [ ] CHANGELOG.md updated (Unreleased section moved under the new version)
@@ -87,8 +83,23 @@ jobs:
             - [ ] README.md reviewed (if needed)
             - [ ] All tests passing
             - [ ] Documentation updated (if needed)
-
-          branch: "prepare-for-release-${{ steps.update_changelog.outputs.new_version }}"
-          commit-message: "Prepare for release ${{ steps.update_changelog.outputs.new_version }}"
+          branch: "release/SDK-${{ github.event.inputs.ticket }}-${{ github.event.inputs.version }}"
+          commit-message: "[SDK-${{ github.event.inputs.ticket }}]: Prepare for release ${{ github.event.inputs.version }}"
           labels: release
           delete-branch: true
+
+      - name: Create Draft GitHub Release
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          version="${{ github.event.inputs.version }}"
+          notes="${{ steps.update_changelog.outputs.notes }}"
+
+          if gh release view "$version" &>/dev/null; then
+            echo "Draft release $version already exists, skipping."
+          else
+            gh release create "$version" \
+              --draft \
+              --title "$version" \
+              --notes-file "$RUNNER_TEMP/release-notes.md"
+          fi
