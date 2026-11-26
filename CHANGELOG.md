@@ -5,10 +5,11 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 ## [Unreleased]
 ### Updates
 - Added the `autoUserUpdate` config option to control the `users/update` call made by `setUserID` and JWT `setEmail`. `'oncePerUser'` sends it once per user per browser until `logout`, and `false` turns it off. The default, `true`, keeps the current behavior (SDK-128).
+- Reject SDK requests cut off by a page navigation in Firefox with an `ECONNABORTED` error, as other browsers already did, instead of resolving them with status 0. This comes with the `axios` bump below (SDK-833).
 
 ### Fixes
 - Fixed the `updateUser` endpoint name and the `setEmail`/`setUserID` signatures in the README.
-- Bumped `axios` to v1.21.1 to resolve the 12 denial of service, prototype pollution, proxy bypass, and header injection advisories reported against v1.18.0, and the `follow-redirects` credential leak (GHSA-mrwp-f3q8-3g9p) in its Node adapter (SDK-833).
+- Bumped `axios` to v1.21.1 to resolve the 12 denial of service, prototype pollution, proxy bypass, redirect SSRF, and header injection advisories reported against v1.18.0. This also moves the `follow-redirects` copy bundled in `index.node.js` to v1.16.3, resolving GHSA-q3jh-wrc6-jgq8, GHSA-8r9p-f939-6h3c, and GHSA-mrwp-f3q8-3g9p (SDK-833).
 
 ## [2.3.3]
 ### Fixes

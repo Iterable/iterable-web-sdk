@@ -226,6 +226,61 @@ describe('API Key Interceptors', () => {
       }
     });
 
+    it('should replace the auth interceptor instead of stacking one when a 401 refreshes the JWT', async () => {
+      const mockBaseAdapter = new MockAdapter(axios);
+      mockBaseAdapter.onPost('/users/update').reply(400, {
+        code: 'Something'
+      });
+      mockRequest.onPost('/users/update').reply(401, {
+        code: 'BadAPIKey'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail, clearRefresh } = initialize('123', mockGenerateJWT);
+      await setEmail('hello@gmail.com').catch(() => undefined);
+
+      const liveRequestInterceptors = () =>
+        mockRequest.axiosInstance.interceptors.request.handlers.filter(
+          (e: any) => e
+        ).length;
+      const before = liveRequestInterceptors();
+      const generateCallsBefore = mockGenerateJWT.mock.calls.length;
+
+      await updateUser().catch(() => undefined);
+
+      expect(mockGenerateJWT.mock.calls.length).toBeGreaterThan(
+        generateCallsBefore
+      );
+      expect(liveRequestInterceptors()).toBe(before);
+      clearRefresh();
+    });
+
+    it('should replace the auth interceptor instead of stacking one when updateEmail refreshes the JWT', async () => {
+      mockRequest.onPost('/users/updateEmail').reply(200, {
+        code: 'hello'
+      });
+
+      const mockGenerateJWT = jest
+        .fn()
+        .mockReturnValue(Promise.resolve(MOCK_JWT_KEY));
+      const { setEmail, clearRefresh } = initialize('123', mockGenerateJWT);
+      await setEmail('hello@gmail.com');
+
+      const liveRequestInterceptors = () =>
+        mockRequest.axiosInstance.interceptors.request.handlers.filter(
+          (e: any) => e
+        ).length;
+      const before = liveRequestInterceptors();
+
+      await updateUserEmail('helloworld@gmail.com');
+
+      expect(mockGenerateJWT).toHaveBeenCalledTimes(2);
+      expect(liveRequestInterceptors()).toBe(before);
+      clearRefresh();
+    });
+
     it('should try to generate JWT again if updateEmail is called', async () => {
       mockRequest.onPost('/users/updateEmail').reply(200, {
         code: 'hello'
