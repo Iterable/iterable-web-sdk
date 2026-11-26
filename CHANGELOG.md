@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixes
 - Fixed the `updateUser` endpoint name and the `setEmail`/`setUserID` signatures in the README.
+- Bumped `axios` to v1.21.1 to resolve the 12 denial of service, prototype pollution, proxy bypass, and header injection advisories reported against v1.18.0, and the `follow-redirects` credential leak (GHSA-mrwp-f3q8-3g9p) in its Node adapter (SDK-833).
 
 ## [2.3.3]
 ### Fixes

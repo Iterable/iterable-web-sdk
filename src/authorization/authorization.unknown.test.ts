@@ -130,19 +130,8 @@ describe('Authorization - Unknown User Activation', () => {
     mockRequest.onPost('/users/update').reply(200, { data: 'ok' });
     mockRequest.onGet(GET_CRITERIA_PATH).reply(200, {});
     // match interceptor cleanup style from authorization.test.ts
-    const requestManager = baseAxiosRequest.interceptors.request as unknown as {
-      handlers?: unknown[];
-    };
-    const responseManager = baseAxiosRequest.interceptors
-      .response as unknown as {
-      handlers?: unknown[];
-    };
-    (requestManager.handlers || []).forEach((_: unknown, index: number) => {
-      baseAxiosRequest.interceptors.request.eject(index);
-    });
-    (responseManager.handlers || []).forEach((_: unknown, index: number) => {
-      baseAxiosRequest.interceptors.response.eject(index);
-    });
+    baseAxiosRequest.interceptors.request.clear();
+    baseAxiosRequest.interceptors.response.clear();
 
     // Note: no need to clear UnknownUserEventManager instance methods here
 

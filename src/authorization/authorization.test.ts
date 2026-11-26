@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { initialize, setTypeOfAuthForTestingOnly } from './authorization';
 import { baseAxiosRequest } from '../request';
@@ -77,20 +77,8 @@ describe('API Key Interceptors', () => {
       data: 'something'
     });
     /* clear any interceptors already configured */
-    [
-      ...Array(
-        mockRequest.axiosInstance.interceptors.request.handlers.length
-      ).keys()
-    ].forEach((e, index) => {
-      baseAxiosRequest.interceptors.request.eject(index);
-    });
-    [
-      ...Array(
-        mockRequest.axiosInstance.interceptors.response.handlers.length
-      ).keys()
-    ].forEach((e, index) => {
-      baseAxiosRequest.interceptors.response.eject(index);
-    });
+    baseAxiosRequest.interceptors.request.clear();
+    baseAxiosRequest.interceptors.response.clear();
   });
 
   describe('non-JWT auth', () => {
@@ -387,13 +375,7 @@ describe('User Identification', () => {
     setTypeOfAuthForTestingOnly('userID');
 
     /* clear any interceptors already configured */
-    [
-      ...Array(
-        mockRequest.axiosInstance.interceptors.request.handlers.length
-      ).keys()
-    ].forEach((e, index) => {
-      baseAxiosRequest.interceptors.request.eject(index);
-    });
+    baseAxiosRequest.interceptors.request.clear();
   });
 
   describe('non-JWT auth', () => {
@@ -604,7 +586,7 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const response = await baseAxiosRequest({
+        const response: AxiosResponse = await baseAxiosRequest({
           method: 'POST',
           url: '/users/hello',
           data: {
@@ -787,7 +769,7 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const response = await baseAxiosRequest({
+        const response: AxiosResponse = await baseAxiosRequest({
           method: 'POST',
           url: '/users/hello',
           data: {
@@ -1009,7 +991,7 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const response = await baseAxiosRequest({
+        const response: AxiosResponse = await baseAxiosRequest({
           method: 'POST',
           url: '/users/hello',
           data: {
@@ -1193,7 +1175,7 @@ describe('User Identification', () => {
           data: 'something'
         });
 
-        const response = await baseAxiosRequest({
+        const response: AxiosResponse = await baseAxiosRequest({
           method: 'POST',
           url: '/users/hello',
           data: {
